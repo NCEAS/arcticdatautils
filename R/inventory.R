@@ -42,7 +42,7 @@ inv_load_filenames <- function(filename, inventory) {
             is.data.frame(inventory))
 
   # Read the filenames from disk
-  filenames <- read.table(filename, col.names = c("filename"), stringsAsFactors = FALSE)
+  filenames <- read.delim(filename, col.names = c("filename"), stringsAsFactors = FALSE)
 
   stopifnot(is.data.frame(filenames))
 
@@ -95,7 +95,7 @@ inv_load_sizes <- function(filename, inventory) {
             "filename" %in% names(inventory))
 
   # Read the sizes from disk
-  sizes <- read.table(filename, col.names = c("size_bytes", "filename"), stringsAsFactors = FALSE)
+  sizes <- read.delim(filename, col.names = c("size_bytes", "filename"), stringsAsFactors = FALSE)
 
   stopifnot(is.data.frame(sizes))
 
@@ -124,7 +124,11 @@ inv_load_checksums <- function(filename, inventory) {
             "filename" %in% names(inventory))
 
   # Read the sizes from disk
-  checksums <- read.table(filename, col.names = c("checksum_sha256", "filename"), stringsAsFactors = FALSE)
+  # NOTE: This is from munged output
+  #   y <- readLines("~/src/arctic-data/planning/file-checksums/file-checksums-sha256.txt")
+  #   y2 <- gsub("  ", "\t", y)
+  #   writeLines(y2, "~/src/arctic-data/planning/file-checksums/file-checksums-sha256.tsv")
+  checksums <- read.delim(filename, header = FALSE, col.names = c("checksum_sha256", "filename"), sep = "\t", stringsAsFactors = FALSE)
 
   stopifnot(is.data.frame(checksums))
 
