@@ -5,7 +5,9 @@ Authors@R: person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("au
 Description: Support package for migrating ACADIS data to KNB.
 Depends:
   R (>= 3.2.3),
-  xml2
+  xml2,
+  stringr,
+  stringi
 License: What license is it under?
 LazyData: true
 Suggests: testthat

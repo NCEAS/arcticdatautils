@@ -6,7 +6,7 @@
 #'
 
 library(dplyr)
-
+library(stringr)
 
 #' Create an empty inventory data.frame. This doesn't need to be a function
 #' but I'm making it one in case the initialization routine becomes more
@@ -181,6 +181,23 @@ inv_load_identifiers <- function(filename, inventory) {
   # First drop the existing identifiers
   inventory <- inventory[,!(names(inventory) %in% "identifier"), drop=FALSE]
   inventory <- left_join(inventory, identifiers, by="filename")
+
+  inventory
+}
+
+#' Adds a column with hierarchy depths
+#'
+#' @param inventory An inventory (data.frame)
+#'
+#' @return An inventory (data.frame)
+inv_add_depth_column <- function(inventory) {
+  stopifnot(class(inventory) == "data.frame", "filename" %in% names(inventory))
+
+  splits <- str_split(inventory$filename, "/")
+  stopifnot(length(splits) == nrow(inventory))
+
+  inventory$depth <- unlist(lapply(splits, length))
+  stopifnot("depth" %in% names(inventory))
 
   inventory
 }
