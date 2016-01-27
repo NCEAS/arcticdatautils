@@ -20,6 +20,10 @@ create_resource_map <- function(variables) {
 
 #' Generate a System Metadata XML string suitable for use in an MN.Create() call
 #'
+#' Relevant documentation:
+#' https://jenkins-ucsb-1.dataone.org/job/API%20Documentation%20-%20trunk/ws/api-documentation/build/html//design/SystemMetadata.html#id3
+#'
+#'
 #' @param identifier
 #' @param size
 #' @param checksum
