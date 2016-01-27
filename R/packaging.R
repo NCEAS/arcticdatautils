@@ -61,8 +61,6 @@ generate_system_metadata <- function(identifier,
                  submitter = submitter,
                  rightsHolder = rightsHolder,
                  replication = replication,
-                 dateUploaded = "XXXXXXX  XXXXXX XXXXXXX",
-                 dateSysMetadataModified = "XXXXXXX  XXXXXX XXXXXXX")
 
   text <- whisker.render(template, values)
   cat(text)

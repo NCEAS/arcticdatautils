@@ -17,6 +17,4 @@
     </allow>
   </accessPolicy>
   <replicationPolicy replicationAllowed="{{replication}}"/>
-  <dateUploaded>{{dateUploaded}}</dateUploaded>
-  <dateSysMetadataModified>{{dateSysMetadataModified}}</dateSysMetadataModified>
 </ns1:systemMetadata>
