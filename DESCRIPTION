@@ -7,7 +7,8 @@ Depends:
   R (>= 3.2.3),
   xml2,
   stringr,
-  stringi
+  stringi,
+  whisker
 License: What license is it under?
 LazyData: true
 Suggests: testthat
