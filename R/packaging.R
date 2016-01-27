@@ -64,7 +64,7 @@ generate_system_metadata <- function(identifier,
                  checksum = checksum,
                  submitter = submitter,
                  rightsHolder = rightsHolder,
-                 replication = replication,
+                 replication = replication)
 
   text <- whisker.render(template, values)
   cat(text)
