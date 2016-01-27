@@ -99,10 +99,18 @@ inv_load_sizes <- function(filename, inventory) {
 
   stopifnot(is.data.frame(sizes))
 
+  if (nrow(inventory) != nrow(sizes)) {
+    warning("Data frames not of the same number of rows.")
+  }
+
   # Join the sizes onto existing filenames in the inventory
   # First drop the existing checksums
   inventory <- inventory[,!(names(inventory) %in% "size_bytes"), drop=FALSE]
   inventory <- left_join(inventory, sizes, by="filename")
+
+  # Check the result
+  if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
+  if (any(is.na(inventory$size_bytes))) { warning("Some values in the 'size_bytes' column were NA.")}
 
   inventory
 }
@@ -132,10 +140,18 @@ inv_load_checksums <- function(filename, inventory) {
 
   stopifnot(is.data.frame(checksums))
 
+  if (nrow(inventory) != nrow(checksums)) {
+    warning("Data frames not of the same number of rows.")
+  }
+
   # Join the checksums onto existing filenames in the inventory
   # First drop the existing checksums
   inventory <- inventory[,!(names(inventory) %in% "checksum_sha256"), drop=FALSE]
   inventory <- left_join(inventory, checksums, by="filename")
+
+  # Check the result
+  if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
+  if (any(is.na(inventory$checksum_sha256))) { warning("Some values in the 'checksum_sha256' column were NA.")}
 
   inventory
 }
