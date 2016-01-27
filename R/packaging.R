@@ -49,7 +49,7 @@ generate_system_metadata <- function(identifier,
                                      submitter,
                                      rightsHolder,
                                      checksumAlgorithm="SHA256",
-                                     formatID="http://www.isotc211.org/2005/gmd",
+                                     formatID="application/octet-stream",
                                      replication="true") {
   filepath <- system.file("data/sysmeta_template.xml", package="arcticdata")
   stopifnot(file.exists(filepath))
