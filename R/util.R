@@ -45,3 +45,16 @@ extract_local_identifier <- function(type, file) {
 
   identifier
 }
+
+
+#' Guess file format from a filename
+#'
+#' @param filename (character)
+#'
+#' @return format (character)
+#' @export
+#'
+#' @examples
+guess_format_from_filename <- function(filename) {
+  "unknown"
+}
