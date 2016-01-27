@@ -68,6 +68,8 @@ generate_system_metadata <- function(identifier,
 
   text <- whisker.render(template, values)
   cat(text)
+
+  text
 }
 
 
