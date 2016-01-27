@@ -104,7 +104,7 @@ inv_load_sizes <- function(filename, inventory) {
   }
 
   # Join the sizes onto existing filenames in the inventory
-  # First drop the existing checksums
+  # First drop the existing sizes
   inventory <- inventory[,!(names(inventory) %in% "size_bytes"), drop=FALSE]
   inventory <- left_join(inventory, sizes, by="filename")
 
