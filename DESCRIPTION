@@ -8,7 +8,8 @@ Depends:
   xml2,
   stringr,
   stringi,
-  whisker
+  whisker,
+  redland
 License: What license is it under?
 LazyData: true
 Suggests: testthat
