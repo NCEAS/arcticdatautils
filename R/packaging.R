@@ -231,3 +231,62 @@ generate_system_metadata <- function(identifier,
 
   text
 }
+
+
+#' Reserve a PID
+#'
+#' @return The PID (character)
+#' @export
+#'
+#' @examples
+#'
+#' reserve_new_ipd() # Reserve a UUID
+#' reserve_new_pid("DOI") # Reserve a DOI
+reserve_new_pid <- function(scheme="UUID") {
+
+}
+
+#add_data_package(X)
+# Look up files
+# Find the ISO record
+#   Create a sysmeta for it
+# Find the data files
+#   Create a sysmeta for each
+
+#' Add a data package from the inventory
+#'
+#' @param package (character)
+#' @param inventory (data.frame)
+#'
+#' @return TODO
+#' @export
+#'
+#' @examples
+add_data_package <- function(package, inventory) {
+  stopifnot(is.character(package), nchar(package) > 0)
+  stopifnot(is.data.frame(inventory))
+
+  # Check we have the right columns in the inventory
+  stopifnot(c("filenames", "size_bytes", "checksum_sha256") %in% names(inventory))
+
+  # Find the one sysmeta
+  files_in_package <- inventory[inventory$package == package,]
+  stopifnot(nrow(files_in_package) > 0)
+
+  metadata_file <- files_in_package[files_in_package$is_dataset,]
+  stopifnot(nrow(metadata_file) == 1)
+
+  scimeta_filename <- metadata_file[1,"filename"]
+  scimeta_size_bytes <- metadata_file[1,"size_bytes"]
+  scimeta_checksum_sha256 <- metadata_file[1,"checksum_sha256"]
+
+  scimeta_sysmeta <- generate_system_metadata(identifier = "IDENTIFIER",
+                                              size = scimeta_size_bytes,
+                                              checksum = scimeta_checksum_sha256,
+                                              submitter = ,
+                                              rightsHolder = ,
+                                              formatID = "X")
+}
+
+
+
