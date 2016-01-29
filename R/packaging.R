@@ -208,7 +208,7 @@ generate_system_metadata <- function(identifier,
                                      checksum,
                                      submitter,
                                      rightsHolder,
-                                     checksumAlgorithm="SHA256",
+                                     checksumAlgorithm="SHA-256",
                                      formatID="application/octet-stream",
                                      replication="true") {
   filepath <- system.file("data/sysmeta_template.xml", package="arcticdata")
