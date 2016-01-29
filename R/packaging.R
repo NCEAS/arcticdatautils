@@ -11,15 +11,11 @@ library(redland)
 #' Relevant documentation:
 #' https://jenkins-ucsb-1.dataone.org/job/API%20Documentation%20-%20trunk/ws/api-documentation/build/html//design/DataPackage.html?highlight=resourcemap#generating-resource-maps
 #'
-#' @param scimeta_objects
-#' @param data_objects
-#' @param child_resource_map
-#'
 #' @return The text of the file (character)
 #' @export
 #'
 #' @examples
-create_resource_map <- function(scimeta_objects, data_objects, child_resource_map) {
+create_resource_map <- function() {
   # Create objects related to an RDF Model
   world <- new("World")
   storage <- new("Storage", world, "hashes", name="", options="hash-type='memory'")
