@@ -7,6 +7,7 @@
 
 library(dplyr)
 library(stringr)
+library(stringi)
 
 #' Create an empty inventory data.frame. This doesn't need to be a function
 #' but I'm making it one in case the initialization routine becomes more
@@ -43,8 +44,14 @@ inv_load_filenames <- function(filename, inventory) {
 
   # Read the filenames from disk
   filenames <- read.delim(filename, col.names = c("filename"), stringsAsFactors = FALSE)
-
   stopifnot(is.data.frame(filenames))
+
+  # Filter files no under with 'acadis-field-projects' or 'acadis-gateway'
+  # subfolders
+  size_before <- nrow(filenames)
+  filenames <- filenames[stri_startswith_fixed(inv$filename, "./acadis-"),]
+  size_diff <- size_before - nrow(filenames)
+  cat("Removed ", size_diff, "filenames that weren't inside acadis-gateway or acadis-field-projects subfolders.\n")
 
   # If inventory is empty, just make the inventory the same as filenames
   if (nrow(inventory) == 0) {
