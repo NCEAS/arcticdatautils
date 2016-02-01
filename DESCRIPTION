@@ -8,8 +8,9 @@ Depends:
   xml2,
   stringr,
   stringi,
-  whisker,
-  redland
+  dataone,
+  datapackage,
+  uuid
 License: What license is it under?
 LazyData: true
 Suggests: testthat
