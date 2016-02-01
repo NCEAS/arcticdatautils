@@ -1,3 +1,3 @@
-aa2233	A
-bb2233	B
-asdf1	C
+aa2233	./acadis-field-projects/A
+bb2233	./acadis-field-projects/B
+asdf1	./acadis-field-projects/C
