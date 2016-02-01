@@ -198,19 +198,174 @@ inv_load_identifiers <- function(filename, inventory) {
   inventory
 }
 
-#' Adds a column with hierarchy depths
+#' Adds a set of extra columsn to the inventory that are useful for working
+#' with them.
 #'
 #' @param inventory An inventory (data.frame)
 #'
 #' @return An inventory (data.frame)
-inv_add_depth_column <- function(inventory) {
+inv_add_extra_columns <- function(inventory) {
   stopifnot(class(inventory) == "data.frame", "filename" %in% names(inventory))
 
-  splits <- str_split(inventory$filename, "/")
-  stopifnot(length(splits) == nrow(inventory))
+  # Mark metadata files
+  inventory$is_metadata <- stri_endswith_fixed(inventory$filename, "ISO.xml") | stri_endswith_fixed(inventory$filename, "iso19139.xml")
 
+  # Mark which root subfolder each file is under
+  inventory$subfolder[stri_startswith_fixed(inventory$filename, "./acadis-field-projects")] <- "FP"
+  inventory$subfolder[stri_startswith_fixed(inventory$filename, "./acadis-gateway")] <- "G"
+
+  # Add a column with full paths (w/o filename)
+  inventory$folder <- unlist(lapply(str_split(inventory$filename, "/"), function(x) { paste(x[1:(length(x) - 1)], collapse="/") } ))
+
+  # Add a column with just filenames
+  inventory$file <- unlist(lapply(str_split(inventory$filename, "/"), function(x) { x[length(x)] } ))
+
+  # Add base dir and depth columns
+  inventory <- inv_add_base_dir_column(inventory)
+  inventory <- inv_add_depth_columns(inventory)
+
+  inventory
+}
+
+#' Add a base directory column to the inventory.
+#'
+#' In this usage, base directory refers to either the folder of a project or
+#' dataset, whatever of the two is the highest hierarchical grouping of
+#' datasets.
+#'
+#' For a dataset that is part of a project, its base directory will be the same
+#' as the base directory for that project. For a dataset that is not part of
+#' a project, its base directory will be its own base directory.
+#'
+#' @param inventory An inventory (data.frame)
+#'
+#' @return An inventory (data.frame)
+#' @export
+#'
+#' @examples
+inv_add_base_dir_column <- function(inventory) {
+  stopifnot(is.data.frame(inventory), nrow(inventory) > 0)
+
+  # Add base_dir column with the base_dir which is either a project root or a dataset root
+  fp_regex <- "(\\.\\/acadis-field-projects\\/[\\w-]+\\/[\\d\\w\\\\.]+)"
+  fp_beringsea_regex <- "(\\.\\/acadis-field-projects\\/\\w+\\/\\w+\\/[\\w\\.-]+)"
+  gateawy_regex <- "(\\.\\/acadis-gateway\\/[a-zA-Z_-]+)"
+
+  inventory$base_dir <- ""
+  metadata_indices <- which(sapply(inventory$is_metadata, isTRUE) == TRUE)
+
+  stopifnot(length(metadata_indices) > 0)
+
+  cat(paste0("Marking base directories for metadata files.\n"))
+
+  for (i in metadata_indices) {
+    filename <- inventory[i,"filename"]
+
+    match <- NA
+
+    # Field Projects + Bering Sea
+    if (stri_detect_fixed(filename, "BeringSea")) {
+      match <- str_extract(filename, fp_beringsea_regex)
+
+      if (is.na(match)) {
+        print(filename)
+        stop("Match was NA. This is bad.", "bs", filename)
+      }
+
+      # Field Projets w/o Bering Sea
+    } else if (stri_startswith_fixed(filename, "./acadis-field-projects")) {
+      match <- str_extract(filename, fp_regex)
+
+      if (is.na(match)) {
+        print(filename)
+        stop("Match was NA. This is bad.", "fp", filename)
+      }
+    } else if (stri_startswith_fixed(filename, "./acadis-gateway")) {
+      match <- str_extract(filename, gateawy_regex)
+
+      if (is.na(match)) {
+        print(filename)
+        stop("Match was NA. This is bad.", "g", filename)
+      }
+    }
+
+    stopifnot(!is.na(match), nchar(match) > 0)
+    inventory[i,"base_dir"] <- match
+  }
+
+  unique_base_dirs <- unique(inventory$base_dir)
+  stopifnot(length(unique_base_dirs) > 0)
+
+  cat(paste0("Marking base_dirs for non-metadata files.\n"))
+
+  for (i in seq_len(length(unique_base_dirs))) {
+    base_dir <- unique_base_dirs[i]
+
+    if (nchar(base_dir) <= 0) {
+      next
+    }
+
+    cat(paste0(i, ":", base_dir, "\n"))
+    inventory[stri_startswith_fixed(inventory$filename, base_dir),"base_dir"] <- base_dir
+  }
+
+  inventory
+}
+
+#' Add a set of columns for marking datasets with various attributes such as
+#' whether they have been added, marked, or can be inserted as-is without
+#' modification.
+#'
+#' @param inventory
+#'
+#' @return An inventory (data.frame)
+#' @export
+#'
+#' @examples
+add_marking_columns <- function(inventory) {
+  stopifnot(is.data.frame(inventory))
+
+  if ("added" %in% names(inventory)) {
+    stop("Column 'added' already exists. Cannot overwrite.")
+  }
+
+  inventory$added <- FALSE # Set false flag
+
+  if ("marked" %in% names(inventory)) {
+    stop("Column 'marked' already exists. Cannot overwrite.")
+  }
+
+  inventory$marked <- FALSE
+
+  if ("as_is" %in% names(inventory)) {
+    stop("Column 'as_is' already exists. Cannot overwrite.")
+  }
+
+  inventory$as_is <- FALSE
+
+  inventory
+}
+
+#' Add columns for the filesystem depth and the range (max-min) of depths
+#' within each base directory
+#'
+#' @param inventory
+#'
+#' @return
+#' @export
+#'
+#' @examples
+inv_add_depth_columns <- function(inventory) {
+  stopifnot(is.data.frame(inventory), nrow(inventory) > 0)
+  stopifnot(c("filename", "base_dir") %in% names(inventory))
+
+  # Add a column for the depth
+  splits <- str_split(inventory$filename, "/")
   inventory$depth <- unlist(lapply(splits, length))
-  stopifnot("depth" %in% names(inventory))
+
+  # Add a column for the depth difference by base_dir
+  inventory <- inventory %>% group_by(base_dir) %>% mutate(depth_diff = max(depth) - min(depth))
+  inventory <- as.data.frame(inventory) # Uncast from table_df
 
   inventory
 }
