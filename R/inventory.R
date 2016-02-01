@@ -152,7 +152,7 @@ inv_load_checksums <- function(filename, inventory) {
   stopifnot(is.data.frame(checksums))
 
   if (nrow(inventory) != nrow(checksums)) {
-    warning("Data frames not of the same number of rows.")
+    warning(paste("Inventory and incoming 'checksums' data.frame not of the same number of rows.", nrow(inventory), "vs", nrow(checksums)))
   }
 
   # Join the checksums onto existing filenames in the inventory
