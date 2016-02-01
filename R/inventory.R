@@ -43,7 +43,10 @@ inv_load_filenames <- function(filename, inventory) {
             is.data.frame(inventory))
 
   # Read the filenames from disk
-  filenames <- read.delim(filename, col.names = c("filename"), stringsAsFactors = FALSE)
+  filenames <- read.delim(filename,
+                          col.names = c("filename"),
+                          header = FALSE,
+                          stringsAsFactors = FALSE)
   stopifnot(is.data.frame(filenames))
 
   # Filter files no under with 'acadis-field-projects' or 'acadis-gateway'
@@ -102,12 +105,15 @@ inv_load_sizes <- function(filename, inventory) {
             "filename" %in% names(inventory))
 
   # Read the sizes from disk
-  sizes <- read.delim(filename, col.names = c("size_bytes", "filename"), stringsAsFactors = FALSE)
+  sizes <- read.delim(filename,
+                      col.names = c("size_bytes", "filename"),
+                      stringsAsFactors = FALSE,
+                      header = FALSE)
 
   stopifnot(is.data.frame(sizes))
 
   if (nrow(inventory) != nrow(sizes)) {
-    warning("Data frames not of the same number of rows.")
+    warning(paste("Inventory and incoming 'sizes' data.frame not of the same number of rows.", nrow(inventory), "vs", nrow(sizes)))
   }
 
   # Join the sizes onto existing filenames in the inventory
@@ -138,12 +144,10 @@ inv_load_checksums <- function(filename, inventory) {
             is.data.frame(inventory),
             "filename" %in% names(inventory))
 
-  # Read the sizes from disk
-  # NOTE: This is from munged output
-  #   y <- readLines("~/src/arctic-data/planning/file-checksums/file-checksums-sha256.txt")
-  #   y2 <- gsub("  ", "\t", y)
-  #   writeLines(y2, "~/src/arctic-data/planning/file-checksums/file-checksums-sha256.tsv")
-  checksums <- read.delim(filename, header = FALSE, col.names = c("checksum_sha256", "filename"), sep = "\t", stringsAsFactors = FALSE)
+  checksums <- read.delim(filename, header = FALSE,
+                          col.names = c("checksum_sha256", "filename"),
+                          sep = "\t",
+                          stringsAsFactors = FALSE)
 
   stopifnot(is.data.frame(checksums))
 
@@ -180,7 +184,9 @@ inv_load_identifiers <- function(filename, inventory) {
             "filename" %in% names(inventory))
 
   # Read the identifiers from disk
-  identifiers <- read.table(filename, col.names = c("identifier", "filename"), stringsAsFactors = FALSE)
+  identifiers <- read.table(filename,
+                            col.names = c("identifier", "filename"),
+                            stringsAsFactors = FALSE)
 
   stopifnot(is.data.frame(identifiers))
 
