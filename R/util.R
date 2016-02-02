@@ -5,7 +5,7 @@
 
 library(stringr)
 library(xml2)
-
+library(tools)
 
 #' Extracts the local identifier for an ACADIS ISO metadata XML file.
 #'
@@ -47,14 +47,39 @@ extract_local_identifier <- function(type, file) {
 }
 
 
-#' Guess file format from a filename
+#' Guess format from filename for a vector of filenames.
 #'
-#' @param filename (character)
+#' @param filenames (character)
 #'
-#' @return format (character)
+#' @return DataOne format identifiers (character)
 #' @export
 #'
 #' @examples
-guess_format_from_filename <- function(filename) {
-  "unknown"
+#'
+# TODO: NETCDF and other formats that aren't obvious from file ext
+# TODO: Put this with the package as data
+dataone_format_mappings <- list("txt" = "text/plain",
+                                "csv" = "text/csv",
+                                "bmp" = "image/bmp",
+                                "gif" = "image/gif",
+                                "jpeg" = "image/jpeg",
+                                "png" = "image/png",
+                                "xml" = "http://www.isotc211.org/2005/gmd",
+                                "bz2" = "application/x-bzip2",
+                                "zip" = "application/zip",
+                                "tar" = "application/x-tar")
+
+guess_format_id <- function(filenames) {
+  extensions <- tolower(file_ext(filenames))
+  filetypes <- vector(mode = "character", length = length(extensions))
+
+  for (i in seq_len(length(extensions))) {
+    if (extensions[i] %in% names(dataone_format_mappings)) {
+      filetypes[i] <- dataone_format_mappings[extensions[i]][[1]]
+    } else {
+      filetypes[i] <- "application/octet-stream"
+    }
+  }
+
+  filetypes
 }
