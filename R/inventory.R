@@ -168,33 +168,41 @@ inv_load_checksums <- function(filename, inventory) {
   inventory
 }
 
-#' Load identifiers into the inventory file from a text file. This function
+#' Load identifiers into the inventory file(s) from a text file. This function
 #' removes the column 'identifier' from inventory before doing a
 #' left join.
 #'
-#' @param filename Filepath to a file containing identifiers.
+#' @param filename(s) Filepath(s) to a file(s) containing identifiers.
 #' @param inventory A \code{data.frame}.
 #'
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_identifiers <- function(filename, inventory) {
-  stopifnot(file.exists(filename))
-  stopifnot("inventory" %in% ls(),
-            is.data.frame(inventory),
+inv_load_identifiers <- function(filenames, inventory) {
+  stopifnot(file.exists(filenames))
+  stopifnot(is.data.frame(inventory),
             "filename" %in% names(inventory))
 
-  # Read the identifiers from disk
-  identifiers <- read.table(filename,
-                            col.names = c("identifier", "filename"),
-                            stringsAsFactors = FALSE)
+  identifiers <- data.frame()
+
+  for (filename in filenames) {
+    # Read the identifiers from disk
+    filename_identifiers <- read.csv(filename,
+                                     col.names = c("filename", "identifier"),
+                                     header = TRUE,
+                                     stringsAsFactors = FALSE)
+
+    # rbind them
+    identifiers <- rbind(identifiers,
+                         filename_identifiers)
+  }
 
   stopifnot(is.data.frame(identifiers))
 
   # Join the identifiers onto existing filenames in the inventory
   # First drop the existing identifiers
-  inventory <- inventory[,!(names(inventory) %in% "identifier"), drop=FALSE]
-  inventory <- left_join(inventory, identifiers, by="filename")
+  inventory <- inventory[,!(names(inventory) %in% "identifier"), drop = FALSE]
+  inventory <- left_join(inventory, identifiers, by = "filename")
 
   inventory
 }
