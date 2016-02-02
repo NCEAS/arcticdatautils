@@ -230,7 +230,7 @@ inv_add_extra_columns <- function(inventory) {
   inventory$file <- unlist(lapply(str_split(inventory$filename, "/"), function(x) { x[length(x)] } ))
 
   # Add base dir and depth columns
-  inventory <- inv_add_base_dir_column(inventory)
+  # inventory <- inv_add_base_dir_column(inventory)
   inventory <- inv_add_depth_columns(inventory)
 
   inventory
@@ -366,14 +366,12 @@ add_marking_columns <- function(inventory) {
 #' @examples
 inv_add_depth_columns <- function(inventory) {
   stopifnot(is.data.frame(inventory), nrow(inventory) > 0)
-  stopifnot(c("filename", "base_dir") %in% names(inventory))
+  stopifnot(c("filename") %in% names(inventory))
 
   # Add a column for the depth
   splits <- str_split(inventory$filename, "/")
   inventory$depth <- unlist(lapply(splits, length))
 
-  # Add a column for the depth difference by base_dir
-  inventory <- inventory %>% group_by(base_dir) %>% mutate(depth_diff = max(depth) - min(depth))
   inventory <- as.data.frame(inventory) # Uncast from table_df
 
   inventory
