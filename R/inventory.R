@@ -144,7 +144,8 @@ inv_load_checksums <- function(filename, inventory) {
             is.data.frame(inventory),
             "filename" %in% names(inventory))
 
-  checksums <- read.delim(filename, header = FALSE,
+  checksums <- read.delim(filename,
+                          header = FALSE,
                           col.names = c("checksum_sha256", "filename"),
                           sep = "\t",
                           stringsAsFactors = FALSE)
