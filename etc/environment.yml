@@ -1,0 +1,12 @@
+development:
+  base_directory: ~/src/arctic-data/packages/
+  identifier_scheme: UUID
+
+test:
+  base_directory: ~/src/arctic-data/packages/
+  identifier_scheme: UUID
+
+production:
+  base_directory: ~/mecum/arctic-data/packages/
+  identifier_scheme: DOI
+

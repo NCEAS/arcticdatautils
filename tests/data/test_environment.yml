@@ -1,0 +1,11 @@
+development:
+  base_directory: /some/directory/
+  identifier_scheme: UUID
+
+test:
+  base_directory: /some/directory/
+  identifier_scheme: UUID
+
+production:
+  base_directory: /some/directory/
+  identifier_scheme: UUID

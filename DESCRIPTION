@@ -10,7 +10,8 @@ Depends:
   stringi,
   dataone,
   datapackage,
-  uuid
+  uuid,
+  yaml
 License: What license is it under?
 LazyData: true
 Suggests: testthat
