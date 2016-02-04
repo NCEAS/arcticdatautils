@@ -111,6 +111,8 @@ insert_package <- function(inventory, package, child_packages=c()) {
          resource_map_pid,
          filepath = resource_map_filepath,
          sysmeta = resource_map_sysmeta)
+
+  resource_map_pid
 }
 
 #' Create a SystemMetadata object. This is a convenience wrapper around just
