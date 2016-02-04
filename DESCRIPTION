@@ -12,7 +12,8 @@ Depends:
   datapackage,
   uuid,
   yaml,
-  tools
+  tools,
+  dplyr
 License: What license is it under?
 LazyData: true
 Suggests: testthat
