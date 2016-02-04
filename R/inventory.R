@@ -5,9 +5,6 @@
 #' and may or may not be copied to another computer and untarred.
 #'
 
-library(dplyr)
-library(stringr)
-library(stringi)
 
 #' Create an empty inventory data.frame. This doesn't need to be a function
 #' but I'm making it one in case the initialization routine becomes more

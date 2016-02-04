@@ -3,9 +3,6 @@
 #'
 #' General utility functions that may be later merged into other files.
 
-library(stringr)
-library(xml2)
-library(tools)
 
 #' Extracts the local identifier for an ACADIS ISO metadata XML file.
 #'

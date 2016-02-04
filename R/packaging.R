@@ -3,9 +3,6 @@
 #'
 #' Code related to packaging datasets.
 
-library(dataone)
-library(datapackage)
-
 
 #' Manually create a Data Package from files in the Inventory.
 #'

@@ -4,7 +4,6 @@
 #' Functions related to loading configuriation based upon the environment
 #' the code is being run under.
 
-library(yaml)
 
 # TODO: Implement this function for real
 env_get <- function() {
