@@ -134,9 +134,7 @@ create_sysmeta <- function(pid, inventory_file, who) {
                  checksumAlgorithm = "SHA256",
                  submitter = who,
                  rightsHolder = who,
-                 fileName = inventory_file[,"file"],
-                 originMemberNode = "urn:node:arctica",
-                 authoritativeMemberNode = "urn:node:artica")
+                 fileName = inventory_file[,"file"])
 
 
   sysmeta <- addAccessRule(sysmeta, "public", "read")
