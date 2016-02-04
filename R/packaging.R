@@ -3,290 +3,193 @@
 #'
 #' Code related to packaging datasets.
 
-library(whisker)
-library(redland)
+library(dataone)
+library(datapackage)
 
-#' Create a Resource Map XML string suitable for use in an MN.Create() call
+
+#' Manually create a Data Package from files in the Inventory.
 #'
-#' Relevant documentation:
-#' https://jenkins-ucsb-1.dataone.org/job/API%20Documentation%20-%20trunk/ws/api-documentation/build/html//design/DataPackage.html?highlight=resourcemap#generating-resource-maps
+#' @param inventory An Inventory (data.frame)
+#' @param package The package identifier (character)
+#' @param child_packages Resource Map PIDs for child Data Packages (character)
 #'
-#' @return The text of the file (character)
+#' @return Nothing.
 #' @export
 #'
 #' @examples
-create_resource_map <- function() {
-  # Create objects related to an RDF Model
-  world <- new("World")
-  storage <- new("Storage", world, "hashes", name="", options="hash-type='memory'")
-  model <- new("Model", world=world, storage, options="")
+#' insert_package(my_inventory_df, "my_package_id")
+insert_package <- function(inventory, package, child_packages=c()) {
+  # Debug
+  inventory <- "YYY"
+  package <- "XXX"
+  child_packages <- c()
 
-  # Set up the namespaces we need
-  rdf <- "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  rdfs1 <- "http://www.w3.org/2001/01/rdf-schema#"
-  dc <- "http://purl.org/dc/elements/1.1/"
-  dcterms <- "http://purl.org/dc/terms/"
-  cito <- "http://purl.org/spar/cito/"
-  ore <- "http://www.openarchives.org/ore/terms/"
+  # Config
+  mn <- MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
+  me <- "CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org"
+  files_base_path <- "~/src/arctic-data/packages/"
 
-  # Temporary: Prepare the (invalid) URIs we'll need
-  resource_map_identifier <- "resmapid"
-  science_metadata_identifier <- "scimetaid"
-  dataobject_identifiers <- c("dataobj1id", "dataobj2id", "dataobj3id", "dataobj4id")
-  aggregation <- paste0(resource_map_identifier, "#aggregation")
+  # Find the package contents (metadata and data)
+  files <- inventory[inventory$package == package,]
+  # Remove this once I fix my bug
+  files <- files[!is.na(files$package),]
+  stopifnot(nrow(files) > 0)
 
-  # Add statemnts
+  # SCIENCE METADATA (1)
+  # Find the metadata object
+  files_metadata <- files[files$is_metadata == TRUE,]
+  stopifnot(nrow(files_metadata) == 1)
+  files_metadata[,"file"]
 
-  # scimeta isDocumentedBy resourceMap
-  addStatement(model, new("Statement", world = world,
-                          subject=science_metadata_identifier,
-                          predicate=paste0(cito, "isDocumentedBy"),
-                          object=resource_map_identifier))
 
-  # aggregation type Aggregation
-  addStatement(model, new("Statement", world = world,
-                          subject=aggregation,
-                          predicate=paste0(rdf, "type"),
-                          object=paste0(ore, "Aggregation")))
+  path_on_disk <- paste0(files_base_path, files_metadata[1,"filename"])
 
-  # aggregation aggregates scimeta
-  addStatement(model, new("Statement", world = world,
-                          subject=aggregation,
-                          predicate=paste0(rdf, "aggregates"),
-                          object=science_metadata_identifier))
+  # Generate and save PID
+  metadata_pid <- generateIdentifier(mn)
+  metadata_sysmeta <- create_sysmeta(metadata_pid, files_metadata[1,], me)
 
-  # aggregation aggregates dataobject
-  for (identifier in dataobject_identifiers) {
-    addStatement(model, new("Statement", world = world,
-                            subject=aggregation,
-                            predicate=paste0(rdf, "aggregates"),
-                            object=identifier))
+  create(mn,
+         metadata_pid,
+         filepath = path_on_disk,
+         sysmeta = metadata_sysmeta)
+
+
+  # DATA (MANY)
+  files_data <- files[files$is_metadata == FALSE,]
+  files_data[,"file"]
+
+  # Create them
+  # Mint PIDs, saving them for later
+  data_pids <- c()
+
+  for (i in seq_len(nrow(files_data))) {
+    path_on_disk <- paste0(files_base_path, files_data[i,"filename"])
+
+    # Generate and save PID
+    data_pid <- generateIdentifier(mn)
+
+    data_sysmeta <- create_sysmeta(data_pid, files_data[i,], me)
+    cat(paste0("Caling MN.create() on ", files_data[i,"file"], ".\n"))
+    create(mn,
+           data_pid,
+           filepath = path_on_disk,
+           sysmeta = data_sysmeta)
+
+    data_pids <- c(data_pids, data_pid)
   }
 
-  # Aggregation label "Aggregation"
-  addStatement(model, new("Statement", world = world,
-                          subject=paste0(ore, "Aggregation"),
-                          predicate=paste0(rdfs1, "label"),
-                          object="Aggregation"))
+  # Generate a resource map
+  # Create the resource map
+  # Create sysmeta for the resource map
+  resource_map_filepath <- create_resource_map(metadata_pid, data_pids)
+  resource_map_size_bytes <- file.info(resource_map_filepath)$size
+  resource_map_checksum <- digest(resource_map_filepath, algo = "sha256")
 
-  # Aggregation isDefinedBy ORE
-  addStatement(model,  new("Statement", world = world,
-                           subject=paste0(ore, "Aggregation"),
-                           predicate=paste0(rdfs1, "isDefinedBy"),
-                           object=ore))
+  # Get the PID from the resource map XML directly
+  # Here I use the ore:isAggregatedBy which points to the #aggregation because
+  # this seems like the best way to get the resource map PID. There's probably
+  # a better way to do this.
 
-  # ResourceMap label
-  addStatement(model, new("Statement", world = world,
-                          subject=paste0(ore, "ResourceMap"),
-                          predicate=paste0(rdfs1, "label"),
-                          object="ResourceMap"))
+  aggregation_uri <- read_xml(resource_map_filepath) %>%
+    xml_find_one("//ore:isAggregatedBy", xml_ns(myxml)) %>%
+    xml_attr("rdf:resource", xml_ns(myxml))
 
-  # ResourceMap isDefinedBy ORE
-  addStatement(model, new("Statement", world = world,
-                          subject=paste0(ore, "ResourceMap"),
-                          predicate=paste0(rdfs1, "isDefinedBy"),
-                          object=ore))
+  stopifnot(is.character(aggregation_uri),
+            nchar(aggregation_uri) > 0)
 
-  # dataobject isDocumentedBy + identifier
-  for (identifier in dataobject_identifiers) {
-    addStatement(model, new("Statement", world = world,
-                            subject=identifier,
-                            predicate=paste0(cito, "isDocumentedBy"),
-                            object=science_metadata_identifier))
+  aggregation_uri_nobaseurl <- gsub("https://cn.dataone.org/cn/v1/resolve/", "", aggregation_uri)
+  resource_map_pid <- gsub("#aggregation", "", aggregation_uri_nobaseurl)
 
-    addStatement(model, new("Statement", world = world,
-                            subject=identifier,
-                            predicate=paste0(dcterms, "identifier"),
-                            object=identifier))
+  resource_map_values <- data.frame("format_id" = "http://www.openarchives.org/ore/terms",
+                                    "size_bytes" = resource_map_size_bytes,
+                                    "checksum_sha256" = resource_map_checksum,
+                                    "file" = paste0(resource_map_pid, ".xml"),
+                                    stringsAsFactors = FALSE)
+
+  resource_map_sysmeta <- create_sysmeta(resource_map_pid, resource_map_values[1,], me)
+  create(mn,
+         resource_map_pid,
+         filepath = resource_map_filepath,
+         sysmeta = resource_map_sysmeta)
+}
+
+#' Create a SystemMetadata object. This is a convenience wrapper around just
+#' calling new("SystemMetadata", ...) directly.
+#'
+#' @param pid The PID for the Object. (character)
+#' @param inventory_file An Inventory
+#' @param who DN for the rightsHolder and submitter (character)
+#'
+#' @return THe SystemMetadata (SystemMetadata)
+#' @export
+#'
+#' @examples
+#' create_sysmeta("my_pid", my_inv[1:10,], CN=Me,O=Test,C=US,DC=cilogon,DC=org")
+create_sysmeta <- function(pid, inventory_file, who) {
+  sysmeta <- new("SystemMetadata",
+                 identifier = pid,
+                 formatId = inventory_file[,"format_id"],
+                 size = inventory_file[,"size_bytes"],
+                 checksum = inventory_file[,"checksum_sha256"],
+                 checksumAlgorithm = "SHA256",
+                 submitter = who,
+                 rightsHolder = who,
+                 fileName = inventory_file[,"file"],
+                 originMemberNode = "urn:node:arctica",
+                 authoritativeMemberNode = "urn:node:artica")
+
+
+  sysmeta <- addAccessRule(sysmeta, "public", "read")
+  sysmeta <- addAccessRule(sysmeta, who, "write")
+  sysmeta <- addAccessRule(sysmeta, who, "changePermission")
+
+  sysmeta
+}
+
+
+#' Create a Resource Map. This is a convenience
+#'
+#' @param metadata_pid PID of the metadata Object (character)
+#' @param data_pids PID(s) of the data Objects (character)
+#' @param child_pids (Optional) PID(s) of child Resource Maps (character)
+#' @param resolve_base (Optional) The resolve service base URL (character)
+#'
+#' @return Absolute path to the Resource Map on disk (character)
+#' @export
+#'
+#' @examples
+create_resource_map <- function(metadata_pid,
+                                data_pids,
+                                child_pids=c(),
+                                resolve_base="https://cn.dataone.org/cn/v1/resolve/") {
+  stopifnot(length(metadata_pid) == 1)
+  stopifnot(length(data_pids) >= 1)
+
+  relationships <- data.frame()
+
+  for (data_pid in data_pids) {
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base, metadata_pid),
+                                      predicate = "http://purl.org/spar/cito/documents",
+                                      object = paste0(resolve_base, data_pid),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
+
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base, data_pid),
+                                      predicate = "http://purl.org/spar/cito/isDocumentedBy",
+                                      object = paste0(resolve_base, metadata_pid),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
   }
 
-  # scimeta identifier
-  addStatement(model, new("Statement", world = world,
-                          subject=science_metadata_identifier,
-                          predicate=paste0(dcterms, "identifier"),
-                          object=science_metadata_identifier))
+  resource_map <- createFromTriples(new("ResourceMap"),
+                                    relations = relationships,
+                                    identifiers = c(metadata_pid, data_pids))
+  outfilepath <- tempfile()
+  serializeRDF(resource_map, outfilepath)
 
-  # scimeta documents dataobject
-  for (identifier in dataobject_identifiers) {
-    addStatement(model, new("Statement", world = world,
-                            subject=science_metadata_identifier,
-                            predicate=paste0(cito, "documents"),
-                            object=identifier))
-  }
-
-  # resource_map type ResourceMap
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(rdf, "type"),
-                          object=paste0(ore, "ResourceMap")))
-
-  # resource_map identifier
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(dcterms, "identifier"),
-                          object=resource_map_identifier))
-
-  # resource_map format
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(dc, "format"),
-                          object="application/rdf+xml"))
-
-  # resource_map describes aggregation
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(ore, "describes"),
-                          object=aggregation))
-
-  # resource_map creator
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(dcterms, "creator"),
-                          object="The `arcticdata` R package."))
-
-  now <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S.000%z")
-
-  # resource_map created
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(dcterms, "created"),
-                          object=now))
-
-  # resource_map modified
-  addStatement(model, new("Statement", world = world,
-                          subject=resource_map_identifier,
-                          predicate=paste0(dcterms, "modified"),
-                          object=now))
-
-  serializer <- new("Serializer", world, mimeType="application/rdf+xml")
-
-  # Set up serializer namespaces
-  setNameSpace(serializer, world, namespace=rdf, prefix="rdf")
-  setNameSpace(serializer, world, namespace=rdfs1, prefix="rdfs1")
-  setNameSpace(serializer, world, namespace=dc, prefix="dc")
-  setNameSpace(serializer, world, namespace=dcterms, prefix="dcterms")
-  setNameSpace(serializer, world, namespace=cito, prefix="cito")
-  setNameSpace(serializer, world, namespace=ore, prefix="ore")
-
-  serialized_resource_map <- serializeToCharacter(serializer, world, model)
-
-  freeSerializer(serializer)
-  freeModel(model)
-  freeWorld(world)
-
-  serialized_resource_map
+  outfilepath
 }
-
-
-#' Generate a System Metadata XML string suitable for use in an MN.Create() call
-#'
-#' Relevant documentation:
-#' https://jenkins-ucsb-1.dataone.org/job/API%20Documentation%20-%20trunk/ws/api-documentation/build/html//design/SystemMetadata.html#id3
-#'
-#'
-#' @param identifier
-#' @param size
-#' @param checksum
-#' @param submitter
-#' @param rightsHolder
-#' @param checksumAlgorithm
-#' @param formatID
-#' @param replication
-#'
-#' @return The text of the file (character)
-#' @export
-#'
-#' @examples
-#' generate_system_metadata(identifier="IDENT",
-#'                        size="1234",
-#'                        checksum="ae626a6d626a6d626a6d6",
-#'                        submitter="some_submitter",
-#'                        rightsHolder = "some_submitter")
-
-generate_system_metadata <- function(identifier,
-                                     size,
-                                     checksum,
-                                     submitter,
-                                     rightsHolder,
-                                     checksumAlgorithm="SHA-256",
-                                     formatID="application/octet-stream",
-                                     replication="true") {
-  filepath <- system.file("data/sysmeta_template.xml", package="arcticdata")
-  stopifnot(file.exists(filepath))
-
-  template <- readChar(filepath, file.info(filepath)$size)
-  stopifnot(nchar(template) > 0)
-
-  values <- list(identifier = identifier,
-                 formatID = formatID,
-                 size = size,
-                 checksumAlgorithm = checksumAlgorithm,
-                 checksum = checksum,
-                 submitter = submitter,
-                 rightsHolder = rightsHolder,
-                 replication = replication)
-
-  text <- whisker.render(template, values)
-  cat(text)
-
-  text
-}
-
-
-#' Reserve a PID
-#'
-#' @return The PID (character)
-#' @export
-#'
-#' @examples
-#'
-#' reserve_new_ipd() # Reserve a UUID
-#' reserve_new_pid("DOI") # Reserve a DOI
-reserve_new_pid <- function(scheme="UUID") {
-
-}
-
-#add_data_package(X)
-# Look up files
-# Find the ISO record
-#   Create a sysmeta for it
-# Find the data files
-#   Create a sysmeta for each
-
-#' Add a data package from the inventory
-#'
-#' @param package (character)
-#' @param inventory (data.frame)
-#'
-#' @return TODO
-#' @export
-#'
-#' @examples
-add_data_package <- function(package, inventory) {
-  stopifnot(is.character(package), nchar(package) > 0)
-  stopifnot(is.data.frame(inventory))
-
-  # Check we have the right columns in the inventory
-  stopifnot(c("filenames", "size_bytes", "checksum_sha256") %in% names(inventory))
-
-  # Find the one sysmeta
-  files_in_package <- inventory[inventory$package == package,]
-  stopifnot(nrow(files_in_package) > 0)
-
-  metadata_file <- files_in_package[files_in_package$is_dataset,]
-  stopifnot(nrow(metadata_file) == 1)
-
-  scimeta_filename <- metadata_file[1,"filename"]
-  scimeta_size_bytes <- metadata_file[1,"size_bytes"]
-  scimeta_checksum_sha256 <- metadata_file[1,"checksum_sha256"]
-
-  scimeta_sysmeta <- generate_system_metadata(identifier = "IDENTIFIER",
-                                              size = scimeta_size_bytes,
-                                              checksum = scimeta_checksum_sha256,
-                                              submitter = ,
-                                              rightsHolder = ,
-                                              formatID = "X")
-}
-
-
-
