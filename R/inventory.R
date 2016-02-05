@@ -116,7 +116,7 @@ inv_load_sizes <- function(filename, inventory) {
   # Join the sizes onto existing filenames in the inventory
   # First drop the existing sizes
   inventory <- inventory[,!(names(inventory) %in% "size_bytes"), drop=FALSE]
-  inventory <- left_join(inventory, sizes, by="filename")
+  inventory <- dplyr::left_join(inventory, sizes, by="filename")
 
   # Check the result
   if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
@@ -156,7 +156,7 @@ inv_load_checksums <- function(filename, inventory) {
   # Join the checksums onto existing filenames in the inventory
   # First drop the existing checksums
   inventory <- inventory[,!(names(inventory) %in% "checksum_sha256"), drop=FALSE]
-  inventory <- left_join(inventory, checksums, by="filename")
+  inventory <- dplyr::left_join(inventory, checksums, by="filename")
 
   # Check the result
   if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
@@ -199,7 +199,7 @@ inv_load_identifiers <- function(filenames, inventory) {
   # Join the identifiers onto existing filenames in the inventory
   # First drop the existing identifiers
   inventory <- inventory[,!(names(inventory) %in% "identifier"), drop = FALSE]
-  inventory <- left_join(inventory, identifiers, by = "filename")
+  inventory <- dplyr::left_join(inventory, identifiers, by = "filename")
 
   inventory
 }
@@ -214,17 +214,17 @@ inv_add_extra_columns <- function(inventory) {
   stopifnot(class(inventory) == "data.frame", "filename" %in% names(inventory))
 
   # Mark metadata files
-  inventory$is_metadata <- stri_endswith_fixed(inventory$filename, "ISO.xml") | stri_endswith_fixed(inventory$filename, "iso19139.xml")
+  inventory$is_metadata <- stringi::stri_endswith_fixed(inventory$filename, "ISO.xml") | stringi::stri_endswith_fixed(inventory$filename, "iso19139.xml")
 
   # Mark which root subfolder each file is under
-  inventory$subfolder[stri_startswith_fixed(inventory$filename, "./acadis-field-projects")] <- "FP"
-  inventory$subfolder[stri_startswith_fixed(inventory$filename, "./acadis-gateway")] <- "G"
+  inventory$subfolder[stringi::stri_startswith_fixed(inventory$filename, "./acadis-field-projects")] <- "FP"
+  inventory$subfolder[stringi::stri_startswith_fixed(inventory$filename, "./acadis-gateway")] <- "G"
 
   # Add a column with full paths (w/o filename)
-  inventory$folder <- unlist(lapply(str_split(inventory$filename, "/"), function(x) { paste(x[1:(length(x) - 1)], collapse="/") } ))
+  inventory$folder <- unlist(lapply(stringr::str_split(inventory$filename, "/"), function(x) { paste(x[1:(length(x) - 1)], collapse = "/") } ))
 
   # Add a column with just filenames
-  inventory$file <- unlist(lapply(str_split(inventory$filename, "/"), function(x) { x[length(x)] } ))
+  inventory$file <- unlist(lapply(stringr::str_split(inventory$filename, "/"), function(x) { x[length(x)] } ))
 
   # Add base dir and depth columns
   # inventory <- inv_add_base_dir_column(inventory)
@@ -270,8 +270,8 @@ inv_add_base_dir_column <- function(inventory) {
     match <- NA
 
     # Field Projects + Bering Sea
-    if (stri_detect_fixed(filename, "BeringSea")) {
-      match <- str_extract(filename, fp_beringsea_regex)
+    if (stringi::stri_detect_fixed(filename, "BeringSea")) {
+      match <- stringr::str_extract(filename, fp_beringsea_regex)
 
       if (is.na(match)) {
         print(filename)
@@ -279,15 +279,15 @@ inv_add_base_dir_column <- function(inventory) {
       }
 
       # Field Projets w/o Bering Sea
-    } else if (stri_startswith_fixed(filename, "./acadis-field-projects")) {
-      match <- str_extract(filename, fp_regex)
+    } else if (stringi::stri_startswith_fixed(filename, "./acadis-field-projects")) {
+      match <- stringr::str_extract(filename, fp_regex)
 
       if (is.na(match)) {
         print(filename)
         stop("Match was NA. This is bad.", "fp", filename)
       }
-    } else if (stri_startswith_fixed(filename, "./acadis-gateway")) {
-      match <- str_extract(filename, gateawy_regex)
+    } else if (stringi::stri_startswith_fixed(filename, "./acadis-gateway")) {
+      match <- stringr::str_extract(filename, gateawy_regex)
 
       if (is.na(match)) {
         print(filename)
@@ -312,7 +312,7 @@ inv_add_base_dir_column <- function(inventory) {
     }
 
     cat(paste0(i, ":", base_dir, "\n"))
-    inventory[stri_startswith_fixed(inventory$filename, base_dir),"base_dir"] <- base_dir
+    inventory[stringi::stri_startswith_fixed(inventory$filename, base_dir),"base_dir"] <- base_dir
   }
 
   inventory
@@ -366,7 +366,7 @@ inv_add_depth_columns <- function(inventory) {
   stopifnot(c("filename") %in% names(inventory))
 
   # Add a column for the depth
-  splits <- str_split(inventory$filename, "/")
+  splits <- stringr::str_split(inventory$filename, "/")
   inventory$depth <- unlist(lapply(splits, length))
 
   inventory <- as.data.frame(inventory) # Uncast from table_df

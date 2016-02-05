@@ -4,16 +4,17 @@ Version: 0.0.0.9000
 Authors@R: person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre"))
 Description: Support package for migrating ACADIS data to KNB.
 Depends:
-  R (>= 3.2.3),
-  xml2,
-  stringr,
-  stringi,
+  R (>= 3.2.3)
+Imports:
+  dplyr,
   dataone,
   datapackage,
+  stringr,
+  stringi,
+  tools,
   uuid,
   yaml,
-  tools,
-  dplyr
-License: What license is it under?
+  xml2
+License: MIT + file LICENSE
 LazyData: true
 Suggests: testthat

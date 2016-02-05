@@ -22,7 +22,7 @@ insert_package <- function(inventory, package, child_packages=c()) {
   child_packages <- c()
 
   # Config
-  mn <- MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
+  mn <- dataone::MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
   me <- "CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org"
   files_base_path <- "~/src/arctic-data/packages/"
 
@@ -42,13 +42,13 @@ insert_package <- function(inventory, package, child_packages=c()) {
   path_on_disk <- paste0(files_base_path, files_metadata[1,"filename"])
 
   # Generate and save PID
-  metadata_pid <- generateIdentifier(mn)
   metadata_sysmeta <- create_sysmeta(metadata_pid, files_metadata[1,], me)
+  metadata_pid <- dataone::generateIdentifier(mn)
 
-  create(mn,
-         metadata_pid,
-         filepath = path_on_disk,
-         sysmeta = metadata_sysmeta)
+  dataone::create(mn,
+                  metadata_pid,
+                  file = path_on_disk,
+                  sysmeta = metadata_sysmeta)
 
 
   # DATA (MANY)
@@ -67,10 +67,10 @@ insert_package <- function(inventory, package, child_packages=c()) {
 
     data_sysmeta <- create_sysmeta(data_pid, files_data[i,], me)
     cat(paste0("Caling MN.create() on ", files_data[i,"file"], ".\n"))
-    create(mn,
-           data_pid,
-           filepath = path_on_disk,
-           sysmeta = data_sysmeta)
+    dataone::create(mn,
+                    data_pid,
+                    file = path_on_disk,
+                    sysmeta = data_sysmeta)
 
     data_pids <- c(data_pids, data_pid)
   }
@@ -88,8 +88,6 @@ insert_package <- function(inventory, package, child_packages=c()) {
   # a better way to do this.
 
   aggregation_uri <- read_xml(resource_map_filepath) %>%
-    xml_find_one("//ore:isAggregatedBy", xml_ns(myxml)) %>%
-    xml_attr("rdf:resource", xml_ns(myxml))
 
   stopifnot(is.character(aggregation_uri),
             nchar(aggregation_uri) > 0)
@@ -131,8 +129,8 @@ create_sysmeta <- function(pid, inventory_file, who) {
                  size = inventory_file[,"size_bytes"],
                  checksum = inventory_file[,"checksum_sha256"],
                  checksumAlgorithm = "SHA256",
-                 submitter = who,
-                 rightsHolder = who,
+                 submitter = submitter,
+                 rightsHolder = rights_holder,
                  fileName = inventory_file[,"file"])
 
 
@@ -176,13 +174,11 @@ create_resource_map <- function(metadata_pid,
     relationships <- rbind(relationships,
                            data.frame(subject = paste0(resolve_base, data_pid),
                                       predicate = "http://purl.org/spar/cito/isDocumentedBy",
-                                      object = paste0(resolve_base, metadata_pid),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
 
-  resource_map <- createFromTriples(new("ResourceMap"),
                                     relations = relationships,
                                     identifiers = c(metadata_pid, data_pids))
   outfilepath <- tempfile()

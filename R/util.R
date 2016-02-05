@@ -19,14 +19,14 @@ extract_local_identifier <- function(type, file) {
   stopifnot(is.character(file), length(file) == 1)
   stopifnot(file.exists(file))
 
-  xml_file <- read_xml(file)
-  xml_ns <- xml_ns(xml_file)
+  xml_file <- xml2::read_xml(file)
+  xml_namespaces <- xml2::xml_ns(xml_file)
 
   if (type == "gateway") {
-    identifier_text <- xml_find_all(xml_file, "//gmd:fileIdentifier/gco:CharacterString/text()", xml_ns)
+    identifier_text <- xml2::xml_find_all(xml_file, "//gmd:fileIdentifier/gco:CharacterString/text()", xml_namespaces)
   }
   else if (type == "field-projects") {
-    identifier_text <- xml_find_all(xml_file, "//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString/text()", xml_ns)
+    identifier_text <- xml2::xml_find_all(xml_file, "//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString/text()", xml_namespaces)
   }
 
   stopifnot(length(identifier_text) == 1)
@@ -35,7 +35,7 @@ extract_local_identifier <- function(type, file) {
     identifier <- as.character(identifier_text)
   }
   else if (type == "field-projects") {
-    identifier <- str_extract(identifier_text, "\\d+\\.\\d+")
+    identifier <- stringr::str_extract(identifier_text, "\\d+\\.\\d+")
   }
 
   if (is.na(identifier)) { stop("Failed to extract identifier.") }
@@ -67,7 +67,7 @@ dataone_format_mappings <- list("txt" = "text/plain",
                                 "tar" = "application/x-tar")
 
 guess_format_id <- function(filenames) {
-  extensions <- tolower(file_ext(filenames))
+  extensions <- tolower(tools::file_ext(filenames))
   filetypes <- vector(mode = "character", length = length(extensions))
 
   for (i in seq_len(length(extensions))) {
