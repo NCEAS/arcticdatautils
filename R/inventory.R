@@ -49,7 +49,7 @@ inv_load_filenames <- function(filename, inventory) {
   # Filter files no under with 'acadis-field-projects' or 'acadis-gateway'
   # subfolders
   size_before <- nrow(filenames)
-  filenames <- filenames[stri_startswith_fixed(filenames$filename, "./acadis-"),"filename", drop = FALSE]
+  filenames <- filenames[stringi::stri_startswith_fixed(filenames$filename, "./acadis-field-projects/") | stringi::stri_startswith_fixed(filenames$filename, "./acadis-gateway/"), "filename", drop = FALSE]
   size_diff <- size_before - nrow(filenames)
   if (size_diff > 0) { cat("Removed ", size_diff, "filename(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
 
