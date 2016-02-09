@@ -16,14 +16,26 @@
 #' @examples
 #' insert_package(my_inventory_df, "my_package_id")
 insert_package <- function(inventory, package, child_pids=c()) {
+
+  # TODO
+  # Add routine to check for the files elsewhere
+  # This should be automated and based upon the inventory file having another
+  # column with that information
+
+
+
+
+
+
   # Debug
-  inventory <- "YYY"
-  package <- "XXX"
-  child_packages <- c()
+  # inventory <- inv
+  # package <- "145b03155507c7c79a87ae95ecef170baef09148"
+  # child_packages <- c()
 
   # Config
   mn <- dataone::MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
   me <- "CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org"
+  rh <- "CN=arctica,UID=arctica,DC=arctica,DC=org"
   files_base_path <- "~/src/arctic-data/packages/"
 
   # Find the package contents (metadata and data)
