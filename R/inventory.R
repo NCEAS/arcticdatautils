@@ -275,6 +275,8 @@ inv_add_extra_columns <- function(inventory) {
   stopifnot("depth" %in% names(inventory))
 
   for (d in seq(max(inventory$depth), min(inventory$depth))) {
+    cat("d.")
+
     inv_atdepth_metadata <- which(inventory$depth == d & inventory$is_metadata == TRUE)
     folders <- unique(inventory[inv_atdepth_metadata,"folder"])
 
@@ -285,6 +287,8 @@ inv_add_extra_columns <- function(inventory) {
       inventory[files_in_package,"package"] <- digest::sha1(folder)
     }
   }
+
+  cat("\n")
 
   # Calculate statistics related to packages
   inventory <- inventory %>%
