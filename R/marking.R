@@ -37,7 +37,7 @@
 #' @export
 #'
 #' @examples
-theme_packages <- function(inventory) {
+theme_packages <- function(inventory, nfiles_cutoff=10) {
   stopifnot(is.data.frame(inventory),
             "package_nfiles" %in% names(inventory))
 
@@ -55,7 +55,7 @@ theme_packages <- function(inventory) {
   inventory$theme <- "ready-to-go"
 
   # Then mark packages with too many files
-  inventory$theme[inventory$package_nfiles > 20] <- "many-files"
+  inventory$theme[inventory$package_nfiles > nfiles_cutoff] <- "many-files"
 
   # Then mark packages with versions embedded in their folders
   inventory$theme[grep("v_\\d\\.", inventory$file)] <- "has-versions"
