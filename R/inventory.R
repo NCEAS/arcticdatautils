@@ -271,9 +271,9 @@ inv_add_extra_columns <- function(inventory) {
   inventory$package <- NA
   inventory <- as.data.frame(inventory) # Conver to data.frame in case it's a tbl_df
 
-  # Traverse depth-first
   stopifnot("depth" %in% names(inventory))
 
+  # Traverse depth-first
   for (d in seq(max(inventory$depth), min(inventory$depth))) {
     cat(paste0(d, "."))
 
@@ -283,7 +283,11 @@ inv_add_extra_columns <- function(inventory) {
     for (folder in folders) {
       # Find all files under this folder's hierarchy that haven't already been
       # packaged
-      files_in_package <- stringi::stri_startswith_fixed(inventory$file, paste0(folder, "/")) & is.na(inventory$package)
+
+      # Note we add a trailing slash to the folder name so that matches aren't
+      # made on partial strings, e.g. ./46.10/ vs ./46.100/
+      files_in_package <- stringi::stri_startswith_fixed(inventory$file, paste0(folder, "/")) &
+        is.na(inventory$package)
       inventory[files_in_package,"package"] <- digest::sha1(folder)
     }
   }
