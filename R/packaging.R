@@ -8,14 +8,14 @@
 #'
 #' @param inventory An Inventory (data.frame)
 #' @param package The package identifier (character)
-#' @param child_packages Resource Map PIDs for child Data Packages (character)
+#' @param child_pids Resource Map PIDs for child Data Packages (character)
 #'
-#' @return Nothing.
+#' @return The PID of the Resource Map for the Data Package.
 #' @export
 #'
 #' @examples
 #' insert_package(my_inventory_df, "my_package_id")
-insert_package <- function(inventory, package, child_packages=c()) {
+insert_package <- function(inventory, package, child_pids=c()) {
   # Debug
   inventory <- "YYY"
   package <- "XXX"
