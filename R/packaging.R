@@ -76,9 +76,9 @@ insert_package <- function(inventory, package, child_pids=c()) {
     path_on_disk <- paste0(files_base_path, files_data[i,"filename"])
 
     # Generate and save PID
-    data_pid <- generateIdentifier(mn)
+    data_pid <- dataone::generateIdentifier(mn)
 
-    data_sysmeta <- create_sysmeta(data_pid, files_data[i,], me)
+    data_sysmeta <- create_sysmeta(data_pid, files_data[i,], me, rh)
     cat(paste0("Caling MN.create() on ", files_data[i,"file"], " for PID '", data_pid, "'.\n"))
     dataone::create(mn,
                     data_pid,
@@ -91,22 +91,10 @@ insert_package <- function(inventory, package, child_pids=c()) {
   # Generate a resource map
   # Create the resource map
   # Create sysmeta for the resource map
-  resource_map_filepath <- create_resource_map(metadata_pid, data_pids)
+  resource_map_filepath <- create_resource_map(metadata_pid, data_pids, child_pids)
   resource_map_size_bytes <- file.info(resource_map_filepath)$size
-  resource_map_checksum <- digest(resource_map_filepath, algo = "sha256")
-
-  # Get the PID from the resource map XML directly
-  # Here I use the ore:isAggregatedBy which points to the #aggregation because
-  # this seems like the best way to get the resource map PID. There's probably
-  # a better way to do this.
-
-  aggregation_uri <- read_xml(resource_map_filepath) %>%
-
-  stopifnot(is.character(aggregation_uri),
-            nchar(aggregation_uri) > 0)
-
-  aggregation_uri_nobaseurl <- gsub("https://cn.dataone.org/cn/v1/resolve/", "", aggregation_uri)
-  resource_map_pid <- gsub("#aggregation", "", aggregation_uri_nobaseurl)
+  resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
+  resource_map_pid <- paste0("resourceMap_", metadata_pid)
 
   resource_map_values <- data.frame("format_id" = "http://www.openarchives.org/ore/terms",
                                     "size_bytes" = resource_map_size_bytes,
@@ -114,11 +102,20 @@ insert_package <- function(inventory, package, child_pids=c()) {
                                     "file" = paste0(resource_map_pid, ".xml"),
                                     stringsAsFactors = FALSE)
 
-  resource_map_sysmeta <- create_sysmeta(resource_map_pid, resource_map_values[1,], me)
-  create(mn,
-         resource_map_pid,
-         filepath = resource_map_filepath,
-         sysmeta = resource_map_sysmeta)
+  resource_map_sysmeta <- create_sysmeta(resource_map_pid,
+                                         resource_map_values[1,],
+                                         me,
+                                         rh)
+
+  response <- dataone::create(mn,
+                              resource_map_pid,
+                              file = resource_map_filepath,
+                              sysmeta = resource_map_sysmeta)
+
+  # TODO Log response
+
+  # Parse the response
+  stopifnot(!is.null(response))
 
   resource_map_pid
 }
@@ -155,7 +152,8 @@ create_sysmeta <- function(pid, inventory_file, submitter, rights_holder) {
 }
 
 
-#' Create a Resource Map. This is a convenience
+#' Create a Resource Map. This is a convenience wrapper around the constructor
+#' of the `ResourceMap` class from `DataPackage`.
 #'
 #' @param metadata_pid PID of the metadata Object (character)
 #' @param data_pids PID(s) of the data Objects (character)
@@ -177,25 +175,29 @@ create_resource_map <- function(metadata_pid,
 
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, metadata_pid),
+                           data.frame(subject = paste0(resolve_base, URLencode(metadata_pid)),
                                       predicate = "http://purl.org/spar/cito/documents",
-                                      object = paste0(resolve_base, data_pid),
+                                      object = paste0(resolve_base, URLencode(data_pid)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, data_pid),
+                           data.frame(subject = paste0(resolve_base, URLencode(data_pid)),
                                       predicate = "http://purl.org/spar/cito/isDocumentedBy",
+                                      object = paste0(resolve_base, URLencode(metadata_pid)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
 
-                                    relations = relationships,
-                                    identifiers = c(metadata_pid, data_pids))
+  resource_map <- datapackage::createFromTriples(new("ResourceMap", id=paste0("resourceMap_", metadata_pid)),
+                                                 relations = relationships,
+                                                 identifiers = c(metadata_pid, data_pids))
   outfilepath <- tempfile()
-  serializeRDF(resource_map, outfilepath)
+  stopifnot(!file.exists(outfilepath))
+
+  datapackage::serializeRDF(resource_map, outfilepath)
 
   outfilepath
 }
