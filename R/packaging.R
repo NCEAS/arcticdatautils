@@ -57,6 +57,7 @@ insert_package <- function(inventory, package, child_pids=c()) {
   metadata_pid <- dataone::generateIdentifier(mn)
   metadata_sysmeta <- create_sysmeta(metadata_pid, files_metadata[1,], me, rh)
 
+  cat(paste0("Caling MN.create() on ", files_metadata[1,"file"], " for PID '", metadata_pid, "'.\n"))
   dataone::create(mn,
                   metadata_pid,
                   file = path_on_disk,
@@ -78,7 +79,7 @@ insert_package <- function(inventory, package, child_pids=c()) {
     data_pid <- generateIdentifier(mn)
 
     data_sysmeta <- create_sysmeta(data_pid, files_data[i,], me)
-    cat(paste0("Caling MN.create() on ", files_data[i,"file"], ".\n"))
+    cat(paste0("Caling MN.create() on ", files_data[i,"file"], " for PID '", data_pid, "'.\n"))
     dataone::create(mn,
                     data_pid,
                     file = path_on_disk,
