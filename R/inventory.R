@@ -281,7 +281,7 @@ inv_add_extra_columns <- function(inventory) {
     for (folder in folders) {
       # Find all files under this folder's hierarchy that haven't already been
       # packaged
-      files_in_package <- stringi::stri_startswith_fixed(inventory$file, folder) & is.na(inventory$package)
+      files_in_package <- stringi::stri_startswith_fixed(inventory$file, paste0(folder, "/")) & is.na(inventory$package)
       inventory[files_in_package,"package"] <- digest::sha1(folder)
     }
   }
