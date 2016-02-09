@@ -291,6 +291,7 @@ inv_add_extra_columns <- function(inventory) {
   cat("\n")
 
   # Calculate statistics related to packages
+  cat("Adding 'package_nfiles', 'package_size_mb', and 'package_has_archives' columns.\n")
   inventory <- inventory %>%
     dplyr::group_by(package) %>%
     dplyr::mutate(package_nfiles = length(package),
