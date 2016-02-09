@@ -54,8 +54,8 @@ insert_package <- function(inventory, package, child_pids=c()) {
   path_on_disk <- paste0(files_base_path, files_metadata[1,"filename"])
 
   # Generate and save PID
-  metadata_sysmeta <- create_sysmeta(metadata_pid, files_metadata[1,], me)
   metadata_pid <- dataone::generateIdentifier(mn)
+  metadata_sysmeta <- create_sysmeta(metadata_pid, files_metadata[1,], me, rh)
 
   dataone::create(mn,
                   metadata_pid,
@@ -127,14 +127,14 @@ insert_package <- function(inventory, package, child_pids=c()) {
 #'
 #' @param pid The PID for the Object. (character)
 #' @param inventory_file An Inventory
-#' @param who DN for the rightsHolder and submitter (character)
-#'
+#' @param submitter The DN for the submitter field (character)
+#' @param rights_holder The DN for the rightsHodler field (character)
 #' @return THe SystemMetadata (SystemMetadata)
 #' @export
 #'
 #' @examples
 #' create_sysmeta("my_pid", my_inv[1:10,], CN=Me,O=Test,C=US,DC=cilogon,DC=org")
-create_sysmeta <- function(pid, inventory_file, who) {
+create_sysmeta <- function(pid, inventory_file, submitter, rights_holder) {
   sysmeta <- new("SystemMetadata",
                  identifier = pid,
                  formatId = inventory_file[,"format_id"],
@@ -146,9 +146,9 @@ create_sysmeta <- function(pid, inventory_file, who) {
                  fileName = inventory_file[,"file"])
 
 
-  sysmeta <- addAccessRule(sysmeta, "public", "read")
-  sysmeta <- addAccessRule(sysmeta, who, "write")
-  sysmeta <- addAccessRule(sysmeta, who, "changePermission")
+  sysmeta <- datapackage::addAccessRule(sysmeta, "public", "read")
+  sysmeta <- datapackage::addAccessRule(sysmeta, submitter, "write")
+  sysmeta <- datapackage::addAccessRule(sysmeta, submitter, "changePermission")
 
   sysmeta
 }
