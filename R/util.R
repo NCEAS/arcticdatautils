@@ -80,3 +80,58 @@ guess_format_id <- function(filenames) {
 
   filetypes
 }
+
+
+#' Print a random dataset.
+#'
+#' @param inventory An inventory (data.frame)
+#' @param theme (optional) A package theme name (character)
+#' @param n (optional) The number of files to show (numeric)
+#'
+#' @return Nothing.
+#' @export
+#'
+#' @examples
+show_random_dataset <- function(inventory, theme=NULL, n=10) {
+  stopifnot(is.data.frame(inventory),
+            all(c("file", "folder", "filename", "theme") %in% names(inventory)))
+
+  themes <- c("has-versions", "many-files", "ready-to-go")
+
+  # If theme was not set, don't filter
+  # Otherwise, filter to theme
+  if (is.null(theme)) {
+    sampled_pkg <- inventory[inventory$package == sample(inventory$package, 1),]
+  } else {
+    stopifnot(is.character(theme),
+              theme %in% themes,
+              "theme" %in% names(inventory))
+    sampled_pkg <- inventory[inventory$package == sample(inventory[inventory$theme == theme,"package"], 1),]
+  }
+
+  stopifnot(nrow(sampled_pkg) > 0)
+
+  # Find the base directory so we can gsub it out of the rest of the files
+  base_dir <- sampled_pkg[which(sampled_pkg$is_metadata == TRUE),"folder"]
+
+  # startDebug
+  if (length(base_dir) != 0){
+    browser()
+  }
+  # endDebug
+
+  stopifnot(length(base_dir) == 1)
+
+  # Grab the files
+  files <- gsub(base_dir, "", sampled_pkg[,"file"])
+
+  # Remove NAs
+  files <- files[!is.na(files)]
+
+  # Print it out
+  cat(paste0("Theme: ", theme, "\n"))
+  cat(paste0("nfiles: ", length(files), "\n"))
+  cat(paste0("Base dir: ", base_dir, "\n"))
+  print(head(files, n = n))
+  if (length(files) > n) { cat(paste0("...and ", length(files) - n, " more files.\n")) }
+}
