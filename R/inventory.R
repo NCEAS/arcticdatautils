@@ -21,41 +21,44 @@ inv_init <- function() {
   inventory
 }
 
-#' Load filenames into the inventory from a text file.
+#' Load files into the inventory from a text file.
 #'
-#' Filenames should be the output of the command:
+#' Files should be the output of the command:
 #'
-#'   you@server:/home/jones/acadis$ find . -type f
+#'   you@server:/path/to/acadis$ find . -type f
 #'
-#' @param filename Filepath to a file containing filenames.
+#' @param path Path to a file containing a file listing.
 #' @param inventory A \code{data.frame}.
 #'
 #' @return An inventory (data.frame)
 #'
 #' @examples
-#' inv_load_filenames("some/file/path.txt", my_inventory)
-inv_load_filenames <- function(filename, inventory) {
-  stopifnot(file.exists(filename))
+#' inv_load_files("some/file/path.txt", my_inventory)
+inv_load_files <- function(path, inventory) {
+  stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory))
 
   # Read the filenames from disk
-  filenames <- read.delim(filename,
-                          col.names = c("filename"),
-                          header = FALSE,
-                          stringsAsFactors = FALSE)
-  stopifnot(is.data.frame(filenames))
+  files <- read.delim(path,
+                      col.names = c("file"),
+                      header = FALSE,
+                      stringsAsFactors = FALSE)
+  stopifnot(is.data.frame(files))
 
-  # Filter files no under with 'acadis-field-projects' or 'acadis-gateway'
+  # Filter out files not under with 'acadis-field-projects' or 'acadis-gateway'
   # subfolders
-  size_before <- nrow(filenames)
-  filenames <- filenames[stringi::stri_startswith_fixed(filenames$filename, "./acadis-field-projects/") | stringi::stri_startswith_fixed(filenames$filename, "./acadis-gateway/"), "filename", drop = FALSE]
-  size_diff <- size_before - nrow(filenames)
-  if (size_diff > 0) { cat("Removed ", size_diff, "filename(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
+  size_before <- nrow(files)
+
+  files <- files[stringi::stri_startswith_fixed(files$file, "./acadis-field-projects/") |
+                   stringi::stri_startswith_fixed(files$file, "./acadis-gateway/"), "file", drop = FALSE]
+
+  size_diff <- size_before - nrow(files)
+  if (size_diff > 0) { cat("Removed ", size_diff, "file(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
 
   # If inventory is empty, just make the inventory the same as filenames
   if (nrow(inventory) == 0) {
-    return(filenames)
+    return(files)
   }
 
   # Only append rows with new filenames
@@ -67,21 +70,22 @@ inv_load_filenames <- function(filename, inventory) {
 
   # Make `filenames` the same shape as `inventory` by appending columns
   for (col_name in names(inventory)) {
-    if (col_name %in% names(filenames)) { next }
-    filenames[,col_name] <- NA
+    if (col_name %in% names(files)) { next }
+    files[,col_name] <- NA
   }
 
-  stopifnot(identical(names(inventory), names(filenames)))
+  stopifnot(identical(names(inventory), names(files)))
 
-  inter_vals <- intersect(inventory$filename, filenames$filename)
 
   # Remove intersections if we had any
+  inter_vals <- intersect(inventory$file, files$file)
+
   if (length(inter_vals) > 0 ) {
-    filenames <- subset(filenames, match(filename, inter_vals, nomatch = 0) == 0)
+    files <- subset(files, match(file, inter_vals, nomatch = 0) == 0)
   }
 
   inventory <- rbind(inventory,
-                     filenames)
+                     files)
 
   inventory
 }
@@ -89,21 +93,21 @@ inv_load_filenames <- function(filename, inventory) {
 #' Load file sizes into an inventory from a text file. Removes the column
 #' 'size_bytes' from inventory before doing a left join.
 #'
-#' @param filename Filepath to a file containing sizes.
+#' @param path Path to a file containing sizes.
 #' @param inventory A \code{data.frame}.
 #'
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_sizes <- function(filename, inventory) {
-  stopifnot(file.exists(filename))
+inv_load_sizes <- function(path, inventory) {
+  stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory),
-            "filename" %in% names(inventory))
+            "file" %in% names(inventory))
 
   # Read the sizes from disk
-  sizes <- read.delim(filename,
-                      col.names = c("size_bytes", "filename"),
+  sizes <- read.delim(path,
+                      col.names = c("size_bytes", "file"),
                       stringsAsFactors = FALSE,
                       header = FALSE)
 
@@ -115,11 +119,11 @@ inv_load_sizes <- function(filename, inventory) {
 
   # Join the sizes onto existing filenames in the inventory
   # First drop the existing sizes
-  inventory <- inventory[,!(names(inventory) %in% "size_bytes"), drop=FALSE]
-  inventory <- dplyr::left_join(inventory, sizes, by="filename")
+  inventory <- inventory[,!(names(inventory) %in% "size_bytes"), drop = FALSE]
+  inventory <- dplyr::left_join(inventory, sizes, by = "file")
 
   # Check the result
-  if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
+  if (any(is.na(inventory$file))) { warning("Some values in the 'filename' column were NA.")}
   if (any(is.na(inventory$size_bytes))) { warning("Some values in the 'size_bytes' column were NA.")}
 
   inventory
@@ -129,21 +133,28 @@ inv_load_sizes <- function(filename, inventory) {
 #' removes the column 'checksum_sha256' from inventory before doing a
 #' left join.
 #'
-#' @param filename Filepath to a file containing sizes.
-#' @param inventory A \code{data.frame}.
+#' @param path Path to a file containing sizes.
+#' @param inventory An inventory (data.frame)
 #'
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_checksums <- function(filename, inventory) {
-  stopifnot(file.exists(filename))
+inv_load_checksums <- function(path, inventory) {
+  stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory),
-            "filename" %in% names(inventory))
+            "file" %in% names(inventory))
 
-  checksums <- read.delim(filename,
+  # Convert the text file to a TSV before reading and joining
+  in_file <- readLines(path)
+  in_file_withtabs <- gsub("  ", "\t", in_file)
+  out_file <- tempfile()
+  writeLines(in_file_withtabs, out_file)
+
+  # Read in the file we made above
+  checksums <- read.delim(out_file,
                           header = FALSE,
-                          col.names = c("checksum_sha256", "filename"),
+                          col.names = c("checksum_sha256", "file"),
                           sep = "\t",
                           stringsAsFactors = FALSE)
 
@@ -155,11 +166,11 @@ inv_load_checksums <- function(filename, inventory) {
 
   # Join the checksums onto existing filenames in the inventory
   # First drop the existing checksums
-  inventory <- inventory[,!(names(inventory) %in% "checksum_sha256"), drop=FALSE]
-  inventory <- dplyr::left_join(inventory, checksums, by="filename")
+  inventory <- inventory[,!(names(inventory) %in% "checksum_sha256"), drop = FALSE]
+  inventory <- dplyr::left_join(inventory, checksums, by = "file")
 
   # Check the result
-  if (any(is.na(inventory$filename))) { warning("Some values in the 'filename' column were NA.")}
+  if (any(is.na(inventory$file))) { warning("Some values in the 'file' column were NA.")}
   if (any(is.na(inventory$checksum_sha256))) { warning("Some values in the 'checksum_sha256' column were NA.")}
 
   inventory
@@ -169,23 +180,23 @@ inv_load_checksums <- function(filename, inventory) {
 #' removes the column 'identifier' from inventory before doing a
 #' left join.
 #'
-#' @param filename(s) Filepath(s) to a file(s) containing identifiers.
-#' @param inventory A \code{data.frame}.
+#' @param path Path(s) to files containing identifiers.
+#' @param inventory An inventory (data.frame)
 #'
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_identifiers <- function(filenames, inventory) {
-  stopifnot(file.exists(filenames))
+inv_load_identifiers <- function(path, inventory) {
+  stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
-            "filename" %in% names(inventory))
+            "file" %in% names(inventory))
 
   identifiers <- data.frame()
 
-  for (filename in filenames) {
+  for (path in paths) {
     # Read the identifiers from disk
-    filename_identifiers <- read.csv(filename,
-                                     col.names = c("filename", "identifier"),
+    filename_identifiers <- read.csv(path,
+                                     col.names = c("file", "identifier"),
                                      header = TRUE,
                                      stringsAsFactors = FALSE)
 
@@ -199,7 +210,7 @@ inv_load_identifiers <- function(filenames, inventory) {
   # Join the identifiers onto existing filenames in the inventory
   # First drop the existing identifiers
   inventory <- inventory[,!(names(inventory) %in% "identifier"), drop = FALSE]
-  inventory <- dplyr::left_join(inventory, identifiers, by = "filename")
+  inventory <- dplyr::left_join(inventory, identifiers, by = "file")
 
   inventory
 }
@@ -211,165 +222,76 @@ inv_load_identifiers <- function(filenames, inventory) {
 #'
 #' @return An inventory (data.frame)
 inv_add_extra_columns <- function(inventory) {
-  stopifnot(class(inventory) == "data.frame", "filename" %in% names(inventory))
+  stopifnot(class(inventory) == "data.frame", "file" %in% names(inventory))
 
   # Mark metadata files
-  inventory$is_metadata <- stringi::stri_endswith_fixed(inventory$filename, "ISO.xml") | stringi::stri_endswith_fixed(inventory$filename, "iso19139.xml")
+  cat("Adding 'is_metadata' column.\n")
+  inventory$is_metadata <- stringi::stri_endswith_fixed(inventory$file, "ISO.xml") |
+    stringi::stri_endswith_fixed(inventory$file, "iso19139.xml")
 
   # Mark which root subfolder each file is under
-  inventory$subfolder[stringi::stri_startswith_fixed(inventory$filename, "./acadis-field-projects")] <- "FP"
-  inventory$subfolder[stringi::stri_startswith_fixed(inventory$filename, "./acadis-gateway")] <- "G"
+  cat("Adding 'subfolder' column.\n")
+  inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-field-projects")] <- "FP"
+  inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-gateway")] <- "G"
 
-  # Add a column with full paths (w/o filename)
-  inventory$folder <- unlist(lapply(stringr::str_split(inventory$filename, "/"), function(x) { paste(x[1:(length(x) - 1)], collapse = "/") } ))
+  # Add a column with filename and folder paths
+  cat("Adding 'folder' and 'filename' columns.\n")
 
-  # Add a column with just filenames
-  inventory$file <- unlist(lapply(stringr::str_split(inventory$filename, "/"), function(x) { x[length(x)] } ))
+  inventory$folder <- unlist(
+    lapply(
+      stringr::str_split(inventory$file, "/"),
+      function(x) {
+        paste(x[1:(length(x) - 1)], collapse = "/")
+      }))
 
-  # Add base dir and depth columns
-  # inventory <- inv_add_base_dir_column(inventory)
-  inventory <- inv_add_depth_columns(inventory)
+  inventory$filename <- unlist(
+    lapply(
+      stringr::str_split(inventory$file, "/"),
+      function(x) {
+        x[length(x)]
+      }))
 
-  inventory
-}
+  # Add depth column
+  cat("Adding 'depth' column.\n")
+  inventory$depth <- unlist(
+    lapply(
+      stringr::str_split(inventory$file, "/"), length))
 
-#' Add a base directory column to the inventory.
-#'
-#' In this usage, base directory refers to either the folder of a project or
-#' dataset, whatever of the two is the highest hierarchical grouping of
-#' datasets.
-#'
-#' For a dataset that is part of a project, its base directory will be the same
-#' as the base directory for that project. For a dataset that is not part of
-#' a project, its base directory will be its own base directory.
-#'
-#' @param inventory An inventory (data.frame)
-#'
-#' @return An inventory (data.frame)
-#' @export
-#'
-#' @examples
-inv_add_base_dir_column <- function(inventory) {
-  stopifnot(is.data.frame(inventory), nrow(inventory) > 0)
+  # Add column for whether or not a file is an archive
+  cat("Adding 'is_archive' column.\n")
+  archive_regex <- ".*\\.(tar|gz|bz2|zip|tgz)$"
+  inventory$is_archive <- grepl(archive_regex, inventory$filename)
 
-  # Add base_dir column with the base_dir which is either a project root or a dataset root
-  fp_regex <- "(\\.\\/acadis-field-projects\\/[\\w-]+\\/[\\d\\w\\\\.]+)"
-  fp_beringsea_regex <- "(\\.\\/acadis-field-projects\\/\\w+\\/\\w+\\/[\\w\\.-]+)"
-  gateawy_regex <- "(\\.\\/acadis-gateway\\/[a-zA-Z_-]+)"
+  # Add a column for the format ID
+  cat("Adding 'format_id' column.\n")
+  inventory$format_id <- guess_format_id(inventory$filename)
 
-  inventory$base_dir <- ""
-  metadata_indices <- which(sapply(inventory$is_metadata, isTRUE) == TRUE)
+  # Add a column for packages
+  cat("Adding 'package' column.\n")
+  inventory$package <- NA
+  inventory <- as.data.frame(inventory) # Conver to data.frame in case it's a tbl_df
 
-  stopifnot(length(metadata_indices) > 0)
+  # Traverse depth-first
+  stopifnot("depth" %in% names(inventory))
 
-  cat(paste0("Marking base directories for metadata files.\n"))
+  for (d in seq(max(inventory$depth), min(inventory$depth))) {
+    inv_atdepth_metadata <- which(inventory$depth == d & inventory$is_metadata == TRUE)
+    folders <- unique(inventory[inv_atdepth_metadata,"folder"])
 
-  for (i in metadata_indices) {
-    filename <- inventory[i,"filename"]
-
-    match <- NA
-
-    # Field Projects + Bering Sea
-    if (stringi::stri_detect_fixed(filename, "BeringSea")) {
-      match <- stringr::str_extract(filename, fp_beringsea_regex)
-
-      if (is.na(match)) {
-        print(filename)
-        stop("Match was NA. This is bad.", "bs", filename)
-      }
-
-      # Field Projets w/o Bering Sea
-    } else if (stringi::stri_startswith_fixed(filename, "./acadis-field-projects")) {
-      match <- stringr::str_extract(filename, fp_regex)
-
-      if (is.na(match)) {
-        print(filename)
-        stop("Match was NA. This is bad.", "fp", filename)
-      }
-    } else if (stringi::stri_startswith_fixed(filename, "./acadis-gateway")) {
-      match <- stringr::str_extract(filename, gateawy_regex)
-
-      if (is.na(match)) {
-        print(filename)
-        stop("Match was NA. This is bad.", "g", filename)
-      }
+    for (folder in folders) {
+      # Find all files under this folder's hierarchy that haven't already been
+      # packaged
+      files_in_package <- stringi::stri_startswith_fixed(inventory$file, folder) & is.na(inventory$package)
+      inventory[files_in_package,"package"] <- digest::sha1(folder)
     }
-
-    stopifnot(!is.na(match), nchar(match) > 0)
-    inventory[i,"base_dir"] <- match
   }
 
-  unique_base_dirs <- unique(inventory$base_dir)
-  stopifnot(length(unique_base_dirs) > 0)
+  # Calculate statistics related to packages
+  inventory <- inventory %>%
+    dplyr::group_by(package) %>%
+    dplyr::mutate(package_nfiles = length(package),
+                  package_size_mb = round(sum(size_bytes) / 1024 / 1024, 1),
+                  package_has_archives = any(is_archive))
 
-  cat(paste0("Marking base_dirs for non-metadata files.\n"))
-
-  for (i in seq_len(length(unique_base_dirs))) {
-    base_dir <- unique_base_dirs[i]
-
-    if (nchar(base_dir) <= 0) {
-      next
-    }
-
-    cat(paste0(i, ":", base_dir, "\n"))
-    inventory[stringi::stri_startswith_fixed(inventory$filename, base_dir),"base_dir"] <- base_dir
-  }
-
-  inventory
-}
-
-#' Add a set of columns for marking datasets with various attributes such as
-#' whether they have been added, marked, or can be inserted as-is without
-#' modification.
-#'
-#' @param inventory
-#'
-#' @return An inventory (data.frame)
-#' @export
-#'
-#' @examples
-add_marking_columns <- function(inventory) {
-  stopifnot(is.data.frame(inventory))
-
-  if ("added" %in% names(inventory)) {
-    stop("Column 'added' already exists. Cannot overwrite.")
-  }
-
-  inventory$added <- FALSE # Set false flag
-
-  if ("marked" %in% names(inventory)) {
-    stop("Column 'marked' already exists. Cannot overwrite.")
-  }
-
-  inventory$marked <- FALSE
-
-  if ("as_is" %in% names(inventory)) {
-    stop("Column 'as_is' already exists. Cannot overwrite.")
-  }
-
-  inventory$as_is <- FALSE
-
-  inventory
-}
-
-#' Add columns for the filesystem depth and the range (max-min) of depths
-#' within each base directory
-#'
-#' @param inventory
-#'
-#' @return
-#' @export
-#'
-#' @examples
-inv_add_depth_columns <- function(inventory) {
-  stopifnot(is.data.frame(inventory), nrow(inventory) > 0)
-  stopifnot(c("filename") %in% names(inventory))
-
-  # Add a column for the depth
-  splits <- stringr::str_split(inventory$filename, "/")
-  inventory$depth <- unlist(lapply(splits, length))
-
-  inventory <- as.data.frame(inventory) # Uncast from table_df
-
-  inventory
+  as.data.frame(inventory)
 }
