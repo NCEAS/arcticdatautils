@@ -58,7 +58,7 @@ theme_packages <- function(inventory) {
   inventory$theme[inventory$package_nfiles > 20] <- "many-files"
 
   # Then mark packages with versions embedded in their folders
-  inventory$theme[grep("v_\\d\\.", inventory$filename)] <- "has-versions"
+  inventory$theme[grep("v_\\d\\.", inventory$file)] <- "has-versions"
 
   # There should be no un-themed packages once we're done
   theme_stats <- inventory %>% group_by(theme) %>%
