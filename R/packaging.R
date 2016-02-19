@@ -165,6 +165,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
     {
       dataone::create(mn,
                       resource_map_pid,
+                      file = resource_map_filepath,
                       sysmeta = resource_map_sysmeta)
     },
     error = function(e) {
