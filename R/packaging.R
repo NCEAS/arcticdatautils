@@ -189,9 +189,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 }
 
 
-
-
-#' Create a Resource Map. This is a convenience wrapper around the constructor
+#' Generate a Resource Map. This is a convenience wrapper around the constructor
 #' of the `ResourceMap` class from `DataPackage`.
 #'
 #' @param metadata_pid PID of the metadata Object (character)
@@ -203,10 +201,10 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 #' @export
 #'
 #' @examples
-create_resource_map <- function(metadata_pid,
-                                data_pids,
-                                child_pids=c(),
-                                resolve_base="https://cn.dataone.org/cn/v1/resolve/") {
+generate_resource_map <- function(metadata_pid,
+                                  data_pids,
+                                  child_pids=c(),
+                                  resolve_base="https://cn.dataone.org/cn/v1/resolve/") {
   stopifnot(length(metadata_pid) == 1)
   stopifnot(length(data_pids) >= 1)
 
