@@ -258,7 +258,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
   cat(paste0("Minting new PID...\n"))
 
   # Try to generate a new pid with generateIdentifier()
-  pid <- NA
+  pid <- ""
 
   pid <- tryCatch(
     {
@@ -269,7 +269,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
     }
   )
 
-  # Return `pid`, whch is either NA or a PID at this point
+  # Return `pid`, whch is either "" or a PID at this point
   pid
 }
 
