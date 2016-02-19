@@ -75,10 +75,12 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   }
 
   # Metadata Object
-  files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
-                                                       metadata_sysmeta,
-                                                       base_path,
-                                                       mn)
+  if (files[files_idx_metadata,"created"] == FALSE) {
+    files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
+                                                         metadata_sysmeta,
+                                                         base_path,
+                                                         mn)
+  }
 
   if (files[files_idx_metadata,"created"] == FALSE) {
     cat(paste0("Object creation failed for metadata object in package ", package, ".\n"))
