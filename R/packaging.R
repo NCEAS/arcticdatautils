@@ -85,128 +85,108 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
     return(files)
   }
 
+
+  for (data_idx in files_idx_data) {
+    cat(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
+
+    files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,], mn, scheme = "UUID")
+
+    if (is.na(files[data_idx,"pid"])) {
+      cat(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
+      return(files)
+    }
+
+    # Metadata SystemMetadata
+    data_sysmeta <- create_sysmeta(files[data_idx,],
+                                   base_path,
+                                   submitter,
+                                   rights_holder)
+
+    if (is.null(metadata_sysmeta)) {
+      cat(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
+      return(files)
+    }
+
+    # Metadata Object
+    if (files[data_idx,"created"] == FALSE) {
+      files[data_idx,"created"] <- create_object(files[data_idx,],
+                                                 data_sysmeta,
+                                                 base_path,
+                                                 mn)
+    }
+
+    if (files[data_idx,"created"] == FALSE) {
+      cat(paste0("Object creation failed for metadata object in package ", package, ".\n"))
+      return(files)
+    }
+  }
+
+  # At this point, all of the metadata and data should be created, let's check
+  if (!all(is.character(files[,"pid"])) && !all(files[,"created"] == TRUE)) {
+    cat(paste0("Not all files in package ", package, " have PIDs and are created. Skipping Resource Map creation.\n"))
+
+    print(files)
+
+    return(files)
+  }
+
+
+
+  # Generate and create() the Resource Map
+  cat(paste0("Creating resource map for package ", package, ".\n"))
+
+  resource_map_filepath <- tempfile()
+
+  resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
+  resource_map_format_id <- "http://www.openarchives.org/ore/terms"
+  resource_map_size_bytes <- file.info(resource_map_filepath)$size
+  resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
+
+  resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
+                                                 files[files_idx_data,"pid"],
+                                                 child_pids)
+
+  resource_map_sysmeta <- new("SystemMetadata",
+                              identifier = resource_map_pid,
+                              formatId = resource_map_format_id,
+                              size = resource_map_size_bytes,
+                              checksum = resource_map_checksum,
+                              checksumAlgorithm = "SHA256",
+                              submitter = submitter,
+                              rightsHolder = rights_holder,
+                              fileName = paste(resource_map_pid, ".xml"))
+
+
+
+  create_resource_map_response <- NULL
+  create_resource_map_response <- tryCatch(
+    {
+      dataone::create(mn,
+                      resource_map_pid,
+                      sysmeta = resource_map_sysmeta)
+    },
+    error = function(e) {
+      cat(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
+      cat(as.character(e))
+    }
+  )
+
+
+  created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
+
+  if (is.character(created_resource_map_pid) &&
+      nchar(created_resource_map_pid) > 0) {
+    files$resmap_created <- TRUE
+  } else {
+    files$resmap_created <- FALSE
+  }
+
   print(files)
 
   return(files)
-
 }
 
 
-
-
-# # DATA (MANY)
-# # Create them
-# # Mint PIDs, saving them for later
-# data_pids <- c()
-#
-# for (i in seq_len(nrow(files_data))) {
-#   path_on_disk <- paste0(base_path, files_data[i,"filename"])
-#
-#   # Generate and save PID
-#   if (!is.na(files_metadata[,"PID"])) {
-#     data_pid <- files_data[,"PID"]
-#   } else {
-#     data_pid <- dataone::generateIdentifier(mn)
-#   }
-#
-#   data_sysmeta <- NULL
-#   data_sysmeta <- tryCatch(
-#     {
-#       create_sysmeta(data_pid,
-#                      files_data[i,],
-#                      submitter,
-#                      rights_holder)
-#     },
-#     warning = function(w) {
-#       cat(paste0("Warning generated while creating SystemMetadata for ", files_data[i,"file"]))
-#     },
-#     error = function(e) {
-#       cat(paste0("Error generated while creating SystemMetadata for ", files_data[i,"file"]))
-#     })
-#
-#   if (is.null(data_sysmeta)) {
-#     cat(paste0("Failed to create SystemMetadata for a data object. Returning early.\n"))
-#     return(list("metadata_pid" = metadata_pid,
-#                 "metadata_created" = TRUE))
-#   }
-#
-#   cat(paste0("Caling MN.create() on ", files_data[i,"file"], " for PID '", data_pid, "'.\n"))
-#   data_create_result <- tryCatch(
-#     {
-#       dataone::create(mn,
-#                       data_pid,
-#                       file = path_on_disk,
-#                       sysmeta = data_sysmeta)
-#     },
-#     warning = function(w) {
-#       cat(paste0("Warning generated while calling MNStorage.create() for ", files_data[i,"file"]))
-#     },
-#     error = function(e) {
-#       cat(paste0("Error generated while calling MNStorage.create() for ", files_data[i,"file"]))
-#     })
-#
-#   # TODO check data_create_result
-#   data_create_result
-#
-#   if (is.null(data_create_result)) {
-#     cat(paste0("Failed to create data object. Returning early.\n"))
-#     return(list("metadata_pid" = metadata_pid,
-#                 "metadata_created" = TRUE))
-#   }
-#
-#   data_pids <- c(data_pids, data_pid)
-# }
-#
-# # Generate a resource map
-# # Create the resource map
-# # Create sysmeta for the resource map
-# resource_map_filepath <- create_resource_map(metadata_pid, data_pids, child_pids)
-# resource_map_size_bytes <- file.info(resource_map_filepath)$size
-# resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
-# resource_map_pid <- paste0("resourceMap_", metadata_pid)
-#
-# resource_map_values <- data.frame("format_id" = "http://www.openarchives.org/ore/terms",
-#                                   "size_bytes" = resource_map_size_bytes,
-#                                   "checksum_sha256" = resource_map_checksum,
-#                                   "file" = paste0(resource_map_pid, ".xml"),
-#                                   stringsAsFactors = FALSE)
-#
-# resource_map_sysmeta <- create_sysmeta(resource_map_pid,
-#                                        resource_map_values[1,],
-#                                        me,
-#                                        rh)
-#
-# response <- tryCatch(
-#   {
-#     dataone::create(mn,
-#                     resource_map_pid,
-#                     file = resource_map_filepath,
-#                     sysmeta = resource_map_sysmeta)
-#   },
-#   warning = function(w) {
-#     cat(paste0("Warning generated while calling MNStorage.create() on Resource Map for package ", package, ".\n"))
-#   },
-#   error = function(e) {
-#     cat(paste0("Error generated while calling MNStorage.create() on Resource Map for package ", package, ".\n"))
-#   })
-#
-# # TODO Log response
-#
-# # Parse the response
-# stopifnot(!is.null(response))
-#
-# # Return the results of this call to the function
-# #
-# # We return all successfully created PIDs so we don't mint them again
-# # We return whether or not each metadata or data object was created
-# # successfully so we can know whether to insert it next time (if we have to
-# # run insert_package on the same package multiple times)
-#
-# list("metadata_pid" = metadata_pid,
-#      "metadata_created" = TRUE,
-#      "data_pids" = data_pids,
-#      "data_created" = rep(TRUE, length(data_pids)))
-# }
 
 
 #' Create a Resource Map. This is a convenience wrapper around the constructor
