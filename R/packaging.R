@@ -56,7 +56,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   # Process metadata
 
   # Metadata PID
-  files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,], mn, scheme="UUID")
+  files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,], mn, scheme = "UUID")
 
   if (is.na(files[files_idx_metadata,"pid"])) {
     cat(paste0("Metadata PID was NA for package ", package, ".\n"))
@@ -251,7 +251,7 @@ create_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
-  resource_map <- datapackage::createFromTriples(new("ResourceMap", id=paste0("resourceMap_", metadata_pid)),
+  resource_map <- datapackage::createFromTriples(new("ResourceMap", id = paste0("resourceMap_", metadata_pid)),
                                                  relations = relationships,
                                                  identifiers = c(metadata_pid, data_pids))
   outfilepath <- tempfile()
@@ -407,7 +407,7 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
   created_pid <- XML::xmlToList(response)
 
-  if(is.character(created_pid) && nchar(created_pid) > 0) {
+  if (is.character(created_pid) && nchar(created_pid) > 0) {
     result <- TRUE
   } else {
     result <- FALSE
