@@ -155,8 +155,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
                               checksumAlgorithm = "SHA256",
                               submitter = submitter,
                               rightsHolder = rights_holder,
-                              fileName = paste(resource_map_pid, ".xml"))
-
+                              fileName = paste0(resource_map_pid, ".xml"))
 
 
   cat(paste0("Creating resource map for package ", package, ".\n"))
