@@ -139,12 +139,8 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 
   resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
-  resource_map_size_bytes <- file.info(resource_map_filepath)$size
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
-
-  resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
-                                                 files[files_idx_data,"pid"],
-                                                 child_pids)
+  resource_map_size_bytes <- file.info(resource_map_filepath)$size
 
   cat(paste0("Generating system metadata for resource map for package ", package, ".\n"))
   resource_map_sysmeta <- new("SystemMetadata",
