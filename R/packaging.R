@@ -134,6 +134,9 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 
   # Generate and create() the Resource Map
   cat(paste0("Generating resource map for package ", package, ".\n"))
+  resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
+                                                 files[files_idx_data,"pid"],
+                                                 child_pids)
 
   resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
