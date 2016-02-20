@@ -228,9 +228,10 @@ generate_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
-  resource_map <- datapackage::createFromTriples(new("ResourceMap", id = paste0("resourceMap_", metadata_pid)),
+  resource_map <- datapackage::createFromTriples(new("ResourceMap",
+                                                     id = paste0("resourceMap_", metadata_pid, reserved = TRUE)),
                                                  relations = relationships,
-                                                 identifiers = c(metadata_pid, data_pids))
+                                                 identifiers = c(metadata_pid, data_pids),
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
 
