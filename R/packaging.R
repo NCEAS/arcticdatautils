@@ -204,7 +204,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 generate_resource_map <- function(metadata_pid,
                                   data_pids,
                                   child_pids=c(),
-                                  resolve_base="https://cn.dataone.org/cn/v1/resolve/") {
+                                  resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
   stopifnot(length(metadata_pid) == 1)
   stopifnot(length(data_pids) >= 1)
 
@@ -232,6 +232,7 @@ generate_resource_map <- function(metadata_pid,
                                                      id = paste0("resourceMap_", metadata_pid, reserved = TRUE)),
                                                  relations = relationships,
                                                  identifiers = c(metadata_pid, data_pids),
+                                                 resolveURI = resolve_base)
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
 
