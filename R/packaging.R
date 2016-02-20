@@ -135,8 +135,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 
 
   # Generate and create() the Resource Map
-  cat(paste0("Creating resource map for package ", package, ".\n"))
-
+  cat(paste0("Generating resource map for package ", package, ".\n"))
 
   resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
@@ -147,6 +146,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
 
+  cat(paste0("Generating system metadata for resource map for package ", package, ".\n"))
   resource_map_sysmeta <- new("SystemMetadata",
                               identifier = resource_map_pid,
                               formatId = resource_map_format_id,
@@ -159,6 +159,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 
 
 
+  cat(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
   create_resource_map_response <- tryCatch(
     {
