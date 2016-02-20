@@ -157,6 +157,9 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
                               rightsHolder = rights_holder,
                               fileName = paste0(resource_map_pid, ".xml"))
 
+  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, "public", "read")
+  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, submitter, "write")
+  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, submitter, "changePermission")
 
   cat(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
