@@ -126,9 +126,7 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   # At this point, all of the metadata and data should be created, let's check
   if (!all(is.character(files[,"pid"])) && !all(files[,"created"] == TRUE)) {
     cat(paste0("Not all files in package ", package, " have PIDs and are created. Skipping Resource Map creation.\n"))
-
     print(files)
-
     return(files)
   }
 
