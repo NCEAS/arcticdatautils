@@ -213,17 +213,17 @@ generate_resource_map <- function(metadata_pid,
 
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, URLencode(metadata_pid)),
+                           data.frame(subject = paste0(resolve_base, URLencode(metadata_pid, reserved = TRUE)),
                                       predicate = "http://purl.org/spar/cito/documents",
-                                      object = paste0(resolve_base, URLencode(data_pid)),
+                                      object = paste0(resolve_base, URLencode(data_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, URLencode(data_pid)),
+                           data.frame(subject = paste0(resolve_base, URLencode(data_pid, reserved = TRUE)),
                                       predicate = "http://purl.org/spar/cito/isDocumentedBy",
-                                      object = paste0(resolve_base, URLencode(metadata_pid)),
+                                      object = paste0(resolve_base, URLencode(metadata_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
