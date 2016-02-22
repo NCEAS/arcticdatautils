@@ -46,19 +46,12 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   files <- files[!is.na(files$package),]   # TODO: Remove this once I fix my bug
   stopifnot(nrow(files) > 0)
 
-
-
   # Don't do anything if we don't have a valid token
   am <- dataone::AuthenticationManager()
+  auth_valid <- dataone:::isAuthValid(am, mn)
 
-  token_info <- NULL
-  token_info <- tryCatch({
-    dataone::getTokenInfo(am)
-  },
-  error = function(e) {})
-
-  if (is.null(token_info) || token_info$expired == TRUE) {
-    cat(paste0("Token not found or expired."))
+  if (auth_valid == FALSE) {
+    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
     return(files)
   }
 
