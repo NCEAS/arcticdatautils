@@ -46,6 +46,22 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   files <- files[!is.na(files$package),]   # TODO: Remove this once I fix my bug
   stopifnot(nrow(files) > 0)
 
+
+
+  # Don't do anything if we don't have a valid token
+  am <- dataone::AuthenticationManager()
+
+  token_info <- NULL
+  token_info <- tryCatch({
+    dataone::getTokenInfo(am)
+  },
+  error = function(e) {})
+
+  if (is.null(token_info) || token_info$expired == TRUE) {
+    cat(paste0("Token not found or expired."))
+    return(files)
+  }
+
   # Seperate files out into metadata and data by capturing their indicies
   # in the files data.frame
   files_idx_metadata <- which(files$is_metadata == TRUE)
