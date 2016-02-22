@@ -13,7 +13,7 @@ env_get <- function() {
 env_load <- function(file) {
   stopifnot(file.exists(file))
 
-  yaml_content <- yaml.load_file(file)
+  yaml_content <- yaml::yaml.load_file(file)
   stopifnot(length(yaml_content) == 3)
 
   current_env <- env_get()
