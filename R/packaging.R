@@ -320,7 +320,7 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
   stopifnot(file.exists(path_on_disk))
 
   # Get the PID
-  pid <- file[1,"pid"]
+  pid <- as.character(file[1,"pid"])
   stopifnot(is.character(pid),
             nchar(pid) > 0)
 
