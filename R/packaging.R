@@ -213,25 +213,30 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
 generate_resource_map <- function(metadata_pid,
                                   data_pids,
                                   child_pids=c(),
-                                  resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
+                                  resolve_base="https://cn.dataone.org/cn/v2/resolve") {
   stopifnot(length(metadata_pid) == 1)
   stopifnot(length(data_pids) >= 1)
+
+  # Validate the vector of child PIDs
+  if (!is.character(child_pids)) {
+    child_pids <- c()
+  }
 
   relationships <- data.frame()
 
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, URLencode(metadata_pid, reserved = TRUE)),
+                           data.frame(subject = paste0(resolve_base,"/", metadata_pid),
                                       predicate = "http://purl.org/spar/cito/documents",
-                                      object = paste0(resolve_base, URLencode(data_pid, reserved = TRUE)),
+                                      object = paste0(resolve_base, "/", data_pid),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, URLencode(data_pid, reserved = TRUE)),
+                           data.frame(subject = paste0(resolve_base, "/", data_pid),
                                       predicate = "http://purl.org/spar/cito/isDocumentedBy",
-                                      object = paste0(resolve_base, URLencode(metadata_pid, reserved = TRUE)),
+                                      object = paste0(resolve_base, "/", metadata_pid),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
