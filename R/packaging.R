@@ -83,6 +83,11 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
     return(files)
   }
 
+  # We're about to use the 'created' column, initialize it if needed
+  if (!("created" %in% names(files))) {
+    files$created <- FALSE
+  }
+
   # Metadata Object
   if (files[files_idx_metadata,"created"] == FALSE) {
     files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
