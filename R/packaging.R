@@ -146,8 +146,13 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
+  # Decide on the Resource Map's PID. This is a temporary solution until
+  # I can figure out the best place to fix the code.
+  # resource_map_pid <- URLencode(paste0("resourceMap_", files[files_idx_metadata,"pid"])
+  resource_map_pid <- uuid::UUIDgenerate()
 
-  resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
+  cat(paste0("Resource map PID should be ", resource_map_pid, ".\n"))
+
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
   resource_map_size_bytes <- file.info(resource_map_filepath)$size
@@ -242,8 +247,13 @@ generate_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
+  # Temporary fix until I can figure out where to fix the code. id is set to the
+  # metadata PID even though the PID I run create with is different. This
+  # apparently doesn't cause any issues for indexing the resource maps. Huh.
+  # I'm doing this becasue datapackage can't handle the reserved characters
+  # like colons.
   resource_map <- datapackage::createFromTriples(new("ResourceMap",
-                                                     id = paste0("resourceMap_", metadata_pid)),
+                                                     id = paste0("resourceMap_", metadata_pid, reserved = TRUE)),
                                                  relations = relationships,
                                                  identifiers = c(metadata_pid, data_pids),
                                                  resolveURI = resolve_base)
