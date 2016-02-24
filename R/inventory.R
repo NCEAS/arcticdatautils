@@ -303,3 +303,25 @@ inv_add_extra_columns <- function(inventory) {
 
   as.data.frame(inventory)
 }
+
+update_inventory <- function(inventory, new_state) {
+  stopifnot(is.data.frame(inventory),
+            is.data.frame(new_state))
+  stopifnot(all(c("file", "pid", "created") %in% names(inventory)))
+
+  for (row_num in seq_len(nrow(new_state))) {
+    file <- new_state[row_num,"file"]
+    pid <- new_state[row_num,"pid"]
+    created <- new_state[row_num,"created"]
+
+    stopifnot(is.character(file))
+    stopifnot(file %in% inventory$file)
+    stopifnot(is.character(pid))
+    stopifnot(is.logical(created))
+
+    inventory[which(inventory$file == file),"pid"] <- pid
+    inventory[which(inventory$file == file),"created"] <- created
+  }
+
+  inventory
+}
