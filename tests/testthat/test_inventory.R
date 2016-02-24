@@ -6,27 +6,27 @@ test_that("an inventory can be created correctly", {
   expect_true(nrow(x) == 0)
 })
 
-test_that("an inventory can be populated with filenames", {
+test_that("an inventory can be populated with files", {
   # Case 1: Empty inv, non-empty file
   inv <- inv_init()
-  result <- inv_load_filenames(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "filenames_simple.csv"), inv)
+  result <- inv_load_files(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "files_simple.txt"), inv)
   expect_true(nrow(result) == 3)
 
   # Case 2: Non-empty inv, non-empty file, where some are the same
   inv <- read.csv(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "inventory_simple.csv"), stringsAsFactors = FALSE)
-  result <- inv_load_filenames(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "filenames_simple.csv"), inv)
+  result <- inv_load_files(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "files_simple.txt"), inv)
   expect_true(nrow(result) == 5)
 
   # Case 3: Non-empty inv, non-empty file, where none are the same
   inv <- read.csv(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "inventory_simple.csv"), stringsAsFactors = FALSE)
-  inv <- subset(inv, filename != "C")
-  result <- inv_load_filenames(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "filenames_simple.csv"), inv)
+  inv <- subset(inv, file != "C")
+  result <- inv_load_files(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "files_simple.txt"), inv)
   expect_true(nrow(result) == 5)
 
   # Case 4: Non-empty inv, non-empty file, inventory already has columns
   inv <- read.csv(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "inventory_simple.csv"), stringsAsFactors = FALSE)
   inv$bytes <- rep(1000, nrow(inv))
-  result <- inv_load_filenames(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "filenames_simple.csv"), inv)
+  result <- inv_load_files(file.path(system.file("tests", "data", "inventory", package = "arcticdata"), "files_simple.txt"), inv)
 
   expect_true(nrow(result) == 5)
   expect_true(ncol(result) == 2)
