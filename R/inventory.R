@@ -305,6 +305,11 @@ inv_add_extra_columns <- function(inventory) {
 }
 
 inv_update <- function(inventory, new_state) {
+
+  # Temporary: Filter NA files from new_state
+  # Need to fix this elsewhere
+  new_state <- new_state[!is.na(new_state$file),]
+
   stopifnot(is.data.frame(inventory),
             is.data.frame(new_state))
   stopifnot(all(c("file", "pid", "created") %in% names(inventory)))
