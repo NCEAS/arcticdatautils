@@ -73,7 +73,7 @@ test_that("calling things repeatedly does not break things", {
 test_that("an inventory can be updated with new information", {
   test_inv <- data.frame(file = "A", pid="", created = FALSE, stringsAsFactors = FALSE)
   new_inv <- data.frame(file = "A", pid="pidA", created = TRUE, stringsAsFactors = FALSE)
-  result <- update_inventory(test_inv, new_inv)
+  result <- inv_update(test_inv, new_inv)
 
   expect_true(result[1,"pid"] == "pidA")
   expect_true(result[1,"created"])
