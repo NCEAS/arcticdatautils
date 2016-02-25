@@ -315,6 +315,7 @@ inv_update <- function(inventory, new_state) {
   stopifnot(all(c("file", "pid", "created") %in% names(inventory)))
 
   for (row_num in seq_len(nrow(new_state))) {
+    cat("U")
     file <- new_state[row_num,"file"]
     pid <- new_state[row_num,"pid"]
     created <- new_state[row_num,"created"]
@@ -327,6 +328,8 @@ inv_update <- function(inventory, new_state) {
     inventory[which(inventory$file == file),"pid"] <- pid
     inventory[which(inventory$file == file),"created"] <- created
   }
+
+  cat("\n")
 
   inventory
 }
