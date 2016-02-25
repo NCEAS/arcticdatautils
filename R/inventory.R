@@ -304,6 +304,72 @@ inv_add_extra_columns <- function(inventory) {
   as.data.frame(inventory)
 }
 
+
+#' Add a column for parent packages.
+#'
+#' @param inventory An Inventory (data.frame)
+#'
+#' @return inventory An Inventory (data.frame)
+#' @export
+#'
+#' @examples
+inv_add_parent_package_column <- function(inventory) {
+  stopifnot(all(c("file", "package", "is_metadata", "depth") %in% names(inventory)))
+
+  packages <- unique(inventory$package)
+
+  stopifnot(is.character(packages),
+            length(packages) > 0)
+
+  if (!("parent_package" %in% names(inventory))) {
+    inventory$parent_package <- ""
+  }
+
+  for (package in packages) {
+    metadata_file <- inventory[inventory$package == package & inventory$is_metadata == TRUE,]
+    stopifnot(nrow(metadata_file) == 1)
+
+    metadata_file_path <- metadata_file[,"file"]
+    metadata_file_depth <- metadata_file[,"depth"]
+
+    stopifnot(is.character(metadata_file_path),
+              is.numeric(metadata_file_depth))
+
+    path_parts <- stringr::str_split(metadata_file_path, "/")[[1]]
+    path_parts <- path_parts[1:(length(path_parts) - 1)]
+
+    # Three is the cutoff here because no package is higher than...
+    # ./acadis-X-X/some_folder/something (length four)
+    while (length(path_parts) > 3) {
+      joined_path <- paste(path_parts, collapse = "/")
+
+      # Note use of X == TRUE, this is to cast each part of the chained &
+      # statements to bools. This is probably a bug somewhere else in my code
+      # that I'm working around.
+      parent_files <- inventory[(inventory$is_metadata == TRUE) &
+                                  (stringi::stri_startswith_fixed(inventory$file, joined_path) == TRUE) &
+                                  ((inventory$depth < metadata_file_depth) == TRUE),]
+
+      if (nrow(parent_files) == 1) {
+        inventory[!is.na(inventory$parent_package) &
+                    inventory$package == package,"parent_package"] <- parent_files[1,"package"]
+
+        # Halt execution of the while() loop
+        path_parts <- c()
+      } else if (nrow(parent_files) > 1) {
+        stop(paste0("Number of direct parent datasets in package ", package, " was greater than one."))
+      } else {
+        # Pluck one level off of path_parts
+        path_parts <- path_parts[1:(length(path_parts) - 1)]
+      }
+    }
+  }
+
+  inventory
+}
+
+
+
 inv_update <- function(inventory, new_state) {
 
   # Temporary: Filter NA files from new_state
