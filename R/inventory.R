@@ -305,6 +305,9 @@ inv_add_extra_columns <- function(inventory) {
 }
 
 
+
+
+
 #' Add a column for parent packages.
 #'
 #' @param inventory An Inventory (data.frame)
@@ -371,17 +374,17 @@ inv_add_parent_package_column <- function(inventory) {
 
 
 inv_update <- function(inventory, new_state) {
+  stopifnot(is.data.frame(inventory),
+            is.data.frame(new_state),
+            nrow(inventory) > 0,
+            nrow(new_state) > 0)
+  stopifnot(all(c("file", "pid", "created") %in% names(inventory)))
 
   # Temporary: Filter NA files from new_state
   # Need to fix this elsewhere
   new_state <- new_state[!is.na(new_state$file),]
 
-  stopifnot(is.data.frame(inventory),
-            is.data.frame(new_state))
-  stopifnot(all(c("file", "pid", "created") %in% names(inventory)))
-
   for (row_num in seq_len(nrow(new_state))) {
-    cat("U")
     file <- new_state[row_num,"file"]
     pid <- new_state[row_num,"pid"]
     created <- new_state[row_num,"created"]
@@ -395,7 +398,7 @@ inv_update <- function(inventory, new_state) {
     inventory[which(inventory$file == file),"created"] <- created
   }
 
-  cat("\n")
-
   inventory
 }
+
+
