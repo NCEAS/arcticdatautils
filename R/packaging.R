@@ -23,6 +23,13 @@
 #' column with that information
 
 insert_package <- function(inventory, package, env=list()) {
+  stopifnot(is.data.frame(inventory),
+            nrow(inventory) > 0,
+            all(c("file", "checksum_sha256", "size_bytes", "package", "parent_package", "pid", "filename") %in% names(inventory)))
+
+  stopifnot(is.character(package),
+            package %in% inventory$package)
+
   stopifnot(!is.null(env), length(env) > 0)
   stopifnot(all(c("base_directory", "identifier_scheme", "mn", "submitter", "rights_holder") %in% names(env)))
   stopifnot(all(unlist(lapply(env, nchar)) > 0))
