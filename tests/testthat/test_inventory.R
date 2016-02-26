@@ -142,4 +142,18 @@ test_that("hierarchical packages are correctly marked", {
   inv <- inv_add_parent_package_column(inv)
 
   expect_equal(inv$parent_package, c("", "A", "B", "C", "D", "E", "F", "G"))
+
+  # Another example
+  inv <- data.frame(file = c("./acadis-gateway/some_long_name/parent.xml",
+                             "./acadis-gateway/some_long_name/child_one/child.xml",
+                             "./acadis-gateway/some_long_name/child_two/child.xml",
+                             "./acadis-gateway/some_long_name/child_three/child.xml"),
+                    package = c("A", "B", "C", "D"),
+                    is_metadata = TRUE,
+                    depth = c(4, 5, 5, 5),
+                    stringsAsFactors = FALSE)
+
+  inv <- inv_add_parent_package_column(inv)
+
+  expect_equal(inv$parent_package, c("", "A", "A", "A"))
 })
