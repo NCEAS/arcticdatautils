@@ -258,7 +258,7 @@ generate_resource_map <- function(metadata_pid,
   # I'm doing this becasue datapackage can't handle the reserved characters
   # like colons.
   resource_map <- datapackage::createFromTriples(new("ResourceMap",
-                                                     id = paste0("resourceMap_", metadata_pid, reserved = TRUE)),
+                                                     id = paste0("resourceMap_", metadata_pid)),
                                                  relations = relationships,
                                                  identifiers = c(metadata_pid, data_pids),
                                                  resolveURI = resolve_base)
