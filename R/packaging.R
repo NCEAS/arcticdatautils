@@ -450,6 +450,10 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
   print(response)
 
+  if (inherits(response, "error")) {
+    return(FALSE)
+  }
+
   created_pid <- XML::xmlToList(response)
 
   if (is.character(created_pid) && nchar(created_pid) > 0) {
