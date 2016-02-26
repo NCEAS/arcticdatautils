@@ -41,6 +41,18 @@ insert_package <- function(inventory, package, child_pids=c(), env=list()) {
             file.exists(base_path))
 
 
+  # Check that any packages with this package as a parent package have
+  # resource map identifiers
+  child_packages <- inventory[inventory$parent_package == package &
+                             inventory$is_metadata,]
+
+  if (!all(child_packages$pid != "")) {
+    stop("Not all child packages had PIDs already. Add those packages first.")
+  }
+
+  # Gather child pids
+  child_pids <- paste0("resourceMap_", unique(child_packages$pid), "TRUE")
+
   # Find the package contents (metadata and data)
   files <- inventory[inventory$package == package,]
   files <- files[!is.na(files$package),]   # TODO: Remove this once I fix my bug
@@ -225,7 +237,7 @@ generate_resource_map <- function(metadata_pid,
                                   child_pids=c(),
                                   resolve_base="https://cn.dataone.org/cn/v2/resolve") {
   stopifnot(length(metadata_pid) == 1)
-  stopifnot(length(data_pids) >= 1)
+  stopifnot((length(data_pids) + length(child_pids)) >= 1)
 
   # Validate the vector of child PIDs
   if (!is.character(child_pids)) {
@@ -235,6 +247,25 @@ generate_resource_map <- function(metadata_pid,
   relationships <- data.frame()
 
   for (data_pid in data_pids) {
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base,"/", metadata_pid),
+                                      predicate = "http://purl.org/spar/cito/documents",
+                                      object = paste0(resolve_base, "/", data_pid),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
+
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base, "/", data_pid),
+                                      predicate = "http://purl.org/spar/cito/isDocumentedBy",
+                                      object = paste0(resolve_base, "/", metadata_pid),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
+  }
+
+  # TODO Implement this fully
+  for (child_pid in child_pids) {
     relationships <- rbind(relationships,
                            data.frame(subject = paste0(resolve_base,"/", metadata_pid),
                                       predicate = "http://purl.org/spar/cito/documents",
