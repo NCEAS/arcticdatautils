@@ -25,7 +25,7 @@
 insert_package <- function(inventory, package, child_pids=c(), env=list()) {
   # Validate the environment parameter
   stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(length(setdiff(c("base_directory", "identifier_scheme", "mn", "submitter", "rights_holder"), names(env))) == 0)
+  stopifnot(all(c("base_directory", "identifier_scheme", "mn", "submitter", "rights_holder") %in% names(env)))
   stopifnot(all(unlist(lapply(env, nchar)) > 0))
 
   # Configuration
