@@ -438,10 +438,12 @@ create_object <- function(file, sysmeta, base_path, mn) {
     },
     warning = function(w) {
       cat(paste0("Warning generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
+      w
     },
     error = function(e) {
       cat(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
       cat(as.character(e))
+      e
     })
 
   # Validate the result
