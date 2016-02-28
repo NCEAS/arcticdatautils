@@ -22,7 +22,7 @@
 #' This should be automated and based upon the inventory file having another
 #' column with that information
 
-insert_package <- function(inventory, package, env=list()) {
+insert_package <- function(inventory, package) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0,
             all(c("file", "checksum_sha256", "size_bytes", "package", "parent_package", "pid", "filename") %in% names(inventory)))
@@ -36,15 +36,23 @@ insert_package <- function(inventory, package, env=list()) {
 
   # Configuration
   library(dataone)  # TODO Remove this library call once the package is fixed
+  env <- env_get()
+  stopifnot(class(env) == "list",
+            length(env) > 0)
+
   mn <- MNode(env$mn)
   submitter <- env$submitter
   rights_holder <- env$rights_holder
   base_path <- env$base_directory
+  alt_path <- env$alternate_directory
+  metadata_identifier_scheme <- env$metadata_identifier_scheme
+  data_identifier_scheme <- env$data_identifier_scheme
 
   stopifnot(class(mn) == "MNode",
             nchar(submitter) > 0,
             nchar(rights_holder) > 0,
-            file.exists(base_path))
+            file.exists(base_path),
+            file.exists(alt_path))
 
 
   # Check that any packages with this package as a parent package have
@@ -83,7 +91,9 @@ insert_package <- function(inventory, package, env=list()) {
   # Process metadata
 
   # Metadata PID
-  files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,], mn, scheme = "UUID")
+  files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
+                                                       mn,
+                                                       scheme = metadata_identifier_scheme)
 
   if (is.na(files[files_idx_metadata,"pid"])) {
     cat(paste0("Metadata PID was NA for package ", package, ".\n"))
@@ -123,7 +133,9 @@ insert_package <- function(inventory, package, env=list()) {
   for (data_idx in files_idx_data) {
     cat(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
 
-    files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,], mn, scheme = "UUID")
+    files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
+                                               mn,
+                                               scheme = data_identifier_scheme)
 
     if (is.na(files[data_idx,"pid"])) {
       cat(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
