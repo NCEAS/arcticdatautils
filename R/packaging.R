@@ -54,6 +54,14 @@ insert_package <- function(inventory, package) {
             file.exists(base_path),
             file.exists(alt_path))
 
+  # Don't do anything if we don't have a valid token
+  am <- dataone::AuthenticationManager()
+  auth_valid <- dataone:::isAuthValid(am, mn)
+
+  if (auth_valid == FALSE) {
+    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
+    return(data.frame())
+  }
 
   # Check that any packages with this package as a parent package have
   # resource map identifiers
@@ -71,15 +79,6 @@ insert_package <- function(inventory, package) {
   files <- inventory[inventory$package == package,]
   files <- files[!is.na(files$package),]   # TODO: Remove this once I fix my bug
   stopifnot(nrow(files) > 0)
-
-  # Don't do anything if we don't have a valid token
-  am <- dataone::AuthenticationManager()
-  auth_valid <- dataone:::isAuthValid(am, mn)
-
-  if (auth_valid == FALSE) {
-    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
-    return(files)
-  }
 
   # Seperate files out into metadata and data by capturing their indicies
   # in the files data.frame
