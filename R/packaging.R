@@ -317,6 +317,16 @@ generate_resource_map <- function(metadata_pid,
   outfilepath
 }
 
+#' Get the already-minted PID from the inventory or mint a new one.
+#'
+#' @param file A single row from the inventory (data.frame)
+#' @param mn The Member Node that will mint the new PID, if needed. (dataone::MNode)
+#' @param scheme The identifier scheme to use. (character)
+#'
+#' @return The identifier (character)
+#' @export
+#'
+#' @examples
 get_or_create_pid <- function(file, mn, scheme="UUID") {
   cat(paste0("get_or_create_pid()\n"))
 
@@ -354,6 +364,21 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 
 
 
+#' Create a sysmeta object.
+#'
+#' This is a wrapper function around the constructor for a
+#' dataone::SystemMetadata object.
+#'
+#' @param file file A single row from the inventory (data.frame)
+#' @param base_path The path prefix to use with the contents of `file[1,"filename]` that
+#' will be used to locate the file on disk. (character)
+#' @param submitter The submitter DN string for the object. (character)
+#' @param rights_holder The rights holder DN string for the object. (character)
+#'
+#' @return The sysmeta object (dataone::SystemMetadata)
+#' @export
+#'
+#' @examples
 create_sysmeta <- function(file, base_path, submitter, rights_holder) {
   cat(paste0("create_sysmeta()\n"))
 
@@ -479,6 +504,4 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
 
 }
-
-
 
