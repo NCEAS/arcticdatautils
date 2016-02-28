@@ -5,11 +5,48 @@
 #' the code is being run under.
 
 
-# TODO: Implement this function for real
+#' Get the current environment name.
+#'
+#' @return The environment name (character)
 env_get <- function() {
-  "development"
+  env <- Sys.getenv("ARCTICDATA_ENV")
+
+  if (env == "") {
+    env <- "development"
+  }
+
+  env
 }
 
+#' Load environmental variables from a YAML-formatted environment file.
+#'
+#' This file should be formatted in the following way:
+#'
+#' some_environment:
+#'   var_one: some value
+#'   var_two: some value
+#'   var_three: some value
+#'
+#' @param file A YAML-formatted environment file.
+#'
+#' @return A list of name <-> value pairs.
+#' @export
+#'
+#' @examples
+#' #' Loading the above file with `env_load()` would return a list with the shape:
+#' > Sys.setenv("ARCTICDATA_ENV", "some_environment")
+#' > dir()
+#' [1] "env.yml"
+#' > env <- env_load("env.yml)
+#' > env
+#' $var_one
+#' [1] "some value"
+#'
+#' $var_two
+#' [1] "some value"
+#'
+#' $var_three
+#' [1] "some value
 env_load <- function(file) {
   stopifnot(file.exists(file))
 
