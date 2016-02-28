@@ -73,7 +73,11 @@ insert_package <- function(inventory, package) {
   }
 
   # Gather child pids
-  child_pids <- paste0("resourceMap_", unique(child_packages$pid), "TRUE")
+  if (nrow(child_packages) > 0) {
+    child_pids <- paste0("resourceMap_", unique(child_packages$pid))
+  } else {
+    child_pids <- c()
+  }
 
   # Find the package contents (metadata and data)
   files <- inventory[inventory$package == package,]
@@ -182,8 +186,7 @@ insert_package <- function(inventory, package) {
                                                  child_pids)
   # Decide on the Resource Map's PID. This is a temporary solution until
   # I can figure out the best place to fix the code.
-  # resource_map_pid <- URLencode(paste0("resourceMap_", files[files_idx_metadata,"pid"])
-  resource_map_pid <- uuid::UUIDgenerate()
+  resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
 
   cat(paste0("Resource map PID should be ", resource_map_pid, ".\n"))
 
@@ -281,34 +284,30 @@ generate_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
-  # TODO Implement this fully
+  aggregation_pid <- paste0("resourceMap_", metadata_pid, "#aggregation")
+
   for (child_pid in child_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base,"/", metadata_pid),
-                                      predicate = "http://purl.org/spar/cito/documents",
-                                      object = paste0(resolve_base, "/", data_pid),
+                           data.frame(subject = paste0(resolve_base,"/", aggregation_pid),
+                                      predicate = "http://www.openarchives.org/ore/terms/aggregates",
+                                      object = paste0(resolve_base, "/", child_pid),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, "/", data_pid),
-                                      predicate = "http://purl.org/spar/cito/isDocumentedBy",
-                                      object = paste0(resolve_base, "/", metadata_pid),
+                           data.frame(subject = paste0(resolve_base, "/", child_pid),
+                                      predicate = "http://www.openarchives.org/ore/terms/isAggregatedBy",
+                                      object = paste0(resolve_base, "/", aggregation_pid),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
 
-  # Temporary fix until I can figure out where to fix the code. id is set to the
-  # metadata PID even though the PID I run create with is different. This
-  # apparently doesn't cause any issues for indexing the resource maps. Huh.
-  # I'm doing this becasue datapackage can't handle the reserved characters
-  # like colons.
   resource_map <- datapackage::createFromTriples(new("ResourceMap",
                                                      id = paste0("resourceMap_", metadata_pid)),
                                                  relations = relationships,
-                                                 identifiers = c(metadata_pid, data_pids),
+                                                 identifiers = c(metadata_pid, data_pids, child_pids),
                                                  resolveURI = resolve_base)
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
