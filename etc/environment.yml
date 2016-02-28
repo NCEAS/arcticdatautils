@@ -1,20 +1,26 @@
 development:
   base_directory: ~/src/arctic-data/packages/
-  identifier_scheme: UUID
+  alternate_directory: ~/src/arctic-data/packages-alt
+  metadata_identifier_scheme: UUID
+  data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
 
 test:
   base_directory: ~/src/arctic-data/packages/
-  identifier_scheme: UUID
+  alternate_directory: ~/src/arctic-data/packages-alt
+  metadata_identifier_scheme: UUID
+  data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
 
 production:
   base_directory: ~/mecum/arctic-data/packages/
-  identifier_scheme: DOI
+  alternate_directory: ~/src/arctic-data/packages-alt
+  metadata_identifier_scheme: DOI
+  data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
