@@ -156,8 +156,7 @@ insert_package <- function(inventory, package) {
   stopifnot(class(mn) == "MNode",
             nchar(submitter) > 0,
             nchar(rights_holder) > 0,
-            file.exists(base_path),
-            file.exists(alt_path))
+            file.exists(base_path))
 
   # Don't do anything if we don't have a valid token
   am <- dataone::AuthenticationManager()
