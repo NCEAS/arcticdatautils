@@ -325,10 +325,15 @@ insert_package <- function(inventory, package) {
     },
     error = function(e) {
       cat(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
-      cat(as.character(e))
+      print(e)
+
+      e
     }
   )
 
+  if (inherits(create_resource_map_response, "error")) {
+    created_resource_map_pid <- NULL
+  }
 
   created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
 
@@ -451,16 +456,21 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
   cat(paste0("Minting new PID...\n"))
 
   # Try to generate a new pid with generateIdentifier()
-  pid <- ""
-
   pid <- tryCatch(
     {
       dataone::generateIdentifier(mn, scheme)
     },
     error = function(e) {
-      # Do nothing
+      cat(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
+      print(e)
+
+      e
     }
   )
+
+  if (inherits(pid, "error")) {
+    pid <- ""
+  }
 
   # Return `pid`, whch is either "" or a PID at this point
   pid
@@ -529,14 +539,18 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 
       x
     },
-    warning = function(w) {
-      cat(paste0("Warning generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
-    },
     error = function(e) {
       cat(paste0("Error generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
-      cat(as.character(e))
+      print(e)
+
+      e
     }
   )
+
+  # Return NULL instead of a dataone::SystemMetadata
+  if (inherits(sysmeta, "error")) {
+    return(NULL)
+  }
 
   sysmeta
 }
@@ -576,13 +590,10 @@ create_object <- function(file, sysmeta, base_path, mn) {
                       file = path_on_disk,
                       sysmeta = sysmeta)
     },
-    warning = function(w) {
-      cat(paste0("Warning generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
-      w
-    },
     error = function(e) {
       cat(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
-      cat(as.character(e))
+      print(e)
+
       e
     })
 
