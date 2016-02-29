@@ -559,6 +559,17 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 
 
 
+#' Create an object from a row of the inventory.
+#'
+#' @param file A row from the inventory (data.frame)
+#' @param sysmeta The file's sysmeta (dataone::SystemMetadata)
+#' @param base_path
+#' @param mn
+#'
+#' @return
+#' @export
+#'
+#' @examples
 create_object <- function(file, sysmeta, base_path, mn) {
   cat(paste0("create_object()\n"))
 
