@@ -4,6 +4,104 @@
 #' Code related to inserting datasets as Data Packages.
 
 
+
+insert_file <- function(inventory, file) {
+  stopifnot(is.data.frame(inventory),
+            nrow(inventory) > 0,
+            all(c("file",
+                  "checksum_sha256",
+                  "size_bytes",
+                  "pid",
+                  "filename") %in% names(inventory)))
+  stopifnot(is.character(file),
+            nchar(file) > 0,
+            file %in% inventory$file)
+
+  # Configuration
+  library(dataone)  # TODO Remove this library call once the package is fixed
+  env <- env_load("etc/environment.yml")
+
+  stopifnot(class(env) == "list",
+            length(env) > 0)
+  stopifnot(!is.null(env), length(env) > 0)
+  stopifnot(all(c("base_directory",
+                  "alternate_directory",
+                  "metadata_identifier_scheme",
+                  "data_identifier_scheme",
+                  "mn",
+                  "submitter",
+                  "rights_holder") %in% names(env)))
+  stopifnot(all(unlist(lapply(env, nchar)) > 0))
+
+  mn <- MNode(env$mn)
+  base_path <- env$base_directory
+  alt_path <- env$alternate_directory
+  metadata_identifier_scheme <- env$metadata_identifier_scheme
+  data_identifier_scheme <- env$data_identifier_scheme
+  submitter <- env$submitter
+  rights_holder <- env$rights_holder
+
+  # Don't do anything if we don't have a valid token
+  am <- dataone::AuthenticationManager()
+  auth_valid <- dataone:::isAuthValid(am, mn)
+
+  if (auth_valid == FALSE) {
+    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
+    return(data.frame())
+  }
+
+  # Find the file
+  inventory_file <- inventory[inventory$file == file,]
+  stopifnot(nrow(inventory_file) == 1)
+
+  # Determine the identifier scheme to use
+  if (inventory_file$is_metadata == TRUE) {
+    identifier_scheme <- metadata_identifier_scheme
+  } else {
+    identifier_scheme <- data_identifier_scheme
+  }
+
+  # PID
+  inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
+                                               mn,
+                                               scheme = identifier_scheme)
+
+  if (is.na(inventory_file[1,"pid"])) {
+    cat(paste0("PID was NA for file ", file, ".\n"))
+    return(inventory_file)
+  }
+
+  # System Metadat
+  sysmeta <- create_sysmeta(inventory_file[1,],
+                            base_path,
+                            submitter,
+                            rights_holder)
+
+  if (is.null(sysmeta)) {
+    cat(paste0("System Metadata creation failed for file ", file, ".\n"))
+    return(inventory_file)
+  }
+
+  if (!("created" %in% names(inventory_file))) {
+    inventory_file$created <- FALSE
+  }
+
+  if (inventory_file[1,"created"] == FALSE) {
+    inventory_file[1,"created"] <- create_object(inventory_file[1,],
+                                                 sysmeta,
+                                                 base_path,
+                                                 mn)
+  }
+
+  if (inventory_file[1,"created"] == FALSE) {
+    cat(paste0("Object creation failed for file ", file, ".\n"))
+    return(inventory_file)
+  }
+
+  return(inventory_file)
+}
+
+
 #' Create a single package Data Package from files in the Inventory.
 #'
 #' @param inventory An Inventory (data.frame)
@@ -30,23 +128,30 @@ insert_package <- function(inventory, package) {
   stopifnot(is.character(package),
             package %in% inventory$package)
 
-  stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(all(c("base_directory", "identifier_scheme", "mn", "submitter", "rights_holder") %in% names(env)))
-  stopifnot(all(unlist(lapply(env, nchar)) > 0))
 
   # Configuration
   library(dataone)  # TODO Remove this library call once the package is fixed
-  env <- env_get()
+  env <- env_load("etc/environment.yml")
+
   stopifnot(class(env) == "list",
             length(env) > 0)
+  stopifnot(!is.null(env), length(env) > 0)
+  stopifnot(all(c("base_directory",
+                  "alternate_directory",
+                  "metadata_identifier_scheme",
+                  "data_identifier_scheme",
+                  "mn",
+                  "submitter",
+                  "rights_holder") %in% names(env)))
+  stopifnot(all(unlist(lapply(env, nchar)) > 0))
 
   mn <- MNode(env$mn)
-  submitter <- env$submitter
-  rights_holder <- env$rights_holder
   base_path <- env$base_directory
   alt_path <- env$alternate_directory
   metadata_identifier_scheme <- env$metadata_identifier_scheme
   data_identifier_scheme <- env$data_identifier_scheme
+  submitter <- env$submitter
+  rights_holder <- env$rights_holder
 
   stopifnot(class(mn) == "MNode",
             nchar(submitter) > 0,
