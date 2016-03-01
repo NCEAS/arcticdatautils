@@ -281,8 +281,6 @@ insert_package <- function(inventory, package) {
     return(files)
   }
 
-
-
   # Generate and create() the Resource Map
   cat(paste0("Generating resource map for package ", package, ".\n"))
   resource_map_pid <- generate_resource_map_pid(files[files_idx_metadata,"pid"])
@@ -461,8 +459,6 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
     return(pid)
   }
 
-
-  # Try to generate a new pid with generateIdentifier()
   cat(paste0("Minting new PID with scheme ", scheme, "\n"))
 
   if (scheme == "UUID") {
@@ -640,8 +636,6 @@ create_object <- function(file, sysmeta, base_path, mn) {
   }
 
   print(result)
+
   result
-
-
 }
-
