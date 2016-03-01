@@ -176,6 +176,40 @@ inv_load_checksums <- function(path, inventory) {
   inventory
 }
 
+
+#' Load DOIs from a text file into the Inventory.
+#'
+#' @param path Location of a text file with DOIs and file paths. (character)
+#' @param inventory An inventory (data.frame)
+#'
+#' @return The modified Inventory (data.frame)
+#' @export
+#'
+#' @examples
+#' inv_load_dois("dois.txt", my_inv)
+inv_load_dois <- function(path, inventory) {
+  stopifnot(file.exists(path))
+  stopifnot(is.data.frame(inventory),
+            "file" %in% names(inventory))
+
+  dois <- read.delim(path,
+                     header = FALSE,
+                     col.names = c("file", "pid"),
+                     stringsAsFactors = FALSE)
+
+  stopifnot(is.data.frame(dois),
+            nrow(dois) > 0,
+            all(is.character(dois$file)),
+            all(is.character(dois$pid)))
+
+  # Join the identifiers onto existing filenames in the inventory
+  # First drop the existing identifiers
+  inventory <- inventory[,!(names(inventory) %in% "pid"), drop = FALSE]
+  inventory <- dplyr::left_join(inventory, dois, by = "file")
+
+  inventory
+}
+
 #' Load identifiers into the inventory file(s) from a text file. This function
 #' removes the column 'identifier' from inventory before doing a
 #' left join.
