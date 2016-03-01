@@ -445,10 +445,7 @@ generate_resource_map_pid <- function(metadata_pid) {
     return(metadata_pid)
   }
 
-  # paste0("resourceMap_",
-  # stringr::str_replace(metadata_pid, "urn:uuid:", ""))
   paste0("resourceMap_", metadata_pid)
-  # uuid::UUIDgenerate()
 }
 
 #' Get the already-minted PID from the inventory or mint a new one.
