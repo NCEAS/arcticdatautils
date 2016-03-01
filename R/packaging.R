@@ -388,6 +388,7 @@ generate_resource_map <- function(metadata_pid,
   resource_map_pid <- generate_resource_map_pid(metadata_pid)
 
   for (child_pid in child_pids) {
+    # aggregates <-> isAggregatedBy
     relationships <- rbind(relationships,
                            data.frame(subject = paste0(resolve_base,"/", URLencode(resource_map_pid, reserved = TRUE), "#aggregation"),
                                       predicate = "http://www.openarchives.org/ore/terms/aggregates",
@@ -400,6 +401,23 @@ generate_resource_map <- function(metadata_pid,
                            data.frame(subject = paste0(resolve_base, "/", URLencode(child_pid, reserved = TRUE)),
                                       predicate = "http://www.openarchives.org/ore/terms/isAggregatedBy",
                                       object = paste0(resolve_base, "/", URLencode(resource_map_pid, reserved = TRUE), "#aggregation"),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
+
+    # documents <-> isDocumentedBy
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
+                                      predicate = "http://purl.org/spar/cito/documents",
+                                      object = paste0(resolve_base, "/", URLencode(child_pid, reserved = TRUE)),
+                                      subjectType = "uri",
+                                      objectType = "uri",
+                                      stringsAsFactors = FALSE))
+
+    relationships <- rbind(relationships,
+                           data.frame(subject = paste0(resolve_base, "/", URLencode(child_pid, reserved = TRUE)),
+                                      predicate = "http://purl.org/spar/cito/isDocumentedBy",
+                                      object = paste0(resolve_base, "/", URLencode(metadata_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
