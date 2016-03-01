@@ -461,20 +461,25 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
     return(pid)
   }
 
-  cat(paste0("Minting new PID...\n"))
 
   # Try to generate a new pid with generateIdentifier()
-  pid <- tryCatch(
-    {
-      dataone::generateIdentifier(mn, scheme)
-    },
-    error = function(e) {
-      cat(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
-      print(e)
+  cat(paste0("Minting new PID with scheme ", scheme, "\n"))
 
-      e
-    }
-  )
+  if (scheme == "UUID") {
+    pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
+  } else {
+    pid <- tryCatch(
+      {
+        dataone::generateIdentifier(mn, scheme)
+      },
+      error = function(e) {
+        cat(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
+        print(e)
+
+        e
+      }
+    )
+  }
 
   if (inherits(pid, "error")) {
     pid <- ""
