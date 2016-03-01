@@ -61,9 +61,9 @@ theme_packages <- function(inventory, nfiles_cutoff=100) {
   inventory$theme[grep("v_\\d\\.", inventory$file)] <- "has-versions"
 
   # There should be no un-themed packages once we're done
-  theme_stats <- inventory %>% group_by(theme) %>%
-    filter(is_metadata == TRUE) %>%
-    summarize(npkgs = length(filename))
+  theme_stats <- dplyr::group_by(inventory, theme)
+  theme_stats <- dplyr::filter(theme_stats, is_metadata == TRUE)
+  theme_stats <- dplyr::summarize(theme_stats, npkgs = length(filename))
 
   cat("Theme summary (by package):\n")
 
