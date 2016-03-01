@@ -178,7 +178,7 @@ insert_package <- function(inventory, package) {
 
   # Gather child pids
   if (nrow(child_packages) > 0) {
-    child_pids <- paste0("resourceMap_", unique(child_packages$pid))
+    child_pids <- vapply(child_packages$pid, generate_resource_map_pid, "")
   } else {
     child_pids <- c()
   }
@@ -285,12 +285,10 @@ insert_package <- function(inventory, package) {
 
   # Generate and create() the Resource Map
   cat(paste0("Generating resource map for package ", package, ".\n"))
+  resource_map_pid <- generate_resource_map_pid(files[files_idx_metadata,"pid"])
   resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
-  # Decide on the Resource Map's PID. This is a temporary solution until
-  # I can figure out the best place to fix the code.
-  resource_map_pid <- paste0("resourceMap_", files[files_idx_metadata,"pid"])
 
   cat(paste0("Resource map PID should be ", resource_map_pid, ".\n"))
 
@@ -377,46 +375,46 @@ generate_resource_map <- function(metadata_pid,
 
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base,"/", metadata_pid),
+                           data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
                                       predicate = "http://purl.org/spar/cito/documents",
-                                      object = paste0(resolve_base, "/", data_pid),
+                                      object = paste0(resolve_base, "/", URLencode(data_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, "/", data_pid),
+                           data.frame(subject = paste0(resolve_base, "/", URLencode(data_pid, reserved = TRUE)),
                                       predicate = "http://purl.org/spar/cito/isDocumentedBy",
-                                      object = paste0(resolve_base, "/", metadata_pid),
+                                      object = paste0(resolve_base, "/", URLencode(metadata_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
 
-  aggregation_pid <- paste0("resourceMap_", metadata_pid, "#aggregation")
+  resource_map_pid <- generate_resource_map_pid(metadata_pid)
 
   for (child_pid in child_pids) {
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base,"/", aggregation_pid),
+                           data.frame(subject = paste0(resolve_base,"/", URLencode(resource_map_pid, reserved = TRUE), "#aggregation"),
                                       predicate = "http://www.openarchives.org/ore/terms/aggregates",
-                                      object = paste0(resolve_base, "/", child_pid),
+                                      object = paste0(resolve_base, "/", URLencode(child_pid, reserved = TRUE)),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
 
     relationships <- rbind(relationships,
-                           data.frame(subject = paste0(resolve_base, "/", child_pid),
+                           data.frame(subject = paste0(resolve_base, "/", URLencode(child_pid, reserved = TRUE)),
                                       predicate = "http://www.openarchives.org/ore/terms/isAggregatedBy",
-                                      object = paste0(resolve_base, "/", aggregation_pid),
+                                      object = paste0(resolve_base, "/", URLencode(resource_map_pid, reserved = TRUE), "#aggregation"),
                                       subjectType = "uri",
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
 
   resource_map <- datapackage::createFromTriples(new("ResourceMap",
-                                                     id = paste0("resourceMap_", metadata_pid)),
+                                                     id = generate_resource_map_pid(metadata_pid)),
                                                  relations = relationships,
-                                                 identifiers = c(metadata_pid, data_pids, child_pids),
+                                                 identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
                                                  resolveURI = resolve_base)
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
@@ -424,6 +422,21 @@ generate_resource_map <- function(metadata_pid,
   datapackage::serializeRDF(resource_map, outfilepath)
 
   outfilepath
+}
+
+
+generate_resource_map_pid <- function(metadata_pid) {
+  stopifnot(is.character(metadata_pid),
+            nchar(metadata_pid) > 0)
+
+  if (stringi::stri_startswith_fixed(metadata_pid, "resourceMap")) {
+    return(metadata_pid)
+  }
+
+  # paste0("resourceMap_",
+  # stringr::str_replace(metadata_pid, "urn:uuid:", ""))
+  paste0("resourceMap_", metadata_pid)
+  # uuid::UUIDgenerate()
 }
 
 #' Get the already-minted PID from the inventory or mint a new one.
