@@ -330,15 +330,11 @@ insert_package <- function(inventory, package) {
 
   if (inherits(create_resource_map_response, "error")) {
     created_resource_map_pid <- NULL
-  }
-
-  created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
-
-  if (is.character(created_resource_map_pid) &&
-      nchar(created_resource_map_pid) > 0) {
-    files$resmap_created <- TRUE
-  } else {
     files$resmap_created <- FALSE
+  } else {
+    print(create_resource_map_response)
+    created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
+    files$resmap_created <- TRUE
   }
 
   print(files)
