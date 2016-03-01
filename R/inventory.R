@@ -186,7 +186,7 @@ inv_load_checksums <- function(path, inventory) {
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_identifiers <- function(path, inventory) {
+inv_load_identifiers <- function(paths, inventory) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
             "file" %in% names(inventory))
