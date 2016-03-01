@@ -170,7 +170,7 @@ insert_package <- function(inventory, package) {
   # Check that any packages with this package as a parent package have
   # resource map identifiers
   child_packages <- inventory[inventory$parent_package == package &
-                             inventory$is_metadata,]
+                              inventory$is_metadata,]
 
   if (!all(child_packages$pid != "")) {
     stop("Not all child packages had PIDs already. Add those packages first.")
