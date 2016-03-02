@@ -611,8 +611,8 @@ validate_environment <- function(env) {
   stopifnot(class(env) == "list",
             length(env) > 0)
   stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(all(c("base_directory",
-                  "alternate_directory",
+  stopifnot(all(c("base_path",
+                  "alternate_path",
                   "metadata_identifier_scheme",
                   "data_identifier_scheme",
                   "mn",
