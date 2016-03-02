@@ -624,7 +624,7 @@ validate_environment <- function(env) {
 
 check_auth <- function(env) {
   am <- dataone::AuthenticationManager()
-  auth_valid <- dataone:::isAuthValid(am, env$mn)
+  auth_valid <- dataone:::isAuthValid(am, dataone::MNode(env$mn))
 
   if (auth_valid == FALSE) {
     cat(paste0("Authentication was not valid agaisnt member node: ", env$mn@endpoint, ". Returning early.\n"))
