@@ -264,9 +264,9 @@ inv_add_extra_columns <- function(inventory) {
     stringi::stri_endswith_fixed(inventory$file, "iso19139.xml")
 
   # Mark which root subfolder each file is under
-  cat("Adding 'subfolder' column.\n")
-  inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-field-projects")] <- "FP"
-  inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-gateway")] <- "G"
+  # cat("Adding 'subfolder' column.\n")
+  # inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-field-projects")] <- "FP"
+  # inventory$subfolder[stringi::stri_startswith_fixed(inventory$file, "./acadis-gateway")] <- "G"
 
   # Add a column with filename and folder paths
   cat("Adding 'folder' and 'filename' columns.\n")
@@ -292,9 +292,9 @@ inv_add_extra_columns <- function(inventory) {
       stringr::str_split(inventory$file, "/"), length))
 
   # Add column for whether or not a file is an archive
-  cat("Adding 'is_archive' column.\n")
-  archive_regex <- ".*\\.(tar|gz|bz2|zip|tgz)$"
-  inventory$is_archive <- grepl(archive_regex, inventory$filename)
+  # cat("Adding 'is_archive' column.\n")
+  # archive_regex <- ".*\\.(tar|gz|bz2|zip|tgz)$"
+  # inventory$is_archive <- grepl(archive_regex, inventory$filename)
 
   # Add a column for the format ID
   cat("Adding 'format_id' column.\n")
@@ -329,11 +329,11 @@ inv_add_extra_columns <- function(inventory) {
   cat("\n")
 
   # Calculate statistics related to packages
-  cat("Adding 'package_nfiles', 'package_size_mb', and 'package_has_archives' columns.\n")
-  inventory <- dplyr::group_by(inventory, package)
-  inventory <- dplyr::mutate(inventory, package_nfiles = length(package),
-                             package_size_mb = round(sum(size_bytes) / 1024 / 1024, 1),
-                             package_has_archives = any(is_archive))
+  # cat("Adding 'package_nfiles', 'package_size_mb', and 'package_has_archives' columns.\n")
+  # inventory <- dplyr::group_by(inventory, package)
+  # inventory <- dplyr::mutate(inventory, package_nfiles = length(package),
+  #                            package_size_mb = round(sum(size_bytes) / 1024 / 1024, 1),
+  #                            package_has_archives = any(is_archive))
 
   as.data.frame(inventory)
 }
