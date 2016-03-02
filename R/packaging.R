@@ -5,6 +5,13 @@
 
 
 
+#' Insert a file from a single row of the Inventory.
+#'
+#' @param inventory An Inventory (data.frame)
+#' @param file The fully-qualified relative path to the file. See examples.
+#'
+#' @example insert_file(my_inv,
+#'                      "./acadis-gateway/project/A/iso.xml")
 insert_file <- function(inventory, file) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0,
