@@ -13,49 +13,14 @@
 #' @example insert_file(my_inv,
 #'                      "./acadis-gateway/project/A/iso.xml")
 insert_file <- function(inventory, file) {
-  stopifnot(is.data.frame(inventory),
-            nrow(inventory) > 0,
-            all(c("file",
-                  "checksum_sha256",
-                  "size_bytes",
-                  "pid",
-                  "filename") %in% names(inventory)))
-  stopifnot(is.character(file),
-            nchar(file) > 0,
-            file %in% inventory$file)
+  validate_inventory(inventory)
+  stopifnot(is.character(file), nchar(file) > 0, file %in% inventory$file)
 
   # Configuration
   library(dataone)  # TODO Remove this library call once the package is fixed
   env <- env_load("etc/environment.yml")
-
-  stopifnot(class(env) == "list",
-            length(env) > 0)
-  stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(all(c("base_directory",
-                  "alternate_directory",
-                  "metadata_identifier_scheme",
-                  "data_identifier_scheme",
-                  "mn",
-                  "submitter",
-                  "rights_holder") %in% names(env)))
-  stopifnot(all(unlist(lapply(env, nchar)) > 0))
-
-  mn <- MNode(env$mn)
-  base_path <- env$base_directory
-  alt_path <- env$alternate_directory
-  metadata_identifier_scheme <- env$metadata_identifier_scheme
-  data_identifier_scheme <- env$data_identifier_scheme
-  submitter <- env$submitter
-  rights_holder <- env$rights_holder
-
-  # Don't do anything if we don't have a valid token
-  am <- dataone::AuthenticationManager()
-  auth_valid <- dataone:::isAuthValid(am, mn)
-
-  if (auth_valid == FALSE) {
-    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
-    return(data.frame())
-  }
+  validate_environment(env)
+  check_auth(env)
 
   # Find the file
   inventory_file <- inventory[inventory$file == file,]
@@ -63,41 +28,37 @@ insert_file <- function(inventory, file) {
 
   # Determine the identifier scheme to use
   if (inventory_file$is_metadata == TRUE) {
-    identifier_scheme <- metadata_identifier_scheme
+    identifier_scheme <- env$metadata_identifier_scheme
   } else {
-    identifier_scheme <- data_identifier_scheme
+    identifier_scheme <- env$data_identifier_scheme
   }
 
-  # PID
+  # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
-                                               mn,
-                                               scheme = identifier_scheme)
+                                               env$mn,
+                                               scheme = env$identifier_scheme)
 
   if (is.na(inventory_file[1,"pid"])) {
     cat(paste0("PID was NA for file ", file, ".\n"))
     return(inventory_file)
   }
 
-  # System Metadat
+  # System Metadata
   sysmeta <- create_sysmeta(inventory_file[1,],
-                            base_path,
-                            submitter,
-                            rights_holder)
+                            env$base_path,
+                            env$submitter,
+                            env$rights_holder)
 
   if (is.null(sysmeta)) {
     cat(paste0("System Metadata creation failed for file ", file, ".\n"))
     return(inventory_file)
   }
 
-  if (!("created" %in% names(inventory_file))) {
-    inventory_file$created <- FALSE
-  }
-
   if (inventory_file[1,"created"] == FALSE) {
     inventory_file[1,"created"] <- create_object(inventory_file[1,],
                                                  sysmeta,
-                                                 base_path,
-                                                 mn)
+                                                 env$base_path,
+                                                 env$mn)
   }
 
   if (inventory_file[1,"created"] == FALSE) {
@@ -128,51 +89,14 @@ insert_file <- function(inventory, file) {
 #' column with that information
 
 insert_package <- function(inventory, package) {
-  stopifnot(is.data.frame(inventory),
-            nrow(inventory) > 0,
-            all(c("file", "checksum_sha256", "size_bytes", "package", "parent_package", "pid", "filename") %in% names(inventory)))
-
-  stopifnot(is.character(package),
-            package %in% inventory$package)
-
+  validate_inventory(inventory)
+  stopifnot(is.character(package), nchar(package) > 0, package %in% inventory$package)
 
   # Configuration
   library(dataone)  # TODO Remove this library call once the package is fixed
   env <- env_load("etc/environment.yml")
-
-  stopifnot(class(env) == "list",
-            length(env) > 0)
-  stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(all(c("base_directory",
-                  "alternate_directory",
-                  "metadata_identifier_scheme",
-                  "data_identifier_scheme",
-                  "mn",
-                  "submitter",
-                  "rights_holder") %in% names(env)))
-  stopifnot(all(unlist(lapply(env, nchar)) > 0))
-
-  mn <- MNode(env$mn)
-  base_path <- env$base_directory
-  alt_path <- env$alternate_directory
-  metadata_identifier_scheme <- env$metadata_identifier_scheme
-  data_identifier_scheme <- env$data_identifier_scheme
-  submitter <- env$submitter
-  rights_holder <- env$rights_holder
-
-  stopifnot(class(mn) == "MNode",
-            nchar(submitter) > 0,
-            nchar(rights_holder) > 0,
-            file.exists(base_path))
-
-  # Don't do anything if we don't have a valid token
-  am <- dataone::AuthenticationManager()
-  auth_valid <- dataone:::isAuthValid(am, mn)
-
-  if (auth_valid == FALSE) {
-    cat(paste0("Authentication was not valid agaisnt member node: ", mn@endpoint, ". Returning early.\n"))
-    return(data.frame())
-  }
+  validate_environment(env)
+  check_auth()
 
   # Check that any packages with this package as a parent package have
   # resource map identifiers
@@ -204,7 +128,7 @@ insert_package <- function(inventory, package) {
 
   # Process metadata
 
-  # Metadata PID
+  # Determine the PID to use for the metadata
   files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
                                                        mn,
                                                        scheme = metadata_identifier_scheme)
@@ -216,9 +140,9 @@ insert_package <- function(inventory, package) {
 
   # Metadata SystemMetadata
   metadata_sysmeta <- create_sysmeta(files[files_idx_metadata,],
-                                     base_path,
-                                     submitter,
-                                     rights_holder)
+                                     env$base_path,
+                                     env$submitter,
+                                     env$rights_holder)
 
   if (is.null(metadata_sysmeta)) {
     cat(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
@@ -233,9 +157,9 @@ insert_package <- function(inventory, package) {
   # Metadata Object
   if (files[files_idx_metadata,"created"] == FALSE) {
     files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
-                                                         metadata_sysmeta,
-                                                         base_path,
-                                                         mn)
+                                                         env$metadata_sysmeta,
+                                                         env$base_path,
+                                                         env$mn)
   }
 
   if (files[files_idx_metadata,"created"] == FALSE) {
@@ -247,9 +171,10 @@ insert_package <- function(inventory, package) {
   for (data_idx in files_idx_data) {
     cat(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
 
+    # Determine the PID to use for the data
     files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
-                                               mn,
-                                               scheme = data_identifier_scheme)
+                                               env$mn,
+                                               scheme = env$data_identifier_scheme)
 
     if (is.na(files[data_idx,"pid"])) {
       cat(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
@@ -258,9 +183,9 @@ insert_package <- function(inventory, package) {
 
     # Metadata SystemMetadata
     data_sysmeta <- create_sysmeta(files[data_idx,],
-                                   base_path,
-                                   submitter,
-                                   rights_holder)
+                                   env$base_path,
+                                   env$submitter,
+                                   env$rights_holder)
 
     if (is.null(metadata_sysmeta)) {
       cat(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
@@ -271,8 +196,8 @@ insert_package <- function(inventory, package) {
     if (files[data_idx,"created"] == FALSE) {
       files[data_idx,"created"] <- create_object(files[data_idx,],
                                                  data_sysmeta,
-                                                 base_path,
-                                                 mn)
+                                                 env$base_path,
+                                                 env$mn)
     }
 
     if (files[data_idx,"created"] == FALSE) {
@@ -284,7 +209,6 @@ insert_package <- function(inventory, package) {
   # At this point, all of the metadata and data should be created, let's check
   if (!all(is.character(files[,"pid"])) && !all(files[,"created"] == TRUE)) {
     cat(paste0("Not all files in package ", package, " have PIDs and are created. Skipping Resource Map creation.\n"))
-    print(files)
     return(files)
   }
 
@@ -295,7 +219,7 @@ insert_package <- function(inventory, package) {
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
 
-  cat(paste0("Resource map PID should be ", resource_map_pid, ".\n"))
+  cat(paste0("Resource map PID is ", resource_map_pid, ".\n"))
 
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
@@ -308,13 +232,13 @@ insert_package <- function(inventory, package) {
                               size = resource_map_size_bytes,
                               checksum = resource_map_checksum,
                               checksumAlgorithm = "SHA256",
-                              submitter = submitter,
-                              rightsHolder = rights_holder,
+                              submitter = env$submitter,
+                              rightsHolder = env$rights_holder,
                               fileName = paste0(resource_map_pid, ".xml"))
 
   resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, "public", "read")
-  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, submitter, "write")
-  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, submitter, "changePermission")
+  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, env$submitter, "write")
+  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
 
   cat(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
@@ -652,8 +576,6 @@ create_object <- function(file, sysmeta, base_path, mn) {
   # We use the XML package to convert the response to a list which just returns
   # a string with the PID when we successfully created the object.
 
-  print(response)
-
   if (inherits(response, "error")) {
     return(FALSE)
   }
@@ -662,11 +584,50 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
   if (is.character(created_pid) && nchar(created_pid) > 0) {
     result <- TRUE
+    cat("Successfully created object with PID ", created_pid, ".\n")
   } else {
     result <- FALSE
   }
 
-  print(result)
-
   result
+}
+
+
+validate_inventory <- function(inventory) {
+  stopifnot(is.data.frame(inventory),
+            nrow(inventory) > 0,
+            all(c("file",
+                  "checksum_sha256",
+                  "size_bytes",
+                  "package",
+                  "parent_package",
+                  "pid",
+                  "filename",
+                  "created",
+                  "ready") %in% names(inventory)))
+}
+
+validate_environment <- function(env) {
+  stopifnot(class(env) == "list",
+            length(env) > 0)
+  stopifnot(!is.null(env), length(env) > 0)
+  stopifnot(all(c("base_directory",
+                  "alternate_directory",
+                  "metadata_identifier_scheme",
+                  "data_identifier_scheme",
+                  "mn",
+                  "submitter",
+                  "rights_holder") %in% names(env)))
+  stopifnot(all(unlist(lapply(env, nchar)) > 0))
+}
+
+
+check_auth <- function(env) {
+  am <- dataone::AuthenticationManager()
+  auth_valid <- dataone:::isAuthValid(am, env$mn)
+
+  if (auth_valid == FALSE) {
+    cat(paste0("Authentication was not valid agaisnt member node: ", env$mn@endpoint, ". Returning early.\n"))
+    return(data.frame())
+  }
 }
