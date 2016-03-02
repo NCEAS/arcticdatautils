@@ -18,7 +18,7 @@ test:
 
 production:
   base_path: ~/acadis/
-  alternate_path: ~/acadis/
+  alternate_path: ~/acadis/-alt/
   metadata_identifier_scheme: DOI
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
