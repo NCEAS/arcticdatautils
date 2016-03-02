@@ -96,7 +96,7 @@ insert_package <- function(inventory, package) {
   library(dataone)  # TODO Remove this library call once the package is fixed
   env <- env_load("etc/environment.yml")
   validate_environment(env)
-  check_auth()
+  check_auth(env)
 
   # Check that any packages with this package as a parent package have
   # resource map identifiers
