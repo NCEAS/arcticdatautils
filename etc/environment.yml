@@ -1,6 +1,6 @@
 development:
-  base_directory: ~/src/arctic-data/packages/
-  alternate_directory: ~/src/arctic-data/packages-alt/
+  base_path: ~/src/arctic-data/packages/
+  alternate_path: ~/src/arctic-data/packages-alt/
   metadata_identifier_scheme: UUID
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
@@ -8,8 +8,8 @@ development:
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
 
 test:
-  base_directory: ~/acadis/
-  alternate_directory: ~/acadis-alt/
+  base_path: ~/acadis/
+  alternate_path: ~/acadis-alt/
   metadata_identifier_scheme: UUID
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
@@ -17,8 +17,8 @@ test:
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
 
 production:
-  base_directory: ~/acadis/
-  alternate_directory: ~/acadis/
+  base_path: ~/acadis/
+  alternate_path: ~/acadis/
   metadata_identifier_scheme: DOI
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
