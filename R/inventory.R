@@ -34,7 +34,7 @@ inv_init <- function() {
 #'
 #' @examples
 #' inv_load_files("some/file/path.txt", my_inventory)
-inv_load_files <- function(path, inventory) {
+inv_load_files <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory))
@@ -99,7 +99,7 @@ inv_load_files <- function(path, inventory) {
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_sizes <- function(path, inventory) {
+inv_load_sizes <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory),
@@ -139,7 +139,7 @@ inv_load_sizes <- function(path, inventory) {
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_checksums <- function(path, inventory) {
+inv_load_checksums <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory),
@@ -187,7 +187,7 @@ inv_load_checksums <- function(path, inventory) {
 #'
 #' @examples
 #' inv_load_dois("dois.txt", my_inv)
-inv_load_dois <- function(path, inventory) {
+inv_load_dois <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
             "file" %in% names(inventory))
@@ -220,7 +220,7 @@ inv_load_dois <- function(path, inventory) {
 #' @return An inventory (data.frame)
 #'
 #' @examples
-inv_load_identifiers <- function(paths, inventory) {
+inv_load_identifiers <- function(inventory, paths) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
             "file" %in% names(inventory))
