@@ -322,7 +322,7 @@ inv_add_extra_columns <- function(inventory) {
       # made on partial strings, e.g. ./46.10/ vs ./46.100/
       files_in_package <- stringi::stri_startswith_fixed(inventory$file, paste0(folder, "/")) &
         is.na(inventory$package)
-      inventory[files_in_package,"package"] <- digest::sha1(folder)
+      inventory[files_in_package,"package"] <- digest::digest(folder, algo="sha1")
     }
   }
 
