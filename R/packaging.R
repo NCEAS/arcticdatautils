@@ -422,17 +422,26 @@ generate_resource_map <- function(metadata_pid,
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
+  resource_map <- new("ResourceMap",
+                      id = generate_resource_map_pid(metadata_pid))
 
-  resource_map <- datapackage::createFromTriples(new("ResourceMap",
-                                                     id = generate_resource_map_pid(metadata_pid)),
+  resource_map <- datapackage::createFromTriples(resource_map,
                                                  relations = relationships,
                                                  identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
                                                  resolveURI = resolve_base)
+
+  # Save the resource map to disk
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
 
   datapackage::serializeRDF(resource_map, outfilepath)
 
+  # Clean up after ourselves
+  datapackage::freeResourceMap(resource_map)
+  rm(resource_map)
+
+  # Return the full filepath to the resource map so calling functions can
+  # reference it
   outfilepath
 }
 
