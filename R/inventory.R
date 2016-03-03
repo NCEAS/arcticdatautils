@@ -56,6 +56,13 @@ inv_load_files <- function(inventory, path) {
   size_diff <- size_before - nrow(files)
   if (size_diff > 0) { cat("Removed", size_diff, "file(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
 
+  # Filter out versioned datasets
+  size_before <- nrow(files)
+  files <- files[grep("v_\\d\\.\\d", files$file, invert = TRUE), "file", drop=FALSE]
+
+  size_diff <- size_before - nrow(files)
+  if (size_diff > 0) { cat("Removed", size_diff, "file(s) that were part of versioned datasets.\n") }
+
   # If inventory is empty, just make the inventory the same as filenames
   if (nrow(inventory) == 0) {
     return(files)
