@@ -370,6 +370,10 @@ inv_add_parent_package_column <- function(inventory) {
   metadata_files <- inventory[inventory$is_metadata == TRUE,]
 
   for (package in packages) {
+    if (is.na(package)) {
+      next
+    }
+
     metadata_file <- metadata_files[metadata_files$package == package,]
     stopifnot(nrow(metadata_file) == 1)
 
@@ -395,7 +399,8 @@ inv_add_parent_package_column <- function(inventory) {
                                        ((metadata_files$depth < metadata_file_depth) == TRUE),]
 
       if (nrow(parent_files) == 1) {
-        inventory[!is.na(inventory$parent_package) &
+        inventory[!is.na(inventory$package) &
+                    !is.na(inventory$parent_package) &
                     inventory$package == package,"parent_package"] <- parent_files[1,"package"]
 
         # Halt execution of the while() loop
