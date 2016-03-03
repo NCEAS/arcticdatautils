@@ -135,3 +135,30 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
   print(head(files, n = n))
   if (length(files) > n) { cat(paste0("...and ", length(files) - n, " more files.\n")) }
 }
+
+
+#' Log a message to the console and to a logfile.
+#'
+#' @param message Your log message (character)
+#'
+#' @return Nothing.
+#' @export
+#'
+#' @examples
+log_message <- function(message=NULL) {
+  if (is.null(message) || !is.character(message) || nchar(message) < 1) {
+    invisible(return(FALSE))
+  }
+
+  # Prepare the message
+  message <- paste0("[", as.POSIXlt(Sys.time(), "GMT"), "] ", stringr::str_replace_all(message, "[\n]", ""))
+
+  # Write it out to stdout and a log
+  cat(paste0(message, "\n"))
+  write(message,
+        file = "arcticdata-log.txt",
+        append = TRUE)
+
+
+  invisible(TRUE)
+}
