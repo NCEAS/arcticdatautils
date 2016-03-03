@@ -24,4 +24,3 @@ production:
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
   rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
-
