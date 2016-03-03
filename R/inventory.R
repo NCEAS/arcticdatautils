@@ -54,7 +54,7 @@ inv_load_files <- function(inventory, path) {
                    stringi::stri_startswith_fixed(files$file, "./acadis-gateway/"), "file", drop = FALSE]
 
   size_diff <- size_before - nrow(files)
-  if (size_diff > 0) { cat("Removed ", size_diff, "file(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
+  if (size_diff > 0) { cat("Removed", size_diff, "file(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
 
   # If inventory is empty, just make the inventory the same as filenames
   if (nrow(inventory) == 0) {
