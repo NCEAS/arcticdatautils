@@ -406,7 +406,8 @@ inv_add_parent_package_column <- function(inventory) {
         # Halt execution of the while() loop
         path_parts <- c()
       } else if (nrow(parent_files) > 1) {
-        stop(paste0("Number of direct parent datasets in package ", package, " was greater than one."))
+        # warning(paste0("Number of direct parent datasets in package ", package, " was greater than one."))
+        path_parts <- path_parts[1:(length(path_parts) - 1)]
       } else {
         # Pluck one level off of path_parts
         path_parts <- path_parts[1:(length(path_parts) - 1)]
