@@ -374,6 +374,8 @@ inv_add_parent_package_column <- function(inventory) {
       next
     }
 
+    cat("\n", which(package == packages))
+
     metadata_file <- metadata_files[metadata_files$package == package,]
     stopifnot(nrow(metadata_file) == 1)
 
