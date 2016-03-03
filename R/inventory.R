@@ -367,8 +367,10 @@ inv_add_parent_package_column <- function(inventory) {
     inventory$parent_package <- ""
   }
 
+  metadata_files <- inventory[inventory$is_metadata == TRUE,]
+
   for (package in packages) {
-    metadata_file <- inventory[inventory$package == package & inventory$is_metadata == TRUE,]
+    metadata_file <- metadata_files[metadata_files$package == package,]
     stopifnot(nrow(metadata_file) == 1)
 
     metadata_file_path <- metadata_file[,"file"]
@@ -383,14 +385,14 @@ inv_add_parent_package_column <- function(inventory) {
     # Three is the cutoff here because no package is higher than...
     # ./acadis-X-X/some_folder/something (length four)
     while (length(path_parts) > 2) {
+      cat(".")
       joined_path <- paste(path_parts, collapse = "/")
 
       # Note use of X == TRUE, this is to cast each part of the chained &
       # statements to bools. This is probably a bug somewhere else in my code
       # that I'm working around.
-      parent_files <- inventory[(inventory$is_metadata == TRUE) &
-                                  (stringi::stri_startswith_fixed(inventory$file, joined_path) == TRUE) &
-                                  ((inventory$depth < metadata_file_depth) == TRUE),]
+      parent_files <- metadata_files[(stringi::stri_startswith_fixed(metadata_files$file, joined_path) == TRUE) &
+                                       ((metadata_files$depth < metadata_file_depth) == TRUE),]
 
       if (nrow(parent_files) == 1) {
         inventory[!is.na(inventory$parent_package) &
