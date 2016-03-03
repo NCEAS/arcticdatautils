@@ -123,8 +123,8 @@ inv_load_sizes <- function(inventory, path) {
   inventory <- dplyr::left_join(inventory, sizes, by = "file")
 
   # Check the result
-  if (any(is.na(inventory$file))) { warning("Some values in the 'filename' column were NA.")}
-  if (any(is.na(inventory$size_bytes))) { warning("Some values in the 'size_bytes' column were NA.")}
+  if (any(is.na(inventory$file))) { message("Some values in the 'filename' column were NA.")}
+  if (any(is.na(inventory$size_bytes))) { message("Some values in the 'size_bytes' column were NA.")}
 
   inventory
 }
@@ -170,8 +170,8 @@ inv_load_checksums <- function(inventory, path) {
   inventory <- dplyr::left_join(inventory, checksums, by = "file")
 
   # Check the result
-  if (any(is.na(inventory$file))) { warning("Some values in the 'file' column were NA.")}
-  if (any(is.na(inventory$checksum_sha256))) { warning("Some values in the 'checksum_sha256' column were NA.")}
+  if (any(is.na(inventory$file))) { message("Some values in the 'file' column were NA.")}
+  if (any(is.na(inventory$checksum_sha256))) { message("Some values in the 'checksum_sha256' column were NA.")}
 
   inventory
 }
