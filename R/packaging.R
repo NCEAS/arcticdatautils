@@ -22,6 +22,9 @@ insert_file <- function(inventory, file) {
   validate_environment(env)
   check_auth(env)
 
+  # Get a hold of the MN
+  mn <- dataone::MNode(env$mn)
+
   # Find the file
   inventory_file <- inventory[inventory$file == file,]
   stopifnot(nrow(inventory_file) == 1)
@@ -35,7 +38,7 @@ insert_file <- function(inventory, file) {
 
   # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
-                                               env$mn,
+                                               mn,
                                                scheme = env$identifier_scheme)
 
   if (is.na(inventory_file[1,"pid"])) {
@@ -58,7 +61,7 @@ insert_file <- function(inventory, file) {
     inventory_file[1,"created"] <- create_object(inventory_file[1,],
                                                  sysmeta,
                                                  env$base_path,
-                                                 env$mn)
+                                                 mn)
   }
 
   if (inventory_file[1,"created"] == FALSE) {
@@ -98,6 +101,8 @@ insert_package <- function(inventory, package) {
   validate_environment(env)
   check_auth(env)
 
+  # Get a hold of the MN
+  mn <- dataone::MNode(env$mn)
   # Check that any packages with this package as a parent package have
   # resource map identifiers
   child_packages <- inventory[inventory$parent_package == package &
@@ -131,7 +136,7 @@ insert_package <- function(inventory, package) {
   # Determine the PID to use for the metadata
   files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
                                                        mn,
-                                                       scheme = metadata_identifier_scheme)
+                                                       scheme = env$metadata_identifier_scheme)
 
   if (is.na(files[files_idx_metadata,"pid"])) {
     log_message(paste0("Metadata PID was NA for package ", package, ".\n"))
@@ -157,9 +162,9 @@ insert_package <- function(inventory, package) {
   # Metadata Object
   if (files[files_idx_metadata,"created"] == FALSE) {
     files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
-                                                         env$metadata_sysmeta,
+                                                         metadata_sysmeta,
                                                          env$base_path,
-                                                         env$mn)
+                                                         mn)
   }
 
   if (files[files_idx_metadata,"created"] == FALSE) {
@@ -173,7 +178,7 @@ insert_package <- function(inventory, package) {
 
     # Determine the PID to use for the data
     files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
-                                               env$mn,
+                                               mn,
                                                scheme = env$data_identifier_scheme)
 
     if (is.na(files[data_idx,"pid"])) {
@@ -197,7 +202,7 @@ insert_package <- function(inventory, package) {
       files[data_idx,"created"] <- create_object(files[data_idx,],
                                                  data_sysmeta,
                                                  env$base_path,
-                                                 env$mn)
+                                                 mn)
     }
 
     if (files[data_idx,"created"] == FALSE) {
