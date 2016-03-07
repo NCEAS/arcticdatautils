@@ -5,7 +5,7 @@ development:
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
-  rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
 
 test:
   base_path: ~/acadis/
@@ -14,7 +14,7 @@ test:
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
-  rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
 
 production:
   base_path: ~/acadis/
@@ -23,4 +23,4 @@ production:
   data_identifier_scheme: UUID
   mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
-  rights_holder: CN=arctica,UID=arctica,DC=arctica,DC=org
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
