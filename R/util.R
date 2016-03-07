@@ -84,14 +84,63 @@ guess_format_id <- function(filenames) {
   filetypes <- vector(mode = "character", length = length(extensions))
 
   for (i in seq_len(length(extensions))) {
-    if (extensions[i] %in% names(dataone_format_mappings)) {
-      filetypes[i] <- dataone_format_mappings[extensions[i]][[1]]
+    extension <- extensions[i]
+
+    # First, handle NetCDF files which have to be loaded and inspected to
+    # determine their foramt
+    if (extension %in% c("nc", "cdf", "ncdf", "netcdf")) {
+      filetypes[i] <- get_netcdf_format_id(filenames[i])
+    } else if (extension %in% names(dataone_format_mappings)) {
+      filetypes[i] <- dataone_format_mappings[extension][[1]]
     } else {
       filetypes[i] <- "application/octet-stream"
     }
   }
 
   filetypes
+}
+
+
+#' Determine the DataONE format ID for the NetCDF file provided by path.
+#'
+#' @param path Full or relative path to the file in question. (character)
+#'
+#' @return The DataONE format ID (character)
+#' @export
+#'
+#' @examples
+get_netcdf_format_id <- function(path) {
+  stopifnot(is.character(path),
+            nchar(path) > 0,
+            file.exists(path))
+
+  # Try to open the file, capturing errors
+  cdf_file <- try({
+    ncdf4::nc_open(path)
+  })
+
+  # If we failed to open the file, we can assume it's not a valid NetCDF file
+  # and we just return application/octet-stream as the format ID
+  if (inherits(cdf_file, "try-error")) {
+    return("application/octet-stream")
+  }
+
+  # Since we got this far, continue detecting the format
+  stopifnot("format" %in% names(cdf_file))
+  format_string <- cdf_file$format
+  stopifnot(is.character(format_string),
+            nchar(format_string) > 0)
+  format_id = ""
+
+  if (format_string == "NC_FORMAT_CLASSIC") {
+    format_id = "netCDF-3"
+  } else if (format_string == "NC_FORMAT_NETCDF4") {
+    format_id = "netCDF-4"
+  } else {
+    stop("Unknown NetCDF format discovered.")
+  }
+
+  return(format_id)
 }
 
 

@@ -9,6 +9,7 @@ Imports:
   dplyr,
   dataone,
   datapackage,
+  ncdf4,
   stringr,
   stringi,
   tools,
