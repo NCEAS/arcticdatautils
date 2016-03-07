@@ -256,6 +256,7 @@ insert_package <- function(inventory, package) {
     },
     error = function(e) {
       log_message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
+      log_message(e$message)
       e
     }
   )
@@ -428,6 +429,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
       },
       error = function(e) {
         log_message(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
+        log_message(e$message)
         e
       }
     )
@@ -506,6 +508,7 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
     },
     error = function(e) {
       log_message(paste0("Error generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
+      log_message(e$message)
       e
     }
   )
@@ -566,6 +569,7 @@ create_object <- function(file, sysmeta, base_path, mn) {
     },
     error = function(e) {
       log_message(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
+      log_message(e$message)
       e
     })
 
