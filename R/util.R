@@ -67,6 +67,7 @@ dataone_format_mappings <- list("bmp" = "image/bmp",
                                 "jpg" = "image/jpeg",
                                 "jpeg" = "image/jpeg",
                                 "kml" = "application/vnd.google-earth.kml xml",
+                                "nc" = "netCDF-3",
                                 "pdf" = "application/pdf",
                                 "png" = "image/png",
                                 "ppt" = "application/vnd.ms-powerpoint",
@@ -79,6 +80,7 @@ dataone_format_mappings <- list("bmp" = "image/bmp",
                                 "xml" = "http://www.isotc211.org/2005/gmd",
                                 "zip" = "application/zip")
 
+
 guess_format_id <- function(filenames) {
   extensions <- tolower(tools::file_ext(filenames))
   filetypes <- vector(mode = "character", length = length(extensions))
@@ -86,11 +88,7 @@ guess_format_id <- function(filenames) {
   for (i in seq_len(length(extensions))) {
     extension <- extensions[i]
 
-    # First, handle NetCDF files which have to be loaded and inspected to
-    # determine their foramt
-    if (extension %in% c("nc", "cdf", "ncdf", "netcdf")) {
-      filetypes[i] <- get_netcdf_format_id(filenames[i])
-    } else if (extension %in% names(dataone_format_mappings)) {
+    if (extension %in% names(dataone_format_mappings)) {
       filetypes[i] <- dataone_format_mappings[extension][[1]]
     } else {
       filetypes[i] <- "application/octet-stream"
