@@ -55,16 +55,29 @@ extract_local_identifier <- function(type, file) {
 #'
 # TODO: NETCDF and other formats that aren't obvious from file ext
 # TODO: Put this with the package as data
-dataone_format_mappings <- list("txt" = "text/plain",
-                                "csv" = "text/csv",
-                                "bmp" = "image/bmp",
-                                "gif" = "image/gif",
-                                "jpeg" = "image/jpeg",
-                                "png" = "image/png",
-                                "xml" = "http://www.isotc211.org/2005/gmd",
+# TODO CLS DAT ASC NETCDF
+# TODO CHECK IF I DEAL WITH .TAR.GZ well OR IF I HAVE TO
+dataone_format_mappings <- list("bmp" = "image/bmp",
                                 "bz2" = "application/x-bzip2",
-                                "zip" = "application/zip",
-                                "tar" = "application/x-tar")
+                                "csv" = "text/csv",
+                                "fasta" = "application/x-fasta",
+                                "gif" = "image/gif",
+                                "gz" = "application/x-gzip",
+                                "html" = "text/html",
+                                "jpg" = "image/jpeg",
+                                "jpeg" = "image/jpeg",
+                                "kml" = "application/vnd.google-earth.kml xml",
+                                "pdf" = "application/pdf",
+                                "png" = "image/png",
+                                "ppt" = "application/vnd.ms-powerpoint",
+                                "tar" = "application/x-tar",
+                                "tif" = "image/tiff",
+                                "tiff" = "image/tiff",
+                                "txt" = "text/plain",
+                                "xls" = "application/vnd.ms-excel",
+                                "xlsx" = "application/vnd.ms-excel",
+                                "xml" = "http://www.isotc211.org/2005/gmd",
+                                "zip" = "application/zip")
 
 guess_format_id <- function(filenames) {
   extensions <- tolower(tools::file_ext(filenames))
