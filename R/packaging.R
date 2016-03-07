@@ -249,10 +249,10 @@ insert_package <- function(inventory, package) {
   create_resource_map_response <- NULL
   create_resource_map_response <- tryCatch(
     {
-      dataone::create(mn,
-                      resource_map_pid,
-                      file = resource_map_filepath,
-                      sysmeta = resource_map_sysmeta)
+      dataone::createObject(mn,
+                            resource_map_pid,
+                            file = resource_map_filepath,
+                            sysmeta = resource_map_sysmeta)
     },
     error = function(e) {
       log_message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
@@ -559,10 +559,10 @@ create_object <- function(file, sysmeta, base_path, mn) {
   response <- NULL
   response <- tryCatch(
     {
-      dataone::create(mn,
-                      pid,
-                      file = path_on_disk,
-                      sysmeta = sysmeta)
+      dataone::createObject(mn,
+                            pid,
+                            file = path_on_disk,
+                            sysmeta = sysmeta)
     },
     error = function(e) {
       log_message(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
