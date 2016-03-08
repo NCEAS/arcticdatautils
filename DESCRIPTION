@@ -6,6 +6,7 @@ Description: Support package for migrating ACADIS data to KNB.
 Depends:
   R (>= 3.2.3)
 Imports:
+  digest,
   dplyr,
   dataone,
   datapackage,
@@ -15,7 +16,8 @@ Imports:
   tools,
   uuid,
   yaml,
-  xml2
+  xml2,
+  XML
 License: MIT + file LICENSE
 LazyData: true
 Suggests: testthat
