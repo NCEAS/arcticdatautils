@@ -21,6 +21,6 @@ production:
   alternate_path: ~/acadis/-alt/
   metadata_identifier_scheme: DOI
   data_identifier_scheme: UUID
-  mn: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
+  mn: https://arcticdata.io/metacat/d1/mn/v2
   submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
