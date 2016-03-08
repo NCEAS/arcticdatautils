@@ -629,6 +629,8 @@ check_auth <- function(env) {
 
   if (auth_valid == FALSE) {
     log_message(paste0("Authentication was not valid agaisnt member node: ", env$mn@endpoint, ". Returning early.\n"))
-    return(data.frame())
+    stop("Authentication not valid.")
   }
+
+  auth_valid
 }
