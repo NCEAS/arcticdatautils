@@ -41,7 +41,7 @@ for (i in seq_len(nrow(inventory))) {
   }
 
   log_message("Updating inventory...")
-  inventory <- inv_update(inventory, insert_result)
+  inventory[i,"created"] <- TRUE
 
   log_message("Writing inventory to disk...")
   save(inventory, file = "inventory-latest.rda")
