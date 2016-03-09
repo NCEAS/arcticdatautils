@@ -18,6 +18,9 @@ Imports:
   yaml,
   xml2,
   XML
+Remotes:
+  DataONEorg/dataone
+  ropensci/datapackage
 License: MIT + file LICENSE
 LazyData: true
 Suggests: testthat
