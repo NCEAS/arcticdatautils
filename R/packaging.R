@@ -414,7 +414,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 
   # Check if the existing PID is a valid one
   if (is.character(pid) && nchar(pid) > 0) {
-    log_message(paste0("Using alreayd-minted PID of ", pid, "\n"))
+    log_message(paste0("Using existing PID of ", pid, "\n"))
     return(pid)
   }
 
