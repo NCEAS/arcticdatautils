@@ -208,6 +208,10 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
 
 #' Log a message to the console and to a logfile.
 #'
+#' Reads from the environment variable 'LOG_PATH' and uses the value set there
+#' to decide the location of the log file. If that envvar isn't set, it defaults
+#' to 'arcticdata-log.txt'.
+#'
 #' @param message Your log message (character)
 #'
 #' @return Nothing.
@@ -219,13 +223,20 @@ log_message <- function(message=NULL) {
     invisible(return(FALSE))
   }
 
+  # Determine the logfile path
+  logfile_path <- Sys.getenv("LOG_PATH")
+
+  if (nchar(logfile_path) == 0) {
+    logfile_path <- "arcticdata-log.txt"
+  }
+
   # Prepare the message
   message <- paste0("[", as.POSIXlt(Sys.time(), "GMT"), "] ", stringr::str_replace_all(message, "[\n]", ""))
 
   # Write it out to stdout and a log
   cat(paste0(message, "\n"))
   write(message,
-        file = "arcticdata-log.txt",
+        file = logfile_path,
         append = TRUE)
 
 

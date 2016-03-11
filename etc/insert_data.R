@@ -1,8 +1,25 @@
 devtools::load_all(".")
 
+# Decide which data file and log file to use
+args <- commandArgs(trailingOnly = TRUE)
+
+if (length(args) == 1) {
+  data_file <- args[1]
+} else {
+  data_file <- "data/data.rda"
+}
+
+# Validate args
+stopifnot(file.exists(data_file))
+log_path <- paste0("insert_data-", gsub("/", "_", data_file), ".log")
+Sys.setenv("LOG_PATH" = log_path)
+if (nchar(log_path) != 0) {
+  log_message(paste0("Using alternate log path of '", log_path, "'\n"))
+}
+
 # Load data
-log_message("Loading data rda")
-load("data/data.rda")
+log_message(paste0("Loading data file from location ", data_file, "\n"))
+load(data_file)
 inventory$ready <- TRUE
 
 stopifnot("inventory" %in% ls(),
@@ -53,8 +70,9 @@ for (i in seq_len(nrow(inventory))) {
 
   # Save to disk every 10 objects
   if (i %% 10 == 0) {
-    log_message("Saving inventory to disk (data/data.rda")
-    save(inventory, file = "data/data.rda")
+    log_message(paste0("Saving inventory to disk at ", data_file, "\n"))
+    save(inventory, file = data_file)
+    break
   }
 }
 
