@@ -403,8 +403,6 @@ generate_resource_map_pid <- function(metadata_pid) {
 #'
 #' @examples
 get_or_create_pid <- function(file, mn, scheme="UUID") {
-  log_message(paste0("get_or_create_pid()\n"))
-
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
             "pid" %in% names(file))
@@ -462,8 +460,6 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 #'
 #' @examples
 create_sysmeta <- function(file, base_path, submitter, rights_holder) {
-  log_message(paste0("create_sysmeta()\n"))
-
   stopifnot(is.data.frame(file),
             nrow(file) == 1)
 
@@ -537,8 +533,6 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 #'
 #' @examples
 create_object <- function(file, sysmeta, base_path, mn) {
-  log_message(paste0("create_object()\n"))
-
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
             "pid" %in% names(file),
