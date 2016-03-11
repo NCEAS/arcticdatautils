@@ -41,6 +41,15 @@ options(authentication_token = token)
 
 stopifnot(all(is.character(inventory$pid)))
 stopifnot(all(nchar(inventory$pid) > 0))
+# Stop if we're expired
+token_info <- try({dataone::getTokenInfo(dataone::AuthenticationManager())})
+if (inherits(token_info, "try-error")) {
+  log_message("Failed to find a token. Quitting.")
+  stop()
+}
+stopifnot(is.data.frame(token_info) && "expired" %in% names(token_info))
+stopifnot(token_info$expired == FALSE)
+
 
 for (i in seq_len(nrow(inventory))) {
   # Insert blank line into logs just to help readability
