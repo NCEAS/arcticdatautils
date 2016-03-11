@@ -23,8 +23,10 @@ log_message(paste0("Loading data file from location ", data_file, "\n"))
 load(data_file)
 inventory$ready <- TRUE
 
+# Do basic sanity checking on the data
 stopifnot("inventory" %in% ls(),
-          "created" %in% names(inventory))
+          all(c("pid", "created") %in% names(inventory)))
+stopifnot(all(is.character(inventory$pid)))
 
 # Set environment
 log_message("Check to see the env is set.")
