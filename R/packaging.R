@@ -588,9 +588,10 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
   if (is.character(created_pid) && nchar(created_pid) > 0) {
     result <- TRUE
-    log_message(paste0("Successfully created object with PID ", created_pid, ".\n"))
+    log_message(paste0("Successfully created object with PID ", created_pid, " for file ", file[1,"file"], ".\n"))
   } else {
     result <- FALSE
+    log_message(paste0("Failed to created object with PID ", created_pid, " for file ", file[1,"file"], ".\n"))
   }
 
   result
