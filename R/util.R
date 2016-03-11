@@ -86,7 +86,7 @@ dataone_format_mappings <- list("avi" = "ideo/avi",
                                 "wmv" = "video/x-ms-wmv",
                                 "xls" = "application/vnd.ms-excel",
                                 "xlsx" = "application/vnd.ms-excel",
-                                "xml" = "http://www.isotc211.org/2005/gmd",
+                                "xml" = "application/xml",
                                 "zip" = "application/zip")
 
 

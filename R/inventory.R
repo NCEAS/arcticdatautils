@@ -306,6 +306,9 @@ inv_add_extra_columns <- function(inventory) {
   # Add a column for the format ID
   cat("Adding 'format_id' column.\n")
   inventory$format_id <- guess_format_id(inventory$filename)
+  # Mark metadata as ISO, .xml files will just be application/xml after this
+  # but we can assume all of our metadata is ISO
+  inventory[inventory$is_metadata,"format_id"] <- "http://www.isotc211.org/2005/gmd"
 
   # Add a column for packages
   cat("Adding 'package' column.\n")
