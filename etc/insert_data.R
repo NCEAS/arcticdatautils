@@ -39,8 +39,6 @@ token = Sys.getenv("D1TOKEN")
 stopifnot(nchar(token) > 0)
 options(authentication_token = token)
 
-stopifnot(all(is.character(inventory$pid)))
-stopifnot(all(nchar(inventory$pid) > 0))
 # Stop if we're expired
 token_info <- try({dataone::getTokenInfo(dataone::AuthenticationManager())})
 if (inherits(token_info, "try-error")) {
