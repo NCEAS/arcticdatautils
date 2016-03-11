@@ -58,7 +58,7 @@ for (i in seq_len(nrow(inventory))) {
   log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
   log_message("Updating inventory...")
-  inventory[i,"created"] <- TRUE
+  inventory <- inv_update(inventory, insert_result)
 
   # Save to disk every 10 objects
   if (i %% 10 == 0) {
