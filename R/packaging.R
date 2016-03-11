@@ -39,7 +39,7 @@ insert_file <- function(inventory, file) {
   # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
                                                mn,
-                                               scheme = env$identifier_scheme)
+                                               scheme = identifier_scheme)
 
   if (is.na(inventory_file[1,"pid"])) {
     log_message(paste0("PID was NA for file ", file, ".\n"))
