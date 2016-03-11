@@ -67,4 +67,5 @@ for (i in seq_len(nrow(inventory))) {
   }
 }
 
+log_message("All done, saving inventory to disk one last time.")
 save(inventory, file = "data/data.rda")
