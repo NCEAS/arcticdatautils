@@ -42,6 +42,20 @@ stopifnot(all(is.character(inventory$pid)))
 stopifnot(all(nchar(inventory$pid) > 0))
 
 for (i in seq_len(nrow(inventory))) {
+  # Insert blank line into logs just to help readability
+  log_message(" ")
+
+  # Grab an updated token from disk. This let's the script keep running
+  # if I log into the VM and update
+  if (file.exists("d1token")) {
+    log_message("Setting token from contents of file 'd1token'")
+    token <- paste0(readLines(con = "d1token"), collapse = "")
+
+    if (nchar(token) > 0) {
+      options(authentication_token = token)
+    }
+  }
+
   file_path <- inventory[i,"file"]
 
   if (inventory[i,"created"] == TRUE) {
