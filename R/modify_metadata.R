@@ -195,18 +195,52 @@ fix_bad_topic <- function(path) {
   doc <- XML::xmlParse(path)
   stopifnot("XMLInternalDocument" %in% class(doc))
 
-  # Try to get gmd:topicCategory nodes
-  topic_category_nodes <- try({
-    XML::getNodeSet(doc, "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory")
+  # Get the MD_DataIdentification element so we can search it for topicCategory
+  # nodes
+  data_ident_nodes <- try({
+    XML::getNodeSet(doc, "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification")
   }, silent = TRUE)
 
   # Return FALSE if executing the xPath failed
-  if (inherits(topic_category_nodes, "try-error")) {
-    return(doc)
+  if (inherits(data_ident_nodes, "try-error")) {
+    return(-1)
   }
 
-  for (i in 1:length(topic_category_nodes)) {
-    topic_category_node <- topic_category_nodes[[i]]
+  for (i in 1:length(data_ident_nodes)) {
+    data_ident_node <- data_ident_nodes[[i]]
+    children <- XML::xmlChildren(data_ident_node)
+
+    topic_category_indices <- which(names(children) %in% "topicCategory")
+
+    browser()
+    for (topic_category_index in topic_category_indices) {
+      topic_category_node <- children[[topic_category_index]]
+
+      # If it has more than one child, fix it
+      # Extract its values
+      # Remove it from the document
+      # Insert a new topicCategory for each topic
+      topic_category_node_children <- XML::xmlChildren(topic_category_node)
+
+      # Skip this one if it doesn't have multiple children
+      if (length(topic_category_node_children) <= 1) {
+        next
+      }
+
+      # Accumulate topics
+      topics <- unlist(lapply(topic_category_node_children, function(x) {
+        stringr::str_trim(XML::xmlValue(x))
+      }))
+
+      XML::removeChildren(data_ident_node, kids = list(topic_category_node))
+
+      for (topic in topics) {
+        new_topic_category_node <- XML::newXMLNode("gmd:topicCategory",
+                                                   XML::newXMLNode("gmd:MD_TopicCategoryCode", XML::newXMLTextNode(topic)))
+        XML::addChildren(data_ident_node, kids = list())
+      }
+
+    }
 
     # Get the children
     codes <- XML::xmlChildren(topic_category_node)
