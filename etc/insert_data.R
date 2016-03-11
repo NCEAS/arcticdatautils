@@ -48,6 +48,7 @@ for (i in seq_len(nrow(inventory))) {
   })
 
   if (inherits(insert_result, "error")) {
+    log_message("Skipping the rest of inserting due to an error in insert_file()\n")
     next
   }
 
