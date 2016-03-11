@@ -1,3 +1,4 @@
+library(methods) # for new()
 devtools::load_all(".")
 
 # Decide which data file and log file to use
