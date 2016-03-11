@@ -32,7 +32,6 @@ stopifnot(all(is.character(inventory$pid)))
 log_message("Check to see the env is set.")
 env_name = Sys.getenv("ARCTICDATA_ENV")
 stopifnot(nchar(env_name) > 0)
-
 env <- env_load("etc/environment.yml")
 
 # Set token
@@ -51,6 +50,7 @@ stopifnot(is.data.frame(token_info) && "expired" %in% names(token_info))
 stopifnot(token_info$expired == FALSE)
 
 
+# Insert each file
 for (i in seq_len(nrow(inventory))) {
   # Insert blank line into logs just to help readability
   log_message(" ")
@@ -96,9 +96,8 @@ for (i in seq_len(nrow(inventory))) {
   if (i %% 10 == 0) {
     log_message(paste0("Saving inventory to disk at ", data_file, "\n"))
     save(inventory, file = data_file)
-    break
   }
 }
 
 log_message("All done, saving inventory to disk one last time.")
-save(inventory, file = "data/data.rda")
+save(inventory, file = data_file)
