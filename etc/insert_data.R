@@ -34,10 +34,6 @@ for (i in seq_len(nrow(inventory))) {
 
   log_message(paste0("Inserting file ", file_path, "\n"))
 
-  # Save time and file size so we can determine insert rate
-  before_time <- Sys.time()
-  file_size_mb <- inventory[i,"size_bytes"] / 1024 / 1024
-
   insert_result <- tryCatch({
     insert_file(inventory, file_path)
   },
@@ -51,11 +47,6 @@ for (i in seq_len(nrow(inventory))) {
     log_message("Skipping the rest of inserting due to an error in insert_file()\n")
     next
   }
-
-  # Print out the insert rate
-  time_diff_sec <- as.numeric(Sys.time() - before_time, "secs")
-  mb_per_s <- file_size_mb / time_diff_sec
-  log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
   log_message("Updating inventory...")
   inventory <- inv_update(inventory, insert_result)

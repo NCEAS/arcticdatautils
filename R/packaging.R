@@ -552,6 +552,10 @@ create_object <- function(file, sysmeta, base_path, mn) {
   pid <- file[1,"pid"]
   path_on_disk <- paste0(base_path, file[1,"file"])
 
+  # Save time and file size so we can determine insert rate
+  before_time <- Sys.time()
+  file_size_mb <- inventory[1,"size_bytes"] / 1024 / 1024
+
   # Run the create() call
   response <- NULL
   response <- tryCatch(
@@ -566,6 +570,11 @@ create_object <- function(file, sysmeta, base_path, mn) {
       log_message(e$message)
       e
     })
+
+  # Print out the insert rate
+  time_diff_sec <- round(as.numeric(Sys.time() - before_time, "secs"), 2)
+  mb_per_s <- round(file_size_mb / time_diff_sec, 2)
+  log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
   # Validate the result
   # We use the XML package to convert the response to a list which just returns
