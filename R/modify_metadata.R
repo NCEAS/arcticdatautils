@@ -212,7 +212,10 @@ fix_bad_topic <- function(path) {
 
     topic_category_indices <- which(names(children) %in% "topicCategory")
 
-    browser()
+    if (length(topic_category_indices) == 0) {
+      next
+    }
+
     for (topic_category_index in topic_category_indices) {
       topic_category_node <- children[[topic_category_index]]
 
@@ -232,33 +235,46 @@ fix_bad_topic <- function(path) {
         stringr::str_trim(XML::xmlValue(x))
       }))
 
-      XML::removeChildren(data_ident_node, kids = list(topic_category_node))
+      # Due to the ISO schema, we have to respect the order of where
+      # the topicCategory node goes in the DataIdentification node. To do this
+      # we need to keep the origin topicCategory node, modifying it to only
+      # have one topic category inside it, then add the other topic categories
+      # as siblings (the siblings is imporrtant here).
+      first_topic <- topics[1]
+      print(first_topic)
+      topic_nodes <- XML::xmlChildren(topic_category_node)
 
-      for (topic in topics) {
-        new_topic_category_node <- XML::newXMLNode("gmd:topicCategory",
-                                                   XML::newXMLNode("gmd:MD_TopicCategoryCode", XML::newXMLTextNode(topic)))
-        XML::addChildren(data_ident_node, kids = list())
+      XML::removeChildren(topic_category_node, kids = seq(1, length(topic_nodes)))
+
+      XML::newXMLNode("gmd:MD_TopicCategoryCode",
+                      first_topic,
+                      parent = topic_category_node)
+
+      for (topic in topics[2:length(topics)]) {
+        print(topic)
+        XML::newXMLNode("gmd:topicCategory", XML::newXMLNode("gmd:MD_TopicCategoryCode", topic), sibling = topic_category_node)
       }
-
     }
-
-    # Get the children
-    codes <- XML::xmlChildren(topic_category_node)
-
-    # Assert there are more than one
-    stopifnot(length(codes) > 1)
-
-    # Create new topicCategory nodes for each one
-    XML::removeChildren(topic_category_node, kids = codes)
-
-    # TODO COMPLETE THIS FUNCTION
-
-    try({
-      XML::xmlValue(topic_category_node[[1]]) <- stringr::str_trim(XML::xmlValue(topic_category_node[[1]]))
-    }, silent = TRUE)
   }
 
   writeLines(XML::saveXML(doc), con = path)
+
+  # Workaround
+  #
+  # For some reason the XML package adds a dummy namespace even when I add
+  # a new node as a sibling to a node that has an ancestor with the namesspace
+  # This is a REALLY quick and dirty way to fix that line of code and move
+  # on
+
+  lines <- readLines(path)
+  pattern <- " xmlns:gmd=\"<dummy>\""
+  matched_lines <- grep(pattern, lines)
+
+  for (i in matched_lines) {
+    lines[i] <- gsub(pattern, "", lines[i])
+  }
+
+  writeLines(lines, con = path)
 }
 
 
