@@ -1,0 +1,6 @@
+response <- RCurl::getURL("https://arcticdata.io/metacat/d1/mn/v2/query/solr/?q=id:*&fl=identifier&rows=0")
+doc <- XML::xmlParse(response)
+solr_response <- XML::getNodeSet(doc, "/response/result")
+line = paste0(as.POSIXlt(Sys.time(), "GMT"), ",", as.numeric(XML::xmlAttrs(solr_response[[1]])["numFound"]))
+print(line)
+write(line, file = "status.txt", append = TRUE)
