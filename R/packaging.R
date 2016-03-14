@@ -258,7 +258,7 @@ insert_package <- function(inventory, package, env=NULL) {
   create_resource_map_response <- NULL
   create_resource_map_response <- tryCatch(
     {
-      dataone::createObject(mn,
+      dataone::createObject(env$mn,
                             resource_map_pid,
                             file = resource_map_filepath,
                             sysmeta = resource_map_sysmeta)
@@ -552,7 +552,7 @@ create_object <- function(file, sysmeta, base_path, mn) {
   stopifnot(is.character(base_path),
             nchar(base_path) > 0)
 
-  stopifnot(class(mn) == "MNode")
+  stopifnot(class(env$mn) == "MNode")
 
   # Set the return value to FALSE by default
   result <- FALSE
@@ -569,7 +569,7 @@ create_object <- function(file, sysmeta, base_path, mn) {
   response <- NULL
   response <- tryCatch(
     {
-      dataone::createObject(mn,
+      dataone::createObject(env$mn,
                             pid,
                             file = path_on_disk,
                             sysmeta = sysmeta)
