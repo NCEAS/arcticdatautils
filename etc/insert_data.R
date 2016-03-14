@@ -41,25 +41,17 @@ token = Sys.getenv("D1TOKEN")
 stopifnot(nchar(token) > 0)
 options(authentication_token = token)
 
-# Stop if we're expired
-token_info <- try({dataone::getTokenInfo(dataone::AuthenticationManager())})
-if (inherits(token_info, "try-error")) {
-  log_message("Failed to find a token. Quitting.")
-  stop()
-}
-stopifnot(is.data.frame(token_info) && "expired" %in% names(token_info))
-stopifnot(token_info$expired == FALSE)
-
+# Stop if the token is expired
+if (is_token_expired()) stop("Token is expired.")
 
 # Insert each file
 for (i in seq_len(nrow(inventory))) {
   # Insert blank line into logs just to help readability
   log_message(" ")
 
-  # Grab an updated token from disk. This let's the script keep running
-  # if I log into the VM and update
-  # We do this every 100 inserts to save time
-  if (i %% 100 == 0 && file.exists("d1token")) {
+  # Grab an updated token from disk if the token is expired and there is one
+  # on disk at 'd1token
+  if (is_token_expired() && file.exists("d1token")) {
     log_message("Setting token from contents of file 'd1token'")
     token <- paste0(readLines(con = "d1token"), collapse = "")
 

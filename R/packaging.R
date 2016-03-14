@@ -23,8 +23,11 @@ insert_file <- function(inventory, file, env=NULL) {
   }
 
   validate_environment(env)
-  check_auth(env)
 
+  if (is_token_expired()) {
+    log_message("Token is expired. Returning un-modified inventory.")
+    return(inventory)
+  }
 
   # Find the file
   inventory_file <- inventory[inventory$file == file,]
@@ -103,7 +106,11 @@ insert_package <- function(inventory, package, env=NULL) {
   }
 
   validate_environment(env)
-  check_auth(env)
+
+  if (is_token_expired()) {
+    log_message("Token is expired. Returning un-modified inventory.")
+    return(inventory)
+  }
 
   # Check that any packages with this package as a parent package have
   # resource map identifiers
@@ -629,14 +636,27 @@ validate_environment <- function(env) {
 }
 
 
-check_auth <- function(env) {
-  am <- dataone::AuthenticationManager()
-  auth_valid <- dataone:::isAuthValid(am, dataone::MNode(env$mn))
-
-  if (auth_valid == FALSE) {
-    log_message(paste0("Authentication was not valid agaisnt member node: ", env$mn@endpoint, ". Returning early.\n"))
-    stop("Authentication not valid.")
+is_token_expired <- function() {
+  # Check for presence of the token in options()
+  if (is.null(options("authentication_token"))) {
+    log_message("Authentication token not set in options().")
+    return(FALSE)
   }
 
-  auth_valid
+  token_info <- try({
+    dataone::getTokenInfo(dataone::AuthenticationManager())
+  })
+
+  if (inherits(token_info, "try-error") ||
+      !is.data.frame(token_info) ||
+      !("expired" %in% names(token_info))) {
+    log_message("Failed to get token info.")
+    return(FALSE)
+  }
+
+  if (token_info$expired == TRUE) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
 }
