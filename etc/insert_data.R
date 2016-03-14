@@ -47,6 +47,12 @@ if (is_token_expired()) stop("Token is expired.")
 
 # Insert each file
 for (i in seq_len(nrow(inventory))) {
+  # Check if the file "quit" exists, and, if so, save the inventory and quit
+  if (file.exists("quit")) {
+    log_message(paste0("File 'quit' exists. Saving inventory and shutting down."))
+    break
+  }
+
   # Insert blank line into logs just to help readability
   log_message(" ")
 
