@@ -130,6 +130,7 @@ test_has_bad_enum <- function(path) {
   FALSE
 }
 
+
 #' Fix a metadata record with a bad topicCategory.
 #'
 #' This is the case where the ISO schema says what's inside a
