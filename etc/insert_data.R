@@ -33,6 +33,7 @@ log_message("Check to see the env is set.")
 env_name = Sys.getenv("ARCTICDATA_ENV")
 stopifnot(nchar(env_name) > 0)
 env <- env_load("etc/environment.yml")
+env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
 # Set token
 log_message("Setting the d1 token")
@@ -91,7 +92,7 @@ for (i in seq_len(nrow(inventory))) {
   }
 
   log_message("Updating inventory...")
-  inventory <- inv_update(inventory, insert_result)
+  inventory <- inv_update(inventory, insert_result, env)
 
   # Save to disk every 100 objects
   if (i %% 100 == 0) {

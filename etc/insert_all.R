@@ -10,6 +10,7 @@ inventory$ready <- TRUE
 # Set environment
 log_message("Setting environment to 'test'")
 Sys.setenv("ARCTICDATA_ENV" = "test")
+env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
 # Set token
 log_message("Setting the d1 token")

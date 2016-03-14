@@ -9,21 +9,22 @@
 #'
 #' @param inventory An Inventory (data.frame)
 #' @param file The fully-qualified relative path to the file. See examples.
+#' @param env (Optional) Specify an environment (list)
 #'
-#' @example insert_file(my_inv,
-#'                      "./acadis-gateway/project/A/iso.xml")
-insert_file <- function(inventory, file) {
+#' @example insert_file(my_inv, "./acadis-gateway/project/A/iso.xml")
+insert_file <- function(inventory, file, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(file), nchar(file) > 0, file %in% inventory$file)
 
   # Configuration
-  library(dataone)  # TODO Remove this library call once the package is fixed
-  env <- env_load("etc/environment.yml")
+  if (is.null(env)) {
+    env <- env_load("etc/environment.yml")
+    env$mn <- dataone::MNode(env$mn_base_url)
+  }
+
   validate_environment(env)
   check_auth(env)
 
-  # Get a hold of the MN
-  mn <- dataone::MNode(env$mn)
 
   # Find the file
   inventory_file <- inventory[inventory$file == file,]
@@ -38,7 +39,7 @@ insert_file <- function(inventory, file) {
 
   # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
-                                               mn,
+                                               env$mn,
                                                scheme = identifier_scheme)
 
   if (is.na(inventory_file[1,"pid"])) {
@@ -91,18 +92,19 @@ insert_file <- function(inventory, file) {
 #' This should be automated and based upon the inventory file having another
 #' column with that information
 
-insert_package <- function(inventory, package) {
+insert_package <- function(inventory, package, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(package), nchar(package) > 0, package %in% inventory$package)
 
   # Configuration
-  library(dataone)  # TODO Remove this library call once the package is fixed
-  env <- env_load("etc/environment.yml")
+  if (is.null(env)) {
+    env <- env_load("etc/environment.yml")
+    env$mn <- dataone::MNode(env$mn_base_url)
+  }
+
   validate_environment(env)
   check_auth(env)
 
-  # Get a hold of the MN
-  mn <- dataone::MNode(env$mn)
   # Check that any packages with this package as a parent package have
   # resource map identifiers
   child_packages <- inventory[inventory$parent_package == package &
@@ -135,7 +137,7 @@ insert_package <- function(inventory, package) {
 
   # Determine the PID to use for the metadata
   files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
-                                                       mn,
+                                                       env$mn,
                                                        scheme = env$metadata_identifier_scheme)
 
   if (is.na(files[files_idx_metadata,"pid"])) {
@@ -164,7 +166,7 @@ insert_package <- function(inventory, package) {
     files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
                                                          metadata_sysmeta,
                                                          env$base_path,
-                                                         mn)
+                                                         env$mn)
   }
 
   if (files[files_idx_metadata,"created"] == FALSE) {
@@ -178,7 +180,7 @@ insert_package <- function(inventory, package) {
 
     # Determine the PID to use for the data
     files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
-                                               mn,
+                                               env$mn,
                                                scheme = env$data_identifier_scheme)
 
     if (is.na(files[data_idx,"pid"])) {
@@ -202,7 +204,7 @@ insert_package <- function(inventory, package) {
       files[data_idx,"created"] <- create_object(files[data_idx,],
                                                  data_sysmeta,
                                                  env$base_path,
-                                                 mn)
+                                                 env$mn)
     }
 
     if (files[data_idx,"created"] == FALSE) {
@@ -620,7 +622,7 @@ validate_environment <- function(env) {
                   "alternate_path",
                   "metadata_identifier_scheme",
                   "data_identifier_scheme",
-                  "mn",
+                  "mn_base_url",
                   "submitter",
                   "rights_holder") %in% names(env)))
   stopifnot(all(unlist(lapply(env, nchar)) > 0))
