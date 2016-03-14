@@ -622,17 +622,18 @@ validate_inventory <- function(inventory) {
 }
 
 validate_environment <- function(env) {
+  env_default_components <- c("base_path",
+                              "alternate_path",
+                              "metadata_identifier_scheme",
+                              "data_identifier_scheme",
+                              "mn_base_url",
+                              "submitter",
+                              "rights_holder")
   stopifnot(class(env) == "list",
             length(env) > 0)
   stopifnot(!is.null(env), length(env) > 0)
-  stopifnot(all(c("base_path",
-                  "alternate_path",
-                  "metadata_identifier_scheme",
-                  "data_identifier_scheme",
-                  "mn_base_url",
-                  "submitter",
-                  "rights_holder") %in% names(env)))
-  stopifnot(all(unlist(lapply(env, nchar)) > 0))
+  stopifnot(all(env_default_components %in% names(env)))
+  stopifnot(all(unlist(lapply(env[env_default_components], nchar)) > 0))
 }
 
 
