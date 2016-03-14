@@ -34,16 +34,16 @@ sum(nrow(large_data_group1), nrow(large_data_group2), nrow(large_data_group3), n
 any(duplicated(c(large_data_group1$file, large_data_group2$file, large_data_group3$file, large_data_group4$file)))
 
 # Check that none of these files are in the 'data.rda'
-load('data/data.rda')
+load('inventory/data.rda')
 any(duplicated(inventory$file, medium$file))
 
 # Save them out
 inventory <- large_data_group1
-save(inventory, file = "data/large_data_group1.rda")
+save(inventory, file = "inventory/large_data_group1.rda")
 inventory <- large_data_group2
-save(inventory, file = "data/large_data_group2.rda")
+save(inventory, file = "inventory/large_data_group2.rda")
 inventory <- large_data_group3
-save(inventory, file = "data/large_data_group3.rda")
+save(inventory, file = "inventory/large_data_group3.rda")
 inventory <- large_data_group4
-save(inventory, file = "data/large_data_group4.rda")
+save(inventory, file = "inventory/large_data_group4.rda")
 

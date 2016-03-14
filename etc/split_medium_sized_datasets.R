@@ -63,17 +63,17 @@ sum(medium_data_group4$size_bytes) / 1024 / 1024 / 1024
 any(duplicated(c(medium_data_group1$file, medium_data_group2$file, medium_data_group3$file, medium_data_group4$file)))
 
 # Check that none of these files are in the 'data.rda'
-load('data/data.rda')
+load('inventory/data.rda')
 any(duplicated(inventory$file, medium$file))
 
 # Save them out
 inventory <- medium_data_group1
-save(inventory, file = "data/medium_data_group1.rda")
+save(inventory, file = "inventory/medium_data_group1.rda")
 inventory <- medium_data_group2
-save(inventory, file = "data/medium_data_group2.rda")
+save(inventory, file = "inventory/medium_data_group2.rda")
 inventory <- medium_data_group3
-save(inventory, file = "data/medium_data_group3.rda")
+save(inventory, file = "inventory/medium_data_group3.rda")
 inventory <- medium_data_group4
-save(inventory, file = "data/medium_data_group4.rda")
+save(inventory, file = "inventory/medium_data_group4.rda")
 
 

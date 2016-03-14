@@ -2,7 +2,7 @@ devtools::load_all(".")
 
 # Load inventory
 log_message("Loading inventory rda")
-load("data/inv.rda")
+load("inventory/inv.rda")
 inventory <- inv
 inventory$created <- FALSE
 inventory$ready <- TRUE

@@ -7,7 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 1) {
   data_file <- args[1]
 } else {
-  data_file <- "data/data.rda"
+  data_file <- "inventory/data.rda"
 }
 
 # Validate args
@@ -57,7 +57,8 @@ for (i in seq_len(nrow(inventory))) {
 
   # Grab an updated token from disk. This let's the script keep running
   # if I log into the VM and update
-  if (file.exists("d1token")) {
+  # We do this every 100 inserts to save time
+  if (i %% 100 == 0 && file.exists("d1token")) {
     log_message("Setting token from contents of file 'd1token'")
     token <- paste0(readLines(con = "d1token"), collapse = "")
 
@@ -92,8 +93,8 @@ for (i in seq_len(nrow(inventory))) {
   log_message("Updating inventory...")
   inventory <- inv_update(inventory, insert_result)
 
-  # Save to disk every 10 objects
-  if (i %% 10 == 0) {
+  # Save to disk every 100 objects
+  if (i %% 100 == 0) {
     log_message(paste0("Saving inventory to disk at ", data_file, "\n"))
     save(inventory, file = data_file)
   }
