@@ -554,7 +554,7 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
   # Save time and file size so we can determine insert rate
   before_time <- Sys.time()
-  file_size_mb <- inventory[1,"size_bytes"] / 1024 / 1024
+  file_size_mb <- file[1,"size_bytes"] / 1024 / 1024
 
   # Run the create() call
   response <- NULL
