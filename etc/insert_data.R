@@ -32,6 +32,7 @@ stopifnot(all(is.character(inventory$pid)))
 log_message("Check to see the env is set.")
 env_name = Sys.getenv("ARCTICDATA_ENV")
 stopifnot(nchar(env_name) > 0)
+log_message(paste0("Loading environment '", env_name, "'.\n"))
 env <- env_load("etc/environment.yml")
 env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
