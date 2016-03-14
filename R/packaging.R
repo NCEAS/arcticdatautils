@@ -634,6 +634,8 @@ validate_environment <- function(env) {
   stopifnot(!is.null(env), length(env) > 0)
   stopifnot(all(env_default_components %in% names(env)))
   stopifnot(all(unlist(lapply(env[env_default_components], nchar)) > 0))
+
+  invisible(TRUE)
 }
 
 
