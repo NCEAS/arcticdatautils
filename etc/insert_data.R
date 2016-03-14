@@ -57,7 +57,7 @@ for (i in seq_len(nrow(inventory))) {
   log_message(" ")
 
   # Grab an updated token from disk if the token is expired and there is one
-  # on disk at 'd1token
+  # on disk at the path './d1token'
   if (is_token_expired() && file.exists("d1token")) {
     log_message("Setting token from contents of file 'd1token'")
     token <- paste0(readLines(con = "d1token"), collapse = "")
