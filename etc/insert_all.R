@@ -3,13 +3,15 @@ devtools::load_all(".")
 # Load inventory
 log_message("Loading inventory rda")
 load("inventory/inv.rda")
-inventory <- inv
-inventory$created <- FALSE
-inventory$ready <- TRUE
+stopifnot(is.data.frame(inventory))
 
 # Set environment
-log_message("Setting environment to 'test'")
-Sys.setenv("ARCTICDATA_ENV" = "test")
+log_message("Check to see the env is set.")
+env_name = Sys.getenv("ARCTICDATA_ENV")
+stopifnot(nchar(env_name) > 0)
+log_message(paste0("Loading environment '", env_name, "'.\n"))
+env <- env_load("etc/environment.yml")
+log_message(paste0("Setting up MNode instance for '", env$mn_base_url, "'.\n"))
 env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
 # Set token
@@ -17,10 +19,6 @@ log_message("Setting the d1 token")
 token = Sys.getenv("D1TOKEN")
 stopifnot(nchar(token) > 0)
 options(authentication_token = token)
-
-# Mint PIDs for all objects
-log_message("Giving all objects new UUID pids")
-inventory$pid <- sapply(1:nrow(inventory), function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) })
 
 packages <- unique(inventory$package)
 
