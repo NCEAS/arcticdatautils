@@ -185,6 +185,12 @@ insert_package <- function(inventory, package, env=NULL) {
 
 
   for (data_idx in files_idx_data) {
+    # Skip if already created
+    if (files[data_idx,"created"] == TRUE) {
+      log_message(paste0("File ", files[data_idx,"filename"], " in package ", package, " already created. Moving on to the next data object.\n"))
+      next
+    }
+
     log_message(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
 
     # Determine the PID to use for the data
