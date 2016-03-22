@@ -588,11 +588,6 @@ create_object <- function(file, sysmeta, base_path, mn) {
       e
     })
 
-  # Print out the insert rate
-  time_diff_sec <- round(as.numeric(Sys.time() - before_time, "secs"), 2)
-  mb_per_s <- round(file_size_mb / time_diff_sec, 2)
-  log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
-
   # Validate the result
   # We use the XML package to convert the response to a list which just returns
   # a string with the PID when we successfully created the object.
@@ -600,6 +595,11 @@ create_object <- function(file, sysmeta, base_path, mn) {
   if (inherits(response, "error")) {
     return(FALSE)
   }
+
+  # Print out the insert rate
+  time_diff_sec <- round(as.numeric(Sys.time() - before_time, "secs"), 2)
+  mb_per_s <- round(file_size_mb / time_diff_sec, 2)
+  log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
   created_pid <- XML::xmlToList(response)
 
