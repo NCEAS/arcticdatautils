@@ -1,8 +1,8 @@
 # Fix up metadata
-orig <- dir("~/Desktop/metadata_sync/latest-sync/",
+orig <- dir("~/sync/",
             pattern = "\\.xml$",
             recursive = TRUE)
-setwd("~/Desktop/metadata_sync/latest-sync/")
+setwd("~/sync")
 
 no_abstracts <- orig[which(sapply(orig, test_has_abstract))]
 bad_enums <- orig[which(sapply(orig, test_has_bad_enum))]
