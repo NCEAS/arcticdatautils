@@ -310,7 +310,7 @@ generate_resource_map <- function(metadata_pid,
                                   child_pids=c(),
                                   resolve_base="https://cn.dataone.org/cn/v2/resolve") {
   stopifnot(length(metadata_pid) == 1)
-  stopifnot((length(data_pids) + length(child_pids)) >= 1)
+  stopifnot(length(metadata_pid) + (length(data_pids) + length(child_pids)) >= 1)
 
   # Validate the vector of child PIDs
   if (!is.character(child_pids)) {
