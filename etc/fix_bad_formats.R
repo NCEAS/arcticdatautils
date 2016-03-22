@@ -162,7 +162,7 @@ pids_to_fix <- structure(list(file = c("./acadis-gateway/SeaIceThickness_Precisi
 
 
 library(dataone)
-library(datapackage)
+library(datapack)
 
 mn <- MNode("https://arcticdata.io/metacat/d1/mn/v2")
 
@@ -188,7 +188,7 @@ for (i in 1:nrow(pids_to_fix)) {
     next
   }
 
-  sm <- try({datapackage::parseSystemMetadata(new("SystemMetadata"), xml = XML::xmlRoot(doc))})
+  sm <- try({datapack::parseSystemMetadata(new("SystemMetadata"), xml = XML::xmlRoot(doc))})
 
   if (inherits(sm, "try-error")) {
     cat(paste0("Parsing sysmeta for ", doc, " failed for some reason. Moving on."))

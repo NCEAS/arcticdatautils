@@ -258,9 +258,9 @@ insert_package <- function(inventory, package, env=NULL) {
                               rightsHolder = env$rights_holder,
                               fileName = paste0(resource_map_pid, ".xml"))
 
-  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, "public", "read")
-  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, env$submitter, "write")
-  resource_map_sysmeta <- datapackage::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "write")
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
 
   log_message(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
@@ -377,7 +377,7 @@ generate_resource_map <- function(metadata_pid,
   resource_map <- new("ResourceMap",
                       id = generate_resource_map_pid(metadata_pid))
 
-  resource_map <- datapackage::createFromTriples(resource_map,
+  resource_map <- datapack::createFromTriples(resource_map,
                                                  relations = relationships,
                                                  identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
                                                  resolveURI = resolve_base)
@@ -386,10 +386,10 @@ generate_resource_map <- function(metadata_pid,
   outfilepath <- tempfile()
   stopifnot(!file.exists(outfilepath))
 
-  datapackage::serializeRDF(resource_map, outfilepath)
+  datapack::serializeRDF(resource_map, outfilepath)
 
   # Clean up after ourselves
-  datapackage::freeResourceMap(resource_map)
+  datapack::freeResourceMap(resource_map)
   rm(resource_map)
 
   # Return the full filepath to the resource map so calling functions can
@@ -513,9 +513,9 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
                fileName = file_name)
 
 
-      x <- datapackage::addAccessRule(x, "public", "read")
-      x <- datapackage::addAccessRule(x, submitter, "write")
-      x <- datapackage::addAccessRule(x, submitter, "changePermission")
+      x <- datapack::addAccessRule(x, "public", "read")
+      x <- datapack::addAccessRule(x, submitter, "write")
+      x <- datapack::addAccessRule(x, submitter, "changePermission")
 
       x
     },

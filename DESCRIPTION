@@ -9,7 +9,7 @@ Imports:
   digest,
   dplyr,
   dataone,
-  datapackage,
+  datapack,
   ncdf4,
   stringr,
   stringi,
@@ -20,7 +20,7 @@ Imports:
   XML
 Remotes:
   DataONEorg/dataone
-  ropensci/datapackage
+  ropensci/datapack
 License: MIT + file LICENSE
 LazyData: true
 Suggests: testthat
