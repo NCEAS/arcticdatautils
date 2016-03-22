@@ -92,7 +92,7 @@ for (i in which(inventory$created == FALSE)) {
   }
 
   log_message("Updating inventory...")
-  inventory <- inv_update(inventory, insert_result, env)
+  inventory <- inv_update(inventory, insert_result)
 
   # Save to disk every 100 objects
   if (i %% 100 == 0) {
