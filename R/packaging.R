@@ -19,6 +19,7 @@ insert_file <- function(inventory, file, env=NULL) {
   # Configuration
   if (is.null(env)) {
     env <- env_load("etc/environment.yml")
+    library(dataone)
     env$mn <- dataone::MNode(env$mn_base_url)
   }
 
@@ -102,6 +103,7 @@ insert_package <- function(inventory, package, env=NULL) {
   # Configuration
   if (is.null(env)) {
     env <- env_load("etc/environment.yml")
+    library(dataone)
     env$mn <- dataone::MNode(env$mn_base_url)
   }
 
