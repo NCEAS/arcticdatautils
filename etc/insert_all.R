@@ -12,6 +12,7 @@ stopifnot(nchar(env_name) > 0)
 log_message(paste0("Loading environment '", env_name, "'.\n"))
 env <- env_load("etc/environment.yml")
 log_message(paste0("Setting up MNode instance for '", env$mn_base_url, "'.\n"))
+library(dataone)
 env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
 # Set token

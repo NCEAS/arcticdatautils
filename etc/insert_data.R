@@ -34,6 +34,7 @@ env_name = Sys.getenv("ARCTICDATA_ENV")
 stopifnot(nchar(env_name) > 0)
 log_message(paste0("Loading environment '", env_name, "'.\n"))
 env <- env_load("etc/environment.yml")
+library(dataone)
 env$mn <- dataone::MNode(env$mn_base_url) # Set up MN instance
 
 # Set token
