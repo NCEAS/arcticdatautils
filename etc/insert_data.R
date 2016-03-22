@@ -47,7 +47,7 @@ options(authentication_token = token)
 if (is_token_expired()) stop("Token is expired.")
 
 # Insert each file
-for (i in seq_len(nrow(inventory))) {
+for (i in which(inventory$created == FALSE)) {
   # Check if the file "quit" exists, and, if so, save the inventory and quit
   if (file.exists("quit")) {
     log_message(paste0("File 'quit' exists. Saving inventory and shutting down."))
