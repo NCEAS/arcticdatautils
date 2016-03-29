@@ -41,6 +41,8 @@ insert_file <- function(inventory, file, env=NULL) {
     identifier_scheme <- env$data_identifier_scheme
   }
 
+  log_message(paste0("Using identifier scheme ", identifier_scheme, "."))
+
   # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
                                                env$mn,
@@ -123,12 +125,15 @@ insert_package <- function(inventory, package, env=NULL) {
     stop("Not all child packages have been created. Add those packages first.")
   }
 
+
   # Gather child pids
   if (nrow(child_packages) > 0) {
     child_pids <- vapply(child_packages$pid, generate_resource_map_pid, "")
-  } else {
+  }
+  else {
     child_pids <- c()
   }
+
 
   # Find the package contents (metadata and data)
   files <- inventory[inventory$package == package,]
@@ -163,6 +168,11 @@ insert_package <- function(inventory, package, env=NULL) {
     if (is.null(metadata_sysmeta)) {
       log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
       return(files)
+    }
+
+    # We're about to use the 'created' column, initialize it if needed
+    if (!("created" %in% names(files))) {
+      files$created <- FALSE
     }
 
     # Metadata Object
@@ -244,7 +254,7 @@ insert_package <- function(inventory, package, env=NULL) {
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
 
-  log_message(paste0("Resource map PID is ", resource_map_pid, ".\n"))
+  log_message(paste0("Resource map PID is ", resource_map_pid, " for package with metadata file ", files[files_idx_metadata,"file"], ".\n"))
 
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
@@ -267,24 +277,24 @@ insert_package <- function(inventory, package, env=NULL) {
 
   log_message(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
-  create_resource_map_response <- tryCatch(
-    {
-      dataone::createObject(env$mn,
-                            resource_map_pid,
-                            file = resource_map_filepath,
-                            sysmeta = resource_map_sysmeta)
-    },
-    error = function(e) {
-      log_message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
-      log_message(e$message)
-      e
-    }
+  create_resource_map_response <- tryCatch({
+    dataone::createObject(env$mn,
+                          resource_map_pid,
+                          file = resource_map_filepath,
+                          sysmeta = resource_map_sysmeta)
+  },
+  error = function(e) {
+    log_message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
+    log_message(e$message)
+    e
+  }
   )
 
   if (inherits(create_resource_map_response, "error")) {
     created_resource_map_pid <- NULL
     files$resmap_created <- FALSE
-  } else {
+  }
+  else {
     print(create_resource_map_response)
     created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
     files$resmap_created <- TRUE
@@ -294,7 +304,6 @@ insert_package <- function(inventory, package, env=NULL) {
 
   return(files)
 }
-
 
 #' Generate a Resource Map. This is a convenience wrapper around the constructor
 #' of the `ResourceMap` class from `DataPackage`.
@@ -322,6 +331,7 @@ generate_resource_map <- function(metadata_pid,
 
   relationships <- data.frame()
 
+  # TEMP
   # Add special statements to try and get metadata-only PIDs to index
   relationships <- rbind(relationships,
                          data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
@@ -330,6 +340,8 @@ generate_resource_map <- function(metadata_pid,
                                     subjectType = "uri",
                                     objectType = "uri",
                                     stringsAsFactors = FALSE))
+
+  # TEMP
 
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
@@ -386,13 +398,14 @@ generate_resource_map <- function(metadata_pid,
                                       objectType = "uri",
                                       stringsAsFactors = FALSE))
   }
+
   resource_map <- new("ResourceMap",
                       id = generate_resource_map_pid(metadata_pid))
 
   resource_map <- datapack::createFromTriples(resource_map,
-                                                 relations = relationships,
-                                                 identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
-                                                 resolveURI = resolve_base)
+                                              relations = relationships,
+                                              identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
+                                              resolveURI = resolve_base)
 
   # Save the resource map to disk
   outfilepath <- tempfile()
@@ -409,16 +422,15 @@ generate_resource_map <- function(metadata_pid,
   outfilepath
 }
 
-
 generate_resource_map_pid <- function(metadata_pid) {
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
 
-  if (stringi::stri_startswith_fixed(metadata_pid, "resourceMap")) {
+  if (stringi::stri_startswith_fixed(metadata_pid, "resource_map_")) {
     return(metadata_pid)
   }
 
-  paste0("resourceMap_", metadata_pid)
+  paste0("resource_map_", metadata_pid)
 }
 
 #' Get the already-minted PID from the inventory or mint a new one.
@@ -440,7 +452,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
   pid <- file[1,"pid"]
 
   # Check if the existing PID is a valid one
-  if (is.character(pid) && nchar(pid) > 0) {
+  if (!is.na(pid) && is.character(pid) && nchar(pid) > 0) {
     log_message(paste0("Using existing PID of ", pid, "\n"))
     return(pid)
   }
@@ -449,7 +461,9 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 
   if (scheme == "UUID") {
     pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
-  } else {
+  }
+
+  else {
     pid <- tryCatch(
       {
         dataone::generateIdentifier(mn, scheme)
@@ -469,9 +483,6 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
   # Return `pid`, whch is either "" or a PID at this point
   pid
 }
-
-
-
 
 #' Create a sysmeta object.
 #'
