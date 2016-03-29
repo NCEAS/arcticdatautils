@@ -142,72 +142,23 @@ insert_package <- function(inventory, package, env=NULL) {
   stopifnot(length(files_idx_metadata) == 1)
 
 
-  # Process metadata
-
-  # Determine the PID to use for the metadata
-  files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
-                                                       env$mn,
-                                                       scheme = env$metadata_identifier_scheme)
-
-  if (is.na(files[files_idx_metadata,"pid"])) {
-    log_message(paste0("Metadata PID was NA for package ", package, ".\n"))
-    return(files)
-  }
-
-  # Metadata SystemMetadata
-  metadata_sysmeta <- create_sysmeta(files[files_idx_metadata,],
-                                     env$base_path,
-                                     env$submitter,
-                                     env$rights_holder)
-
-  if (is.null(metadata_sysmeta)) {
-    log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
-    return(files)
-  }
-
-  # We're about to use the 'created' column, initialize it if needed
-  if (!("created" %in% names(files))) {
-    files$created <- FALSE
-  }
-
-  # Metadata Object
+  # Process metadata if it hasn't already been created
   if (files[files_idx_metadata,"created"] == FALSE) {
-    files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
-                                                         metadata_sysmeta,
-                                                         env$base_path,
-                                                         env$mn)
-  }
+    # Determine the PID to use for the metadata
+    files[files_idx_metadata,"pid"] <- get_or_create_pid(files[files_idx_metadata,],
+                                                         env$mn,
+                                                         scheme = env$metadata_identifier_scheme)
 
-  if (files[files_idx_metadata,"created"] == FALSE) {
-    log_message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
-    return(files)
-  }
-
-
-  for (data_idx in files_idx_data) {
-    # Skip if already created
-    if (files[data_idx,"created"] == TRUE) {
-      log_message(paste0("File ", files[data_idx,"filename"], " in package ", package, " already created. Moving on to the next data object.\n"))
-      next
-    }
-
-    log_message(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
-
-    # Determine the PID to use for the data
-    files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
-                                               env$mn,
-                                               scheme = env$data_identifier_scheme)
-
-    if (is.na(files[data_idx,"pid"])) {
-      log_message(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
+    if (is.na(files[files_idx_metadata,"pid"])) {
+      log_message(paste0("Metadata PID was NA for package ", package, ".\n"))
       return(files)
     }
 
     # Metadata SystemMetadata
-    data_sysmeta <- create_sysmeta(files[data_idx,],
-                                   env$base_path,
-                                   env$submitter,
-                                   env$rights_holder)
+    metadata_sysmeta <- create_sysmeta(files[files_idx_metadata,],
+                                       env$base_path,
+                                       env$submitter,
+                                       env$rights_holder)
 
     if (is.null(metadata_sysmeta)) {
       log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
@@ -215,17 +166,69 @@ insert_package <- function(inventory, package, env=NULL) {
     }
 
     # Metadata Object
-    if (files[data_idx,"created"] == FALSE) {
-      files[data_idx,"created"] <- create_object(files[data_idx,],
-                                                 data_sysmeta,
-                                                 env$base_path,
-                                                 env$mn)
+    if (files[files_idx_metadata,"created"] == FALSE) {
+      files[files_idx_metadata,"created"] <- create_object(files[files_idx_metadata,],
+                                                           metadata_sysmeta,
+                                                           env$base_path,
+                                                           env$mn)
     }
 
-    if (files[data_idx,"created"] == FALSE) {
+    if (files[files_idx_metadata,"created"] == FALSE) {
       log_message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
       return(files)
     }
+  } else {
+    log_message("Skipped creating metadata because it was already created.")
+  }
+
+  # Insert data files if needed
+  if (any(files[files_idx_data,"created"] == FALSE)) {
+
+    for (data_idx in files_idx_data) {
+      # Skip if already created
+      if (files[data_idx,"created"] == TRUE) {
+        log_message(paste0("File ", files[data_idx,"filename"], " in package ", package, " already created. Moving on to the next data object.\n"))
+        next
+      }
+
+      log_message(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
+
+      # Determine the PID to use for the data
+      files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
+                                                 env$mn,
+                                                 scheme = env$data_identifier_scheme)
+
+      if (is.na(files[data_idx,"pid"])) {
+        log_message(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
+        return(files)
+      }
+
+      # Metadata SystemMetadata
+      data_sysmeta <- create_sysmeta(files[data_idx,],
+                                     env$base_path,
+                                     env$submitter,
+                                     env$rights_holder)
+
+      if (is.null(metadata_sysmeta)) {
+        log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
+        return(files)
+      }
+
+      # Metadata Object
+      if (files[data_idx,"created"] == FALSE) {
+        files[data_idx,"created"] <- create_object(files[data_idx,],
+                                                   data_sysmeta,
+                                                   env$base_path,
+                                                   env$mn)
+      }
+
+      if (files[data_idx,"created"] == FALSE) {
+        log_message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
+        return(files)
+      }
+    }
+  } else {
+    log_message("Skipped creating data files because they were all created.")
   }
 
   # At this point, all of the metadata and data should be created, let's check
