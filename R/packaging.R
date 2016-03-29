@@ -322,6 +322,15 @@ generate_resource_map <- function(metadata_pid,
 
   relationships <- data.frame()
 
+  # Add special statements to try and get metadata-only PIDs to index
+  relationships <- rbind(relationships,
+                         data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
+                                    predicate = "http://purl.org/spar/cito/documents",
+                                    object = paste0(resolve_base, "/", URLencode(metadata_pid, reserved = TRUE)),
+                                    subjectType = "uri",
+                                    objectType = "uri",
+                                    stringsAsFactors = FALSE))
+
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
                            data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
