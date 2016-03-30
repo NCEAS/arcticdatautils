@@ -242,3 +242,20 @@ log_message <- function(message=NULL) {
 
   invisible(TRUE)
 }
+
+
+object_exists <- function(mn_base_url, pid) {
+  stopifnot(is.character(mn_base_url),
+            nchar(mn_base_url) > 0,
+            is.character(pid),
+            nchar(pid) > 0)
+
+  url <- paste0(mn_base_url, "/meta/", pid)
+  response <- httr::GET(url)
+
+  if (!inherits(response, "response") || response$status_code != 200){
+    return(invisible(FALSE))
+  }
+
+  invisible(TRUE)
+}

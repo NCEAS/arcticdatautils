@@ -694,3 +694,155 @@ is_token_expired <- function() {
     return(FALSE)
   }
 }
+
+
+determine_child_pids <- function(inventory, package) {
+  stopifnot(all(c("package", "parent_package", "is_metadata") %in% names(inventory)))
+
+  child_packages <- inventory[inventory$parent_package == package &
+                                inventory$is_metadata,]
+
+  # Gather child pids
+  if (nrow(child_packages) > 0) {
+    child_pids <- vapply(child_packages$pid, generate_resource_map_pid, "")
+  } else {
+    child_pids <- c()
+  }
+
+  names(child_pids) <- NULL
+  child_pids
+}
+
+
+#' Convert a package's metadata record to EML and update it and its
+#' resource map with new PIDs.
+#'
+#' @param inventory (data.frame)
+#' @param package (character)
+#'
+#' @return TRUE or FALSE depending on sucess (logical)
+#' @export
+#'
+#' @examples
+convert_to_eml_and_update_package <- function(inventory,
+                                              package,
+                                              env = NULL) {
+  validate_inventory(inventory)
+  stopifnot("newpid" %in% names(inventory))
+  stopifnot(is.character(package),
+            nchar(package))
+  stopifnot(!is.null(env))
+
+  package_files <- inventory[inventory$package == package,]
+  stopifnot(nrow(package_files) > 0)
+
+  metadata_file_idx <- which(package_files$is_metadata == TRUE)
+  data_file_idx <- which(package_files$is_metadata == FALSE)
+  stopifnot(length(metadata_file_idx) == 1)
+
+  log_message(paste0("Convert to EML and updating package ", package, "\n"))
+
+  # Convert it to EML
+  eml_doc_path <- convert_iso_to_eml(package_files[metadata_file_idx,"file"])
+
+  # Get a new PID and replace the packageId
+  # new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate()) # TODO
+  new_pid <- package_files[metadata_file_idx,"newpid"]
+  stopifnot(!is.na(new_pid),
+            is.character(new_pid),
+            nchar(new_pid) > 0)
+
+  replace_package_id(eml_doc_path, new_pid)
+
+  # Call UPDATE on the metadata object
+  old_pid <- package_files[metadata_file_idx,"pid"]
+
+  # Does this PID even exist? Stop now if it doesn't.
+  if (!object_exists(env$mn_base_url, old_pid)) {
+    log_message(paste0("Object with PID ", old_pid, " not found. Quitting.\n"))
+    return(FALSE)
+  }
+
+  sysmeta <- new("SystemMetadata",
+                 identifier = new_pid,
+                 formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                 size = file.size(eml_doc_path),
+                 checksum = digest::digest(eml_doc_path, algo = "sha256"),
+                 checksumAlgorithm = "SHA256",
+                 submitter = env$submitter,
+                 rightsHolder = env$rights_holder,
+                 fileName = package_files[metadata_file_idx,"filename"])
+
+  sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+
+  update_response <- tryCatch({
+    dataone::updateObject(env$mn, old_pid, eml_doc_path, new_pid, sysmeta)
+  },
+  error = function(e) {
+    log_message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+    log_message(e)
+    e
+  })
+
+  if (inherits(update_response, "error")) {
+    package_files$resmap_created <- FALSE
+    return(FALSE)
+  }
+
+  log_message(paste0("Inserted updated resource map for package ", package, "\n"))
+
+  # Resource Map
+  # Hack the package_files data.frame to have the new PID
+  package_files[metadata_file_idx,"pid"] <- new_pid
+
+  metadata_pid <- package_files[metadata_file_idx,"pid"]
+  data_pids <- package_files[data_file_idx,"pid"]
+  child_pids <- determine_child_pids(inventory, package)
+
+  resource_map_filepath <- generate_resource_map(metadata_pid, data_pids, child_pids)
+
+  resource_map_pid <- generate_resource_map_pid(metadata_pid)
+  resource_map_format_id <- "http://www.openarchives.org/ore/terms"
+  resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
+  resource_map_size_bytes <- file.info(resource_map_filepath)$size
+
+  resource_map_sysmeta <- new("SystemMetadata",
+                              identifier = resource_map_pid,
+                              formatId = resource_map_format_id,
+                              size = resource_map_size_bytes,
+                              checksum = resource_map_checksum,
+                              checksumAlgorithm = "SHA256",
+                              submitter = env$submitter,
+                              rightsHolder = env$rights_holder,
+                              fileName = paste0(resource_map_pid, ".xml"))
+
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+
+
+  old_resmap_pid <- generate_resource_map_pid(old_pid)
+
+  # Does this PID even exist? Stop now if it doesn't.
+  if (!object_exists(env$mn_base_url, old_resmap_pid)) {
+    log_message(paste0("Object with PID ", old_resmap_pid, " not found. Quitting.\n"))
+    return(FALSE)
+  }
+
+  update_response <- tryCatch({
+    dataone::updateObject(env$mn, old_resmap_pid, resource_map_filepath, resource_map_pid, resource_map_sysmeta)
+  },
+  error = function(e) {
+    log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+    log_message(e)
+    e
+  })
+
+  if (inherits(update_response, "error")) {
+    package_files$resmap_created <- FALSE
+  }
+
+  return(TRUE)
+}

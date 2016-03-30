@@ -10,6 +10,7 @@ Imports:
   dplyr,
   dataone,
   datapack,
+  httr,
   ncdf4,
   stringr,
   stringi,
