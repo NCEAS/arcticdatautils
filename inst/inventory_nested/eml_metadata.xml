@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml
+  packageId="urn:uuid:f5dd7829-7e61-4a3b-a378-0a4b769d85f1"
+  system="dev"
+  xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ds="eml://ecoinformatics.org/dataset-2.1.1"
+  xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1"
+  xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 eml.xsd">
+  <dataset>
+    <title>Nested test: A</title>
+    <creator>
+      <individualName>
+        <givenName>Bryce</givenName>
+        <surName>Mecum</surName>
+      </individualName>
+      <organizationName>NCEAS</organizationName>
+      <address>
+        <deliveryPoint>735 State St.</deliveryPoint>
+        <city>Santa Barbara</city>
+        <administrativeArea>California</administrativeArea>
+        <postalCode>93101</postalCode>
+        <country>United States</country>
+      </address>
+      <phone>805-893-2500</phone>
+      <electronicMailAddress>mecum@nceas.ucsb.edu</electronicMailAddress>
+    </creator>
+    <pubDate>2016-03-25</pubDate>
+    <abstract>
+      <para>This is an abstract.</para>
+    </abstract>
+    <coverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>1990</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>1997</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+      <geographicCoverage>
+        <geographicDescription>Santa Barbara, CA</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-123.0000</westBoundingCoordinate>
+          <eastBoundingCoordinate>-123.0000</eastBoundingCoordinate>
+          <northBoundingCoordinate>80.0000</northBoundingCoordinate>
+          <southBoundingCoordinate>80.0000</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+    </coverage>
+    <contact>
+      <individualName>
+        <givenName>Bryce</givenName>
+        <surName>Mecum</surName>
+      </individualName>
+      <organizationName>NCEAS</organizationName>
+      <address>
+        <deliveryPoint>735 State St.</deliveryPoint>
+        <city>Santa Barbara</city>
+        <administrativeArea>California</administrativeArea>
+        <postalCode>93101</postalCode>
+        <country>United States</country>
+      </address>
+      <phone>805-893-2500</phone>
+      <electronicMailAddress>mecum@nceas.ucsb.edu</electronicMailAddress>
+    </contact>
+  </dataset>
+</eml:eml>

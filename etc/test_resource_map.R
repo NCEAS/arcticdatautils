@@ -2,7 +2,6 @@
 # TODO: Turn this into a test
 
 library(dataone)
-library(digest)
 devtools::load_all(".")
 devtools::load_all("~/src/ropensci-datapackage/")
 
@@ -21,7 +20,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 
 inv <- inv_add_extra_columns(inv)
@@ -43,7 +42,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 
 inv <- inv_add_extra_columns(inv)
@@ -65,7 +64,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 inv <- rbind(inv,
              inv,
@@ -98,7 +97,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 inv <- rbind(inv,
              inv,
@@ -132,7 +131,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 inv <- rbind(inv,
              inv,
@@ -165,7 +164,7 @@ files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 inv <- rbind(inv,
              inv,
@@ -205,7 +204,7 @@ last <- insert_package(inv, "A", env)
 
 inv <- data.frame(file = files,
                   size_bytes = file.size(files),
-                  checksum_sha256 = sapply(files, function(file) { digest(file, algo="sha256")}),
+                  checksum_sha256 = sapply(files, function(file) { digest::digest(file, algo="sha256")}),
                   stringsAsFactors = FALSE)
 inv <- rbind(inv,
              inv,

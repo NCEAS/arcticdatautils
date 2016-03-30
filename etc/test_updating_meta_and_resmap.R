@@ -23,11 +23,27 @@ library(dplyr)
 # Set up the environment
 env <- env_load("etc/environment.yml")
 env$mn <- MNode(env$mn_base_url)
+env$base_path <- "~/src/arctic-data/arcticdata/"
 
 # Load the inventory
-inventory_path <- "~/src/arctic-data/inventory/master_all.csv"
+inventory_path <- "inst/inventory_nested/inventory_nested.csv"
 inventory <- read.csv(inventory_path,
                       stringsAsFactors = FALSE)
+
+
+# (Optional) Insert the originals
+inventory$pid <- sapply(inventory, digest::digest, algo = "sha256")
+inventory$created <- FALSE
+inventory$ready <- TRUE
+
+for (d in seq(max(inventory$depth), min(inventory$depth))) {
+  for (package in unique(inventory[inventory$depth == d,"package"])) {
+    cat(paste0("Inserting package ", package, "\n"))
+
+    last_insert <- insert_package(inventory, package, env)
+    inventory <- inv_update(inventory, last_insert)
+  }
+}
 
 # Bring in a list of new PIDs
 # new_pids <- read.csv("...")
