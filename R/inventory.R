@@ -377,8 +377,6 @@ inv_add_parent_package_column <- function(inventory) {
       next
     }
 
-    cat("\n", which(package == packages))
-
     metadata_file <- metadata_files[metadata_files$package == package,]
     stopifnot(nrow(metadata_file) == 1)
 
@@ -394,7 +392,6 @@ inv_add_parent_package_column <- function(inventory) {
     # Three is the cutoff here because no package is higher than...
     # ./acadis-X-X/some_folder/something (length four)
     while (length(path_parts) > 2) {
-      cat(".")
       joined_path <- paste(path_parts, collapse = "/")
 
       # Note use of X == TRUE, this is to cast each part of the chained &
