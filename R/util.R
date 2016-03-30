@@ -244,6 +244,18 @@ log_message <- function(message=NULL) {
 }
 
 
+#' Check if an object exists on a Member Node.
+#'
+#' This is a simple check for the HTTP status of a /meta/{PID} call on the
+#' provided member node.
+#'
+#' @param mn_base_url Member Node to query (character)
+#' @param pid PID to check the existence of (character)
+#'
+#' @return Whether the object exists (logical)
+#' @export
+#'
+#' @examples
 object_exists <- function(mn_base_url, pid) {
   stopifnot(is.character(mn_base_url),
             nchar(mn_base_url) > 0,
@@ -259,3 +271,85 @@ object_exists <- function(mn_base_url, pid) {
 
   invisible(TRUE)
 }
+
+
+#' Convert and ISO document to EML using an XSLT.
+#'
+#' This is a better of a nasty function right now but it essentially
+#' takes a file in, loads an XSLT file and does the conversion. The nasty part
+#' is that I have the XSLT file in a hard-linked directory on my computer
+#' because we're still actively developing the XSLT.
+#'
+#' @param path Path to the file to convert. (character)
+#'
+#' @return Location of the converted file (character)
+#' @export
+#'
+#' @examples
+convert_iso_to_eml <- function(path) {
+  tmpfile <- tempfile(fileext = ".xml")
+  full_path <- paste0(env$base_path, "/", path)
+  stopifnot(file.exists(full_path))
+
+  doc <- tryCatch({
+    xml2::read_xml(full_path)
+  },
+  warning = function(w) {
+    log_message(w)
+  },
+  error = function(e) {
+    log_message(e)
+  })
+
+  # Hack fix, I can change this later so I don't have to do WD stuff
+  old_wd <- getwd()
+  setwd("~/src/iso2eml/src")
+
+  transformed_document <- tryCatch({
+    xslt::xslt_transform(doc, isotoeml)
+  },
+  warning = function(w) {
+    log_message(w)
+  },
+  error = function(e) {
+    log_message(e)
+  })
+
+  xml2::write_xml(transformed_document, tmpfile)
+
+  setwd(old_wd)
+
+  tmpfile
+}
+
+
+#' Replace the EML 'packageId' attribute on the root element with a
+#' certain value.
+#'
+#' Note: I am just using string manipulation (replacement) because I don't want
+#' the XML package to have re-format the XML when I edit it and write it back
+#' to disk.
+#'
+#' @param path Path to the XML file to edit. (character)
+#' @param replacement The new value (character)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+replace_package_id <- function(path, replacement) {
+  stopifnot(file.exists(path),
+            is.character(replacement),
+            nchar(replacement) > 0)
+
+  lines <- readLines(con = path)
+
+  package_id_line <- which(str_detect(lines, "packageId") == TRUE)
+  stopifnot(length(package_id_line) == 1)
+
+  lines[package_id_line] <- str_replace(lines[package_id_line],
+                                        "packageId=\"(.+)\"",
+                                        paste0("packageId=\"", replacement ,"\""))
+  writeLines(lines, con = path)
+}
+

@@ -38,58 +38,6 @@ env$base_path <- "~/sync/"
 #'  - Update all resource maps above it ? No. This will be done later.
 
 
-convert_iso_to_eml <- function(path) {
-  tmpfile <- tempfile(fileext = ".xml")
-  full_path <- paste0(env$base_path, "/", path)
-  stopifnot(file.exists(full_path))
-
-  doc <- tryCatch({
-    read_xml(full_path)
-  },
-  warning = function(w) {
-    log_message(w)
-  },
-  error = function(e) {
-    log_message(e)
-  })
-
-  # Hack fix, I can change this later so I don't have to do WD stuff
-  old_wd <- getwd()
-  setwd("~/src/iso2eml/src")
-
-  transformed_document <- tryCatch({
-    xslt::xslt_transform(doc, isotoeml)
-  },
-  warning = function(w) {
-    log_message(w)
-  },
-  error = function(e) {
-    log_message(e)
-  })
-
-  xml2::write_xml(transformed_document, tmpfile)
-
-  setwd(old_wd)
-
-  tmpfile
-}
-
-
-replace_package_id <- function(path, replacement) {
-  stopifnot(file.exists(path),
-            is.character(replacement),
-            nchar(replacement) > 0)
-
-  lines <- readLines(con = path)
-
-  package_id_line <- which(str_detect(lines, "packageId") == TRUE)
-  stopifnot(length(package_id_line) == 1)
-
-  lines[package_id_line] <- str_replace(lines[package_id_line],
-                                        "packageId=\"(.+)\"",
-                                        paste0("packageId=\"", replacement ,"\""))
-  writeLines(lines, con = path)
-}
 
 # Run it
 for (d in max(inventory$depth):min(inventory$depth)) {
