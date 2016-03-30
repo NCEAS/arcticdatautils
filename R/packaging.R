@@ -743,7 +743,8 @@ convert_to_eml_and_update_package <- function(inventory,
   log_message(paste0("Convert to EML and updating package ", package, "\n"))
 
   # Convert it to EML
-  eml_doc_path <- convert_iso_to_eml(package_files[metadata_file_idx,"file"])
+  iso_file_path <- paste0(env$base_path, package_files[metadata_file_idx,"file"])
+  eml_doc_path <- convert_iso_to_eml(iso_file_path)
 
   # Get a new PID and replace the packageId
   # new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate()) # TODO
@@ -846,3 +847,4 @@ convert_to_eml_and_update_package <- function(inventory,
 
   return(TRUE)
 }
+

@@ -280,15 +280,15 @@ object_exists <- function(mn_base_url, pid) {
 #' is that I have the XSLT file in a hard-linked directory on my computer
 #' because we're still actively developing the XSLT.
 #'
-#' @param path Path to the file to convert. (character)
+#' @param full_path Path to the file to convert. (character)
+#' @param isotoeml the XSLT object to be used for transformation
 #'
 #' @return Location of the converted file (character)
 #' @export
 #'
 #' @examples
-convert_iso_to_eml <- function(path) {
+convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
   tmpfile <- tempfile(fileext = ".xml")
-  full_path <- paste0(env$base_path, "/", path)
   stopifnot(file.exists(full_path))
 
   doc <- tryCatch({
