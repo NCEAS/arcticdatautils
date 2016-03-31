@@ -416,11 +416,21 @@ replace_package_id <- function(path, replacement) {
   stopifnot(is.character(replacement),
             nchar(replacement) > 0)
 
-  xmldoc <- XML::xmlParseDoc(file = path)
-  root <- XML::xmlRoot(xmldoc)
-  XML::xmlAttrs(root) <- c(packageId = replacement)
+  result <- tryCatch({
+    xmldoc <- XML::xmlParseDoc(file = path)
+    root <- XML::xmlRoot(xmldoc)
+    XML::xmlAttrs(root) <- c(packageId = replacement)
+    XML::saveXML(xmldoc, path)
+  },
+  error = function(e) {
+    e
+  })
 
-  XML::saveXML(xmldoc, path)
+  if (inherits(result, "error")) {
+    log_message(result)
+  }
+
+  path
 }
 
 
