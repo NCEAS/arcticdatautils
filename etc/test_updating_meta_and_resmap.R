@@ -33,9 +33,15 @@ inventory <- read.csv(inventory_path,
 
 
 # (Optional) Insert the originals
-inventory$pid <- sapply(inventory, digest::digest, algo = "sha256")
+inventory$pid <- sapply(1:nrow(inventory), function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) } )
+inventory[inventory$is_metadata,"format_id"] <- "eml://ecoinformatics.org/eml-2.1.1"
 inventory$created <- FALSE
 inventory$ready <- TRUE
+
+# Temp filter to just A
+inventory <- inventory[inventory$package == "A",]
+inventory <- inventory[3:4,]
+# End temp
 
 for (d in seq(max(inventory$depth), min(inventory$depth))) {
   for (package in unique(inventory[inventory$depth == d,"package"])) {
