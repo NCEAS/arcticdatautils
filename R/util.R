@@ -322,6 +322,73 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
   tmpfile
 }
 
+#' Extract the EML responsible-party blocks in a document, and parse the
+#' surName field to create proper givenName/surName structure
+#'
+#' @param path file path to the EML document to process (character)
+#'
+#' @return path to the converted EML file (character)
+#' @import XML
+#' @export
+substitute_eml_party <- function(path) {
+
+  # Read in the EML document
+  ns <- c(eml='eml://ecoinformatics.org/eml-2.1.1')
+  eml = XML::xmlParse(path)
+
+  # For each of the creator, contact, associatedParty elements
+  creators <- XML::getNodeSet(eml, '/eml:eml/dataset/creator', ns)
+  rplist <- sapply(creators, change_eml_name)
+  associates <- XML::getNodeSet(eml, '/eml:eml/dataset/associatedParty', ns)
+  rplist <- sapply(associates, change_eml_name)
+  contacts <- XML::getNodeSet(eml, '/eml:eml/dataset/contact', ns)
+  rplist <- sapply(contacts, change_eml_name)
+
+  # Serialize the EML document to disk
+  XML::saveXML(eml, file=path)
+
+  # Return the EML path
+  return(path)
+}
+
+#' Utility function to extract a name string from an XML individualName node,
+#' parse it into tokens,and reformat the individualName with new children nodes
+#'
+#' @param party the XML node containing a subclass of eml:ResponsibleParty
+#' @return the modified XML node
+#' @import XML
+#' @export
+change_eml_name <- function(party) {
+  # Parse out the surName and givenName of the party
+  user_name <- XML::xpathApply(party, "./individualName/surName", XML::xmlValue)
+
+  # TODO: if no individualName exists, just move on
+
+  parts <- stringr::str_split(user_name, ' ')
+  eml_suffix = as.character(NA)
+
+  # Check for suffix (Jr., III)
+  last <- length(parts[[1]])
+  if (parts[[1]][last]=="Jr." || parts[[1]][last]=="III") {
+    eml_suffix <- parts[[1]][length(parts[[1]])]
+    last <- last-1
+  }
+  eml_surname <- parts[[1]][last]
+  eml_givenname <- paste(parts[[1]][1:(last-1)], collapse=' ')
+
+  # Create a new individualName Node
+  child_nodes <- list(XML::xmlNode("givenName", eml_givenname))
+  if (!is.na(eml_suffix)) {
+    suffix <- XML::xmlNode("givenName", eml_suffix)
+    child_nodes[[length(child_nodes)+1]] <- suffix
+  }
+  sn <- XML::xmlNode("surName", eml_surname)
+  child_nodes[[length(child_nodes)+1]] <- sn
+  name_node <- XML::xmlNode("individualName", .children=child_nodes)
+
+  # Substitute in a new name structure for the old in the EML document
+  XML::replaceNodes(party[['individualName']], name_node)
+}
 
 #' Replace the EML 'packageId' attribute on the root element with a
 #' certain value.
