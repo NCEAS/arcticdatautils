@@ -5,14 +5,11 @@ library(dataone)
 devtools::load_all(".")
 devtools::load_all("~/src/ropensci-datapackage/")
 
-
-Sys.setenv("D1TOKEN" = "eyJhbGciOiJSUzI1NiJ9.eyJleHAiOjE0NTkxMDI4MzAsInN1YiI6IkNOPUJyeWNlIE1lY3VtIEEyNzU3NixPPUdvb2dsZSxDPVVTLERDPWNpbG9nb24sREM9b3JnIiwiY29uc3VtZXJLZXkiOiJ0aGVjb25zdW1lcmtleSIsImlzc3VlZEF0IjoiMjAxNi0wMy0yN1QwMDoyMDozMC43OTIrMDA6MDAiLCJ1c2VySWQiOiJDTj1CcnljZSBNZWN1bSBBMjc1NzYsTz1Hb29nbGUsQz1VUyxEQz1jaWxvZ29uLERDPW9yZyIsImZ1bGxOYW1lIjoiQnJ5Y2VNZWN1bSIsInR0bCI6NjQ4MDAsImlhdCI6MTQ1OTAzODAzMH0.eEYTp9F8w2y8ceU01ikh4ms5WMCvm0vmOaPgschHydxuSWZCE_KcJUVYi0UE9vdIWPd13QUMtvsD4UjKGTwbg6wGdO0HbuB_szzBwYyXbiNAuUkLXCTtl0bc7DxnicQ4F3Cqw9hhFqZW5HoFwfdrLYZnLBcv-zTZ0HiS_8GBIH_r1iS-nqzgGr15GxIgInh4BM7uvivCMYrzsIoD95UdCre-6Odd2cmH19ZK21Nxuq3zuuDjRpzN1kr9t_I_9SXX80o2oD7ZKjCJriPO739GgCWYCsAdUTfnArmWr_YkEIIXN2I31sPD_cVVNJgil_GYPsHv4p_5AdhicCkq5txyElOZnNM2Pq3aBVYCiOzSfiVqy35a7YpPfpnS3NoZFWTHiVbWAs7lPgAmwRx5wbuVeVgRU3lhn1Kx6LHSTfdDBXQraAD1tdEszCv0dsPlQnZ0LhXl_uL4C4Xj9lyEU1Srm7PTphVvpZHtlEDFfbX4gQw515dBuNyZJd4fs0d0BZ4xVrCtVHLGW17jt8fSPQEjSU-ylxE5oPzq7tZvfDCG4ntF1jbQeneZU9H0RdaS0ZYRvGp3BOFxaFwlK9j_8-2rjiMLrCoVYofVOWpdD-Frwsa4By4ZHodezKMHqe1m8BlbWrDbvCJmawq75WYrpvnoA7RJ8ucSW2JbTHuE9t8bAnA")
-options(authentication_token = Sys.getenv("D1TOKEN"))
-
 Sys.setenv("ARCTICDATA_ENV" = "development")
 env <- env_load("etc/environment.yml")
 env$mn <- MNode(env$mn_base_url)
 env$base_path <- "./"
+
 # Make three data files
 # Make a metadata file
 
@@ -59,7 +56,6 @@ insert_package(inv, "A", env)
 
 
 # Now do nested ones
-
 files <- paste0("./inst/inventory_simple/", dir("./inst/inventory_simple/"))
 
 inv <- data.frame(file = files,
