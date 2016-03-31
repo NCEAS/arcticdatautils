@@ -888,7 +888,7 @@ convert_to_eml_and_update_package <- function(inventory,
   }
 
   log_message(paste0("Updating old resource map ", old_resmap_pid, " with new resmap pid ", resource_map_pid, ".\n"))
-
+  log_message(paste0("New resource map is at ", resource_map_filepath, "\n"))
   update_response <- tryCatch({
     dataone::updateObject(x = env$mn,
                           pid = old_resmap_pid,
@@ -901,6 +901,8 @@ convert_to_eml_and_update_package <- function(inventory,
     log_message(e)
     e
   })
+
+  log_message(update_response)
 
   if (inherits(update_response, "error")) {
     package_files$resmap_created <- FALSE
