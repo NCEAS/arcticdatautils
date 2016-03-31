@@ -18,6 +18,7 @@
 #' is introduced $pid_old so that the correct linkages can be made.
 
 library(dataone)
+devtools::load_all("~/src/ropensci-datapackage/")
 library(dplyr)
 
 # Set up the environment
