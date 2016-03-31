@@ -455,3 +455,7 @@ path_join <- function(path_parts=c("")) {
   # Remove ./ from the middle of the string
   # e.g. ./asdf/./fdas
   result <- gsub("(.)\\.\\/", "\\1\\/", result)
+
+  result
+}
+
