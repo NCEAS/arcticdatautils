@@ -427,3 +427,31 @@ replace_package_id <- function(path, replacement) {
   writeLines(lines, con = path)
 }
 
+
+
+#' (Intelligently) join (possibly redudant) path parts together.
+#'
+#' Joins path strings like "./" to "./my/dir" as "./my/dir" instead of as
+#' "././my/dir.
+#'
+#' @param path_parts (character)
+#'
+#' @return The joined path string (character)
+#' @export
+#'
+#' @examples
+path_join <- function(path_parts=c("")) {
+  result <- paste0(path_parts, collapse = "")
+
+  # Change duplicated './' to just a single './'
+  result <- gsub("[\\.\\/]{2,}", "\\.\\/", result)
+
+  # Remove mid-path "/./"
+  # e.g. ./asdf/./fdas
+  result <- gsub("\\/\\.\\/", "\\/", result)
+
+  # "~/src/arcticdata./inst/asdf"
+
+  # Remove ./ from the middle of the string
+  # e.g. ./asdf/./fdas
+  result <- gsub("(.)\\.\\/", "\\1\\/", result)
