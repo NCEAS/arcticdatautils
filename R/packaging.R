@@ -736,9 +736,9 @@ convert_to_eml_and_update_package <- function(inventory,
                                               package,
                                               env = NULL) {
   validate_inventory(inventory)
-  stopifnot("newpid" %in% names(inventory))
+  stopifnot("pid_old" %in% names(inventory))
   stopifnot(is.character(package),
-            nchar(package))
+            nchar(package) > 0)
   stopifnot(!is.null(env))
 
   package_files <- inventory[inventory$package == package,]
@@ -751,12 +751,17 @@ convert_to_eml_and_update_package <- function(inventory,
   log_message(paste0("Convert to EML and updating package ", package, "\n"))
 
   # Convert it to EML
-  iso_file_path <- paste0(env$base_path, package_files[metadata_file_idx,"file"])
-  eml_doc_path <- convert_iso_to_eml(iso_file_path)
+  # iso_file_path <- path_join(c(env$base_path, "/", package_files[metadata_file_idx,"file"]))
+  # isotoeml <- xslt::read_xslt("iso2eml.xsl")
+  # eml_doc_path <- convert_iso_to_eml(iso_file_path, isotoeml = isotoeml)
+  eml_doc_path <- package_files[metadata_file_idx,"file"]
 
   # Get a new PID and replace the packageId
-  # new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate()) # TODO
-  new_pid <- package_files[metadata_file_idx,"newpid"]
+  new_pid <- package_files[metadata_file_idx,"pid"]
+  old_pid <- package_files[metadata_file_idx,"pid_old"]
+
+  log_message(paste0("Updating object with old PID ", old_pid, " with new PID ", new_pid, ".\n"))
+
   stopifnot(!is.na(new_pid),
             is.character(new_pid),
             nchar(new_pid) > 0)
@@ -764,8 +769,6 @@ convert_to_eml_and_update_package <- function(inventory,
   replace_package_id(eml_doc_path, new_pid)
 
   # Call UPDATE on the metadata object
-  old_pid <- package_files[metadata_file_idx,"pid"]
-
   # Does this PID even exist? Stop now if it doesn't.
   if (!object_exists(env$mn_base_url, old_pid)) {
     log_message(paste0("Object with PID ", old_pid, " not found. Quitting.\n"))
@@ -787,7 +790,11 @@ convert_to_eml_and_update_package <- function(inventory,
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
 
   update_response <- tryCatch({
-    dataone::updateObject(env$mn, old_pid, eml_doc_path, new_pid, sysmeta)
+    dataone::updateObject(x = env$mn,
+                          pid = old_pid,
+                          file = eml_doc_path,
+                          newpid = new_pid,
+                          sysmeta = sysmeta)
   },
   error = function(e) {
     log_message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
@@ -840,8 +847,14 @@ convert_to_eml_and_update_package <- function(inventory,
     return(FALSE)
   }
 
+  log_message(paste0("Updating old resource map ", old_resmap_pid, " with new resmap pid ", resource_map_pid, ".\n"))
+
   update_response <- tryCatch({
-    dataone::updateObject(env$mn, old_resmap_pid, resource_map_filepath, resource_map_pid, resource_map_sysmeta)
+    dataone::updateObject(x = env$mn,
+                          pid = old_resmap_pid,
+                          file = resource_map_filepath,
+                          newpid = resource_map_pid,
+                          sysmeta = resource_map_sysmeta)
   },
   error = function(e) {
     log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
