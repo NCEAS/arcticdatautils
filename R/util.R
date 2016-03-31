@@ -418,10 +418,10 @@ replace_package_id <- function(path, replacement) {
 
   lines <- readLines(con = path)
 
-  package_id_line <- which(str_detect(lines, "packageId") == TRUE)
+  package_id_line <- which(stringr::str_detect(lines, "packageId") == TRUE)
   stopifnot(length(package_id_line) == 1)
 
-  lines[package_id_line] <- str_replace(lines[package_id_line],
+  lines[package_id_line] <- stringr::str_replace(lines[package_id_line],
                                         "packageId=\"(.+)\"",
                                         paste0("packageId=\"", replacement ,"\""))
   writeLines(lines, con = path)
