@@ -318,8 +318,6 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
     log_message(paste0("isotoeml is ", isotoeml))
     log_message(paste0("doc is ", doc))
     log_message(paste0("transformed doc is ", transformed_document))
-    stop()
-
   } else {
     xml2::write_xml(transformed_document, tmpfile)
   }
