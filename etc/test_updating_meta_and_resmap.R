@@ -17,9 +17,12 @@
 #' The $pid column is the new PID for the updated objects and a new column
 #' is introduced $pid_old so that the correct linkages can be made.
 
-library(dataone)
-devtools::load_all("~/src/ropensci-datapackage/")
+# Load in vendored copies of rdataone and datapack
+devtools::load_all("vendor/rdataone")
+devtools::load_all("vendor/datapack")
+devtools::load_all(".")
 library(dplyr)
+
 
 # Set up the environment
 env <- env_load("etc/environment.yml")
@@ -27,21 +30,14 @@ env$mn <- MNode(env$mn_base_url)
 env$base_path <- "~/src/arctic-data/arcticdata/"
 
 # Load the inventory
-inventory_path <- "inst/inventory_nested/inventory_nested.csv"
+inventory_path <- "inst/inventory_nested_iso/inventory_nested_iso.csv"
 inventory <- read.csv(inventory_path,
                       stringsAsFactors = FALSE)
-
-
-# (Optional) Insert the originals
 inventory$pid <- sapply(1:nrow(inventory), function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) } )
-inventory[inventory$is_metadata,"format_id"] <- "eml://ecoinformatics.org/eml-2.1.1"
-inventory$created <- FALSE
-inventory$ready <- TRUE
 
-# Temp filter to just A
-inventory <- inventory[inventory$package == "A",]
-inventory <- inventory[3:4,]
-# End temp
+# # Temp filter to just A
+# inventory <- inventory[inventory$package == "A",]
+# # End temp
 
 for (d in seq(max(inventory$depth), min(inventory$depth))) {
   for (package in unique(inventory[inventory$depth == d,"package"])) {
@@ -56,9 +52,8 @@ for (d in seq(max(inventory$depth), min(inventory$depth))) {
 # new_pids <- read.csv("...")
 # inventory <- left_join(inventory, new_pids, by = "file")
 inventory$pid_old <- inventory$pid
-inventory$pid <- sapply(1:nrow(inventory),
-                        function(x) { paste0("urn:uuid:",
-                                             uuid::UUIDgenerate() )})
+inventory[inventory$is_metadata,"pid"] <- sapply(1:nrow(inventory[inventory$is_metadata,]),
+                                                 function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
 
 # Insert
 for (d in max(inventory$depth):min(inventory$depth)) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <eml:eml
-  packageId="urn:uuid:f5dd7829-7e61-4a3b-a378-0a4b769d85f1"
+  packageId="urn:uuid:c793e7a4-6c1f-4474-b1ad-290a75d763e6"
   system="dev"
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -8,7 +8,7 @@
   xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1"
   xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 eml.xsd">
   <dataset>
-    <title>Nested test: B</title>
+    <title>Nested test: A</title>
     <creator>
       <individualName>
         <givenName>Bryce</givenName>

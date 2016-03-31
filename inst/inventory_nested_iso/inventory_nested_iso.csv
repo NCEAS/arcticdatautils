@@ -1,0 +1,7 @@
+"","file","checksum_sha256","size_bytes","is_metadata","folder","filename","depth","format_id","package","package_nfiles","parent_package","created","ready"
+"1","inst/inventory_nested_iso/A/A.txt","3ee7a9df15593a747596c7b391933d164f93266e8991091525fb129fdb1e942b",2,FALSE,"inst/inventory_nested_iso/A","A.txt",4,"text/plain","A",7,"",FALSE,TRUE
+"6","inst/inventory_nested_iso/A/metadata.xml","58592509e9e730c18fd40407d3812f25ce3b5b747773e502960de0c6af057d92",31835,TRUE,"inst/inventory_nested_iso/A","metadata.xml",4,"http://www.isotc211.org/2005/gmd","A",7,"",FALSE,TRUE
+"2","inst/inventory_nested_iso/A/B/B.txt","9b648c09df77fc1db3fb839de7a658ca3e47c0d0676be2d709fb23efff3555ac",2,FALSE,"inst/inventory_nested_iso/A/B","B.txt",5,"text/plain","B",7,"A",FALSE,TRUE
+"5","inst/inventory_nested_iso/A/B/metadata.xml","994911fd51c1aa38eb2dda9fbc978e31d1728a672f33212f0091ca40c0cbdf84",31835,TRUE,"inst/inventory_nested_iso/A/B","metadata.xml",5,"http://www.isotc211.org/2005/gmd","B",7,"A",FALSE,TRUE
+"3","inst/inventory_nested_iso/A/B/C/C.txt","dbf0fbed667dba2f591a90e39259565b3f851692d35a4715e14df4df206d8eed",2,FALSE,"inst/inventory_nested_iso/A/B/C","C.txt",6,"text/plain","C",7,"B",FALSE,TRUE
+"4","inst/inventory_nested_iso/A/B/C/metadata.xml","86b68ec079c51c168283980309dadec6e00dee24be1bda4759b03414ed5cf502",31835,TRUE,"inst/inventory_nested_iso/A/B/C","metadata.xml",6,"http://www.isotc211.org/2005/gmd","C",7,"B",FALSE,TRUE
