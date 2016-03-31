@@ -134,7 +134,6 @@ insert_package <- function(inventory, package, env=NULL) {
     child_pids <- c()
   }
 
-
   # Find the package contents (metadata and data)
   files <- inventory[inventory$package == package,]
   files <- files[!is.na(files$package),]   # TODO: Remove this once I fix my bug
@@ -331,8 +330,8 @@ generate_resource_map <- function(metadata_pid,
 
   relationships <- data.frame()
 
-  # TEMP
   # Add special statements to try and get metadata-only PIDs to index
+  # Here we add that that the metadata document documents itself which is hacky
   relationships <- rbind(relationships,
                          data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
                                     predicate = "http://purl.org/spar/cito/documents",
@@ -341,8 +340,15 @@ generate_resource_map <- function(metadata_pid,
                                     objectType = "uri",
                                     stringsAsFactors = FALSE))
 
-  # TEMP
+  relationships <- rbind(relationships,
+                         data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
+                                    predicate = "http://purl.org/spar/cito/isDocumentedBy",
+                                    object = paste0(resolve_base, "/", URLencode(metadata_pid, reserved = TRUE)),
+                                    subjectType = "uri",
+                                    objectType = "uri",
+                                    stringsAsFactors = FALSE))
 
+  # Add metadata -> documents -> data statements (and their inverse)
   for (data_pid in data_pids) {
     relationships <- rbind(relationships,
                            data.frame(subject = paste0(resolve_base,"/", URLencode(metadata_pid, reserved = TRUE)),
@@ -361,6 +367,7 @@ generate_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
+  # Add #aggregation aggregates/documenents child resource maps statements
   resource_map_pid <- generate_resource_map_pid(metadata_pid)
 
   for (child_pid in child_pids) {
@@ -402,6 +409,7 @@ generate_resource_map <- function(metadata_pid,
   resource_map <- new("ResourceMap",
                       id = generate_resource_map_pid(metadata_pid))
 
+  log_message(paste0("Creating resource map with pids ", paste0(unlist(c(metadata_pid, data_pids, child_pids)), collapse = ", ")))
   resource_map <- datapack::createFromTriples(resource_map,
                                               relations = relationships,
                                               identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
