@@ -322,7 +322,6 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
 
   } else {
     xml2::write_xml(transformed_document, tmpfile)
-
   }
 
 
@@ -397,6 +396,7 @@ change_eml_name <- function(party) {
   XML::replaceNodes(party[['individualName']], name_node)
 }
 
+
 #' Replace the EML 'packageId' attribute on the root element with a
 #' certain value.
 #'
@@ -412,21 +412,16 @@ change_eml_name <- function(party) {
 #'
 #' @examples
 replace_package_id <- function(path, replacement) {
-  stopifnot(file.exists(path),
-            is.character(replacement),
+  stopifnot(file.exists(path))
+  stopifnot(is.character(replacement),
             nchar(replacement) > 0)
 
-  lines <- readLines(con = path)
+  xmldoc <- XML::xmlParseDoc(file = path)
+  root <- XML::xmlRoot(xmldoc)
+  XML::xmlAttrs(root) <- c(packageId = replacement)
 
-  package_id_line <- which(stringr::str_detect(lines, "packageId") == TRUE)
-  stopifnot(length(package_id_line) == 1)
-
-  lines[package_id_line] <- stringr::str_replace(lines[package_id_line],
-                                        "packageId=\"(.+)\"",
-                                        paste0("packageId=\"", replacement ,"\""))
-  writeLines(lines, con = path)
+  XML::saveXML(xmldoc, path)
 }
-
 
 
 #' (Intelligently) join (possibly redudant) path parts together.
