@@ -288,8 +288,10 @@ object_exists <- function(mn_base_url, pid) {
 #'
 #' @examples
 convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
-  tmpfile <- tempfile(fileext = ".xml")
   stopifnot(file.exists(full_path))
+  stopifnot(inherits(isotoeml, "xslt_document"))
+
+  tmpfile <- tempfile(fileext = ".xml")
 
   doc <- tryCatch({
     xml2::read_xml(full_path)
@@ -301,10 +303,6 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
     log_message(e)
   })
 
-  # Hack fix, I can change this later so I don't have to do WD stuff
-  old_wd <- getwd()
-  setwd("~/src/iso2eml/src")
-
   transformed_document <- tryCatch({
     xslt::xslt_transform(doc, isotoeml)
   },
@@ -315,9 +313,18 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
     log_message(e)
   })
 
-  xml2::write_xml(transformed_document, tmpfile)
+  if (!inherits(transformed_document, "xml_document")) {
+    log_message(paste0("Full path is ", full_path))
+    log_message(paste0("isotoeml is ", isotoeml))
+    log_message(paste0("doc is ", doc))
+    log_message(paste0("transformed doc is ", transformed_document))
+    stop()
 
-  setwd(old_wd)
+  } else {
+    xml2::write_xml(transformed_document, tmpfile)
+
+  }
+
 
   tmpfile
 }

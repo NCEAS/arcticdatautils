@@ -10,7 +10,7 @@ library(XML)
 library(stringr)
 library(stringi)
 
-isotoeml <- xslt::read_xslt("~/src/iso2eml/src/iso2eml.xsl")
+isotoeml <- xslt::read_xslt("iso2eml.xsl")
 
 inventory <- read.csv("~/src/arctic-data/inventory/master_all.csv", stringsAsFactors = FALSE)
 nrow(inventory)
