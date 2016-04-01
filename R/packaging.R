@@ -764,7 +764,8 @@ determine_child_pids <- function(inventory, package) {
 #' @examples
 convert_to_eml_and_update_package <- function(inventory,
                                               package,
-                                              env = NULL) {
+                                              env = NULL,
+                                              additional_identifiers_table = NULL) {
   validate_inventory(inventory)
   stopifnot("pid_old" %in% names(inventory))
   stopifnot(is.character(package),
