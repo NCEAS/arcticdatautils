@@ -764,8 +764,7 @@ determine_child_pids <- function(inventory, package) {
 #' @examples
 convert_to_eml_and_update_package <- function(inventory,
                                               package,
-                                              env = NULL,
-                                              additional_identifiers_table = NULL) {
+                                              env = NULL) {
   validate_inventory(inventory)
   stopifnot("pid_old" %in% names(inventory))
   stopifnot(is.character(package),
@@ -816,22 +815,6 @@ convert_to_eml_and_update_package <- function(inventory,
 
   # Update the 'packageId' attribute on the root element with the new PID
   replace_package_id(eml_file_path, new_pid)
-
-  # Convert names where the entire name is concatenated into <surName> into
-  # their proper parts
-  eml_file_path <- substitute_eml_party(eml_file_path)
-
-  # Add any additional identifiers we can find
-  if (is.data.frame(additional_identifiers_table) &&
-      "file" %in% names(additional_identifiers_table)) {
-    identifiers_for_file <- additional_identifiers_table[additional_identifiers_table$file == package_files[metadata_file_idx,"file"],]
-
-    if (length(identifiers_for_file) > 0) {
-      add_additional_identifiers(eml_file_path,
-                                 eml_file_path,
-                                 identifiers_for_file)
-    }
-  }
 
   # Generate a new filename
   new_metadata_file_name <- "metadata.xml"
