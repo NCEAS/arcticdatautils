@@ -575,24 +575,13 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 #' @examples
 add_access_rules <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {
-    log_message("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n")
+    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
     return(sysmeta)
   }
 
-  # Hack until we determine how to actually set access policies
-  if (env_get() == "development") {
-    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
-
-  } else {
-    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-  }
+  sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
 
   sysmeta
 }
