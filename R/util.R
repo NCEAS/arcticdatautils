@@ -363,33 +363,52 @@ substitute_eml_party <- function(path) {
 #' @import XML
 #' @export
 change_eml_name <- function(party) {
+
+  # Check if there is an individualName element exists
+  if (length(XML::getNodeSet(party, "./individualName")) == 0) {
+    return(party)
+  }
+
+  # Check if there is already a <givenName> tag and do nothing if there is
+  if (length(XML::getNodeSet(party, "./individualName/givenName")) > 0) {
+    log_message("Doing nothing...")
+    return(party)
+  }
+
   # Parse out the surName and givenName of the party
   user_name <- XML::xpathApply(party, "./individualName/surName", XML::xmlValue)
 
-  # TODO: if no individualName exists, just move on
-
-  parts <- stringr::str_split(user_name, ' ')
-  eml_suffix = as.character(NA)
-
-  # Check for suffix (Jr., III)
-  last <- length(parts[[1]])
-  if (parts[[1]][last]=="Jr." || parts[[1]][last]=="III") {
-    eml_suffix <- parts[[1]][length(parts[[1]])]
-    last <- last-1
+  if (nchar(user_name) == 0) {
+    return(party)
   }
-  eml_surname <- parts[[1]][last]
-  eml_givenname <- paste(parts[[1]][1:(last-1)], collapse=' ')
 
-  # Create a new individualName Node
-  child_nodes <- list(XML::xmlNode("givenName", eml_givenname))
-  if (!is.na(eml_suffix)) {
-    suffix <- XML::xmlNode("givenName", eml_suffix)
-    child_nodes[[length(child_nodes)+1]] <- suffix
+  # Replace commas with spaces
+  user_name <- stringr::str_replace_all(user_name, ",", "")
+  parsed_name <- humaniformat::parse_names(user_name)
+
+  child_nodes <- list()
+
+  if (nchar(parsed_name['first_name'] > 0)) {
+    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['first_name'])
   }
-  sn <- XML::xmlNode("surName", eml_surname)
-  child_nodes[[length(child_nodes)+1]] <- sn
-  name_node <- XML::xmlNode("individualName", .children=child_nodes)
 
+  if (nchar(parsed_name['last_name'] > 0)) {
+    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("surName", parsed_name['last_name'])
+  }
+
+  if (nchar(parsed_name['suffix'])) {
+    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['suffix'])
+  }
+
+  if (nchar(parsed_name['salutation'])) {
+    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['salutation'])
+  }
+
+  if (nchar(parsed_name['middle_name'])) {
+    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['middle_name'])
+  }
+
+  name_node <- XML::newXMLNode("individualName", child_nodes)
   # Substitute in a new name structure for the old in the EML document
   XML::replaceNodes(party[['individualName']], name_node)
 }
