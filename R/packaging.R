@@ -769,6 +769,14 @@ convert_to_eml_and_update_package <- function(inventory,
   stopifnot("pid_old" %in% names(inventory))
   stopifnot(is.character(package),
             nchar(package) > 0)
+
+  # Grab the env if one wasn't passed in explicitly
+  if (is.null(env)) {
+    env <- env_load("etc/environment.yml")
+    library(dataone)
+    env$mn <- MNode(env$mn_base_url)
+  }
+
   stopifnot(!is.null(env))
 
   package_files <- inventory[inventory$package == package,]
