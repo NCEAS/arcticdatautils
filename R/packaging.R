@@ -796,10 +796,18 @@ convert_to_eml_and_update_package <- function(inventory,
 
   log_message(paste0("Convert to EML and updating package ", package, "\n"))
 
-  # Convert the document to EML
-  iso_file_path <- package_files[metadata_file_idx,"file"]
-  iso_to_eml <- xslt::read_xslt("iso2eml.xsl")
-  eml_file_path <- convert_iso_to_eml(iso_file_path, iso_to_eml)
+  # Find the converted EML documente
+  if (!file.exists(env$alternate_path)) {
+    log_message(paste0("Alternate path location of ", env$alternate_path, " does not exist. Returning.\n"))
+    return(package_files)
+  }
+
+  eml_file_path <- path_join(c(env$alternate_path, package_files[metadata_file_idx,"file"]))
+
+  if (!file.exists(eml_file_path)) {
+    log_message(paste0("EML file not found at path ", eml_file_path, ".\n"))
+    return(package_files)
+  }
 
   log_message(paste0("Converted document is at ", eml_file_path, "\n"))
 
