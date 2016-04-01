@@ -780,21 +780,29 @@ convert_to_eml_and_update_package <- function(inventory,
 
   stopifnot(!is.null(env))
 
+  # Subset the inventory to just files for this package
   package_files <- inventory[inventory$package == package,]
   stopifnot(nrow(package_files) > 0)
 
+  # Check the token
+  if (is_token_expired()) {
+    log_message("Token is expired. Returning un-modified inventory.")
+    return(package_files)
+  }
+
+  # Grab the metadata and data indices for later use
   metadata_file_idx <- which(package_files$is_metadata == TRUE)
   data_file_idx <- which(package_files$is_metadata == FALSE)
   stopifnot(length(metadata_file_idx) == 1)
 
   log_message(paste0("Convert to EML and updating package ", package, "\n"))
 
-  # Convert it to EML
-  iso_file_path <- path_join(c(env$base_path, "/", package_files[metadata_file_idx,"file"]))
-  isotoeml <- xslt::read_xslt("iso2eml.xsl")
-  eml_doc_abs_path <- convert_iso_to_eml(iso_file_path, isotoeml = isotoeml)
-  log_message(paste0("Converted document is at ", eml_doc_abs_path, "\n"))
-  # eml_doc_path <- package_files[metadata_file_idx,"file"]
+  # Convert the document to EML
+  iso_file_path <- package_files[metadata_file_idx,"file"]
+  iso_to_eml <- xslt::read_xslt("iso2eml.xsl")
+  eml_file_path <- convert_iso_to_eml(iso_file_path, iso_to_eml)
+
+  log_message(paste0("Converted document is at ", eml_file_path, "\n"))
 
   # Get a new PID and replace the packageId
   new_pid <- package_files[metadata_file_idx,"pid"]
@@ -806,7 +814,13 @@ convert_to_eml_and_update_package <- function(inventory,
             is.character(new_pid),
             nchar(new_pid) > 0)
 
-  replace_package_id(eml_doc_abs_path, new_pid)
+  # Update the 'packageId' attribute on the root element with the new PID
+  replace_package_id(eml_file_path, new_pid)
+
+  # Convert names where the entire name is concatenated into <surName> into
+  # their proper parts
+  eml_file_path <- substitute_eml_party(eml_file_path)
+
   # Add any additional identifiers we can find
   if (is.data.frame(additional_identifiers_table) &&
       "file" %in% names(additional_identifiers_table)) {
@@ -819,8 +833,10 @@ convert_to_eml_and_update_package <- function(inventory,
     }
   }
 
+  # Generate a new filename
+  new_metadata_file_name <- "metadata.xml"
 
-  # Call UPDATE on the metadata object
+  # Call MNStorage.update on the metadata object
   # Does this PID even exist? Stop now if it doesn't.
   if (!object_exists(env$mn_base_url, old_pid)) {
     log_message(paste0("Object with PID ", old_pid, " not found. Returning package.\n"))
@@ -830,19 +846,19 @@ convert_to_eml_and_update_package <- function(inventory,
   sysmeta <- new("SystemMetadata",
                  identifier = new_pid,
                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
-                 size = file.size(eml_doc_abs_path),
-                 checksum = digest::digest(eml_doc_abs_path, algo = "sha256"),
+                 size = file.size(eml_file_path),
+                 checksum = digest::digest(eml_file_path, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = env$submitter,
                  rightsHolder = env$rights_holder,
-                 fileName = package_files[metadata_file_idx,"filename"])
+                 fileName = new_metadata_file_name)
 
   sysmeta <- add_access_rules(sysmeta)
 
   update_response <- tryCatch({
     dataone::updateObject(x = env$mn,
                           pid = old_pid,
-                          file = eml_doc_abs_path,
+                          file = eml_file_path,
                           newpid = new_pid,
                           sysmeta = sysmeta)
   },
@@ -862,13 +878,13 @@ convert_to_eml_and_update_package <- function(inventory,
   # Resource Map
   # Hack the package_files data.frame to have the new PID
   package_files[metadata_file_idx,"pid"] <- new_pid
+  # ^^ do something better here... ^^
 
   metadata_pid <- package_files[metadata_file_idx,"pid"]
   data_pids <- package_files[data_file_idx,"pid"]
   child_pids <- determine_child_pids(inventory, package)
 
   resource_map_filepath <- generate_resource_map(metadata_pid, data_pids, child_pids)
-
   resource_map_pid <- generate_resource_map_pid(metadata_pid)
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
@@ -891,9 +907,7 @@ convert_to_eml_and_update_package <- function(inventory,
 
   # Does this PID even exist? Stop now if it doesn't.
   if (!object_exists(env$mn_base_url, old_resmap_pid)) {
-    log_message(paste0("Object with PID ", old_resmap_pid, " not found. Quitting.\n"))
-    return(FALSE)
-  }
+    log_message(paste0("Resource map with PID ", old_resmap_pid, " not found. Inserting the resource map as a new object.\n"))
 
     create_response <- tryCatch({
       dataone::createObject(x = env$mn,
