@@ -55,6 +55,14 @@ inventory$pid_old <- inventory$pid
 inventory[inventory$is_metadata,"pid"] <- sapply(1:nrow(inventory[inventory$is_metadata,]),
                                                  function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
 
+# Load up alternate identifiers table
+# alternate_identifiers <- read.csv("../identifiers/master_identifiers_list.csv",
+#                                   stringsAsFactors = FALSE)
+
+alternate_identifiers <- data.frame(file = inventory$file,
+                                    primary_key = sapply(1:nrow(inventory), function(x) { uuid::UUIDgenerate() } ),
+                                    stringsAsFactors = FALSE)
+
 # Insert
 for (d in max(inventory$depth):min(inventory$depth)) {
   print(d)
@@ -64,6 +72,6 @@ for (d in max(inventory$depth):min(inventory$depth)) {
   for (package in packages_at_depth) {
     print(package)
 
-    convert_to_eml_and_update_package(inventory, package, env)
+    convert_to_eml_and_update_package(inventory, package, env, alternate_identifiers)
   }
 }

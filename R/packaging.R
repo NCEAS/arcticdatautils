@@ -789,6 +789,18 @@ convert_to_eml_and_update_package <- function(inventory,
             nchar(new_pid) > 0)
 
   replace_package_id(eml_doc_abs_path, new_pid)
+  # Add any additional identifiers we can find
+  if (is.data.frame(additional_identifiers_table) &&
+      "file" %in% names(additional_identifiers_table)) {
+    identifiers_for_file <- additional_identifiers_table[additional_identifiers_table$file == package_files[metadata_file_idx,"file"],]
+
+    if (length(identifiers_for_file) > 0) {
+      add_additional_identifiers(eml_file_path,
+                                 eml_file_path,
+                                 identifiers_for_file)
+    }
+  }
+
 
   # Call UPDATE on the metadata object
   # Does this PID even exist? Stop now if it doesn't.

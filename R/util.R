@@ -431,6 +431,54 @@ replace_package_id <- function(path, replacement) {
   path
 }
 
+add_additional_identifiers <- function(file,
+                                       eml_file_path,
+                                       identifiers) {
+  stopifnot(is.character(file),
+            nchar(file) > 0,
+            file.exists(eml_file_path),
+            is.data.frame(identifiers),
+            nrow(identifiers) == 1)
+
+  # Gather the identifiers into a usable format
+  identifier_types <- c("file_identifier", "identifier", "primary_key", "alternative_identifier")
+  alternate_identifiers <- c()
+
+  for (ident_type in identifier_types) {
+    # Skip NA cells
+    if (!(ident_type %in% names(identifiers)) || is.na(identifiers[1,ident_type])) {
+      next
+    }
+
+    alternate_identifiers <- c(alternate_identifiers, identifiers[1,ident_type])
+  }
+
+  doc <- XML::xmlParseDoc(file = eml_file_path)
+  datasets <- XML::getNodeSet(doc, "//dataset/title")
+
+  # Stop here if there are more than one <dataset> elements
+  if (length(datasets) != 1) {
+    return(eml_file_path)
+  }
+
+  for (identifier in alternate_identifiers) {
+    log_message(paste0("Adding alternate identifier of ", identifier, "\n"))
+    new_node <- XML::newXMLNode("alternateIdentifier", identifier)
+    XML::addSibling(datasets[[1]], new_node, after = FALSE)
+  }
+
+  XML::saveXML(doc, eml_file_path, indent = TRUE)
+
+  eml_file_path
+}
+
+create_alternate_identifier_node <- function(identifier) {
+  stopifnot(is.character(identifier),
+            nchar(identifier) > 0)
+
+
+}
+
 
 #' (Intelligently) join (possibly redudant) path parts together.
 #'
