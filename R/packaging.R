@@ -886,25 +886,42 @@ convert_to_eml_and_update_package <- function(inventory,
     return(FALSE)
   }
 
-  log_message(paste0("Updating old resource map ", old_resmap_pid, " with new resmap pid ", resource_map_pid, ".\n"))
-  log_message(paste0("New resource map is at ", resource_map_filepath, "\n"))
-  update_response <- tryCatch({
-    dataone::updateObject(x = env$mn,
-                          pid = old_resmap_pid,
-                          file = resource_map_filepath,
-                          newpid = resource_map_pid,
-                          sysmeta = resource_map_sysmeta)
-  },
-  error = function(e) {
-    log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
-    log_message(e)
-    e
-  })
+    create_response <- tryCatch({
+      dataone::createObject(x = env$mn,
+                            pid = resource_map_pid,
+                            file = resource_map_filepath,
+                            sysmeta = resource_map_sysmeta)
+    },
+    error = function(e) {
+      log_message(paste0("Error produced during call to createObject for resource map ", resource_map_pid, " in package ", package, "\n"))
+      log_message(e)
+      e
+    })
 
-  log_message(update_response)
+    log_message(create_response)
 
-  if (inherits(update_response, "error")) {
-    package_files$resmap_created <- FALSE
+  } else {
+    log_message(paste0("Updating old resource map ", old_resmap_pid, " with new resmap pid ", resource_map_pid, ".\n"))
+    log_message(paste0("New resource map is at ", resource_map_filepath, "\n"))
+
+    update_response <- tryCatch({
+      dataone::updateObject(x = env$mn,
+                            pid = old_resmap_pid,
+                            file = resource_map_filepath,
+                            newpid = resource_map_pid,
+                            sysmeta = resource_map_sysmeta)
+    },
+    error = function(e) {
+      log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+      log_message(e)
+      e
+    })
+
+    log_message(update_response)
+
+    if (inherits(update_response, "error")) {
+      package_files$resmap_created <- FALSE
+    }
   }
 
   return(TRUE)
