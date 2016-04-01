@@ -335,18 +335,26 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
 #' @import XML
 #' @export
 substitute_eml_party <- function(path) {
+  print("substitute_eml_party")
 
   # Read in the EML document
   ns <- c(eml = 'eml://ecoinformatics.org/eml-2.1.1')
   eml = XML::xmlParse(path)
 
   # For each of the creator, contact, associatedParty elements
-  creators <- XML::getNodeSet(eml, '/eml:eml/dataset/creator', ns)
-  rplist <- sapply(creators, change_eml_name)
-  associates <- XML::getNodeSet(eml, '/eml:eml/dataset/associatedParty', ns)
-  rplist <- sapply(associates, change_eml_name)
-  contacts <- XML::getNodeSet(eml, '/eml:eml/dataset/contact', ns)
-  rplist <- sapply(contacts, change_eml_name)
+  # creators <- XML::getNodeSet(eml, '/eml:eml/dataset/creator', ns)
+  # print(class(creators))
+  # sapply(creators, change_eml_name)
+  # associates <- XML::getNodeSet(eml, '/eml:eml/dataset/associatedParty', ns)
+  # print(class(associates))
+  # sapply(associates, change_eml_name)
+  # contacts <- XML::getNodeSet(eml, '/eml:eml/dataset/contact', ns)
+  # print(class(contacts))
+  # sapply(contacts, change_eml_name)
+
+  XML::xpathSApply(eml, "//dataset/creator", change_eml_name)
+  XML::xpathSApply(eml, "//dataset/associatedParty", change_eml_name)
+  XML::xpathSApply(eml, "//dataset/contact", change_eml_name)
 
   # Serialize the EML document to disk
   XML::saveXML(eml, file = path)
@@ -363,20 +371,26 @@ substitute_eml_party <- function(path) {
 #' @import XML
 #' @export
 change_eml_name <- function(party) {
-
+  print("change_eml_name")
+  print(party)
   # Check if there is an individualName element exists
   if (length(XML::getNodeSet(party, "./individualName")) == 0) {
     return(party)
   }
-
+  print('1')
   # Check if there is already a <givenName> tag and do nothing if there is
   if (length(XML::getNodeSet(party, "./individualName/givenName")) > 0) {
     log_message("Doing nothing...")
     return(party)
   }
 
-  # Parse out the surName and givenName of the party
-  user_name <- XML::xpathApply(party, "./individualName/surName", XML::xmlValue)
+  print("2")
+  # Parse out the surName and givenName(s) of the party
+  user_name <- XML::xpathSApply(party, "./individualName/surName", XML::xmlValue)
+
+  if (length(user_name) != 1) {
+    cat(paste0("For some reason, there was not a single surName value, but instead there were ", length(user_name), ".\n"))
+  }
 
   if (nchar(user_name) == 0) {
     return(party)
@@ -384,33 +398,64 @@ change_eml_name <- function(party) {
 
   # Replace commas with spaces
   user_name <- stringr::str_replace_all(user_name, ",", "")
-  parsed_name <- humaniformat::parse_names(user_name)
+  print(user_name)
 
+  parsed_name <- humaniformat::parse_names(user_name)
+  print(parsed_name)
   child_nodes <- list()
 
-  if (nchar(parsed_name['first_name'] > 0)) {
-    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['first_name'])
-  }
+  # if (nchar(parsed_name['first_name'] > 0)) {
+  #   child_nodes[[length(child_nodes) + 1]] <- XML::newXMLNode("givenName", parsed_name['first_name'])
+  # }
 
   if (nchar(parsed_name['last_name'] > 0)) {
-    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("surName", parsed_name['last_name'])
+    child_nodes[[length(child_nodes) + 1]] <- XML::newXMLNode("surName", parsed_name['last_name'])
   }
 
-  if (nchar(parsed_name['suffix'])) {
-    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['suffix'])
-  }
+  # if (nchar(parsed_name['suffix']) > 0) {
+  #   child_nodes[[length(child_nodes) + 1]] <- XML::newXMLNode("givenName", parsed_name['suffix'])
+  # }
+  #
+  # if (nchar(parsed_name['salutation']) > 0) {
+  #   child_nodes[[length(child_nodes) + 1]] <- XML::newXMLNode("givenName", parsed_name['salutation'])
+  # }
+  #
+  # if (nchar(parsed_name['middle_name']) > 0) {
+  #   child_nodes[[length(child_nodes) + 1]] <- XML::newXMLNode("givenName", parsed_name['middle_name'])
+  # }
 
-  if (nchar(parsed_name['salutation'])) {
-    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['salutation'])
-  }
+  print(child_nodes)
+  name_node <- XML::newXMLNode("individualName")
+  for (i in 1:length(child_nodes)) {
+    XML::addChildren(name_node, child_nodes[i])
 
-  if (nchar(parsed_name['middle_name'])) {
-    child_nodes[[length(child_nodes) + 1]] <- XML::xmlNode("givenName", parsed_name['middle_name'])
   }
+  # name_node <- XML::xmlNode("individualName", child_nodes)
+  print("Just created a new node")
+  print(name_node)
 
-  name_node <- XML::newXMLNode("individualName", child_nodes)
   # Substitute in a new name structure for the old in the EML document
-  XML::replaceNodes(party[['individualName']], name_node)
+  # individ_name <- XML::getNodeSet(party, "./individualName")
+
+  # if (length(individ_name) != 1) {
+  #   return(party)
+  # }
+
+  # XML::replaceNodes(party[['individualName']], name_node)
+  indiv_nodes <- XML::getNodeSet(party, "./individualName")[[1]]
+
+  if (length(indiv_nodes) != 1) {
+    return(party)
+  }
+
+  print("REPLACE")
+  print(indiv_nodes)
+
+  print(indiv_nodes)
+  print(name_node)
+  XML::replaceNodes(indiv_nodes, name_node)
+
+  party
 }
 
 
@@ -528,4 +573,3 @@ path_join <- function(path_parts=c("")) {
 
   result
 }
-
