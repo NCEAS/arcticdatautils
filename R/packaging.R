@@ -814,8 +814,8 @@ convert_to_eml_and_update_package <- function(inventory,
   # Call UPDATE on the metadata object
   # Does this PID even exist? Stop now if it doesn't.
   if (!object_exists(env$mn_base_url, old_pid)) {
-    log_message(paste0("Object with PID ", old_pid, " not found. Quitting.\n"))
-    return(FALSE)
+    log_message(paste0("Object with PID ", old_pid, " not found. Returning package.\n"))
+    return(package_files)
   }
 
   sysmeta <- new("SystemMetadata",
@@ -924,6 +924,6 @@ convert_to_eml_and_update_package <- function(inventory,
     }
   }
 
-  return(TRUE)
+  return(package_files)
 }
 
