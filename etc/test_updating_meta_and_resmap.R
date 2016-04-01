@@ -21,23 +21,17 @@
 devtools::load_all("vendor/rdataone")
 devtools::load_all("vendor/datapack")
 devtools::load_all(".")
-library(dplyr)
-
 
 # Set up the environment
 env <- env_load("etc/environment.yml")
 env$mn <- MNode(env$mn_base_url)
 env$base_path <- "~/src/arctic-data/arcticdata/"
+env$alternate_path <- "~/src/arctic-data/arcticdata/"
 
 # Load the inventory
-inventory_path <- "inst/inventory_nested_iso/inventory_nested_iso.csv"
-inventory <- read.csv(inventory_path,
+inventory <- read.csv("inst/inventory_nested_iso/inventory_nested_iso.csv",
                       stringsAsFactors = FALSE)
-inventory$pid <- sapply(1:nrow(inventory), function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) } )
-
-# # Temp filter to just A
-# inventory <- inventory[inventory$package == "A",]
-# # End temp
+inventory$pid <- sapply(1:nrow(inventory), function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
 
 for (d in seq(max(inventory$depth), min(inventory$depth))) {
   for (package in unique(inventory[inventory$depth == d,"package"])) {
@@ -49,8 +43,6 @@ for (d in seq(max(inventory$depth), min(inventory$depth))) {
 }
 
 # Bring in a list of new PIDs
-# new_pids <- read.csv("...")
-# inventory <- left_join(inventory, new_pids, by = "file")
 inventory$pid_old <- inventory$pid
 inventory[inventory$is_metadata,"pid"] <- sapply(1:nrow(inventory[inventory$is_metadata,]),
                                                  function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
@@ -64,6 +56,7 @@ for (d in max(inventory$depth):min(inventory$depth)) {
   for (package in packages_at_depth) {
     print(package)
 
-    update_package(inventory, package, env)
+    last <- update_package(inventory, package, env)
+    inventory <- inv_update(inventory, last)
   }
 }
