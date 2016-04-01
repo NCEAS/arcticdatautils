@@ -258,6 +258,7 @@ insert_package <- function(inventory, package, env=NULL) {
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
   resource_map_size_bytes <- file.info(resource_map_filepath)$size
+  resource_map_file_name <- paste0(stringr::str_replace_all(resource_map_pid, ":", "_"), ".xml")
 
   log_message(paste0("Generating system metadata for resource map for package ", package, ".\n"))
   resource_map_sysmeta <- new("SystemMetadata",
@@ -268,7 +269,7 @@ insert_package <- function(inventory, package, env=NULL) {
                               checksumAlgorithm = "SHA256",
                               submitter = env$submitter,
                               rightsHolder = env$rights_holder,
-                              fileName = paste0(resource_map_pid, ".xml"))
+                              fileName = resource_map_file_name)
 
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
@@ -863,6 +864,7 @@ convert_to_eml_and_update_package <- function(inventory,
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
   resource_map_size_bytes <- file.info(resource_map_filepath)$size
+  resource_map_file_name <- paste0(stringr::str_replace_all(resource_map_pid, ":", "_"), ".xml")
 
   resource_map_sysmeta <- new("SystemMetadata",
                               identifier = resource_map_pid,
@@ -872,7 +874,7 @@ convert_to_eml_and_update_package <- function(inventory,
                               checksumAlgorithm = "SHA256",
                               submitter = env$submitter,
                               rightsHolder = env$rights_holder,
-                              fileName = paste0(resource_map_pid, ".xml"))
+                              fileName = resource_map_file_name)
 
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
