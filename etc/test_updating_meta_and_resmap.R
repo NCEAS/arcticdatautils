@@ -55,7 +55,6 @@ inventory$pid_old <- inventory$pid
 inventory[inventory$is_metadata,"pid"] <- sapply(1:nrow(inventory[inventory$is_metadata,]),
                                                  function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
 
-
 # Insert
 for (d in max(inventory$depth):min(inventory$depth)) {
   print(d)
@@ -65,6 +64,6 @@ for (d in max(inventory$depth):min(inventory$depth)) {
   for (package in packages_at_depth) {
     print(package)
 
-    convert_to_eml_and_update_package(inventory, package, env)
+    update_package(inventory, package, env)
   }
 }
