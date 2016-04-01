@@ -814,7 +814,7 @@ convert_to_eml_and_update_package <- function(inventory,
   replace_package_id(eml_file_path, new_pid)
 
   # Generate a new filename
-  new_metadata_file_name <- "metadata.xml"
+  new_metadata_file_name <- "science_metadata.xml"
 
   # Call MNStorage.update on the metadata object
   # Does this PID even exist? Stop now if it doesn't.
