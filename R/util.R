@@ -337,7 +337,7 @@ convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
 substitute_eml_party <- function(path) {
 
   # Read in the EML document
-  ns <- c(eml='eml://ecoinformatics.org/eml-2.1.1')
+  ns <- c(eml = 'eml://ecoinformatics.org/eml-2.1.1')
   eml = XML::xmlParse(path)
 
   # For each of the creator, contact, associatedParty elements
@@ -349,7 +349,7 @@ substitute_eml_party <- function(path) {
   rplist <- sapply(contacts, change_eml_name)
 
   # Serialize the EML document to disk
-  XML::saveXML(eml, file=path)
+  XML::saveXML(eml, file = path)
 
   # Return the EML path
   return(path)
