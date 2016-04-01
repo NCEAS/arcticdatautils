@@ -4,7 +4,7 @@ development:
   metadata_identifier_scheme: UUID
   data_identifier_scheme: UUID
   mn_base_url: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
-  submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
+  submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
 
 test:
@@ -13,7 +13,7 @@ test:
   metadata_identifier_scheme: UUID
   data_identifier_scheme: UUID
   mn_base_url: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
-  submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
+  submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
 
 production:
@@ -22,5 +22,5 @@ production:
   metadata_identifier_scheme: DOI
   data_identifier_scheme: UUID
   mn_base_url: https://arcticdata.io/metacat/d1/mn/v2
-  submitter: CN=Bryce Mecum A27576,O=Google,C=US,DC=cilogon,DC=org
+  submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
