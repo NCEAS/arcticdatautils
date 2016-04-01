@@ -863,7 +863,7 @@ convert_to_eml_and_update_package <- function(inventory,
   resource_map_pid <- generate_resource_map_pid(metadata_pid)
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
-  resource_map_size_bytes <- file.info(resource_map_filepath)$size
+  resource_map_size_bytes <- file.size(resource_map_filepath)
   resource_map_file_name <- paste0(stringr::str_replace_all(resource_map_pid, ":", "_"), ".xml")
 
   resource_map_sysmeta <- new("SystemMetadata",
