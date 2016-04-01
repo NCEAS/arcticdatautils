@@ -270,19 +270,7 @@ insert_package <- function(inventory, package, env=NULL) {
                               rightsHolder = env$rights_holder,
                               fileName = paste0(resource_map_pid, ".xml"))
 
-  if (env_get() == "development") {
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
-
-  } else {
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
-  }
+  resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
   log_message(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
@@ -554,22 +542,8 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
                fileName = file_name)
 
 
-      if (env_get() == "development") {
-        x <- datapack::addAccessRule(x, "public", "read")
-        x <- datapack::addAccessRule(x, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
-        x <- datapack::addAccessRule(x, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-        x <- datapack::addAccessRule(x, env$submitter, "write")
-        x <- datapack::addAccessRule(x, env$submitter, "changePermission")
-        x <- datapack::addAccessRule(x, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
+      add_access_rules(x)
 
-
-      } else {
-        x <- datapack::addAccessRule(x, "public", "read")
-        x <- datapack::addAccessRule(x, submitter, "write")
-        x <- datapack::addAccessRule(x, submitter, "changePermission")
-      }
-
-      x
     },
     error = function(e) {
       log_message(paste0("Error generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
@@ -587,6 +561,40 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 }
 
 
+#' Add access rules to the sysmeta object
+#'
+#' This is a function because I add a set of standard set of access rules to
+#' every object and the access rules don't differ across objects.
+#'
+#' @param sysmeta The SystemMetadata to add rules to (SystemMetadata)
+#'
+#' @return The modified SystemMetadata object
+#' @export
+#'
+#' @examples
+add_access_rules <- function(sysmeta) {
+  if (!inherits(sysmeta, "SystemMetadata")) {
+    log_message("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n")
+    return(sysmeta)
+  }
+
+  # Hack until we determine how to actually set access policies
+  if (env_get() == "development") {
+    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
+    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "write")
+    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
+    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
+
+  } else {
+    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+  }
+
+  sysmeta
+}
 
 
 
@@ -819,19 +827,7 @@ convert_to_eml_and_update_package <- function(inventory,
                  rightsHolder = env$rights_holder,
                  fileName = package_files[metadata_file_idx,"filename"])
 
-  if (env_get() == "development") {
-    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
-
-  } else {
-    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
-    sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-  }
+  sysmeta <- add_access_rules(sysmeta)
 
   update_response <- tryCatch({
     dataone::updateObject(x = env$mn,
@@ -878,19 +874,8 @@ convert_to_eml_and_update_package <- function(inventory,
                               rightsHolder = env$rights_holder,
                               fileName = paste0(resource_map_pid, ".xml"))
 
-  if (env_get() == "development") {
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, env$submitter, "changePermission")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-editors,DC=dataone,DC=org", "changePermission")
+  resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
-  } else {
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "public", "read")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
-    resource_map_sysmeta <- datapack::addAccessRule(resource_map_sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
-  }
   old_resmap_pid <- generate_resource_map_pid(old_pid)
 
   # Does this PID even exist? Stop now if it doesn't.
