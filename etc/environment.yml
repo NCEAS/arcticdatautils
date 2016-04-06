@@ -18,7 +18,7 @@ test:
 
 production:
   base_path: ~/acadis/
-  alternate_path: ~/acadis/-alt/
+  alternate_path: ~/acadis-alt/
   metadata_identifier_scheme: DOI
   data_identifier_scheme: UUID
   mn_base_url: https://arcticdata.io/metacat/d1/mn/v2
