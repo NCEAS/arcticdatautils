@@ -579,6 +579,12 @@ add_access_rules <- function(sysmeta) {
     return(sysmeta)
   }
 
+  # Add myself explicitly as changePermission/write so I can update objects
+  # in the dev environment
+  if (env_get() == "development") {
+    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
+  }
+
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
@@ -803,7 +809,7 @@ update_package <- function(inventory,
   data_file_idx <- which(package_files$is_metadata == FALSE)
   stopifnot(length(metadata_file_idx) == 1)
 
-  log_message(paste0("Convert to EML and updating package ", package, "\n"))
+  log_message(paste0("Updating package ", package, "\n"))
 
   # Find the converted EML documente
   if (!file.exists(env$alternate_path)) {
@@ -831,7 +837,10 @@ update_package <- function(inventory,
             nchar(new_pid) > 0)
 
   # Update the 'packageId' attribute on the root element with the new PID
-  replace_package_id(eml_file_path, new_pid)
+  tmp <- tempfile()
+  file.copy(eml_file_path, tmp)
+  replace_package_id(tmp, new_pid)
+  eml_file_path <- tmp
 
   # Generate a new filename
   new_metadata_file_name <- "science_metadata.xml"
@@ -843,49 +852,59 @@ update_package <- function(inventory,
     return(package_files)
   }
 
-  sysmeta <- new("SystemMetadata",
-                 identifier = new_pid,
-                 formatId = "eml://ecoinformatics.org/eml-2.1.1",
-                 size = file.size(eml_file_path),
-                 checksum = digest::digest(eml_file_path, algo = "sha256"),
-                 checksumAlgorithm = "SHA256",
-                 submitter = env$submitter,
-                 rightsHolder = env$rights_holder,
-                 fileName = new_metadata_file_name)
+  # Update the object if it doesn't exist on the MN
+  log_message(paste0("Checking if metadata object with pid ", new_pid, " already exists.\n"))
 
-  sysmeta <- add_access_rules(sysmeta)
+  if (!object_exists(env$mn_base_url, new_pid)) {
+    sysmeta <- new("SystemMetadata",
+                   identifier = new_pid,
+                   formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                   size = file.size(eml_file_path),
+                   checksum = digest::digest(eml_file_path, algo = "sha256"),
+                   checksumAlgorithm = "SHA256",
+                   submitter = env$submitter,
+                   rightsHolder = env$rights_holder,
+                   fileName = new_metadata_file_name)
 
-  update_response <- tryCatch({
-    dataone::updateObject(x = env$mn,
-                          pid = old_pid,
-                          file = eml_file_path,
-                          newpid = new_pid,
-                          sysmeta = sysmeta)
-  },
-  error = function(e) {
-    log_message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
-    log_message(e)
-    e
-  })
+    sysmeta <- add_access_rules(sysmeta)
 
-  if (inherits(update_response, "error")) {
-    package_files$resmap_created <- FALSE
-    return(FALSE)
+    update_response <- tryCatch({
+      dataone::updateObject(x = env$mn,
+                            pid = old_pid,
+                            file = eml_file_path,
+                            newpid = new_pid,
+                            sysmeta = sysmeta)
+    },
+    error = function(e) {
+      log_message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+      log_message(e)
+      e
+    })
+
+    if (inherits(update_response, "error")) {
+      package_files$resmap_created <- FALSE
+      return(package_files)
+    }
+
+    # Set the updated flag to TRUE
+    package_files$updated <- TRUE
+
+    log_message(paste0("Inserted updated metadata object for package ", package, "\n"))
+  }
+  else {
+    log_message(paste0("Metadata object already exists. Moving on to the resource map.\n"))
   }
 
-  log_message(paste0("Inserted updated resource map for package ", package, "\n"))
+
 
   # Resource Map
-  # Hack the package_files data.frame to have the new PID
-  package_files[metadata_file_idx,"pid"] <- new_pid
-  # ^^ do something better here... ^^
-
   metadata_pid <- package_files[metadata_file_idx,"pid"]
+  resource_map_pid <- generate_resource_map_pid(metadata_pid)
+
   data_pids <- package_files[data_file_idx,"pid"]
   child_pids <- determine_child_pids(inventory, package)
 
   resource_map_filepath <- generate_resource_map(metadata_pid, data_pids, child_pids)
-  resource_map_pid <- generate_resource_map_pid(metadata_pid)
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
   resource_map_size_bytes <- file.size(resource_map_filepath)
@@ -902,51 +921,69 @@ update_package <- function(inventory,
                               fileName = resource_map_file_name)
 
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
-
   old_resmap_pid <- generate_resource_map_pid(old_pid)
 
-  # Does this PID even exist? Stop now if it doesn't.
-  if (!object_exists(env$mn_base_url, old_resmap_pid)) {
-    log_message(paste0("Resource map with PID ", old_resmap_pid, " not found. Inserting the resource map as a new object.\n"))
 
-    create_response <- tryCatch({
-      dataone::createObject(x = env$mn,
-                            pid = resource_map_pid,
-                            file = resource_map_filepath,
-                            sysmeta = resource_map_sysmeta)
-    },
-    error = function(e) {
-      log_message(paste0("Error produced during call to createObject for resource map ", resource_map_pid, " in package ", package, "\n"))
-      log_message(e)
-      e
-    })
 
-    log_message(create_response)
 
+  # Cases...
+  # 1. Old resource map doesn't exist
+  #    then just create the new one if it doesn't exist
+  # 2. Old resource map does exist
+  #    then update it with the new one if it doesn't exist
+
+  # Check if the new resource map already exists
+
+  if (object_exists(env$mn_base_url, resource_map_pid)) {
+    log_message(paste0("The new resource map with PID ", resource_map_pid, " already exists. Finishing up.\n"))
   } else {
-    log_message(paste0("Updating old resource map ", old_resmap_pid, " with new resmap pid ", resource_map_pid, ".\n"))
-    log_message(paste0("New resource map is at ", resource_map_filepath, "\n"))
+    # Now check if the OLD resource map exists
 
-    update_response <- tryCatch({
-      dataone::updateObject(x = env$mn,
-                            pid = old_resmap_pid,
-                            file = resource_map_filepath,
-                            newpid = resource_map_pid,
-                            sysmeta = resource_map_sysmeta)
-    },
-    error = function(e) {
-      log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
-      log_message(e)
-      e
-    })
+    if (!object_exists(env$mn_base_url, old_resmap_pid)) {
+      log_message(paste0("Old resource map with PID ", resource_map_pid, " doesn't exist. Using createObject instead of updateObject.\n"))
 
-    log_message(update_response)
+      create_response <- tryCatch({
+        dataone::createObject(x = env$mn,
+                              pid = resource_map_pid,
+                              file = resource_map_filepath,
+                              sysmeta = resource_map_sysmeta)
+      },
+      error = function(e) {
+        log_message(paste0("Error produced during call to createObject for resource map ", resource_map_pid, " in package ", package, "\n"))
+        log_message(e)
+        e
+      })
 
-    if (inherits(update_response, "error")) {
-      package_files$resmap_created <- FALSE
+      if (inherits(create_response, "error")) {
+        log_message("There was an error calling createObject. Returning package files as is.\n")
+        return(package_files)
+      }
+
+      log_message(create_response)
+    } else {
+      # Update the old resource map
+      update_response <- tryCatch({
+        dataone::updateObject(x = env$mn,
+                              pid = old_resmap_pid,
+                              file = resource_map_filepath,
+                              newpid = resource_map_pid,
+                              sysmeta = resource_map_sysmeta)
+      },
+      error = function(e) {
+        log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+        log_message(e)
+        e
+      })
+
+      if (inherits(update_response, "error")) {
+        log_message("There was an error calling updateObject Returning package files as is.\n")
+        return(package_files)
+      }
+
+      log_message(update_response)
     }
   }
 
-  return(package_files)
+  package_files
 }
 
