@@ -41,34 +41,6 @@ get_related_pids <- function(mn, pid) {
            response$resourceMap))
 }
 
-#' Check if the given SystemMetadata instance has the access policy specified
-#' by 'subject' and 'permission'
-#'
-#' @param sysmeta The SystemMetadata instanace to check (SystemMetadata)
-#' @param subject The subject of the access policy (character)
-#' @param permission The permission to check (character)
-#'
-#' @return Whether the subject-policy combination was found (logical)
-#' @export
-#'
-#' @examples
-#' # Check if user "bryce" has write access
-#' has_access_policy(my_sm, "bryce", "write)
-has_access_policy <- function(sysmeta, subject, permission) {
-  stopifnot(class(sysmeta) == "SystemMetadata",
-            is.character(subject),
-            nchar(subject) > 0,
-            is.character(subject),
-            nchar(subject) > 0)
-
-  access_policy <- sysmeta@accessPolicy
-
-  # Convert each row to a single character so we can easily look it up
-  policies <- paste(access_policy$subject, access_policy$permission, sep = "#")
-  query <- paste(subject, permission, sep = "#")
-
-  query %in% policies
-}
 
 #' Set the specified access policy on the given PID.
 #'
@@ -98,7 +70,7 @@ set_access_rule <- function(mn, pid, subject, permission) {
   sysmeta <- dataone::getSystemMetadata(mn,
                                         URLencode(pid, reserved = TRUE))
 
-  if (has_access_policy(sysmeta, subject, permission)) {
+  if (datapack::hasAccessRule(sysmeta, subject, permission)) {
     return(TRUE)
   }
 
