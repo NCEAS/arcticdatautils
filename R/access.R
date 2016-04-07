@@ -95,5 +95,27 @@ set_access_rules <- function(mn, pid, subject, permissions) {
   cat("Updating sysmeta.\n")
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
+
+#' Set the rightsHolder value for an object.
+#'
+#' @param mn The Member Node to send the query (MNode)
+#' @param pid The PID to set the access rule for (character)
+#' @param subject The subject to use as rightsHolder (character)
+#'
+#' @return Whether the update succeeeded (logical)
+#' @export
+#'
+#' @examples
+set_rights_holder <- function(mn, pid, subject) {
+  stopifnot(class(mn) == "MNode",
+            is.character(pid),
+            nchar(pid) > 0,
+            is.character(subject))
+
+  sysmeta <- dataone::getSystemMetadata(mn,
+                                        URLencode(pid, reserved = TRUE))
+
+
+  sysmeta@rightsHolder <- subject
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
