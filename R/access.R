@@ -52,7 +52,7 @@ get_related_pids <- function(mn, pid) {
 #' @param mn The Member Node to send the query (MNode)
 #' @param pid The PID to set the access rule for (character)
 #' @param subject The subject of the rule (character)
-#' @param permission The permission for the rule (character)
+#' @param permissions The permissions for the rule (character)
 #'
 #' @return Whether the update succeeded or the rule was already set (logical)
 #' @export
@@ -60,20 +60,40 @@ get_related_pids <- function(mn, pid) {
 #' @examples
 #' # Set write access for bryce on PID "XYZ"
 #' set_access_rule(my_mn, "XYZ", "bryce", "write)
-set_access_rule <- function(mn, pid, subject, permission) {
+set_access_rules <- function(mn, pid, subject, permissions) {
   stopifnot(class(mn) == "MNode",
             is.character(pid),
             nchar(pid) > 0,
             is.character(subject),
-            is.character(permission))
+            is.character(permissions))
 
   sysmeta <- dataone::getSystemMetadata(mn,
                                         URLencode(pid, reserved = TRUE))
 
-  if (datapack::hasAccessRule(sysmeta, subject, permission)) {
+
+  # Check if we need to make any changes at all and skip updating the sysmeta
+  # if no changes are needed
+  if (all(sapply(permissions,
+                 function(permission) {
+                   datapack::hasAccessRule(sysmeta, subject, permission)
+                 }))) {
+    cat("All permissions were already set. Skipping update.\n")
     return(TRUE)
   }
 
-  sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
+  for (permission in permissions) {
+    if (datapack::hasAccessRule(sysmeta, subject, permission)) {
+      cat(paste0("Skipping the addition of permission '", permission, "'.\n"))
+      next
+    }
+
+    cat(paste0("Adding permission '", permission, "'\n"))
+    sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
+  }
+
+
+  cat("Updating sysmeta.\n")
+  dataone::updateSystemMetadata(mn, pid, sysmeta)
+}
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
