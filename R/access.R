@@ -42,80 +42,84 @@ get_related_pids <- function(mn, pid) {
 }
 
 
-#' Set the specified access policy on the given PID.
+#' Set the given subject as the rightsHolder and subject with write and
+#' changePermission access for the given PID.
 #'
-#' This function takes care of the work of fetching the System Metadata
-#' for the given PID, checking if the System Metadata has the specified
-#' access policy, adding it to the local copy of the System Metadata if
-#' necessary, and updating the SystemMetadata on the specified Member Node.
+#' This function only updates the existing System Metadata if a change is
+#' needed.
 #'
 #' @param mn The Member Node to send the query (MNode)
 #' @param pid The PID to set the access rule for (character)
-#' @param subject The subject of the rule (character)
+#' @param subject The subject of the rule(s) (character)
 #' @param permissions The permissions for the rule (character)
 #'
-#' @return Whether the update succeeded or the rule was already set (logical)
+#' @return Whether an updated was needed.
 #' @export
 #'
 #' @examples
-#' # Set write access for bryce on PID "XYZ"
-#' set_access_rule(my_mn, "XYZ", "bryce", "write)
-set_access_rules <- function(mn, pid, subject, permissions) {
+set_rights_and_access <- function(mn, pid, subject, permissions) {
   stopifnot(class(mn) == "MNode",
             is.character(pid),
             nchar(pid) > 0,
             is.character(subject),
             is.character(permissions))
 
-  sysmeta <- dataone::getSystemMetadata(mn,
-                                        URLencode(pid, reserved = TRUE))
+  sysmeta <- tryCatch({
+    dataone::getSystemMetadata(mn, pid)
+  },
+  error = function(e) {
+    log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", env$mn_base_url, "'.\n"))
+    log_message(e)
+    e
+  })
 
+  if (inherits(sysmeta, "error")) {
+    stop("Failed to get System Metadat.")
+  }
 
-  # Check if we need to make any changes at all and skip updating the sysmeta
-  # if no changes are needed
-  if (all(sapply(permissions,
-                 function(permission) {
-                   datapack::hasAccessRule(sysmeta, subject, permission)
-                 }))) {
-    cat("All permissions were already set. Skipping update.\n")
-    return(TRUE)
+  # Track whether we have changed the record to avoid an uncessary update call
+  changed <- FALSE
+
+  # Set rights holder if needed
+  if (subject != sysmeta@rightsHolder) {
+    changed <- TRUE
+
+    cat("Setting rights holder to ", subject, ".\n")
+    sysmeta@rightsHolder <- subject
+  } else {
+    cat("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n")
   }
 
   for (permission in permissions) {
     if (datapack::hasAccessRule(sysmeta, subject, permission)) {
-      cat(paste0("Skipping the addition of permission '", permission, "'.\n"))
+      cat(paste0("Skipping the addition of permission '", permission, "' for subject '", subject, "'\n"))
       next
     }
 
-    cat(paste0("Adding permission '", permission, "'\n"))
+    changed <- TRUE
+
+    cat(paste0("Adding permission '", permission, "' for subject '", subject, "'\n"))
     sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
   }
 
+  if (changed == TRUE) {
+    cat("Updating sysmeta.\n")
 
-  cat("Updating sysmeta.\n")
-  dataone::updateSystemMetadata(mn, pid, sysmeta)
-}
+    update_response <- tryCatch({
+      dataone::updateSystemMetadata(mn, pid, sysmeta)
+    },
+    error = function(e) {
+      log_message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
+      log_message(e)
+      e
+    })
 
-#' Set the rightsHolder value for an object.
-#'
-#' @param mn The Member Node to send the query (MNode)
-#' @param pid The PID to set the access rule for (character)
-#' @param subject The subject to use as rightsHolder (character)
-#'
-#' @return Whether the update succeeeded (logical)
-#' @export
-#'
-#' @examples
-set_rights_holder <- function(mn, pid, subject) {
-  stopifnot(class(mn) == "MNode",
-            is.character(pid),
-            nchar(pid) > 0,
-            is.character(subject))
+    if (inherits(update_response, "error")) {
+      stop("Failed update.")
+    }
+  } else {
+    cat("No changes needed.\n")
+  }
 
-  sysmeta <- dataone::getSystemMetadata(mn,
-                                        URLencode(pid, reserved = TRUE))
-
-
-  sysmeta@rightsHolder <- subject
-  dataone::updateSystemMetadata(mn, pid, sysmeta)
+  changed
 }
