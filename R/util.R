@@ -433,10 +433,6 @@ change_eml_name <- function(party) {
 #' Replace the EML 'packageId' attribute on the root element with a
 #' certain value.
 #'
-#' Note: I am just using string manipulation (replacement) because I don't want
-#' the XML package to have re-format the XML when I edit it and write it back
-#' to disk.
-#'
 #' @param path Path to the XML file to edit. (character)
 #' @param replacement The new value (character)
 #'
