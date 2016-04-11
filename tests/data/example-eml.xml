@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:stmml="http://www.xml-cml.org/schema/stmml" xmlns:sw="eml://ecoinformatics.org/software-2.1.1" xmlns:cit="eml://ecoinformatics.org/literature-2.1.1" xmlns:ds="eml://ecoinformatics.org/dataset-2.1.1" xmlns:prot="eml://ecoinformatics.org/protocol-2.1.1" xmlns:doc="eml://ecoinformatics.org/documentation-2.1.1" xmlns:res="eml://ecoinformatics.org/resource-2.1.1" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 ~/development/eml/eml.xsd" packageId="urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c" system="knb" scope="system">
+  <dataset>
+    <alternateIdentifier>urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c</alternateIdentifier>
+    <alternateIdentifier>ee386c24-66ac-11e3-9147-00c0f03d5b7c</alternateIdentifier>
+    <title>A Chronosequence Approach To Examine the Interaction of Fire and Permafrost Influence in Forest Regeneration and Carbon Sequestration in Far Northeastern Siberia</title>
+    <creator>
+      <individualName>
+        <givenName>Heather</givenName>
+        <surName>Alexander</surName>
+      </individualName>
+    </creator>
+    <associatedParty>
+      <individualName>
+        <givenName>Heather</givenName>
+        <surName>Alexander</surName>
+      </individualName>
+      <role>principalInvestigator</role>
+    </associatedParty>
+    <pubDate>2013-12-16</pubDate>
+    <language>eng</language>
+    <abstract>
+      <para>Global change models predict high-latitude boreal forests will become increasingly susceptible to fire threat due to climate warming. Because boreal forests contain a large proportion of terrestrial carbon (C) stocks, any change to the fire regime will likely have substantial impacts on C exchange and storage. This project will utilize a chronosequence approach to examine how fire and permafrost interact to influence forest regeneration and C sequestration within larch forests near arctic treeline in Far Northeastern Siberia. The hypothesis is that post-fire soil organic layer depth mediates C storage through indirect impacts on forest regeneration because of its role as a thermal regulator and barrier to seed germination. This research will build on investigations initiated in summer 2010 and will be compared to recent and ongoing research within Interior Alaska. A cross-polar comparison will increase our understanding of how C dynamics under an altered fire regime vary across boreal regions with differing permafrost dynamics and vegetation types. This fellowship will support the post-doctoral fellow?s career goals by providing training in arctic boreal forest ecology, experience in executing independent research, skills in mentoring undergraduate students, and an opportunity to collaborate with arctic researchers from within and outside the U.S. By addressing fundamental questions concerning how an altered fire regime indirectly impacts C cycling of Siberian larch forests, this study will provide much needed information about an ecologically important yet understudied region and will improve our ability to predict the impacts of climate change and altered fire regimes on arctic ecosystems. Siberian larch forests comprise 20% of all boreal forest ecosystems and are a critical component of the global C cycle. They are different from other boreal forests in that they are comprised of a single tree genus (Larix spp.), with a deciduous growth habit, that often grows on continuous permafrost. Thus, their response to warming climate and an altered fire regime is likely to differ from boreal forests in other regions. Our current knowledge of their ecology and potential susceptibility to climate change remains limited because of logistical constraints associated with conducting research in Siberia and minimal translations of Russian scientific efforts into English. Uncertainties regarding current C pools in Siberian boreal forests remain a significant factor affecting our ability to predict climate-induced changes to the global C cycle. By comparing results to the relatively well-studied boreal forests of interior Alaska, the study will further our ability to detect whether boreal response to changing fire is similar across zones differing in permafrost characteristics and vegetation types, or whether more detailed studies are needed for accurate modeling of ecosystem response to climate change. The study will contribute to our understanding of how boreal fires impact global C cycling and provide essential data necessary for scaling-up boreal forest C pools, estimating C emissions from boreal fires, and calibrating predictive models of future global C cycling. Broader Impacts: The research will advance our understanding of Siberian larch forests, an important yet understudied ecosystem, while advancing the teaching and mentoring skills of a post- doctoral researcher. The post-doctoral fellow?s research activities, methodologies, and findings will be integrated into the education of undergraduate students through participation in the NSF-funded Polaris Project lecture series and discussion groups and by mentoring of an undergraduate field assistant in ecosystem ecology. Basing field research out of the Northeast Science Station in the Russian Far Northeast will provide a venue for building partnerships between the post-doctoral fellow, other arctic researchers from the U.S., and Russian collaborators. The collaborations will be used to integrate research findings with Russian scientific efforts. Scientific findings resulting from the proposed research will be widely disseminated through publications in scientific journals, presentations at international conferences, and more informally, through postings on the post-doctoral researcher?s web page. Active layer and soil moisture measurements will be submitted to the Circumpolar Active Layer Monitoring network to provide critical data for model validations and scaling-up of climate change impacts on boreal forest ecosystems.</para>
+    </abstract>
+    <keywordSet>
+      <keyword>PLR</keyword>
+    </keywordSet>
+    <intellectualRights>
+      <para>This work is licensed under the Creative Commons Attribution 4.0 International License.To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.</para>
+    </intellectualRights>
+    <coverage>
+      <!--No geographic description provided-->
+      <!--Geographic coverage-->
+      <geographicCoverage>
+        <geographicDescription>No geographic description provided.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>90</westBoundingCoordinate>
+          <eastBoundingCoordinate>180</eastBoundingCoordinate>
+          <northBoundingCoordinate>90</northBoundingCoordinate>
+          <southBoundingCoordinate>50</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <!--Temporal coverage-->
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2011-06-15</calendarDate>
+            <time>00:00:00</time>
+          </beginDate>
+          <endDate>
+            <calendarDate>2013-05-31</calendarDate>
+            <time>00:00:00</time>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact>
+      <organizationName>NSF Arctic Data Center</organizationName>
+    </contact>
+    <project>
+      <title>A Chronosequence Approach To Examine the Interaction of Fire and Permafrost Influence in Forest Regeneration and Carbon Sequestration in Far Northeastern Siberia</title>
+      <personnel>
+        <individualName>
+          <givenName>Heather</givenName>
+          <surName>Alexander</surName>
+        </individualName>
+        <role>principalInvestigator</role>
+      </personnel>
+      <abstract>Global change models predict high-latitude boreal forests will become increasingly susceptible to fire threat due to climate warming. Because boreal forests contain a large proportion of terrestrial carbon (C) stocks, any change to the fire regime will likely have substantial impacts on C exchange and storage. This project will utilize a chronosequence approach to examine how fire and permafrost interact to influence forest regeneration and C sequestration within larch forests near arctic treeline in Far Northeastern Siberia. The hypothesis is that post-fire soil organic layer depth mediates C storage through indirect impacts on forest regeneration because of its role as a thermal regulator and barrier to seed germination. This research will build on investigations initiated in summer 2010 and will be compared to recent and ongoing research within Interior Alaska. A cross-polar comparison will increase our understanding of how C dynamics under an altered fire regime vary across boreal regions with differing permafrost dynamics and vegetation types. This fellowship will support the post-doctoral fellow?s career goals by providing training in arctic boreal forest ecology, experience in executing independent research, skills in mentoring undergraduate students, and an opportunity to collaborate with arctic researchers from within and outside the U.S. By addressing fundamental questions concerning how an altered fire regime indirectly impacts C cycling of Siberian larch forests, this study will provide much needed information about an ecologically important yet understudied region and will improve our ability to predict the impacts of climate change and altered fire regimes on arctic ecosystems. Siberian larch forests comprise 20% of all boreal forest ecosystems and are a critical component of the global C cycle. They are different from other boreal forests in that they are comprised of a single tree genus (Larix spp.), with a deciduous growth habit, that often grows on continuous permafrost. Thus, their response to warming climate and an altered fire regime is likely to differ from boreal forests in other regions. Our current knowledge of their ecology and potential susceptibility to climate change remains limited because of logistical constraints associated with conducting research in Siberia and minimal translations of Russian scientific efforts into English. Uncertainties regarding current C pools in Siberian boreal forests remain a significant factor affecting our ability to predict climate-induced changes to the global C cycle. By comparing results to the relatively well-studied boreal forests of interior Alaska, the study will further our ability to detect whether boreal response to changing fire is similar across zones differing in permafrost characteristics and vegetation types, or whether more detailed studies are needed for accurate modeling of ecosystem response to climate change. The study will contribute to our understanding of how boreal fires impact global C cycling and provide essential data necessary for scaling-up boreal forest C pools, estimating C emissions from boreal fires, and calibrating predictive models of future global C cycling. Broader Impacts: The research will advance our understanding of Siberian larch forests, an important yet understudied ecosystem, while advancing the teaching and mentoring skills of a post- doctoral researcher. The post-doctoral fellow?s research activities, methodologies, and findings will be integrated into the education of undergraduate students through participation in the NSF-funded Polaris Project lecture series and discussion groups and by mentoring of an undergraduate field assistant in ecosystem ecology. Basing field research out of the Northeast Science Station in the Russian Far Northeast will provide a venue for building partnerships between the post-doctoral fellow, other arctic researchers from the U.S., and Russian collaborators. The collaborations will be used to integrate research findings with Russian scientific efforts. Scientific findings resulting from the proposed research will be widely disseminated through publications in scientific journals, presentations at international conferences, and more informally, through postings on the post-doctoral researcher?s web page. Active layer and soil moisture measurements will be submitted to the Circumpolar Active Layer Monitoring network to provide critical data for model validations and scaling-up of climate change impacts on boreal forest ecosystems.</abstract>
+      <funding>
+        <para>NSF Award 1103443</para>
+      </funding>
+    </project>
+  </dataset>
+</eml:eml>

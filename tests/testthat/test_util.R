@@ -25,3 +25,26 @@ test_that("paths can be joined", {
   # Other tests
   expect_equal(path_join("~/src/arcticdata./inst/asdf"), "~/src/arcticdata/inst/asdf")
 })
+
+test_that("a string can be added to a file", {
+  # Prepare a temp file with an example EML doc
+  eml_file <- file.path(system.file("tests", "data", package = "arcticdata"), "example-eml.xml")
+  tmp <- tempfile()
+  file.copy(eml_file, tmp)
+
+  # Get original title
+  doc_pre <- XML::xmlParseDoc(tmp)
+  title_pre <- XML::xmlValue(XML::getNodeSet(doc_pre, "//dataset/title")[[1]])
+
+  # Add the string
+  add_string_to_title(tmp, " a test")
+
+  # Get the updated title
+  doc_post <- XML::xmlParseDoc(tmp)
+  title_post <- XML::xmlValue(XML::getNodeSet(doc_post, "//dataset/title")[[1]])
+
+  expect_equal(paste0(title_pre, " a test"), title_post)
+
+  # Clean up
+  file.remove(tmp)
+})

@@ -466,6 +466,41 @@ replace_package_id <- function(path, replacement) {
   path
 }
 
+#' Adds a string to the title element in the given file.
+#'
+#' @param path Path to the XML file to edit. (character)
+#' @param replacement The new value (character)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+add_string_to_title <- function(path, string) {
+  stopifnot(file.exists(path))
+  stopifnot(is.character(string),
+            nchar(string) > 0)
+
+  result <- tryCatch({
+    xmldoc <- XML::xmlParseDoc(file = path)
+    title_nodes <- XML::getNodeSet(xmldoc, "//dataset/title")
+    stopifnot(length(title_nodes) == 1)
+
+    XML::xmlValue(title_nodes[[1]]) <- paste0(XML::xmlValue(title_nodes[[1]]),
+                                              string)
+    XML::saveXML(xmldoc, path)
+  },
+  error = function(e) {
+    e
+  })
+
+  if (inherits(result, "error")) {
+    log_message(result)
+  }
+
+  path
+}
+
+
 add_additional_identifiers <- function(path, identifiers) {
   stopifnot(is.character(file),
             nchar(file) > 0,
