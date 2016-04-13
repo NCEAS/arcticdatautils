@@ -310,6 +310,7 @@ insert_package <- function(inventory, package, env=NULL) {
 #' @param data_pids PID(s) of the data Objects (character)
 #' @param child_pids (Optional) PID(s) of child Resource Maps (character)
 #' @param resolve_base (Optional) The resolve service base URL (character)
+#' @param resource_ma_pid (Optional) The PID to use for the resource map.
 #'
 #' @return Absolute path to the Resource Map on disk (character)
 #' @export
@@ -318,7 +319,8 @@ insert_package <- function(inventory, package, env=NULL) {
 generate_resource_map <- function(metadata_pid,
                                   data_pids,
                                   child_pids=c(),
-                                  resolve_base="https://cn.dataone.org/cn/v2/resolve") {
+                                  resolve_base="https://cn.dataone.org/cn/v2/resolve",
+                                  resource_map_pid=NULL) {
   stopifnot(length(metadata_pid) == 1)
   stopifnot(length(metadata_pid) + (length(data_pids) + length(child_pids)) >= 1)
 
@@ -367,7 +369,10 @@ generate_resource_map <- function(metadata_pid,
   }
 
   # Add #aggregation aggregates/documenents child resource maps statements
-  resource_map_pid <- generate_resource_map_pid(metadata_pid)
+  if (is.null(resource_map_pid)) {
+    log_message("Generating automated resource map PID")
+    resource_map_pid <- generate_resource_map_pid(metadata_pid)
+  }
 
   for (child_pid in child_pids) {
     # aggregates <-> isAggregatedBy
@@ -406,7 +411,7 @@ generate_resource_map <- function(metadata_pid,
   }
 
   resource_map <- new("ResourceMap",
-                      id = generate_resource_map_pid(metadata_pid))
+                      id = resource_map_pid)
 
   log_message(paste0("Creating resource map with pids ", paste0(unlist(c(metadata_pid, data_pids, child_pids)), collapse = ", ")))
   resource_map <- datapack::createFromTriples(resource_map,
