@@ -1,56 +1,59 @@
 #' Update all the ISO metadata with EML
-#'
-#'
+
+# library(dataone) # Custom reference
+# library(datapack) # Custom reference
 devtools::load_all(".")
-library(dataone)
-devtools::load_all("~/src/ropensci-datapackage/")
-library(xslt)
-library(xml2)
-library(XML)
-library(stringr)
-library(stringi)
 
-isotoeml <- xslt::read_xslt("iso2eml.xsl")
+# Load inventory
+inventory_file_path <- "inventory/master_updated.csv"
+if (!file.exists(inventory_file_path)) {
+  log_message("Inventory file not found. Exiting.")
+  break
+}
 
-inventory <- read.csv("~/src/arctic-data/inventory/master_all.csv", stringsAsFactors = FALSE)
-nrow(inventory)
-nrow(inventory[!is.na(inventory$package),])
-inventory <- inventory[!is.na(inventory$package),] #Filter out non-package files
-nrow(inventory)
+log_message("Loading inventory file.")
+inventory <- read.csv(inventory_file_path,
+                      stringsAsFactors = FALSE)
 
-# Filter out large packages
-nrow(inventory)
-inventory <- inventory[inventory$package_nfiles <= 1000,]
-nrow(inventory)
+# Filter out non-package files
+inventory <- inventory[which(!is.na(inventory$package)),]
 
-# Setup
-Sys.setenv("ARCTICDATA_ENV" = "development")
-options(authentication_token = Sys.getenv("D1TOKEN"))
+# Setup env
+Sys.setenv("ARCTICDATA_ENV" = "production")
 env <- env_load("etc/environment.yml")
 library(dataone)
 env$mn <- MNode(env$mn_base_url)
-env$base_path <- "~/sync/"
 
-######
-#' For each package:
-#'  - Update the metadata object (new pid is used)
-#'  - Update the resource map
-#'  - Update all resource maps above it ? No. This will be done later.
+# Set up token
+token <- Sys.getenv("D1TOKEN")
 
+if (nchar(token) == 0) {
+  log_message("No token found on env var $D1TOKEN. Set it and restart.\n")
+  break
+}
+
+log_message("Setting authentication token...")
+options(authentication_token = token)
 
 
 # Run it
 for (d in max(inventory$depth):min(inventory$depth)) {
-  print(d)
+  log_message(paste0("Processing depth ", d, "."))
 
   packages_at_depth <- unique(inventory[inventory$is_metadata & inventory$depth == d,"package"])
 
   for (package in packages_at_depth) {
-    convert_to_eml_and_update_package(inventory, package)
+    # Check if 'quit' file exists and quit
+    if (file.exists("quit")) {
+      log_message("Quit file was present. Finishing up and exiting.")
+      break
+    }
+
+    log_message(paste0("Inserting package ", package, "."))
+
+    last <- update_package(inventory, package, env)
   }
 }
 
-# Insert a file, temporary code
-# inventory[inventory$file == package_files[metadata_file_idx,"file"],"created"] <- FALSE
-# insert_file(inventory, package_files[metadata_file_idx,"file"], env)
-# inventory[inventory$file == package_files[metadata_file_idx,"file"],"created"] <- TRUE
+log_message("All done.")
+

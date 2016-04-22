@@ -18,15 +18,15 @@
 #' is introduced $pid_old so that the correct linkages can be made.
 
 # Load in vendored copies of rdataone and datapack
-devtools::load_all("vendor/rdataone")
-devtools::load_all("vendor/datapack")
+
 devtools::load_all(".")
 
 # Set up the environment
+Sys.setenv("ARCTICDATA_ENV"="development")
 env <- env_load("etc/environment.yml")
 env$mn <- MNode(env$mn_base_url)
-env$base_path <- "~/src/arctic-data/arcticdata/"
-env$alternate_path <- "~/src/arctic-data/arcticdata/"
+env$base_path <- "~/src/arctic-data/arcticdata/inst/inventory_nested_iso/"
+env$alternate_path <- "~/src/arctic-data/arcticdata/inst/inventory_nested_eml/"
 
 # Load the inventory
 inventory <- read.csv("inst/inventory_nested_iso/inventory_nested_iso.csv",
@@ -46,6 +46,7 @@ for (d in seq(max(inventory$depth), min(inventory$depth))) {
 inventory$pid_old <- inventory$pid
 inventory[inventory$is_metadata,"pid"] <- sapply(1:nrow(inventory[inventory$is_metadata,]),
                                                  function(x) { paste0("urn:uuid:", uuid::UUIDgenerate())})
+inventory$updated <- FALSE
 
 # Insert
 for (d in max(inventory$depth):min(inventory$depth)) {
