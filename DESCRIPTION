@@ -4,24 +4,25 @@ Version: 0.0.0.9000
 Authors@R: person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre"))
 Description: Support package for migrating ACADIS data to KNB.
 Depends:
-  R (>= 3.2.3)
+    R (>= 3.2.3)
 Imports:
-  digest,
-  dplyr,
-  dataone,
-  datapack,
-  httr,
-  ncdf4,
-  stringr,
-  stringi,
-  tools,
-  uuid,
-  yaml,
-  xml2,
-  XML
-Remotes:
-  DataONEorg/dataone
-  ropensci/datapack
+    digest,
+    dplyr,
+    dataone,
+    datapack,
+    httr,
+    ncdf4,
+    stringr,
+    stringi,
+    tools,
+    uuid,
+    yaml,
+    xml2,
+    XML
+Remotes: DataONEorg/dataone
+    ropensci/datapack
 License: MIT + file LICENSE
 LazyData: true
-Suggests: testthat
+Suggests:
+    testthat
+RoxygenNote: 5.0.1
