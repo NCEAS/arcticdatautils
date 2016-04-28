@@ -155,3 +155,40 @@ set_rights_and_access <- function(mn, pid, subject, permissions) {
 
   changed
 }
+
+#' Replace subjects in the accessPolicy section of a System Metadata entries.
+#'
+#' This function was written out to fix capitalization errors but in a set of
+#' existing System Metadata entries but can be used to replace any subject.
+#'
+#'
+#' @param sysmeta The System Metadata object (SystemMetadata)
+#' @param from The DN string to replace (character)
+#' @param to The DN string to put in place of `from` (character)
+#'
+#' @return The modified System Metadata (SystemMetadata)
+#' @export
+#'
+#' @examples
+replace_subject <- function(sysmeta,
+                            from="cn=arctic-data-admins,dc=dataone,dc=org",
+                            to="CN=arctic-data-admins,DC=dataone,DC=org") {
+  if (!inherits(sysmeta, "SystemMetadata")) {
+    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+    return(sysmeta)
+  }
+
+  # Get the access policy data.frame
+  ap <- sysmeta@accessPolicy
+
+  # Convert subject column from factor to string
+  # We do this so we can assign new values to it without dealing with factor
+  # nonsense.
+  ap$subject <- as.character(ap$subject)
+
+  # Replace the subjects
+  ap[which(ap$subject == from),"subject"] <- to
+  sysmeta@accessPolicy <- ap
+
+  sysmeta
+}
