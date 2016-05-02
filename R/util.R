@@ -448,7 +448,9 @@ replace_package_id <- function(path, replacement) {
   result <- tryCatch({
     xmldoc <- XML::xmlParseDoc(file = path)
     root <- XML::xmlRoot(xmldoc)
-    XML::xmlAttrs(root) <- c(packageId = replacement)
+    XML::xmlAttrs(root) <- c(packageId = replacement,
+                             system = "arcticdata")
+
     XML::saveXML(xmldoc, path)
   },
   error = function(e) {
