@@ -26,7 +26,7 @@ add_access_rules <- function(sysmeta) {
     sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
   }
 
-  sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "read")
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
 
