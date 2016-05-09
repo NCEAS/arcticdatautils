@@ -103,6 +103,7 @@ publish_object <- function(mn_uri, filepath, formatId,
 #' @param parent_child_pids optional vector of identifiers of child packages in the parent package
 #' @import dataone
 #' @import datapack
+#' @import EML
 #' @export
 publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pids,
                            metadata_file=as.character(NA), use_doi=FALSE,
