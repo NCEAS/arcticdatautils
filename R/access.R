@@ -34,6 +34,28 @@ add_access_rules <- function(sysmeta) {
 }
 
 
+#' Adds access to the given System Metadata for the arctic-data-admins group
+#'
+#' @param sysmeta
+#'
+#' @return
+#' @export
+#'
+#' @examples
+add_admin_group_access <- function(sysmeta) {
+  if (!inherits(sysmeta, "SystemMetadata")) {
+    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+    return(sysmeta)
+  }
+
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+
+  sysmeta
+}
+
+
 get_related_pids <- function(mn, pid) {
   stopifnot(is.character(mn),
             is.character(pid),
