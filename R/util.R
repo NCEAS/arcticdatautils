@@ -234,7 +234,7 @@ log_message <- function(message=NULL) {
   message <- paste0("[", as.POSIXlt(Sys.time(), "GMT"), "] ", stringr::str_replace_all(message, "[\n]", ""))
 
   # Write out the message as a warning() and log it to file
-  message(paste0(message, "\n"))
+  message(paste0(message))
   write(message,
         file = logfile_path,
         append = TRUE)
