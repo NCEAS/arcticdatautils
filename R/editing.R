@@ -96,7 +96,7 @@ publish_object <- function(mn,
     return(NULL)
   }
 
-    new_pid <- get_identifier(create_response)
+  new_pid <- get_identifier(create_response)
   log_message(paste0("Published file with identifier: ", new_pid))
   return(new_pid)
 }
@@ -147,23 +147,24 @@ publish_update <- function(mn,
   ###############################
   if (is.na(metadata_file_path)) {
     # Get the metadata doc
-    eml <- read_eml(rawToChar(getObject(mn, metadata_old_pid)), asText = TRUE)
+    eml <- eml::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
     if (!file.exists(metadata_file_path)) {
-      stop(paste0("Metadata doesn't exist: ", metadata_file_path)
+      stop(paste0("Metadata doesn't exist: ", metadata_file_path))
     }
-    eml <- read_eml(metadata_file_path)
+
+    eml <- eml::read_eml(metadata_file_path)
   }
 
   # get the metadata sysmeta from the node
-  eml_sm <- getSystemMetadata(mn, metadata_old_pid)
+  eml_sm <- dataone::getSystemMetadata(mn, metadata_old_pid)
   #eml_acl <- sysmeta_orig@accessPolicy
   # TODO: error check: md and sm existence
 
   # get the resource_map (not used for now, could be used to get the list of data pids)
-  resmap <- rawToChar(getObject(mn, resmap_old_pid))
-  resmap_sm <- getSystemMetadata(mn, resmap_old_pid)
+  # resmap <- rawToChar(dataone::getObject(mn, resmap_old_pid))
+  resmap_sysmeta <- dataone::getSystemMetadata(mn, resmap_old_pid)
   # TODO: error check: resmap existence, and ensure we don't fail hard
 
   # Get the list of data files from the resource map
@@ -175,11 +176,12 @@ publish_update <- function(mn,
   # Generate PIDs for our updated objects
   ##################################
   if (use_doi) {
-    metadata_updated_pid <- generateIdentifier(mn, scheme="DOI")
+    metadata_updated_pid <- dataone::generateIdentifier(mn, scheme="DOI")
   } else {
     metadata_updated_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   }
-  resmap_updated_pid <- paste0("resourceMap_",  metadata_updated_pid)
+
+  resmap_updated_pid <- paste0("resource_map_",  metadata_updated_pid)
 
   # Update the metadata object
   ############################
@@ -189,101 +191,64 @@ publish_update <- function(mn,
   # slot(eml, "access") <- new("access)
   # slot(eml@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]], "access") <- new("access")
   eml_file <- paste0(tempdir(), "/metadata.xml")
-  write_eml(eml, eml_file)
+  eml::write_eml(eml, eml_file)
+
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
                                   formatId = "eml://ecoinformatics.org/eml-2.1.1",
                                   size = file.size(eml_file),
-                                  checksum = digest::digest(eml_file, algo="sha256"),
+                                  checksum = digest::digest(eml_file, algo = "sha256"),
                                   checksumAlgorithm = "SHA256",
                                   submitter = me,
                                   rightsHolder = eml_sm@rightsHolder,
                                   obsoletes = metadata_old_pid)  # Note that I'm setting this here and on the rest of the objects
+
   metadata_updated_sysmeta@originMemberNode <- mn@identifier
   metadata_updated_sysmeta@authoritativeMemberNode <- mn@identifier
   metadata_updated_sysmeta@accessPolicy <- eml_sm@accessPolicy
-  metadata_updated_sysmeta <- addAccessRule(metadata_updated_sysmeta, "public", "read")
+  metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
   update_rights_holder(mn, eml_sm@identifier, me)
-
-  updateObject(mn,
+  dataone::updateObject(mn,
                pid = metadata_old_pid,
                newpid = metadata_updated_pid,
                file = eml_file,
                sysmeta = metadata_updated_sysmeta)
   update_rights_holder(mn, eml_sm@identifier, eml_sm@rightsHolder)
-  message("Updated metadata document...")
+
+  log_message("Updated metadata document.")
 
   # Update the resource map
   #########################
-  # Use the arcticdata package's helper function to create a resource map
+  update_rights_holder(mn, resmap_old_pid, me)
+  update_resource_map(mn,
+                      resource_map_pid = resmap_old_pid,
+                      metadata_pid = metadata_updated_pid,
+                      data_pids = data_old_pids,
+                      resource_map_pid = resmap_updated_pid)
+  update_rights_holder(mn, resmap_old_pid, resmap_sysmeta@rightsHolder)
 
-  resmap_updated_path <- generate_resource_map(metadata_pid = metadata_updated_pid,
-                                               data_pids = c(data_old_pids),
-                                               resource_map_pid = resmap_updated_pid)
-  resmap_updated_sysmeta <- new("SystemMetadata",
-                                identifier = resmap_updated_pid,
-                                formatId = "http://www.openarchives.org/ore/terms",
-                                size = file.size(resmap_updated_path),
-                                checksum = digest::digest(resmap_updated_path, algo="sha256"),
-                                checksumAlgorithm = "SHA256",
-                                submitter = me,
-                                rightsHolder = resmap_sm@rightsHolder,
-                                obsoletes = resmap_old_pid)
-  resmap_updated_sysmeta@originMemberNode <- mn@identifier
-  resmap_updated_sysmeta@authoritativeMemberNode <- mn@identifier
-  resmap_updated_sysmeta@accessPolicy <- resmap_sm@accessPolicy
-  resmap_updated_sysmeta <- addAccessRule(resmap_updated_sysmeta, "public", "read")
-
-  update_rights_holder(mn, resmap_sm@identifier, me)
-  updateObject(mn,
-               pid = resmap_old_pid,
-               newpid = resmap_updated_pid,
-               file = resmap_updated_path,
-               sysmeta = resmap_updated_sysmeta)
-  update_rights_holder(mn, resmap_sm@identifier, resmap_sm@rightsHolder)
   message("Updated resource map")
 
   # Update the parent resource map to add the new package
   #######################################################
-  tested <- FALSE  # Flag this section as untested so it won't be run; TODO: test this and remove flag
-  if (tested && !is.na(parent_resmap_pid)) {
-
-    if(is.na(parent_metadata_pid) || is.na(parent_data_pids) || is.na(parent_child_pids)) {
+  if (!is.na(parent_resmap_pid)) {
+    if (is.na(parent_metadata_pid) ||
+        is.na(parent_data_pids) ||
+        is.na(parent_child_pids)) {
       stop("Missing required parameters to update parent package.")
     }
-    parent_resmap_updated_pid <- paste0("resourceMap_urn:uuid:", uuid::UUIDgenerate())
-    parent_resmap_sm <- getSystemMetadata(mn, parent_resmap_pid)
 
-    # TODO: Remove these hardcoded IDs and child pids
-    parent_resmap_updated_path <- generate_resource_map(metadata_pid = parent_metadata_pid,
-                                                        data_pids = parent_data_pids,
-                                                        child_pids = parent_child_pids,
-                                                        resource_map_pid = parent_resmap_updated_pid)
-
-    parent_resmap_updated_sysmeta <- new("SystemMetadata",
-                                         identifier = parent_resmap_updated_pid,
-                                         formatId = "http://www.openarchives.org/ore/terms",
-                                         size = file.size(parent_resmap_updated_path),
-                                         checksum = digest::digest(parent_resmap_updated_path, algo="sha256"),
-                                         checksumAlgorithm = "SHA256",
-                                         submitter = me,
-                                         rightsHolder = parent_resmap_sm@rightsHolder,
-                                         obsoletes = parent_resmap_pid)
-    parent_resmap_updated_sysmeta@originMemberNode <- mn@identifier
-    parent_resmap_updated_sysmeta@authoritativeMemberNode <- mn@identifier
-    parent_resmap_updated_sysmeta@accessPolicy <- eml_sm@accessPolicy
-    parent_resmap_updated_sysmeta <- addAccessRule(parent_resmap_updated_sysmeta, "public", "read")
-
-    update_rights_holder(mn, parent_resmap_sm@identifier, me)
-    updateObject(mn,
-                 pid = parent_resmap_pid,
-                 newpid = parent_resmap_updated_pid,
-                 file = parent_resmap_updated_path,
-                 sysmeta = parent_resmap_updated_sysmeta)
-    update_rights_holder(mn, parent_resmap_sm@identifier, me)
+    update_rights_holder(mn, parent_resmap_pid, me)
+    update_resource_map(mn,
+                        resource_map_pid = parent_resmap_pid,
+                        metadata_pid = parent_metadata_pid,
+                        data_pids = parent_data_pids,
+                        child_pids = parent_child_pids)
+    update_rights_holder(mn, parent_resmap_pid, me)
   }
 }
+
 
 #' Change the rightsHolder field for a given PID.
 #'
