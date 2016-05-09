@@ -11,7 +11,7 @@
 #' system metadata for that identifier and use it to provide rightsHolder, accessPolicy,
 #' and replicationPolicy metadata. Note that this function only uploads the object to
 #' the Member Node, and does not add it to a data package, which can be done separately.
-#' @param mn_uri base URI for the Member Node
+#' @param mn The Member Node to publish the object to (MNode)
 #' @param filepath the path to the file to be published
 #' @param formatId the dataone format identifier
 #' @param identifier optional string to be used as an identifer
@@ -19,30 +19,36 @@
 #' @import dataone
 #' @import datapack
 #' @export
-publish_object <- function(mn_uri, filepath, formatId,
-                           identifier=as.character(NA), clone_id=as.character(NA)) {
+publish_object <- function(mn,
+                           filepath,
+                           format_id,
+                           identifier=as.character(NA),
+                           clone_id=as.character(NA)) {
 
-  if (missing(mn_uri) || missing(filepath) || missing(formatId)) {
-    stop("mn_uri, filepath, and formatId are required parameters.")
+  if (missing(mn) || missing(filepath) || missing(format_id)) {
+    stop("mn, filepath, and format_id are required parameters.")
   }
 
   # Set up some variables for use later on
   ########################################
-  mn <- MNode(mn_uri)
-  # TODO: check that the MN connection was successful
-
-  info <- getTokenInfo(AuthenticationManager())
-  me <- info[which(info$name=='dataone_test_token'),]$subject
-  if (info[which(info$name=='dataone_test_token'),]$expired!=FALSE) {
-    stop("Stopped processing becuase your token is expired. Please provide a new dataone_test_token.")
-  }
-
-  # TODO: factor these out as params
-  group <- "CN=arctic-data-admins,DC=dataone,DC=org"
+  me <- get_token_subject()
 
   # Get the clone_id sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
   if (!is.na(clone_id)) {
-    clone_sysmeta <- getSystemMetadata(mn, clone_id)
+    log_message(paste0("Cloning System Metadata for new object from ", clone_id, "."))
+
+    clone_sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, clone_id)
+    },
+    error = function(e) {
+      log_message(paste0("Error while cloning System Metadata from ", clone_id, "."))
+      log_message(e)
+      e
+    })
+
+    if (inherits(clone_sysmeta, "error")) {
+      return(NULL)
+    }
   }
 
   # Generate an identifier if not provided
@@ -52,14 +58,16 @@ publish_object <- function(mn_uri, filepath, formatId,
 
   sysmeta <- new("SystemMetadata",
                  identifier = identifier,
-                 formatId = formatId,
+                 formatId = format_id,
                  size = file.size(filepath),
                  checksum = digest::digest(filepath, algo="sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me)
+
   sysmeta@originMemberNode <- mn@identifier
   sysmeta@authoritativeMemberNode <- mn@identifier
+
   if (exists("clone_sysmeta")) {
     sysmeta@rightsHolder <- clone_sysmeta@rightsHolder
     sysmeta@accessPolicy <- clone_sysmeta@accessPolicy
@@ -68,16 +76,31 @@ publish_object <- function(mn_uri, filepath, formatId,
     sysmeta@preferredNodes <- clone_sysmeta@preferredNodes
     sysmeta@blockedNodes <- clone_sysmeta@blockedNodes
   }
-  sysmeta <- addAccessRule(sysmeta, "public", "read")
-  sysmeta <- addAccessRule(sysmeta, group, "read")
-  sysmeta <- addAccessRule(sysmeta, group, "write")
-  sysmeta <- addAccessRule(sysmeta, group, "changePermission")
+  sysmeta <- add_admin_group_access(sysmeta)
+  sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   sysmeta@fileName <- basename(filepath)
 
-  newId <- createObject(mn, pid = identifier, file = filepath, sysmeta = sysmeta)
-  message(paste0("Published data file with identifier: ", identifier))
-  return(newId)
+  create_response <- tryCatch({
+    dataone::createObject(mn,
+                          pid = identifier,
+                          file = filepath,
+                          sysmeta = sysmeta)
+  },
+  error = function(e) {
+    log_message(paste0("Failed to publish object. "))
+    log_message(e)
+    e
+  })
+
+  if (inherits(create_response, "error")) {
+    return(NULL)
+  }
+
+    new_pid <- get_identifier(create_response)
+  log_message(paste0("Published file with identifier: ", new_pid))
+  return(new_pid)
 }
+
 
 #' Publish an updated data package.
 #'
@@ -91,7 +114,7 @@ publish_object <- function(mn_uri, filepath, formatId,
 #' should be updated as well, using the parent_medata_pid, parent_data_pids, and
 #' parent_child_pids as members of the updated package. In all cases, the objects
 #' are made publicly readable.
-#' @param mn_uri The base URI for the Member Node to be updated
+#' @param mn The Member Node to update the object on (MNode)
 #' @param metadata_old_pid The PID of the EML metadata document to be updated
 #' @param resmap_old_pid The PID of the resource map for the package
 #' @param data_old_pids a vector of PIDs of data objects in the package
@@ -105,8 +128,12 @@ publish_object <- function(mn_uri, filepath, formatId,
 #' @import datapack
 #' @import EML
 #' @export
-publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pids,
-                           metadata_file=as.character(NA), use_doi=FALSE,
+publish_update <- function(mn,
+                           metadata_old_pid,
+                           resmap_old_pid,
+                           data_old_pids,
+                           metadata_file_path=as.character(NA),
+                           use_doi=FALSE,
                            parent_resmap_pid=as.character(NA),
                            parent_metadata_pid=as.character(NA),
                            parent_data_pids=as.character(NA),
@@ -114,27 +141,19 @@ publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pi
 
   # Set up some variables for use later on
   ########################################
-  mn <- MNode(mn_uri)
-  # TODO: check that the MN connection was successful
-
-  info <- getTokenInfo(AuthenticationManager())
-  me <- info[which(info$name=='dataone_test_token'),]$subject
-  if (info[which(info$name=='dataone_test_token'),]$expired!=FALSE) {
-    stop("Stopped processing becuase your token is expired. Please provide a new dataone_test_token.")
-  }
-
-  # TODO: factor these out as params
-  group <- "CN=arctic-data-admins,DC=dataone,DC=org"
+  me <- get_token_subject()
 
   # Get some things from the node
   ###############################
-  if (is.na(metadata_file)) {
+  if (is.na(metadata_file_path)) {
     # Get the metadata doc
-    eml <- read_eml(rawToChar(getObject(mn, metadata_old_pid)), asText=TRUE)
+    eml <- read_eml(rawToChar(getObject(mn, metadata_old_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
-    metadata_updated_path <- metadata_file
-    eml <- read_eml(metadata_file)
+    if (!file.exists(metadata_file_path)) {
+      stop(paste0("Metadata doesn't exist: ", metadata_file_path)
+    }
+    eml <- read_eml(metadata_file_path)
   }
 
   # get the metadata sysmeta from the node
@@ -151,7 +170,7 @@ publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pi
   # TODO: parse these from the resource map, rather than taking them as input
   # TODO: data_old_pids <- as.vector(c("pid1", "pid2", "pid3"))
 
-  message("Downloaded EML and sysmeta...")
+  log_message("Downloaded EML and sysmeta...")
 
   # Generate PIDs for our updated objects
   ##################################
@@ -185,13 +204,14 @@ publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pi
   metadata_updated_sysmeta@accessPolicy <- eml_sm@accessPolicy
   metadata_updated_sysmeta <- addAccessRule(metadata_updated_sysmeta, "public", "read")
 
-  update_RightsHolder(mn, me, eml_sm@identifier)
+  update_rights_holder(mn, eml_sm@identifier, me)
+
   updateObject(mn,
                pid = metadata_old_pid,
                newpid = metadata_updated_pid,
                file = eml_file,
                sysmeta = metadata_updated_sysmeta)
-  update_RightsHolder(mn, eml_sm@rightsHolder, eml_sm@identifier)
+  update_rights_holder(mn, eml_sm@identifier, eml_sm@rightsHolder)
   message("Updated metadata document...")
 
   # Update the resource map
@@ -215,13 +235,13 @@ publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pi
   resmap_updated_sysmeta@accessPolicy <- resmap_sm@accessPolicy
   resmap_updated_sysmeta <- addAccessRule(resmap_updated_sysmeta, "public", "read")
 
-  update_RightsHolder(mn, me, resmap_sm@identifier)
+  update_rights_holder(mn, resmap_sm@identifier, me)
   updateObject(mn,
                pid = resmap_old_pid,
                newpid = resmap_updated_pid,
                file = resmap_updated_path,
                sysmeta = resmap_updated_sysmeta)
-  update_RightsHolder(mn, resmap_sm@rightsHolder, resmap_sm@identifier)
+  update_rights_holder(mn, resmap_sm@identifier, resmap_sm@rightsHolder)
   message("Updated resource map")
 
   # Update the parent resource map to add the new package
@@ -255,34 +275,82 @@ publish_update <- function(mn_uri, metadata_old_pid, resmap_old_pid, data_old_pi
     parent_resmap_updated_sysmeta@accessPolicy <- eml_sm@accessPolicy
     parent_resmap_updated_sysmeta <- addAccessRule(parent_resmap_updated_sysmeta, "public", "read")
 
-    update_RightsHolder(mn, me, parent_resmap_sm@identifier)
+    update_rights_holder(mn, parent_resmap_sm@identifier, me)
     updateObject(mn,
                  pid = parent_resmap_pid,
                  newpid = parent_resmap_updated_pid,
                  file = parent_resmap_updated_path,
                  sysmeta = parent_resmap_updated_sysmeta)
-    update_RightsHolder(mn, parent_resmap_sm@rightsHolder, parent_resmap_sm@identifier)
+    update_rights_holder(mn, parent_resmap_sm@identifier, me)
   }
 }
 
-#' Change the rightsHolder field
+#' Change the rightsHolder field for a given PID.
 #'
-#' Update the rights holder to the provided subject for the object identified in the
-#' provided system metadata document on the given Member Node.
-#' @param mn the MNode instance to be changed
-#' @param subject the identifier of the new rightsHolder, often an ORCID or DN
-#' @param sysmeta_pid the identifier for the object to be changed
+#' Update the rights holder to the provided subject for the object identified in
+#' the provided system metadata document on the given Member Node.
+#'
+#' @param mn the MNode instance to be changed (MNode)
+#' @param pid the identifier for the object to be changed (character)
+#' @param subject the identifier of the new rightsHolder, often an ORCID or DN (character)
 #' @import dataone
 #' @import datapack
 #' @export
-update_RightsHolder <- function(mn, subject, sysmeta_pid) {
-  # Copy the sysmeta and change the rightsHolder
-  sysmeta_me <- getSystemMetadata(mn, resmap_old_pid)
-  sysmeta_me@rightsHolder <- subject
-  updateSystemMetadata(mn, sysmeta_me@identifier, sysmeta_me)
+update_rights_holder <- function(mn, pid, subject) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.character(subject),
+            nchar(subject) > 0)
+
+  log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
+
+  # Get System Metadata
+  sysmeta <- tryCatch({
+    log_message(paste0("Getting System Metadata for PID ", pid, "..."))
+    dataone::getSystemMetadata(mn, pid)
+  },
+  error = function(e) {
+    log_message(paste0("Failed to get System Metadata for PID of ", pid, "."))
+    log_message(e)
+    e
+  })
+
+  if (inherits(sysmeta, "error")) {
+    return(FALSE)
+  }
+
+  # Change rightsHolder (if needed)
+  if (sysmeta@rightsHolder == subject) {
+    log_message(paste0("No change to System Metadata needed because the rightsHolder is already ", subject, "."))
+    return(TRUE)
+  } else {
+    sysmeta@rightsHolder <- subject
+  }
+
+  # Update System Metadata
+  update <- tryCatch({
+    log_message(paste0("Updating System Metadata for PID ", pid, "..."))
+    dataone::updateSystemMetadata(mn,
+                                  pid = pid,
+                                  sysmeta = sysmeta)
+  },
+  error = function(e) {
+    log_message(paste0("Failed to update rightsHolder on ", pid, " to ", subject, "."))
+    log_message(e)
+    e
+  })
+
+  if (inherits(update, "error") | update == FALSE) {
+    return(FALSE)
+  }
+
+  log_message(paste0("Successfully updated System Metadata for PID ", pid, "..."))
+  return(TRUE)
 }
 
-#' Replace an existing Resource Map with a new one.
+
+#' Update an existing Resource Map with a new one.
 #'
 #' This function is intended to be used to add a few new child packages to a
 #' parent package. For exmaple, if you have:
@@ -309,69 +377,41 @@ update_RightsHolder <- function(mn, subject, sysmeta_pid) {
 #' @param metadata_pid
 #' @param data_pids
 #' @param child_pids
-
-
-update_children <- function(mn,
-                            resource_map_pid,
-                            metadata_pid,
-                            data_pids,
-                            child_pids) {
+update_resource_map <- function(mn,
+                                resource_map_pid,
+                                metadata_pid,
+                                data_pids,
+                                child_pids=c()) {
 
   # Check arguments
+  stopifnot(class(mn) == "MNode")
   stopifnot(is.character(resource_map_pid),
             nchar(resource_map_pid) > 0)
-
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
-
   stopifnot(all(sapply(data_pids, is.character)))
-
   stopifnot(all(sapply(child_pids, is.character)))
+  stopifnot(is_resource_map(mn, resource_map_pid))
 
-  # Verify the first param is a resouce map
-  old_rm_sm <- tryCatch({
-    dataone::getSystemMetadatda(mn, resource_map_pid)
+  # Get the current rightsHolder
+  sysmeta <- tryCatch({
+    dataone::getSystemMetadata(mn, resource_map_pid)
   },
   error = function(e) {
-    log_message(paste0("Failed to get System Metadata for resource_map_pid of ", resource_map_pid, "."))
+    log_message(paste0("Error getting System Metadata for ", resource_map_pid, ":"))
     log_message(e)
     e
   })
 
-  if (inherits(old_rm_sm, "error")) {
-    return(FALSE)
+  if (inherits(sysmeta, "error")) {
+    return(NULL)
   }
 
-  if (old_rm_sm@formatId != "http://www.openarchives.org/ore/terms") {
-    log_message(paste0("Format ID of resource map pid ", resource_map_pid, " was not http://www.openarchives.org/ore/terms but was ", old_rm_sm@formatId, ". Ensure the argument 'resource_map_pid' is a Resource Map PID."))
-    return(FALSE)
-  }
+  previous_rights_holder <- sysmeta@rightsHolder
 
-  # Get the existing rightsHolder and change it to us
-  previous_rights_holder <- NA
-
-  if (old_rm_sm@rightsHolder != "CN=arctic-data-admins,DC=dataone,DC=org") {
-    log_message("Changing rightsHolder to CN=arctic-data-admins,DC=dataone,DC=org")
-
-    previous_rights_holder <- old_rm_sm@rightsHolder
-    old_rm_sm@rightsHolder <- "CN=arctic-data-admins,DC=dataone,DC=org"
-
-    response <- tryCatch({
-      dataone::updateSystemMetadata(mn,
-                                    pid = resource_map_pid,
-                                    sysmeta = old_rm_sm)
-    },
-    error = function(e) {
-      log_message(paste0("Failed to update rightsHolder on ", resource_map_pid, " from ", previous_rights_holder, " to CN=arctic-data-admins,DC=dataone,DC=org."))
-      log_message(e)
-    })
-
-    if (inherits(response, "error")) {
-      return(FALSE)
-    }
-  } else {
-    log_message("rightsHolder was already set to CN=arctic-data-admins,DC=dataone,DC=org so there is no need to update the System Metadata prior to updating.")
-  }
+  # Set the rightsHolder to us temporarily
+  me <- get_token_subject()
+  update_rights_holder(mn, resource_map_pid, me)
 
   # Create the replacement resource map
   new_rm_pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
@@ -380,16 +420,33 @@ update_children <- function(mn,
                                        child_pids = child_pids,
                                        resource_map_pid = new_rm_pid)
 
+  rm(sysmeta)
 
-  new_rm_sysmeta <- old_rm_sm
-  old_rm_sm@identifier <- new_rm_pid
-  old_rm_sm@size <- file.size(new_rm_path)
-  old_rm_sm@checksum <- digest::digest(new_rm_path, algo = "sha256")
-  old_rm_sm@checksumAlgorithm <- "SHA256"
-  old_rm_sm@rightsHolder <- previous_rights_holder
+  sysmeta <- tryCatch({
+    log_message(paste("Getting updated copy of System Metadata for ", resource_map_pid))
+    dataone::getSystemMetadata(mn, resource_map_pid)
+  },
+  error = function(e) {
+    log_message(paste0("Error getting System Metadata for ", resource_map_pid, ":"))
+    log_message(e)
+    e
+  })
+
+  if (inherits(sysmeta, "error")) {
+    return(NULL)
+  }
+
+  new_rm_sysmeta <- sysmeta
+  new_rm_sysmeta@identifier <- new_rm_pid
+  new_rm_sysmeta@size <- file.size(new_rm_path)
+  new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha256")
+  new_rm_sysmeta@checksumAlgorithm <- "SHA256"
+  new_rm_sysmeta@rightsHolder <- previous_rights_holder
+  new_rm_sysmeta@obsoletes <- resource_map_pid
 
   # Update it
   resmap_update_response <- tryCatch({
+    log_message(paste0("Updating resource map..."))
     dataone::updateObject(mn,
                           pid = resource_map_pid,
                           newpid = new_rm_pid,
@@ -398,15 +455,21 @@ update_children <- function(mn,
     )
   },
   error = function(e) {
-    log_message("There was an error while updating the resource map object.")
+    log_message("There was an error while updating the resource map:")
     log_message(e)
+    e
   })
 
-  file.remove(new_rm_path)
-
-  if (inherits(resmap_update_response, "error")) {
-    return(FALSE)
+  if (file.exists(new_rm_path)) {
+    file.remove(new_rm_path)
   }
 
-  return(TRUE)
+  if (inherits(resmap_update_response, "error")) {
+    return(NULL)
+  }
+
+  new_pid <- get_identifier(resmap_update_response)
+  log_message(paste0("Successfully updated ", resource_map_pid, " with ", new_rm_pid, "."))
+
+  return(new_pid)
 }
