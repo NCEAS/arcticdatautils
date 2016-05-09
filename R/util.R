@@ -578,3 +578,84 @@ path_join <- function(path_parts=c("")) {
 
   result
 }
+
+#' Test whether an object is a particular format ID.
+#'
+#' @param mn
+#' @param pid
+#' @param format_id
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_format_id <- function(mn, pid, format_id) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.character(format_id),
+            nchar(format_id) > 0)
+
+  # Get System Metadata
+  sysmeta <- tryCatch({
+    log_message(paste0("Getting System Metadata for PID ", pid, "..."))
+    dataone::getSystemMetadata(mn, pid)
+  },
+  error = function(e) {
+    log_message(paste0("Failed to get System Metadata for PID of ", pid, "."))
+    log_message(e)
+    e
+  })
+
+  if (inherits(sysmeta, "error")) {
+    return(FALSE)
+  }
+
+  if (sysmeta@formatId == format_id) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+is_resource_map <- function(mn, pid) {
+  is_format_id(mn, pid, "http://www.openarchives.org/ore/terms")
+}
+
+
+#' Returns the subject of the set dataone_test_token
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_token_subject <- function() {
+  info <- dataone::getTokenInfo(dataone::AuthenticationManager())
+  me <- info[which(info$name == 'dataone_test_token'),]$subject
+
+  if (info[which(info$name == 'dataone_test_token'),]$expired != FALSE) {
+    stop("Stopped processing becuase your token is expired. Please provide a new dataone_test_token.")
+  }
+
+  return(me)
+}
+
+
+#' Get the identifier from a DataONE response.
+#'
+#' Example resposne:
+#'
+#' <d1:identifier xmlns:d1="http://ns.dataone.org/service/types/v1">
+#'   urn:uuid:12aaf494-5840-434d-9cdb-c2597d58543e
+#' </d1:identifier>
+#'
+#' @param dataone_response ("XMLInternalDocument" "XMLAbstractDocument")
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_identifier <- function(dataone_response) {
+  stopifnot("XMLInternalDocument" %in% class(dataone_response))
+  XML::xmlValue(XML::getNodeSet(dataone_response, "//d1:identifier/text()", namespaces = c("d1"="http://ns.dataone.org/service/types/v1")))
+}
