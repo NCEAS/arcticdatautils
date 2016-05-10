@@ -353,7 +353,7 @@ update_resource_map <- function(mn,
   new_rm_sysmeta@checksumAlgorithm <- "SHA256"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
   new_rm_sysmeta@obsoletes <- old_resource_map_pid
-  new_rm_sysmeta <- add_access_rules(new_rm_sysmeta)
+  new_rm_sysmeta <- add_admin_group_access(new_rm_sysmeta)
 
   if (public == TRUE) {
     new_rm_sysmeta <- datapack::addAccessRule(new_rm_sysmeta, "public", "read")
