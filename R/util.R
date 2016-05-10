@@ -659,3 +659,14 @@ get_identifier <- function(dataone_response) {
   stopifnot("XMLInternalDocument" %in% class(dataone_response))
   XML::xmlValue(XML::getNodeSet(dataone_response, "//d1:identifier/text()", namespaces = c("d1"="http://ns.dataone.org/service/types/v1")))
 }
+
+
+#' Helper function to generate a new UUID PID.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+new_uuid <- function() {
+  paste0("urn:uuid:", uuid::UUIDgenerate())
+}
