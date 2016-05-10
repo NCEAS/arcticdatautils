@@ -324,6 +324,10 @@ generate_resource_map <- function(metadata_pid,
   stopifnot(length(metadata_pid) == 1)
   stopifnot(length(metadata_pid) + (length(data_pids) + length(child_pids)) >= 1)
 
+  # Uniquify the data and child PIDs
+  data_pids <- unique(data_pids)
+  child_pids <- unique(child_pids)
+
   # Validate the vector of child PIDs
   if (!is.character(child_pids)) {
     child_pids <- c()
