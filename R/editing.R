@@ -153,7 +153,7 @@ publish_update <- function(mn,
   # Generate PIDs for our updated objects
   ##################################
   if (use_doi) {
-    metadata_updated_pid <- dataone::generateIdentifier(mn, scheme="DOI")
+    metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
   } else {
     metadata_updated_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   }
