@@ -124,14 +124,14 @@ publish_update <- function(mn,
   ###############################
   if (is.na(metadata_file_path)) {
     # Get the metadata doc
-    eml <- eml::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
+    eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
     if (!file.exists(metadata_file_path)) {
       stop(paste0("Metadata doesn't exist: ", metadata_file_path))
     }
 
-    eml <- eml::read_eml(metadata_file_path)
+    eml <- EML::read_eml(metadata_file_path)
   }
 
   # get the metadata sysmeta from the node
@@ -168,7 +168,7 @@ publish_update <- function(mn,
   # slot(eml, "access") <- new("access)
   # slot(eml@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]], "access") <- new("access")
   eml_file <- paste0(tempdir(), "/metadata.xml")
-  eml::write_eml(eml, eml_file)
+  EML::write_eml(eml, eml_file)
 
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
