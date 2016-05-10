@@ -274,7 +274,7 @@ object_exists <- function(mn, pid) {
 
 #' Convert and ISO document to EML using an XSLT.
 #'
-#' This is a better of a nasty function right now but it essentially
+#' This is a bit of a nasty function right now but it essentially
 #' takes a file in, loads an XSLT file and does the conversion. The nasty part
 #' is that I have the XSLT file in a hard-linked directory on my computer
 #' because we're still actively developing the XSLT.
@@ -286,7 +286,14 @@ object_exists <- function(mn, pid) {
 #' @export
 #'
 #' @examples
-convert_iso_to_eml <- function(full_path, isotoeml=isotoeml) {
+convert_iso_to_eml <- function(full_path, isotoeml=NA) {
+  # Load the XSLT from the default location
+  if (is.na(isotoeml)) {
+    xsl_path <- file.path(system.file("inst", package = "arcticdata"), "iso2eml.xsl")
+    stopifnot(file.exists(xsl_path))
+    isotoeml <- xslt::read_xslt(xsl_path)
+  }
+
   stopifnot(file.exists(full_path))
   stopifnot(inherits(isotoeml, "xslt_document"))
 
