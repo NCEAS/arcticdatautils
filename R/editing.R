@@ -143,7 +143,7 @@ publish_update <- function(mn,
 
   # get the resource_map (not used for now, could be used to get the list of data pids)
   # resmap <- rawToChar(dataone::getObject(mn, resmap_old_pid))
-  resmap_sysmeta <- dataone::getSystemMetadata(mn, resmap_old_pid)
+  # resmap_sysmeta <- dataone::getSystemMetadata(mn, resmap_old_pid)
   # TODO: error check: resmap existence, and ensure we don't fail hard
 
   # Get the list of data files from the resource map
