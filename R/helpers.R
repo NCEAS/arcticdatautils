@@ -5,7 +5,7 @@
 create_dummy_metadata <- function(mn) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
-  the_file <- system.file("tests/data/example-eml.xml", package = "arcticdata")
+  the_file <- file.path(system.file("tests/data/example-eml.xml", package = "arcticdata"))
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
