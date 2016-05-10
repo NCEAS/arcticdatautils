@@ -84,7 +84,7 @@ create_dummy_package <- function(mn, size = 2) {
   pid
 }
 
-create_parent_package <- function(mn, children) {
+create_dummy_parent_package <- function(mn, children) {
   me <- get_token_subject()
   meta_pid <- create_dummy_metadata(mn)
 
