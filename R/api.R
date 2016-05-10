@@ -32,7 +32,7 @@ get_token <- function() {
 
 is_token_expired <- function() {
   # Check for presence of the token in options()
-  if (is.null(options("authentication_token"))) {
+  if (!is_token_set()) {
     log_message("Authentication token not set in options().")
     return(FALSE)
   }
