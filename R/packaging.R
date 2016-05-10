@@ -676,32 +676,6 @@ validate_environment <- function(env) {
 }
 
 
-is_token_expired <- function() {
-  # Check for presence of the token in options()
-  if (is.null(options("authentication_token"))) {
-    log_message("Authentication token not set in options().")
-    return(FALSE)
-  }
-
-  token_info <- try({
-    dataone::getTokenInfo(dataone::AuthenticationManager())
-  })
-
-  if (inherits(token_info, "try-error") ||
-      !is.data.frame(token_info) ||
-      !("expired" %in% names(token_info))) {
-    log_message("Failed to get token info.")
-    return(FALSE)
-  }
-
-  if (token_info$expired == TRUE) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-}
-
-
 determine_child_pids <- function(inventory, package) {
   stopifnot(all(c("package", "parent_package", "is_metadata") %in% names(inventory)))
 
