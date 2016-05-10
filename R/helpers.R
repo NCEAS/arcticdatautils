@@ -111,5 +111,6 @@ create_dummy_parent_package <- function(mn, children) {
   log_message(paste0("Creating parent package map ", pid))
   createObject(mn, pid, resmap_path, sysmeta)
 
-  pid
+  list(parent = pid,
+       children = children)
 }
