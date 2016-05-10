@@ -199,15 +199,12 @@ publish_update <- function(mn,
 
   # Update the resource map
   #########################
-  update_rights_holder(mn, resmap_old_pid, me)
-
   update_resource_map(mn,
-                      resource_map_pid = resmap_old_pid,
+                      old_resource_map_pid = resmap_old_pid,
+                      new_resource_map_pid = resmap_updated_pid,
                       metadata_pid = metadata_updated_pid,
                       data_pids = data_old_pids,
                       public = TRUE)
-
-  update_rights_holder(mn, resmap_old_pid, resmap_sysmeta@rightsHolder)
 
   message("Updated resource map")
 
@@ -220,15 +217,12 @@ publish_update <- function(mn,
       stop("Missing required parameters to update parent package.")
     }
 
-    update_rights_holder(mn, parent_resmap_pid, me)
-
     update_resource_map(mn,
-                        resource_map_pid = parent_resmap_pid,
+                        old_resource_map_pid = parent_resmap_pid,
                         metadata_pid = parent_metadata_pid,
                         data_pids = parent_data_pids,
-                        child_pids = parent_child_pids)
-
-    update_rights_holder(mn, parent_resmap_pid, me)
+                        child_pids = parent_child_pids,
+                        public = TRUE)
   }
 }
 
