@@ -18,11 +18,13 @@ test_that("an environment string can be returned", {
 })
 
 test_that("can correctly load the environment", {
-  Sys.setenv("ARCTICDATA_ENV" = "")
 
   # Defaults to development if the env var isn't found
+  Sys.setenv("ARCTICDATA_ENV" = "")
   expect_true(env_get() == "development")
+  Sys.unsetenv("ARCTICDATA_ENV")
 
   Sys.setenv("ARCTICDATA_ENV" = "production")
   expect_true(env_get() == "production")
+  Sys.unsetenv("ARCTICDATA_ENV")
 })
