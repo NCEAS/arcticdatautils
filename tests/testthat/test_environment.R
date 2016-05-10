@@ -2,6 +2,7 @@
 #'
 #' Test functions related to loading handling application environment.
 
+context("environment")
 
 test_that("can load a simple environment file", {
   x <- yaml::yaml.load_file(file.path(system.file("tests", "data", package = "arcticdata"), "test_environment.yml"))

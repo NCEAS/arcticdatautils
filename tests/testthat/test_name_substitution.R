@@ -1,5 +1,7 @@
 #' test_name_substitution.R
 
+context("name_substitution")
+
 test_that("the contents of <surName> are expanded into their parts as we expect", {
   eml_file <- file.path(system.file("tests", "data", package = "arcticdata"), "name_sub_test-01.xml")
   tmp <- tempfile()

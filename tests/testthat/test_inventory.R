@@ -1,5 +1,7 @@
 #' test_inventory.R
 
+context("inventory")
+
 test_that("an inventory can be created correctly", {
   x <- inv_init()
   expect_true(is.data.frame(x))

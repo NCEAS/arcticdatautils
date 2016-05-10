@@ -1,5 +1,7 @@
 #' test_util.R
 
+context("util")
+
 test_that("identifiers can be extracted", {
   x <- file.path(system.file("tests", "data", package = "arcticdata"), "example-field-projects-file.xml")
   identifier <- extract_local_identifier("field-projects", x)
