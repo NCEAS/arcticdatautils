@@ -1,7 +1,10 @@
 Package: arcticdata
 Title: What the Package Does (one line, title case)
 Version: 0.0.0.9000
-Authors@R: person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre"))
+Authors@R: c(
+  person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
+  person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb")
+  )
 Description: Support package for migrating ACADIS data to KNB.
 Depends:
     R (>= 3.2.3)
@@ -10,6 +13,7 @@ Imports:
     dplyr,
     dataone,
     datapack,
+    EML,
     httr,
     ncdf4,
     stringr,
@@ -19,8 +23,9 @@ Imports:
     yaml,
     xml2,
     XML
-Remotes: DataONEorg/dataone
-    ropensci/datapack
+Remotes: DataONEorg/dataone,
+    ropensci/datapack,
+    ropensci/EML
 License: MIT + file LICENSE
 LazyData: true
 Suggests:
