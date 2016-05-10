@@ -124,6 +124,7 @@ publish_update <- function(mn,
   ###############################
   if (is.na(metadata_file_path)) {
     # Get the metadata doc
+    log_message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
@@ -131,6 +132,7 @@ publish_update <- function(mn,
       stop(paste0("Metadata doesn't exist: ", metadata_file_path))
     }
 
+    log_message(paste0("Getting metadata from the path: ", metadata_file_path, "."))
     eml <- EML::read_eml(metadata_file_path)
   }
 
@@ -153,7 +155,9 @@ publish_update <- function(mn,
   # Generate PIDs for our updated objects
   ##################################
   if (use_doi) {
+    log_message("Minting a new DOI")
     metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
+    log_message(paste0("Minted a new DOI of ", metadata_updated_pid))
   } else {
     metadata_updated_pid <- new_uuid()
   }
