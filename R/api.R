@@ -1,6 +1,19 @@
 # Utility functions for the DataONE API
 
 
+#' Test whether a token is set.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+is_token_set <- function() {
+  tryCatch(get_token(),
+           error = function(e) return(FALSE))
+  return(TRUE)
+}
+
+
 #' Gets the currently set authentication token.
 #'
 #' @return
