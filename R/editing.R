@@ -217,7 +217,6 @@ publish_update <- function(mn,
   #######################################################
   if (!is.na(parent_resmap_pid)) {
     if (is.na(parent_metadata_pid) ||
-        is.na(parent_data_pids) ||
         is.na(parent_child_pids)) {
       stop("Missing required parameters to update parent package.")
     }
