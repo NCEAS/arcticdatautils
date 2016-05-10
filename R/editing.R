@@ -315,7 +315,7 @@ update_resource_map <- function(mn,
                                 old_resource_map_pid,
                                 new_resource_map_pid=NA,
                                 metadata_pid,
-                                data_pids,
+                                data_pids=c(),
                                 child_pids=c(),
                                 public=FALSE) {
 
@@ -325,8 +325,6 @@ update_resource_map <- function(mn,
             nchar(old_resource_map_pid) > 0)
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
-  stopifnot(all(sapply(data_pids, is.character)))
-  stopifnot(all(sapply(child_pids, is.character)))
   stopifnot(is_resource_map(mn, old_resource_map_pid))
 
   # Get the current rightsHolder
