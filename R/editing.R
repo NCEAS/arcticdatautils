@@ -162,6 +162,7 @@ publish_update <- function(mn,
     metadata_updated_pid <- new_uuid()
   }
 
+  # Generate a resource map PID from the new metadata PID
   resmap_updated_pid <- paste0("resource_map_",  metadata_updated_pid)
 
   # Update the metadata object
