@@ -1,9 +1,15 @@
 # Utility functions for the DataONE API
 
 
+#' Gets the currently set authentication token.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_token <- function() {
   # Get token
-  if (is.null(getOption("authentication_token"))) {
+  if (is.null(getOption("dataone_test_token"))) {
     stop("No authentication token is set in options(). Please set one and try again.")
   }
 
