@@ -47,7 +47,11 @@ env_get <- function() {
 #'
 #' $var_three
 #' [1] "some value
-env_load <- function(file) {
+env_load <- function(file=NA) {
+  if (is.na(file)) {
+    file <- file.path(system.file("etc", package = "arcticdata"), "environment.yml")
+  }
+
   stopifnot(file.exists(file))
 
   yaml_content <- yaml::yaml.load_file(file)
