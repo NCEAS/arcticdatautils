@@ -323,19 +323,7 @@ update_resource_map <- function(mn,
   stopifnot(is_resource_map(mn, old_resource_map_pid))
 
   # Get the current rightsHolder
-  sysmeta <- tryCatch({
-    dataone::getSystemMetadata(mn, old_resource_map_pid)
-  },
-  error = function(e) {
-    log_message(paste0("Error getting System Metadata for ", old_resource_map_pid, ":"))
-    log_message(e)
-    e
-  })
-
-  if (inherits(sysmeta, "error")) {
-    return(NULL)
-  }
-
+  sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
   previous_rights_holder <- sysmeta@rightsHolder
 
   # Set the rightsHolder to us temporarily
@@ -353,19 +341,8 @@ update_resource_map <- function(mn,
 
   rm(sysmeta)
 
-  sysmeta <- tryCatch({
-    log_message(paste("Getting updated copy of System Metadata for ", old_resource_map_pid))
-    dataone::getSystemMetadata(mn, old_resource_map_pid)
-  },
-  error = function(e) {
-    log_message(paste0("Error getting System Metadata for ", old_resource_map_pid, ":"))
-    log_message(e)
-    e
-  })
-
-  if (inherits(sysmeta, "error")) {
-    return(NULL)
-  }
+  log_message(paste("Getting updated copy of System Metadata for ", old_resource_map_pid))
+  sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
 
   new_rm_sysmeta <- sysmeta
   new_rm_sysmeta@identifier <- new_resource_map_pid
