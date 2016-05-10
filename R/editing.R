@@ -41,7 +41,7 @@ publish_object <- function(mn,
 
   # Generate an identifier if not provided
   if (is.na(identifier)) {
-    identifier <- paste0("urn:uuid:", uuid::UUIDgenerate())
+    identifier <- new_uuid()
   }
 
   sysmeta <- new("SystemMetadata",
@@ -155,7 +155,7 @@ publish_update <- function(mn,
   if (use_doi) {
     metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
   } else {
-    metadata_updated_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
+    metadata_updated_pid <- new_uuid()
   }
 
   resmap_updated_pid <- paste0("resource_map_",  metadata_updated_pid)
@@ -328,7 +328,7 @@ update_resource_map <- function(mn,
 
   # Create the replacement resource map
   if (is.na(new_resource_map_pid)) {
-    new_resource_map_pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+    new_resource_map_pid <- paste0("resource_map_", new_uuid())
   }
 
   new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
