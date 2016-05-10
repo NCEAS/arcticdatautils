@@ -8,9 +8,14 @@
 #'
 #' @examples
 is_token_set <- function() {
-  tryCatch(get_token(),
-           error = function(e) return(FALSE))
-  return(TRUE)
+  token <- tryCatch(get_token(),
+                    error = function(e) FALSE)
+
+  if (token == FALSE) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
 }
 
 
