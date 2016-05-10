@@ -374,7 +374,7 @@ change_eml_name <- function(party) {
     return(party)
   }
 
-    # Check if there is already a <givenName> tag and do nothing if there is
+  # Check if there is already a <givenName> tag and do nothing if there is
   if (length(XML::getNodeSet(party, "./individualName/givenName")) > 0) {
     log_message("Doing nothing...")
     return(party)
@@ -630,6 +630,12 @@ is_resource_map <- function(mn, pid) {
 #' @examples
 get_token_subject <- function() {
   info <- dataone::getTokenInfo(dataone::AuthenticationManager())
+
+  # Throw an error for the dataone package so we stop when there are no tokens.
+  if (nrow(info) == 0) {
+    stop("No tokens defined.")
+  }
+
   me <- info[which(info$name == 'dataone_test_token'),]$subject
 
   if (info[which(info$name == 'dataone_test_token'),]$expired != FALSE) {
