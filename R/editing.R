@@ -36,19 +36,7 @@ publish_object <- function(mn,
   # Get the clone_id sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
   if (!is.na(clone_id)) {
     log_message(paste0("Cloning System Metadata for new object from ", clone_id, "."))
-
-    clone_sysmeta <- tryCatch({
-      dataone::getSystemMetadata(mn, clone_id)
-    },
-    error = function(e) {
-      log_message(paste0("Error while cloning System Metadata from ", clone_id, "."))
-      log_message(e)
-      e
-    })
-
-    if (inherits(clone_sysmeta, "error")) {
-      return(NULL)
-    }
+    clone_sysmeta <- dataone::getSystemMetadata(mn, clone_id)
   }
 
   # Generate an identifier if not provided
@@ -80,21 +68,10 @@ publish_object <- function(mn,
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   sysmeta@fileName <- basename(filepath)
 
-  create_response <- tryCatch({
-    dataone::createObject(mn,
-                          pid = identifier,
-                          file = filepath,
-                          sysmeta = sysmeta)
-  },
-  error = function(e) {
-    log_message(paste0("Failed to publish object. "))
-    log_message(e)
-    e
-  })
-
-  if (inherits(create_response, "error")) {
-    return(NULL)
-  }
+  create_response <- dataone::createObject(mn,
+                                           pid = identifier,
+                                           file = filepath,
+                                           sysmeta = sysmeta)
 
   new_pid <- get_identifier(create_response)
   log_message(paste0("Published file with identifier: ", new_pid))
@@ -158,7 +135,7 @@ publish_update <- function(mn,
   }
 
   # get the metadata sysmeta from the node
-  eml_sm <- dataone::getSystemMetadata(mn, metadata_old_pid)
+  metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_old_pid)
   #eml_acl <- sysmeta_orig@accessPolicy
   # TODO: error check: md and sm existence
 
@@ -200,32 +177,36 @@ publish_update <- function(mn,
                                   checksum = digest::digest(eml_file, algo = "sha256"),
                                   checksumAlgorithm = "SHA256",
                                   submitter = me,
-                                  rightsHolder = eml_sm@rightsHolder,
-                                  obsoletes = metadata_old_pid)  # Note that I'm setting this here and on the rest of the objects
+                                  rightsHolder = metadata_sysmeta@rightsHolder,
+                                  obsoletes = metadata_old_pid)
 
   metadata_updated_sysmeta@originMemberNode <- mn@identifier
   metadata_updated_sysmeta@authoritativeMemberNode <- mn@identifier
-  metadata_updated_sysmeta@accessPolicy <- eml_sm@accessPolicy
+  metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
-  update_rights_holder(mn, eml_sm@identifier, me)
+  update_rights_holder(mn, metadata_sysmeta@identifier, me)
+
   dataone::updateObject(mn,
-               pid = metadata_old_pid,
-               newpid = metadata_updated_pid,
-               file = eml_file,
-               sysmeta = metadata_updated_sysmeta)
-  update_rights_holder(mn, eml_sm@identifier, eml_sm@rightsHolder)
+                        pid = metadata_old_pid,
+                        newpid = metadata_updated_pid,
+                        file = eml_file,
+                        sysmeta = metadata_updated_sysmeta)
+
+  update_rights_holder(mn, metadata_sysmeta@identifier, metadata_sysmeta@rightsHolder)
 
   log_message("Updated metadata document.")
 
   # Update the resource map
   #########################
   update_rights_holder(mn, resmap_old_pid, me)
+
   update_resource_map(mn,
                       resource_map_pid = resmap_old_pid,
                       metadata_pid = metadata_updated_pid,
                       data_pids = data_old_pids,
-                      resource_map_pid = resmap_updated_pid)
+                      public = TRUE)
+
   update_rights_holder(mn, resmap_old_pid, resmap_sysmeta@rightsHolder)
 
   message("Updated resource map")
@@ -240,11 +221,13 @@ publish_update <- function(mn,
     }
 
     update_rights_holder(mn, parent_resmap_pid, me)
+
     update_resource_map(mn,
                         resource_map_pid = parent_resmap_pid,
                         metadata_pid = parent_metadata_pid,
                         data_pids = parent_data_pids,
                         child_pids = parent_child_pids)
+
     update_rights_holder(mn, parent_resmap_pid, me)
   }
 }
@@ -271,19 +254,8 @@ update_rights_holder <- function(mn, pid, subject) {
   log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
 
   # Get System Metadata
-  sysmeta <- tryCatch({
-    log_message(paste0("Getting System Metadata for PID ", pid, "..."))
-    dataone::getSystemMetadata(mn, pid)
-  },
-  error = function(e) {
-    log_message(paste0("Failed to get System Metadata for PID of ", pid, "."))
-    log_message(e)
-    e
-  })
-
-  if (inherits(sysmeta, "error")) {
-    return(FALSE)
-  }
+  log_message(paste0("Getting System Metadata for PID ", pid, "..."))
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
 
   # Change rightsHolder (if needed)
   if (sysmeta@rightsHolder == subject) {
@@ -294,23 +266,13 @@ update_rights_holder <- function(mn, pid, subject) {
   }
 
   # Update System Metadata
-  update <- tryCatch({
-    log_message(paste0("Updating System Metadata for PID ", pid, "..."))
-    dataone::updateSystemMetadata(mn,
-                                  pid = pid,
-                                  sysmeta = sysmeta)
-  },
-  error = function(e) {
-    log_message(paste0("Failed to update rightsHolder on ", pid, " to ", subject, "."))
-    log_message(e)
-    e
-  })
-
-  if (inherits(update, "error") | update == FALSE) {
-    return(FALSE)
-  }
+  log_message(paste0("Updating System Metadata for PID ", pid, "..."))
+  dataone::updateSystemMetadata(mn,
+                                pid = pid,
+                                sysmeta = sysmeta)
 
   log_message(paste0("Successfully updated System Metadata for PID ", pid, "..."))
+
   return(TRUE)
 }
 
@@ -343,27 +305,29 @@ update_rights_holder <- function(mn, pid, subject) {
 #' @param data_pids
 #' @param child_pids
 update_resource_map <- function(mn,
-                                resource_map_pid,
+                                old_resource_map_pid,
+                                new_resource_map_pid=NA,
                                 metadata_pid,
                                 data_pids,
-                                child_pids=c()) {
+                                child_pids=c(),
+                                public=FALSE) {
 
   # Check arguments
   stopifnot(class(mn) == "MNode")
-  stopifnot(is.character(resource_map_pid),
-            nchar(resource_map_pid) > 0)
+  stopifnot(is.character(old_resource_map_pid),
+            nchar(old_resource_map_pid) > 0)
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
   stopifnot(all(sapply(data_pids, is.character)))
   stopifnot(all(sapply(child_pids, is.character)))
-  stopifnot(is_resource_map(mn, resource_map_pid))
+  stopifnot(is_resource_map(mn, old_resource_map_pid))
 
   # Get the current rightsHolder
   sysmeta <- tryCatch({
-    dataone::getSystemMetadata(mn, resource_map_pid)
+    dataone::getSystemMetadata(mn, old_resource_map_pid)
   },
   error = function(e) {
-    log_message(paste0("Error getting System Metadata for ", resource_map_pid, ":"))
+    log_message(paste0("Error getting System Metadata for ", old_resource_map_pid, ":"))
     log_message(e)
     e
   })
@@ -376,23 +340,25 @@ update_resource_map <- function(mn,
 
   # Set the rightsHolder to us temporarily
   me <- get_token_subject()
-  update_rights_holder(mn, resource_map_pid, me)
+  update_rights_holder(mn, old_resource_map_pid, me)
 
   # Create the replacement resource map
-  new_rm_pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+  if (is.na(new_resource_map_pid)) {
+    new_resource_map_pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+  }
   new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
-                                       resource_map_pid = new_rm_pid)
+                                       resource_map_pid = new_resource_map_pid)
 
   rm(sysmeta)
 
   sysmeta <- tryCatch({
-    log_message(paste("Getting updated copy of System Metadata for ", resource_map_pid))
-    dataone::getSystemMetadata(mn, resource_map_pid)
+    log_message(paste("Getting updated copy of System Metadata for ", old_resource_map_pid))
+    dataone::getSystemMetadata(mn, old_resource_map_pid)
   },
   error = function(e) {
-    log_message(paste0("Error getting System Metadata for ", resource_map_pid, ":"))
+    log_message(paste0("Error getting System Metadata for ", old_resource_map_pid, ":"))
     log_message(e)
     e
   })
@@ -402,39 +368,33 @@ update_resource_map <- function(mn,
   }
 
   new_rm_sysmeta <- sysmeta
-  new_rm_sysmeta@identifier <- new_rm_pid
+  new_rm_sysmeta@identifier <- new_resource_map_pid
   new_rm_sysmeta@size <- file.size(new_rm_path)
   new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha256")
   new_rm_sysmeta@checksumAlgorithm <- "SHA256"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
-  new_rm_sysmeta@obsoletes <- resource_map_pid
+  new_rm_sysmeta@obsoletes <- old_resource_map_pid
+  new_rm_sysmeta <- add_access_rules(new_rm_sysmeta)
+
+  if (public == TRUE) {
+    new_rm_sysmeta <- datapack::addAccessRule(new_rm_sysmeta, "public", "read")
+  }
 
   # Update it
-  resmap_update_response <- tryCatch({
-    log_message(paste0("Updating resource map..."))
-    dataone::updateObject(mn,
-                          pid = resource_map_pid,
-                          newpid = new_rm_pid,
-                          sysmeta = new_rm_sysmeta,
-                          file = new_rm_path
-    )
-  },
-  error = function(e) {
-    log_message("There was an error while updating the resource map:")
-    log_message(e)
-    e
-  })
+  log_message(paste0("Updating resource map..."))
+  resmap_update_response <- dataone::updateObject(mn,
+                                                  pid = old_resource_map_pid,
+                                                  newpid = new_resource_map_pid,
+                                                  sysmeta = new_rm_sysmeta,
+                                                  file = new_rm_path
+  )
 
   if (file.exists(new_rm_path)) {
     file.remove(new_rm_path)
   }
 
-  if (inherits(resmap_update_response, "error")) {
-    return(NULL)
-  }
-
   new_pid <- get_identifier(resmap_update_response)
-  log_message(paste0("Successfully updated ", resource_map_pid, " with ", new_rm_pid, "."))
+  log_message(paste0("Successfully updated ", old_resource_map_pid, " with ", new_resource_map_pid, "."))
 
   return(new_pid)
 }
