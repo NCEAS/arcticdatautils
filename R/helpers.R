@@ -81,7 +81,9 @@ create_dummy_package <- function(mn, size = 2) {
   log_message(paste0("Creating resource map ", pid))
   dataone::createObject(mn, pid, resmap_path, sysmeta)
 
-  pid
+  list(metadata = meta_pid,
+       data = data_pids,
+       resource_map = pid)
 }
 
 create_dummy_parent_package <- function(mn, children) {
