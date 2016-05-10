@@ -300,10 +300,12 @@ update_rights_holder <- function(mn, pid, subject) {
 #' in place before the update.
 #'
 #' @param mn
-#' @param resource_map_pid
 #' @param metadata_pid
 #' @param data_pids
+#' @param old_resource_map_pid
+#' @param new_resource_map_pid
 #' @param child_pids
+#' @param public Whether or not to make the new resource map public read (logical)
 update_resource_map <- function(mn,
                                 old_resource_map_pid,
                                 new_resource_map_pid=NA,
@@ -334,6 +336,7 @@ update_resource_map <- function(mn,
   if (is.na(new_resource_map_pid)) {
     new_resource_map_pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
   }
+
   new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
