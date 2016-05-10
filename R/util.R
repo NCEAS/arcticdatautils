@@ -265,10 +265,10 @@ object_exists <- function(mn, pid) {
   response <- httr::GET(url)
 
   if (!inherits(response, "response") || response$status_code != 200){
-    return(invisible(FALSE))
+    return(FALSE)
+  } else {
+    return(TRUE)
   }
-
-  invisible(TRUE)
 }
 
 
