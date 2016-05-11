@@ -264,7 +264,7 @@ update_rights_holder <- function(mn, pid, subject) {
 
   # Change rightsHolder (if needed)
   if (sysmeta@rightsHolder == subject) {
-    log_message(paste0("No change to System Metadata needed because the rightsHolder is already ", subject, "."))
+    log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
     return(TRUE)
   } else {
     sysmeta@rightsHolder <- subject
