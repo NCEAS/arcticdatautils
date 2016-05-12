@@ -50,3 +50,19 @@ test_that("a string can be added to a file", {
   # Clean up
   file.remove(tmp)
 })
+
+test_that("a package id can be changed", {
+  library(EML)
+
+  eml_file <- file.path(system.file("tests", "data", package = "arcticdata"), "example-eml.xml")
+  tmp <- tempfile()
+  file.copy(eml_file, tmp)
+
+  replace_package_id(tmp, "new_package_id")
+
+  doc <- read_eml(tmp)
+  expect_equal(as.character(doc@packageId), "new_package_id")
+
+  # Clean up
+  file.remove(tmp)
+})

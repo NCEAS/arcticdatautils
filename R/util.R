@@ -451,21 +451,13 @@ replace_package_id <- function(path, replacement) {
   stopifnot(is.character(replacement),
             nchar(replacement) > 0)
 
-  result <- tryCatch({
-    xmldoc <- XML::xmlParseDoc(file = path)
-    root <- XML::xmlRoot(xmldoc)
-    XML::xmlAttrs(root) <- c(packageId = replacement,
-                             system = "arcticdata")
+  doc <- EML::read_eml(path)
+  stopifnot(class(doc) == "eml")
 
-    XML::saveXML(xmldoc, path)
-  },
-  error = function(e) {
-    e
-  })
+  doc@packageId <- new("xml_attribute", replacement)
+  doc@system <- new("xml_attribute", "arcticdata")
 
-  if (inherits(result, "error")) {
-    log_message(result)
-  }
+  EML::write_eml(doc, path)
 
   path
 }
