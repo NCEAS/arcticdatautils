@@ -22,8 +22,8 @@
 publish_object <- function(mn,
                            filepath,
                            format_id,
-                           identifier=as.character(NA),
-                           clone_id=as.character(NA)) {
+                           identifier=NULL,
+                           clone_id=NULL) {
 
   if (missing(mn) || missing(filepath) || missing(format_id)) {
     stop("mn, filepath, and format_id are required parameters.")
@@ -34,13 +34,13 @@ publish_object <- function(mn,
   me <- get_token_subject()
 
   # Get the clone_id sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
-  if (!is.na(clone_id)) {
+  if (!is.null(clone_id)) {
     log_message(paste0("Cloning System Metadata for new object from ", clone_id, "."))
     clone_sysmeta <- dataone::getSystemMetadata(mn, clone_id)
   }
 
   # Generate an identifier if not provided
-  if (is.na(identifier)) {
+  if (is.null(identifier)) {
     identifier <- new_uuid()
   }
 
@@ -109,12 +109,13 @@ publish_update <- function(mn,
                            metadata_old_pid,
                            resmap_old_pid,
                            data_old_pids,
-                           metadata_file_path=as.character(NA),
+                           child_pids=NULL,
+                           metadata_file_path=NULL,
                            use_doi=FALSE,
-                           parent_resmap_pid=as.character(NA),
-                           parent_metadata_pid=as.character(NA),
-                           parent_data_pids=as.character(NA),
-                           parent_child_pids=as.character(NA)) {
+                           parent_resmap_pid=NULL,
+                           parent_metadata_pid=NULL,
+                           parent_data_pids=NULL,
+                           parent_child_pids=NULL) {
 
   # Set up some variables for use later on
   ########################################
@@ -122,7 +123,7 @@ publish_update <- function(mn,
 
   # Get some things from the node
   ###############################
-  if (is.na(metadata_file_path)) {
+  if (is.null(metadata_file_path)) {
     # Get the metadata doc
     log_message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
@@ -198,7 +199,9 @@ publish_update <- function(mn,
                         file = eml_file,
                         sysmeta = metadata_updated_sysmeta)
 
-  update_rights_holder(mn, metadata_sysmeta@identifier, metadata_sysmeta@rightsHolder)
+  update_rights_holder(mn,
+                       metadata_sysmeta@identifier,
+                       metadata_sysmeta@rightsHolder)
 
   log_message("Updated metadata document.")
 
@@ -215,9 +218,8 @@ publish_update <- function(mn,
 
   # Update the parent resource map to add the new package
   #######################################################
-  if (!is.na(parent_resmap_pid)) {
-    if (is.na(parent_metadata_pid) ||
-        is.na(parent_child_pids)) {
+  if (!is.null(parent_resmap_pid)) {
+    if (is.null(parent_metadata_pid)) {
       stop("Missing required parameters to update parent package.")
     }
 
@@ -256,10 +258,8 @@ update_rights_holder <- function(mn, pid, subject) {
   stopifnot(is.character(subject),
             nchar(subject) > 0)
 
-  log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
 
   # Get System Metadata
-  log_message(paste0("Getting System Metadata for PID ", pid, "..."))
   sysmeta <- dataone::getSystemMetadata(mn, pid)
 
   # Change rightsHolder (if needed)
@@ -271,12 +271,10 @@ update_rights_holder <- function(mn, pid, subject) {
   }
 
   # Update System Metadata
-  log_message(paste0("Updating System Metadata for PID ", pid, "..."))
+  log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
   dataone::updateSystemMetadata(mn,
                                 pid = pid,
                                 sysmeta = sysmeta)
-
-  log_message(paste0("Successfully updated System Metadata for PID ", pid, "..."))
 
   return(TRUE)
 }
@@ -313,10 +311,10 @@ update_rights_holder <- function(mn, pid, subject) {
 #' @param public Whether or not to make the new resource map public read (logical)
 update_resource_map <- function(mn,
                                 old_resource_map_pid,
-                                new_resource_map_pid=NA,
+                                new_resource_map_pid=NULL,
                                 metadata_pid,
-                                data_pids=c(),
-                                child_pids=c(),
+                                data_pids=NULL,
+                                child_pids=NULL,
                                 public=FALSE) {
 
   # Check arguments
@@ -336,7 +334,7 @@ update_resource_map <- function(mn,
   update_rights_holder(mn, old_resource_map_pid, me)
 
   # Create the replacement resource map
-  if (is.na(new_resource_map_pid)) {
+  if (is.null(new_resource_map_pid)) {
     new_resource_map_pid <- paste0("resource_map_", new_uuid())
   }
 
