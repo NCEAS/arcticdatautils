@@ -322,7 +322,6 @@ generate_resource_map <- function(metadata_pid,
                                   resolve_base="https://cn.dataone.org/cn/v2/resolve",
                                   resource_map_pid=NULL) {
   stopifnot(length(metadata_pid) == 1)
-  stopifnot(length(metadata_pid) + (length(data_pids) + length(child_pids)) >= 1)
 
   # Uniquify the data and child PIDs
   data_pids <- unique(data_pids)
