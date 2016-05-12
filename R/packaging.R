@@ -317,8 +317,8 @@ insert_package <- function(inventory, package, env=NULL) {
 #'
 #' @examples
 generate_resource_map <- function(metadata_pid,
-                                  data_pids,
-                                  child_pids=c(),
+                                  data_pids=NULL,
+                                  child_pids=NULL,
                                   resolve_base="https://cn.dataone.org/cn/v2/resolve",
                                   resource_map_pid=NULL) {
   stopifnot(length(metadata_pid) == 1)
