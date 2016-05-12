@@ -23,7 +23,7 @@ Imports:
     yaml,
     xml2,
     XML
-Remotes: DataONEorg/dataone,
+Remotes: DataONEorg/rdataone,
     ropensci/datapack,
     ropensci/EML
 License: MIT + file LICENSE
