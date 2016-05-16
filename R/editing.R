@@ -357,6 +357,8 @@ update_resource_map <- function(mn,
   new_rm_sysmeta@checksumAlgorithm <- "SHA256"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
   new_rm_sysmeta@obsoletes <- old_resource_map_pid
+  slot(new_rm_sysmeta, "obsoletedBy", check = FALSE) <- NA
+
   new_rm_sysmeta <- add_admin_group_access(new_rm_sysmeta)
 
   if (public == TRUE) {
