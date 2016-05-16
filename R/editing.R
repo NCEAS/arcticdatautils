@@ -223,6 +223,8 @@ publish_update <- function(mn,
       stop("Missing required parameters to update parent package.")
     }
 
+    log_message("Updating parent resource map...")
+
     # Check to see if the just-updated package is in the list of
     # parent_child_pids, notify the user, and add it to the list
     if (!(resmap_updated_pid %in% parent_child_pids)) {
