@@ -256,19 +256,24 @@ log_message <- function(message=NULL) {
 #' @export
 #'
 #' @examples
-object_exists <- function(mn, pid) {
+object_exists <- function(mn, pids) {
   stopifnot(class(mn) == "MNode",
-            is.character(pid),
-            nchar(pid) > 0)
+            is.character(pids))
 
-  url <- paste0(mn@endpoint, "/meta/", pid)
-  response <- httr::GET(url)
+  result <- vector(mode = "logical", length = length(pids))
 
-  if (!inherits(response, "response") || response$status_code != 200){
-    return(FALSE)
-  } else {
-    return(TRUE)
+  for (i in seq_along(pids)) {
+    url <- paste0(mn@endpoint, "/meta/", pids[i])
+    response <- httr::GET(url)
+
+    if (!inherits(response, "response") || response$status_code != 200) {
+      result[i] <- FALSE
+    } else {
+      result[i] <- TRUE
+    }
   }
+
+  return(result)
 }
 
 
