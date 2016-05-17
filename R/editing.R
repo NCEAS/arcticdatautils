@@ -212,6 +212,7 @@ publish_update <- function(mn,
                       new_resource_map_pid = resmap_updated_pid,
                       metadata_pid = metadata_updated_pid,
                       data_pids = data_old_pids,
+                      child_pids = child_pids,
                       public = TRUE)
 
   message("Updated resource map")
