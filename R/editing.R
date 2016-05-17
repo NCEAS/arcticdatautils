@@ -117,6 +117,21 @@ publish_update <- function(mn,
                            parent_data_pids=NULL,
                            parent_child_pids=NULL) {
 
+  stopifnot(object_exists(mn, metadata_old_pid))
+  stopifnot(object_exists(mn, resmap_old_pid))
+  if (!is.null(data_old_pids))
+    stopifnot(object_exists(mn, data_old_pids))
+  if (!is.null(child_pids))
+    stopifnot(object_exists(mn, child_pids))
+  if (!is.null(parent_resmap_pid))
+  stopifnot(object_exists(mn, parent_resmap_pid))
+  if (!is.null(parent_metadata_pid))
+  stopifnot(object_exists(mn, parent_metadata_pid))
+  if (!is.null(parent_data_pids))
+    stopifnot(object_exists(mn, parent_data_pids))
+  if (!is.null(parent_child_pids))
+    stopifnot(object_exists(mn, parent_child_pids))
+
   # Set up some variables for use later on
   ########################################
   me <- get_token_subject()
@@ -258,6 +273,7 @@ update_rights_holder <- function(mn, pid, subject) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pid),
             nchar(pid) > 0)
+  stopifnot(object_exists(mn, pid))
   stopifnot(is.character(subject),
             nchar(subject) > 0)
 
@@ -326,6 +342,15 @@ update_resource_map <- function(mn,
             nchar(old_resource_map_pid) > 0)
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
+
+  log_message("Checking all the object passed in as arguments exist before going on...")
+  stopifnot(object_exists(mn, old_resource_map_pid))
+  stopifnot(object_exists(mn, metadata_pid))
+  if (!is.null(data_pids))
+    stopifnot(object_exists(mn, data_pids))
+  if (!is.null(child_pids))
+    stopifnot(object_exists(mn, child_pids))
+
   stopifnot(is_resource_map(mn, old_resource_map_pid))
 
   # Get the current rightsHolder
