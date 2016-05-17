@@ -132,6 +132,9 @@ publish_update <- function(mn,
   if (!is.null(parent_child_pids))
     stopifnot(object_exists(mn, parent_child_pids))
 
+  # Prepare the response object
+  response <- list()
+
   # Set up some variables for use later on
   ########################################
   me <- get_token_subject()
@@ -214,6 +217,8 @@ publish_update <- function(mn,
                         file = eml_file,
                         sysmeta = metadata_updated_sysmeta)
 
+  response["metadata_pid"] <- metadata_updated_pid
+
   update_rights_holder(mn,
                        metadata_sysmeta@identifier,
                        metadata_sysmeta@rightsHolder)
@@ -222,13 +227,13 @@ publish_update <- function(mn,
 
   # Update the resource map
   #########################
-  update_resource_map(mn,
-                      old_resource_map_pid = resmap_old_pid,
-                      new_resource_map_pid = resmap_updated_pid,
-                      metadata_pid = metadata_updated_pid,
-                      data_pids = data_old_pids,
-                      child_pids = child_pids,
-                      public = TRUE)
+  response["resource_map_pid"] <- update_resource_map(mn,
+                                                      old_resource_map_pid = resmap_old_pid,
+                                                      new_resource_map_pid = resmap_updated_pid,
+                                                      metadata_pid = metadata_updated_pid,
+                                                      data_pids = data_old_pids,
+                                                      child_pids = child_pids,
+                                                      public = TRUE)
 
   message("Updated resource map")
 
@@ -248,13 +253,17 @@ publish_update <- function(mn,
       parent_child_pids <- c(parent_child_pids, resmap_updated_pid)
     }
 
-    update_resource_map(mn,
-                        old_resource_map_pid = parent_resmap_pid,
-                        metadata_pid = parent_metadata_pid,
-                        data_pids = parent_data_pids,
-                        child_pids = parent_child_pids,
-                        public = TRUE)
+    response["parent_resource_map_pid"] <- update_resource_map(mn,
+                                                           old_resource_map_pid = parent_resmap_pid,
+                                                           metadata_pid = parent_metadata_pid,
+                                                           data_pids = parent_data_pids,
+                                                           child_pids = parent_child_pids,
+                                                           public = TRUE)
+
+
   }
+
+  return(response)
 }
 
 
