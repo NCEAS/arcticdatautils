@@ -235,7 +235,7 @@ publish_update <- function(mn,
                                                       child_pids = child_pids,
                                                       public = TRUE)
 
-  message("Updated resource map")
+  log_message("Updated resource map")
 
   # Update the parent resource map to add the new package
   #######################################################
