@@ -323,6 +323,13 @@ generate_resource_map <- function(metadata_pid,
                                   resource_map_pid=NULL) {
   stopifnot(length(metadata_pid) == 1)
 
+  if (is.null(resource_map_pid)) {
+    stop("Argument 'resource_map_pid' was NULL (not set). You must set this argument.")
+  }
+
+  stopifnot(is.character(resource_map_pid),
+            nchar(resource_map_pid) > 0)
+
   # Uniquify the data and child PIDs
   data_pids <- unique(data_pids)
   child_pids <- unique(child_pids)
@@ -372,11 +379,6 @@ generate_resource_map <- function(metadata_pid,
   }
 
   # Add #aggregation aggregates/documenents child resource maps statements
-  if (is.null(resource_map_pid)) {
-    log_message("Generating automated resource map PID")
-    resource_map_pid <- generate_resource_map_pid(metadata_pid)
-  }
-
   for (child_pid in child_pids) {
     # aggregates <-> isAggregatedBy
     relationships <- rbind(relationships,
