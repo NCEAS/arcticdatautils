@@ -486,6 +486,9 @@ update_resource_map <- function(mn,
                                                   file = new_rm_path
   )
 
+  # Set the rightsHolder back
+  update_rights_holder(mn, old_resource_map_pid, previous_rights_holder)
+
   if (file.exists(new_rm_path)) {
     file.remove(new_rm_path)
   }
