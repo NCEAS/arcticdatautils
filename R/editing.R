@@ -273,12 +273,12 @@ publish_update <- function(mn,
 #' the provided system metadata document on the given Member Node.
 #'
 #' @param mn the MNode instance to be changed (MNode)
-#' @param pid the identifier for the object to be changed (character)
+#' @param pids the identifiers for the object to be changed (character)
 #' @param subject the identifier of the new rightsHolder, often an ORCID or DN (character)
 #' @import dataone
 #' @import datapack
 #' @export
-update_rights_holder <- function(mn, pid, subject) {
+update_rights_holder <- function(mn, pids, subject) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -286,9 +286,14 @@ update_rights_holder <- function(mn, pid, subject) {
   stopifnot(is.character(subject),
             nchar(subject) > 0)
 
+  for (pid in pids) {
+    # Get System Metadata
+    sysmeta <- dataone::getSystemMetadata(mn, pid)
 
-  # Get System Metadata
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
+    # Change rightsHolder (if needed)
+    if (sysmeta@rightsHolder == subject) {
+      log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
+    } else {
 
   # Change rightsHolder (if needed)
   if (sysmeta@rightsHolder == subject) {
