@@ -370,9 +370,9 @@ create_resource_map <- function(mn,
   stopifnot(file.exists(path))
 
   actual <- publish_object(mn,
-                          filepath = path,
-                          identifier = pid,
-                          format_id = "http://www.openarchives.org/ore/terms")
+                           filepath = path,
+                           identifier = pid,
+                           format_id = "http://www.openarchives.org/ore/terms")
 
   stopifnot(pid == actual)
 
