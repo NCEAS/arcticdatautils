@@ -308,6 +308,60 @@ update_rights_holder <- function(mn, pids, subject) {
 }
 
 
+#' Create a resource map.
+#'
+#' Similar to but different than update_resource_map in that it uses a create
+#' call instead of an update call.
+#'
+#' @param mn
+#' @param metadata_pid
+#' @param data_pids
+#' @param child_pids
+#'
+#' @return The created resource map's PID (character)
+#' @export
+#'
+#' @examples
+#' create_resource_map(mn, "X", "Y", "Z")
+create_resource_map <- function(mn,
+                                metadata_pid,
+                                data_pids=NULL,
+                                child_pids=NULL) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(metadata_pid),
+            nchar(metadata_pid) > 0)
+
+  log_message("Checking all the object passed in as arguments exist before going on...")
+
+  stopifnot(object_exists(mn, metadata_pid))
+  if (!is.null(data_pids))
+    stopifnot(object_exists(mn, data_pids))
+  if (!is.null(child_pids))
+    stopifnot(object_exists(mn, child_pids))
+
+  pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+
+  path <- generate_resource_map(metadata_pid = metadata_pid,
+                                data_pids = data_pids,
+                                child_pids = child_pids,
+                                resource_map_pid = pid)
+
+  stopifnot(file.exists(path))
+
+  actual <- publish_object(mn,
+                          filepath = path,
+                          identifier = pid,
+                          format_id = "http://www.openarchives.org/ore/terms")
+
+  stopifnot(pid == actual)
+
+  return(pid)
+}
+
+
 #' Update an existing Resource Map with a new one.
 #'
 #' This function is intended to be used to add a few new child packages to a
@@ -353,6 +407,7 @@ update_resource_map <- function(mn,
             nchar(metadata_pid) > 0)
 
   log_message("Checking all the object passed in as arguments exist before going on...")
+
   stopifnot(object_exists(mn, old_resource_map_pid))
   stopifnot(object_exists(mn, metadata_pid))
   if (!is.null(data_pids))
@@ -364,6 +419,8 @@ update_resource_map <- function(mn,
 
   # Get the current rightsHolder
   sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
+  stopifnot(class(sysmeta) == "SystemMetadata")
+
   previous_rights_holder <- sysmeta@rightsHolder
 
   # Set the rightsHolder to us temporarily
@@ -379,11 +436,13 @@ update_resource_map <- function(mn,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
                                        resource_map_pid = new_resource_map_pid)
+  stopifnot(file.exists(new_rm_path))
 
   rm(sysmeta)
 
   log_message(paste("Getting updated copy of System Metadata for ", old_resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
+  stopifnot(class(sysmeta) == "SystemMetadata")
 
   new_rm_sysmeta <- sysmeta
   new_rm_sysmeta@identifier <- new_resource_map_pid
