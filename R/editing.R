@@ -294,20 +294,15 @@ update_rights_holder <- function(mn, pids, subject) {
     if (sysmeta@rightsHolder == subject) {
       log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
     } else {
+      sysmeta@rightsHolder <- subject
 
-  # Change rightsHolder (if needed)
-  if (sysmeta@rightsHolder == subject) {
-    log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
-    return(TRUE)
-  } else {
-    sysmeta@rightsHolder <- subject
+      # Update System Metadata
+      log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
+      dataone::updateSystemMetadata(mn,
+                                    pid = pid,
+                                    sysmeta = sysmeta)
+    }
   }
-
-  # Update System Metadata
-  log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
-  dataone::updateSystemMetadata(mn,
-                                pid = pid,
-                                sysmeta = sysmeta)
 
   return(TRUE)
 }
