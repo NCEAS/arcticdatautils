@@ -263,10 +263,14 @@ object_exists <- function(mn, pids) {
   result <- vector(mode = "logical", length = length(pids))
 
   for (i in seq_along(pids)) {
-    url <- paste0(mn@endpoint, "/meta/", pids[i])
-    response <- httr::GET(url)
+    sysmeta <- tryCatch({
+      suppressWarnings(dataone::getSystemMetadata(mn, pids[i]))
+    },
+    error = function(e) {
+      e
+    })
 
-    if (!inherits(response, "response") || response$status_code != 200) {
+    if (inherits(sysmeta, "error") || class(sysmeta) != "SystemMetadata") {
       result[i] <- FALSE
     } else {
       result[i] <- TRUE
