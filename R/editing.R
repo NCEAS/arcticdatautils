@@ -235,7 +235,7 @@ publish_update <- function(mn,
                                                       child_pids = child_pids,
                                                       public = TRUE)
 
-  update_rights_holder(mn, response["resource_map_pid"], metadata_sysmeta@rightsHolder)
+  update_rights_holder(mn, response[["resource_map_pid"]], metadata_sysmeta@rightsHolder)
 
   log_message("Updated resource map")
 
@@ -262,7 +262,7 @@ publish_update <- function(mn,
                                                                child_pids = parent_child_pids,
                                                                public = TRUE)
 
-    update_rights_holder(mn, response["parent_resource_map_pid"], metadata_sysmeta@rightsHolder)
+    update_rights_holder(mn, response[["parent_resource_map_pid"]], metadata_sysmeta@rightsHolder)
   }
 
   return(response)
