@@ -282,31 +282,47 @@ publish_update <- function(mn,
 #' @export
 update_rights_holder <- function(mn, pids, subject) {
   stopifnot(class(mn) == "MNode")
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
-  stopifnot(object_exists(mn, pid))
+  stopifnot(is.character(pids),
+            all(nchar(pid) > 0))
   stopifnot(is.character(subject),
             nchar(subject) > 0)
 
-  for (pid in pids) {
+  result <- vector(mode = "logical", length = length(pids))
+
+  for (i in seq_along(pids)) {
+    pid <- pids[i]
+
     # Get System Metadata
     sysmeta <- dataone::getSystemMetadata(mn, pid)
 
     # Change rightsHolder (if needed)
     if (sysmeta@rightsHolder == subject) {
       log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
+      result[i] <- TRUE
     } else {
       sysmeta@rightsHolder <- subject
 
       # Update System Metadata
       log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
-      dataone::updateSystemMetadata(mn,
-                                    pid = pid,
-                                    sysmeta = sysmeta)
+      response <- tryCatch({
+        dataone::updateSystemMetadata(mn,
+                                      pid = pid,
+                                      sysmeta = sysmeta)
+      },
+      error = function(e) {
+        log_message(e)
+        e
+      })
+
+      if (inherits(response, "error")) {
+        result[i] <- FALSE
+      } else {
+        result[i] <- TRUE
+      }
     }
   }
 
-  return(TRUE)
+  return(result)
 }
 
 
