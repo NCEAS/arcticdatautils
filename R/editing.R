@@ -254,11 +254,11 @@ publish_update <- function(mn,
     }
 
     response["parent_resource_map_pid"] <- update_resource_map(mn,
-                                                           old_resource_map_pid = parent_resmap_pid,
-                                                           metadata_pid = parent_metadata_pid,
-                                                           data_pids = parent_data_pids,
-                                                           child_pids = parent_child_pids,
-                                                           public = TRUE)
+                                                               old_resource_map_pid = parent_resmap_pid,
+                                                               metadata_pid = parent_metadata_pid,
+                                                               data_pids = parent_data_pids,
+                                                               child_pids = parent_child_pids,
+                                                               public = TRUE)
 
 
   }
