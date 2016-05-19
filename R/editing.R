@@ -1,8 +1,7 @@
 #' editing.R
 #'
 #' High-level functions for managing content.
-#'
-#'
+
 
 #' Publish an object on a member node
 #'
