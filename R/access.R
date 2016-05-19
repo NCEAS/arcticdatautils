@@ -96,6 +96,63 @@ get_related_pids <- function(mn, pid) {
 }
 
 
+#' Change the rightsHolder field for a given PID.
+#'
+#' Update the rights holder to the provided subject for the object identified in
+#' the provided system metadata document on the given Member Node.
+#'
+#' @param mn the MNode instance to be changed (MNode)
+#' @param pids the identifiers for the object to be changed (character)
+#' @param subject the identifier of the new rightsHolder, often an ORCID or DN (character)
+#' @import dataone
+#' @import datapack
+#' @export
+update_rights_holder <- function(mn, pids, subject) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(pids),
+            all(nchar(pid) > 0))
+  stopifnot(is.character(subject),
+            nchar(subject) > 0)
+
+  result <- vector(mode = "logical", length = length(pids))
+
+  for (i in seq_along(pids)) {
+    pid <- pids[i]
+
+    # Get System Metadata
+    sysmeta <- dataone::getSystemMetadata(mn, pid)
+
+    # Change rightsHolder (if needed)
+    if (sysmeta@rightsHolder == subject) {
+      log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
+      result[i] <- TRUE
+    } else {
+      sysmeta@rightsHolder <- subject
+
+      # Update System Metadata
+      log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
+      response <- tryCatch({
+        dataone::updateSystemMetadata(mn,
+                                      pid = pid,
+                                      sysmeta = sysmeta)
+      },
+      error = function(e) {
+        log_message(e)
+        e
+      })
+
+      if (inherits(response, "error")) {
+        result[i] <- FALSE
+      } else {
+        result[i] <- TRUE
+      }
+    }
+  }
+
+  return(result)
+}
+
+
 #' Set the given subject as the rightsHolder and subject with write and
 #' changePermission access for the given PID.
 #'
