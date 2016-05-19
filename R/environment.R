@@ -47,8 +47,8 @@ env_get <- function() {
 #'
 #' $var_three
 #' [1] "some value
-env_load <- function(file=NA) {
-  if (is.na(file)) {
+env_load <- function(file=NULL) {
+  if (is.null(file)) {
     file <- file.path(system.file("inst", package = "arcticdatautils"), "environment.yml")
   }
 
