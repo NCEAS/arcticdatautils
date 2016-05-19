@@ -3,11 +3,11 @@
 context("util")
 
 test_that("identifiers can be extracted", {
-  x <- file.path(system.file("tests", "data", package = "arcticdata"), "example-field-projects-file.xml")
+  x <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-field-projects-file.xml")
   identifier <- extract_local_identifier("field-projects", x)
   expect_equal(identifier, "215.001")
 
-  x <- file.path(system.file("tests", "data", package = "arcticdata"), "example-gateway-file.xml")
+  x <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-gateway-file.xml")
   identifier <- extract_local_identifier("gateway", x)
   expect_equal(identifier, "urn:x-wmo:md:org.aoncadis.www::d9330d2b-4174-11e3-8af4-00c0f03d5b7c")
 })
@@ -30,7 +30,7 @@ test_that("paths can be joined", {
 
 test_that("a string can be added to a file", {
   # Prepare a temp file with an example EML doc
-  eml_file <- file.path(system.file("tests", "data", package = "arcticdata"), "example-eml.xml")
+  eml_file <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-eml.xml")
   tmp <- tempfile()
   file.copy(eml_file, tmp)
 
@@ -54,7 +54,7 @@ test_that("a string can be added to a file", {
 test_that("a package id can be changed", {
   library(EML)
 
-  eml_file <- file.path(system.file("tests", "data", package = "arcticdata"), "example-eml.xml")
+  eml_file <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-eml.xml")
   tmp <- tempfile()
   file.copy(eml_file, tmp)
 
