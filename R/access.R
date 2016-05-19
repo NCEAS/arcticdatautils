@@ -57,7 +57,7 @@ add_admin_group_access <- function(sysmeta) {
 
 
 get_related_pids <- function(mn, pid) {
-  stopifnot(is.character(mn),
+  stopifnot(class(mn) == "Mnode",
             is.character(pid),
             nchar(pid) > 0)
 
@@ -69,7 +69,7 @@ get_related_pids <- function(mn, pid) {
   response <- solr::solr_search(q = sprintf("id:%s", pid_esc),
                                 fl = "identifier,resourceMap,documents",
                                 rows = 1000,
-                                base = paste0(mn, "/query/solr"))
+                                base = paste0(mn@endpoint, "/query/solr"))
 
   if (is.null(response)) {
     warning(paste0("Response was NULL for pid ", pid, "."))
