@@ -24,9 +24,10 @@ publish_object <- function(mn,
                            identifier=NULL,
                            clone_id=NULL) {
 
-  if (missing(mn) || missing(filepath) || missing(format_id)) {
-    stop("mn, filepath, and format_id are required parameters.")
-  }
+  stopifnot(class(mn) == "MNode")
+  stopifnot(file.exists(filepath))
+  stopifnot(is.character(format_id),
+            nchar(format_id) > 0)
 
   # Set up some variables for use later on
   ########################################
