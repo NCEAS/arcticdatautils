@@ -49,7 +49,7 @@ env_get <- function() {
 #' [1] "some value
 env_load <- function(file=NULL) {
   if (is.null(file)) {
-    file <- file.path(system.file("inst", package = "arcticdatautils"), "environment.yml")
+    file <- file.path(system.file(package = "arcticdatautils"), "environment.yml")
   }
 
   stopifnot(file.exists(file))
