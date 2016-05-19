@@ -1,0 +1,26 @@
+development:
+  base_path: ~/src/arctic-data/packages/
+  alternate_path: ~/src/arctic-data/packages-alt/
+  metadata_identifier_scheme: UUID
+  data_identifier_scheme: UUID
+  mn_base_url: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
+  submitter: http://orcid.org/0000-0002-0381-3766
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
+
+test:
+  base_path: ~/acadis/
+  alternate_path: ~/acadis-alt/
+  metadata_identifier_scheme: UUID
+  data_identifier_scheme: UUID
+  mn_base_url: https://dev.nceas.ucsb.edu/knb/d1/mn/v2
+  submitter: http://orcid.org/0000-0002-0381-3766
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
+
+production:
+  base_path: ~/acadis/
+  alternate_path: ~/acadis-alt/
+  metadata_identifier_scheme: DOI
+  data_identifier_scheme: UUID
+  mn_base_url: https://arcticdata.io/metacat/d1/mn/v2
+  submitter: http://orcid.org/0000-0002-0381-3766
+  rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
