@@ -58,11 +58,11 @@ env_load <- function(name=NULL, path=NULL) {
   # Determine the file to load the environment from
   if (!is.null(path)) {
     stopifnot(file.exists(path))
-
     file <- path
   } else {
     file <- file.path(system.file(package = "arcticdatautils"), "environment.yml")
   }
+
   stopifnot(file.exists(file))
 
   # Pull out the content from the YAML file
