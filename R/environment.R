@@ -27,7 +27,8 @@ env_get <- function() {
 #'   var_two: some value
 #'   var_three: some value
 #'
-#' @param file A YAML-formatted environment file.
+#' @param name (Optional) The environment name (character)
+#' @param path (Optional) Path to an environment file (character)
 #'
 #' @return A list of name <-> value pairs.
 #' @export
@@ -47,18 +48,32 @@ env_get <- function() {
 #'
 #' $var_three
 #' [1] "some value
-env_load <- function(file=NULL) {
-  if (is.null(file)) {
-    file <- file.path(system.file(package = "arcticdatautils"), "environment.yml")
+env_load <- function(name=NULL, path=NULL) {
+  # Determine the environment to load
+  if (is.null(name)) {
+    name <- env_get()
   }
 
+  # If ARCTICDATA_ENV is set but a
+  # Determine the file to load the environment from
+  if (!is.null(path)) {
+    stopifnot(file.exists(path))
+
+    file <- path
+  } else {
+    file <- file.path(system.file(package = "arcticdatautils"), "environment.yml")
+  }
   stopifnot(file.exists(file))
 
+  # Pull out the content from the YAML file
   yaml_content <- yaml::yaml.load_file(file)
   stopifnot(length(yaml_content) == 3)
+  stopifnot(name %in% names(yaml_content))
+  env <- yaml_content[name][[1]]
 
-  current_env <- env_get()
-  stopifnot(current_env %in% names(yaml_content))
+  # Load up the MN
+  env$mn <- dataone::MNode(env$mn_base_url)
 
-  yaml_content[current_env][[1]]
+  # Return the list of environmental variables
+  env
 }
