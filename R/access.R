@@ -57,7 +57,7 @@ add_admin_group_access <- function(sysmeta) {
 
 
 get_related_pids <- function(mn, pid) {
-  stopifnot(class(mn) == "Mnode",
+  stopifnot(class(mn) == "MNode",
             is.character(pid),
             nchar(pid) > 0)
 
