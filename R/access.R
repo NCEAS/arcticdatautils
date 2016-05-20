@@ -90,9 +90,9 @@ get_related_pids <- function(mn, pid) {
   print(response)
   cat("\n\n")
 
-  unlist(c(response$identifier,
+  unique(unlist(c(response$identifier,
            stringr::str_split(response$documents, ","),
-           response$resourceMap))
+           response$resourceMap)))
 }
 
 
