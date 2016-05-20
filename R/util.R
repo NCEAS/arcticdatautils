@@ -298,7 +298,7 @@ object_exists <- function(mn, pids) {
 convert_iso_to_eml <- function(full_path, isotoeml=NA) {
   # Load the XSLT from the default location
   if (is.na(isotoeml)) {
-    xsl_path <- file.path(system.file("inst", package = "arcticdatautils"), "iso2eml.xsl")
+    xsl_path <- file.path(system.file(package = "arcticdatautils"), "iso2eml.xsl")
     stopifnot(file.exists(xsl_path))
     isotoeml <- xslt::read_xslt(xsl_path)
   }
