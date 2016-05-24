@@ -1,7 +1,7 @@
 context("EML")
 
 test_that("an EML otherEntity subtree can be created when the sysmeta has a filename", {
-  x <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-sysmeta.xml")
+  x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
@@ -15,7 +15,7 @@ test_that("an EML otherEntity subtree can be created when the sysmeta has a file
 })
 
 test_that("an EML otherEntity subtree can be created when the sysmeta doesn't have a filename ", {
-  x <- file.path(system.file("tests", "data", package = "arcticdatautils"), "example-sysmeta-nofilename.xml")
+  x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta-nofilename.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
