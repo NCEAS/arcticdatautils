@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<d1_v2.0:systemMetadata xmlns:d1_v2.0="http://ns.dataone.org/service/types/v2.0" xmlns:d1="http://ns.dataone.org/service/types/v1">
+    <serialVersion>0</serialVersion>
+    <identifier>some-identifier</identifier>
+    <formatId>application/octet-stream</formatId>
+    <size>1024</size>
+    <checksum algorithm="SHA256">a1b48cf2fbb77d2dfda25565942dd4ce80c62dc9a7a864a97994d1b6833909f2</checksum>
+    <submitter>http://orcid.org/0000-0002-0381-3766</submitter>
+    <rightsHolder>http://orcid.org/0000-0002-0381-3766</rightsHolder>
+    <accessPolicy>
+        <allow>
+            <subject>CN=arctic-data-admins,DC=dataone,DC=org</subject>
+            <permission>read</permission>
+            <permission>write</permission>
+            <permission>changePermission</permission>
+        </allow>
+        <allow>
+            <subject>public</subject>
+            <permission>read</permission>
+        </allow>
+    </accessPolicy><replicationPolicy replicationAllowed="true" numberReplicas="3"/>
+    <archived>false</archived>
+    <dateUploaded>2016-05-24T21:35:06.872+00:00</dateUploaded>
+    <dateSysMetadataModified>2016-05-24T21:35:06.872+00:00</dateSysMetadataModified>
+    <originMemberNode>urn:node:mnTestKNB</originMemberNode>
+    <authoritativeMemberNode>urn:node:mnTestKNB</authoritativeMemberNode>
+</d1_v2.0:systemMetadata>

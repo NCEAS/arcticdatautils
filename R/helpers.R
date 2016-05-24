@@ -2,10 +2,15 @@
 #'
 #' Various helper functions for things like testing the package.
 
-create_dummy_metadata <- function(mn) {
+create_dummy_metadata <- function(mn, data_pids=NULL) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
   the_file <- file.path(system.file("tests/data/example-eml.xml", package = "arcticdatautils"))
+
+  # Add otherEntity elements if needed
+  if (!is.null(data_pids)) {
+    the_file <- add_other_entities(mn, the_file, data_pids)
+  }
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
@@ -15,6 +20,7 @@ create_dummy_metadata <- function(mn) {
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me)
+
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
@@ -53,13 +59,17 @@ create_dummy_object <- function(mn) {
 
 create_dummy_package <- function(mn, size = 2) {
   me <- get_token_subject()
-  meta_pid <- create_dummy_metadata(mn)
+
+  # Data objects
   data_pids <- sapply(1:(size - 1), function(i) {
     create_dummy_object(mn)
   })
 
   # Filter NA pids (failed creates)
   data_pids <- data_pids[!is.na(data_pids)]
+
+  # Metadata objects
+  meta_pid <- create_dummy_metadata(mn, data_pids = data_pids)
 
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   resmap_path <- generate_resource_map(meta_pid,
