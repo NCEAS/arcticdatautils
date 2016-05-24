@@ -296,9 +296,9 @@ create_resource_map <- function(mn,
 
   stopifnot(object_exists(mn, metadata_pid))
   if (!is.null(data_pids))
-    stopifnot(object_exists(mn, data_pids))
+    stopifnot(all(object_exists(mn, data_pids)))
   if (!is.null(child_pids))
-    stopifnot(object_exists(mn, child_pids))
+    stopifnot(all(object_exists(mn, child_pids)))
 
   pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
 
