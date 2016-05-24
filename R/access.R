@@ -56,7 +56,17 @@ add_admin_group_access <- function(sysmeta) {
 }
 
 
-get_related_pids <- function(mn, pid) {
+#' Get the related PIDs for a given PID (i.e. data files, resource maps).
+#'
+#' @param mn
+#' @param pid
+#' @param flatten Whether to flatten the result into a single character vector (logical)
+#'
+#' @return Either a character vector or list
+#' @export
+#'
+#' @examples
+get_related_pids <- function(mn, pid, flatten = TRUE) {
   stopifnot(class(mn) == "MNode",
             is.character(pid),
             nchar(pid) > 0)
@@ -86,13 +96,16 @@ get_related_pids <- function(mn, pid) {
     return(character(length = 0))
   }
 
-  cat("\nDebugging response..\n")
-  print(response)
-  cat("\n\n")
+  if (flatten == TRUE) {
+    return(unique(unlist(c(response$identifier,
+                    stringr::str_split(response$documents, ","),
+                    response$resourceMap))))
+  } else {
+    return(list(pid = response$identifier,
+                documents = stringr::str_split(response$documents, ","),
+                resource_map = response$resourceMap))
+  }
 
-  unique(unlist(c(response$identifier,
-           stringr::str_split(response$documents, ","),
-           response$resourceMap)))
 }
 
 
