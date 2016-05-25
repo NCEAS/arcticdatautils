@@ -124,7 +124,7 @@ get_related_pids <- function(mn, pid, flatten = TRUE) {
 update_rights_holder <- function(mn, pids, subject) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pids),
-            all(nchar(pid) > 0))
+            all(nchar(pids) > 0))
   stopifnot(is.character(subject),
             nchar(subject) > 0)
 

@@ -5,7 +5,8 @@ Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
   person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb")
   )
-Description: Support package for arcticdata.io
+Description: This package provides a set of utility methods for uploading
+  and  editing data on the Arctic Data Catalog.
 Depends:
     R (>= 3.2.3)
 Imports:
@@ -15,6 +16,7 @@ Imports:
     datapack,
     EML,
     httr,
+    methods,
     ncdf4,
     stringr,
     stringi,

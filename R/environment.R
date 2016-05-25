@@ -9,7 +9,7 @@
 #'
 #' @return (character) The environment name.
 #'
-#' @export (list) A list of environmental variables.
+#' @export
 env_get <- function() {
   env <- Sys.getenv("ARCTICDATA_ENV")
 
@@ -32,24 +32,10 @@ env_get <- function() {
 #' @param name (character) Optional. The environment name.
 #' @param path (character) Optional. Path to an environment file.
 #'
-#' @return A list of name <-> value pairs.
+#' @return (list) A list of name-value pairs.
 #' @export
 #'
 #' @examples
-#' #' Loading the above file with `env_load()` would return a list with the shape:
-#' > Sys.setenv("ARCTICDATA_ENV", "some_environment")
-#' > dir()
-#' [1] "env.yml"
-#' > env <- env_load("env.yml)
-#' > env
-#' $var_one
-#' [1] "some value"
-#'
-#' $var_two
-#' [1] "some value"
-#'
-#' $var_three
-#' [1] "some value
 env_load <- function(name=NULL, path=NULL) {
   # Determine the environment to load
   if (is.null(name)) {

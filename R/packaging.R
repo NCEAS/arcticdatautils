@@ -13,7 +13,7 @@
 #'
 #' @export
 #'
-#' @example insert_file(my_inv, "./acadis-gateway/project/A/iso.xml")
+#' @examples
 insert_file <- function(inventory, file, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(file), nchar(file) > 0, file %in% inventory$file)
@@ -21,7 +21,6 @@ insert_file <- function(inventory, file, env=NULL) {
   # Configuration
   if (is.null(env)) {
     env <- env_load("etc/environment.yml")
-    library(dataone)
     env$mn <- dataone::MNode(env$mn_base_url)
   }
 
@@ -94,13 +93,6 @@ insert_file <- function(inventory, file, env=NULL) {
 #' @export
 #'
 #' @examples
-#' insert_package(my_inventory_df, "my_package_id")
-#'
-#' TODO
-#' Add routine to check for the files elsewhere
-#' This should be automated and based upon the inventory file having another
-#' column with that information
-
 insert_package <- function(inventory, package, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(package), nchar(package) > 0, package %in% inventory$package)
@@ -108,7 +100,6 @@ insert_package <- function(inventory, package, env=NULL) {
   # Configuration
   if (is.null(env)) {
     env <- env_load("etc/environment.yml")
-    library(dataone)
     env$mn <- dataone::MNode(env$mn_base_url)
   }
 
@@ -777,7 +768,6 @@ update_package <- function(inventory,
   # Grab the env if one wasn't passed in explicitly
   if (is.null(env)) {
     env <- env_load("etc/environment.yml")
-    library(dataone)
     env$mn <- MNode(env$mn_base_url)
   }
 

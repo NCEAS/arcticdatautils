@@ -215,7 +215,7 @@ publish_update <- function(mn,
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
-  update_rights_holder(mn, metadata_sysmeta@identifier, me)
+  update_rights_holder(mn, metadata_old_pid, me)
 
   dataone::updateObject(mn,
                         pid = metadata_old_pid,
@@ -226,7 +226,7 @@ publish_update <- function(mn,
   response["metadata_pid"] <- metadata_updated_pid
 
   update_rights_holder(mn,
-                       metadata_sysmeta@identifier,
+                       metadata_old_pid,
                        metadata_sysmeta@rightsHolder)
 
   log_message("Updated metadata document.")
@@ -289,7 +289,6 @@ publish_update <- function(mn,
 #' @export
 #'
 #' @examples
-#' create_resource_map(mn, "X", "Y", "Z")
 create_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,

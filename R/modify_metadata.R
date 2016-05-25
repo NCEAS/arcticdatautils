@@ -138,7 +138,7 @@ test_has_bad_enum <- function(path) {
 #' vocabulary. But in the ISO metadata we have, there are newlines and spaces
 #' around that text which causes a check for string equality to fail. i.e.
 #'
-#' 'oceans' != '\n     oceans     \n'
+#' 'oceans' != '     oceans     '
 #'
 #' @param path
 #'
@@ -182,7 +182,7 @@ fix_bad_enum <- function(path) {
 #'   <gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
 #'   <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
 #' </gmd:topicCategory>
-
+#'
 #' @param path
 #'
 #' @return

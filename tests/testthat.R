@@ -1,4 +1,4 @@
 library(testthat)
-library(arcticdata)
+library(arcticdatautils)
 
-test_check("arcticdata")
+test_check("arcticdatautils")

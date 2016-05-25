@@ -14,7 +14,6 @@
 #' @export
 #'
 #' @examples
-#' inv_init()
 inv_init <- function() {
   inventory <- data.frame(stringsAsFactors = FALSE)
 
@@ -35,7 +34,6 @@ inv_init <- function() {
 #' @export
 #'
 #' @examples
-#' inv_load_files("some/file/path.txt", my_inventory)
 inv_load_files <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -200,7 +198,6 @@ inv_load_checksums <- function(inventory, path) {
 #' @export
 #'
 #' @examples
-#' inv_load_dois("dois.txt", my_inv)
 inv_load_dois <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),

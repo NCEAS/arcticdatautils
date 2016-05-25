@@ -5,8 +5,8 @@
 
 #' Create a test metadata object.
 #'
-#' @param mn
-#' @param data_pids
+#' @param mn (MNode) The Member Node.
+#' @param data_pids (character) Optional. PIDs for data objects the metadata documents.
 #'
 #' @export
 create_dummy_metadata <- function(mn, data_pids=NULL) {
@@ -39,7 +39,7 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 
 #' Create a test object.
 #'
-#' @param mn
+#' @param mn (MNode) The Member Node.
 #'
 #' @return
 #' @export
@@ -74,8 +74,8 @@ create_dummy_object <- function(mn) {
 
 #' Create a test package.
 #'
-#' @param mn
-#' @param size
+#' @param mn (MNode) The Member Node.
+#' @param size (numeric) The number of files in the package.
 #'
 #' @return
 #' @export
@@ -122,8 +122,8 @@ create_dummy_package <- function(mn, size = 2) {
 
 #' Create a test parent package.
 #'
-#' @param mn
-#' @param children
+#' @param mn (MNode) The Member Node.
+#' @param children (character) Child package (resource maps) PIDs.
 #'
 #' @return
 #' @export

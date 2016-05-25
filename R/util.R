@@ -43,19 +43,6 @@ extract_local_identifier <- function(type, file) {
 }
 
 
-#' Guess format from filename for a vector of filenames.
-#'
-#' @param filenames (character)
-#'
-#' @return (character) DataOne format identifiers strings.
-#' @export
-#'
-#' @examples
-#'
-# TODO: NETCDF and other formats that aren't obvious from file ext
-# TODO: Put this with the package as data
-# TODO CLS DAT ASC NETCDF
-# TODO CHECK IF I DEAL WITH .TAR.GZ well OR IF I HAVE TO
 dataone_format_mappings <- list("avi" = "ideo/avi",
                                 "bmp" = "image/bmp",
                                 "bz2" = "application/x-bzip2",
@@ -89,6 +76,14 @@ dataone_format_mappings <- list("avi" = "ideo/avi",
                                 "zip" = "application/zip")
 
 
+#' Guess format from filename for a vector of filenames.
+#'
+#' @param filenames (character)
+#'
+#' @return (character) DataOne format identifiers strings.
+#' @export
+#'
+#' @examples
 guess_format_id <- function(filenames) {
   extensions <- tolower(tools::file_ext(filenames))
   filetypes <- vector(mode = "character", length = length(extensions))
@@ -475,7 +470,7 @@ replace_package_id <- function(path, replacement) {
 #' Adds a string to the title element in the given file.
 #'
 #' @param path (character) Path to the XML file to edit.
-#' @param replacement (character) The new value.
+#' @param string (character) The new value.
 #'
 #' @return
 #' @export
