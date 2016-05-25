@@ -6,9 +6,8 @@
 
 #' Extracts the local identifier for an ACADIS ISO metadata XML file.
 #'
-#' @param type: A string, one of "gateway" or "field-projects". (character)
-#' @param file: A string, a connection, or raw vector (same as xml2::read_xml).
-#'  (character)
+#' @param type (character) A string, one of "gateway" or "field-projects".
+#' @param file (character) A string, a connection, or raw vector (same as xml2::read_xml).
 #'
 #' @returns The identifier string. (character)
 
@@ -48,7 +47,7 @@ extract_local_identifier <- function(type, file) {
 #'
 #' @param filenames (character)
 #'
-#' @return DataOne format identifiers (character)
+#' @return (character) DataOne format identifiers strings.
 #' @export
 #'
 #' @examples
@@ -110,9 +109,9 @@ guess_format_id <- function(filenames) {
 
 #' Determine the DataONE format ID for the NetCDF file provided by path.
 #'
-#' @param path Full or relative path to the file in question. (character)
+#' @param path (character) Full or relative path to the file in question.
 #'
-#' @return The DataONE format ID (character)
+#' @return (character) The DataONE format ID.
 #' @export
 #'
 #' @examples
@@ -153,9 +152,9 @@ get_netcdf_format_id <- function(path) {
 
 #' Print a random dataset.
 #'
-#' @param inventory An inventory (data.frame)
-#' @param theme (optional) A package theme name (character)
-#' @param n (optional) The number of files to show (numeric)
+#' @param inventory (data.frame) An inventory.
+#' @param theme (character) Optional. A package theme name.
+#' @param n (numeric) Optional. The number of files to show.
 #'
 #' @return Nothing.
 #' @export
@@ -212,7 +211,7 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
 #' to decide the location of the log file. If that envvar isn't set, it defaults
 #' to 'arcticdata-log.txt'.
 #'
-#' @param message Your log message (character)
+#' @param message (character) Your log message.
 #'
 #' @return Nothing.
 #' @export
@@ -249,10 +248,10 @@ log_message <- function(message=NULL) {
 #' This is a simple check for the HTTP status of a /meta/{PID} call on the
 #' provided member node.
 #'
-#' @param mn_base_url Member Node to query (character)
-#' @param pid PID to check the existence of (character)
+#' @param mn_base_url (character) Member Node to query.
+#' @param pid (character) PID to check the existence of.
 #'
-#' @return Whether the object exists (logical)
+#' @return (logical) Whether the object exists.
 #' @export
 #'
 #' @examples
@@ -288,10 +287,10 @@ object_exists <- function(mn, pids) {
 #' is that I have the XSLT file in a hard-linked directory on my computer
 #' because we're still actively developing the XSLT.
 #'
-#' @param full_path Path to the file to convert. (character)
-#' @param isotoeml the XSLT object to be used for transformation
+#' @param full_path (character) Path to the file to convert.
+#' @param isotoeml (xslt) the XSLT object to be used for transformation.
 #'
-#' @return Location of the converted file (character)
+#' @return (character) Location of the converted file.
 #' @export
 #'
 #' @examples
@@ -346,7 +345,7 @@ convert_iso_to_eml <- function(full_path, isotoeml=NA) {
 #'
 #' @param path file path to the EML document to process (character)
 #'
-#' @return path to the converted EML file (character)
+#' @return path (character) Path to the converted EML file.
 #' @import XML
 #' @export
 substitute_eml_party <- function(path) {
@@ -381,7 +380,9 @@ substitute_eml_party <- function(path) {
 #' parse it into tokens,and reformat the individualName with new children nodes
 #'
 #' @param party the XML node containing a subclass of eml:ResponsibleParty
+#'
 #' @return the modified XML node
+#'
 #' @import XML
 #' @export
 change_eml_name <- function(party) {
@@ -448,8 +449,8 @@ change_eml_name <- function(party) {
 #' Replace the EML 'packageId' attribute on the root element with a
 #' certain value.
 #'
-#' @param path Path to the XML file to edit. (character)
-#' @param replacement The new value (character)
+#' @param path (character) Path to the XML file to edit.
+#' @param replacement (character) The new value.
 #'
 #' @return
 #' @export
@@ -473,8 +474,8 @@ replace_package_id <- function(path, replacement) {
 
 #' Adds a string to the title element in the given file.
 #'
-#' @param path Path to the XML file to edit. (character)
-#' @param replacement The new value (character)
+#' @param path (character) Path to the XML file to edit.
+#' @param replacement (character) The new value.
 #'
 #' @return
 #' @export
@@ -506,6 +507,15 @@ add_string_to_title <- function(path, string) {
 }
 
 
+#' Add a set of additional identifiers to an EML document.
+#'
+#' @param path (character) Path to the EML document.
+#' @param identifiers (character) Set of identifiers to add.
+#'
+#' @return (character) Path to the modified document.
+#' @export
+#'
+#' @examples
 add_additional_identifiers <- function(path, identifiers) {
   stopifnot(is.character(file),
             nchar(file) > 0,
@@ -548,13 +558,6 @@ add_additional_identifiers <- function(path, identifiers) {
   path
 }
 
-create_alternate_identifier_node <- function(identifier) {
-  stopifnot(is.character(identifier),
-            nchar(identifier) > 0)
-
-
-}
-
 
 #' (Intelligently) join (possibly redudant) path parts together.
 #'
@@ -563,7 +566,7 @@ create_alternate_identifier_node <- function(identifier) {
 #'
 #' @param path_parts (character)
 #'
-#' @return The joined path string (character)
+#' @return (character)The joined path string.
 #' @export
 #'
 #' @examples
@@ -588,11 +591,11 @@ path_join <- function(path_parts=c("")) {
 
 #' Test whether an object is a particular format ID.
 #'
-#' @param mn
-#' @param pid
-#' @param format_id
+#' @param mn (MNode)
+#' @param pid (character)
+#' @param format_id (character)
 #'
-#' @return
+#' @return (logical)
 #' @export
 #'
 #' @examples
@@ -625,6 +628,15 @@ is_format_id <- function(mn, pid, format_id) {
   }
 }
 
+#' Determines whether the object with the given PID is a resource map.
+#'
+#' @param mn (MNode)
+#' @param pid (character)
+#'
+#' @return (logical)
+#' @export
+#'
+#' @examples
 is_resource_map <- function(mn, pid) {
   is_format_id(mn, pid, "http://www.openarchives.org/ore/terms")
 }
@@ -632,7 +644,7 @@ is_resource_map <- function(mn, pid) {
 
 #' Returns the subject of the set dataone_test_token
 #'
-#' @return
+#' @return (character) The token subject.
 #' @export
 #'
 #' @examples
@@ -664,7 +676,7 @@ get_token_subject <- function() {
 #'
 #' @param dataone_response ("XMLInternalDocument" "XMLAbstractDocument")
 #'
-#' @return
+#' @return (character) The PID.
 #' @export
 #'
 #' @examples
@@ -676,7 +688,7 @@ get_identifier <- function(dataone_response) {
 
 #' Helper function to generate a new UUID PID.
 #'
-#' @return
+#' @return (character) A new UUID PID.
 #' @export
 #'
 #' @examples

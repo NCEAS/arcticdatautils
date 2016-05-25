@@ -10,13 +10,16 @@
 #' system metadata for that identifier and use it to provide rightsHolder, accessPolicy,
 #' and replicationPolicy metadata. Note that this function only uploads the object to
 #' the Member Node, and does not add it to a data package, which can be done separately.
-#' @param mn The Member Node to publish the object to (MNode)
+#'
+#' @param mn (MNode) The Member Node to publish the object to.
 #' @param filepath the path to the file to be published
 #' @param formatId the dataone format identifier
-#' @param identifier optional string to be used as an identifer
+#' @param identifier Optional. String to be used as an identifer
 #' @param clone_id optional string identifier or an object whose sysmeta should be cloned
+#'
 #' @import dataone
 #' @import datapack
+#'
 #' @export
 publish_object <- function(mn,
                            filepath,
@@ -91,7 +94,8 @@ publish_object <- function(mn,
 #' should be updated as well, using the parent_medata_pid, parent_data_pids, and
 #' parent_child_pids as members of the updated package. In all cases, the objects
 #' are made publicly readable.
-#' @param mn The Member Node to update the object on (MNode)
+#'
+#' @param mn (MNode)The Member Node to update the object on.
 #' @param metadata_old_pid The PID of the EML metadata document to be updated
 #' @param resmap_old_pid The PID of the resource map for the package
 #' @param data_old_pids a vector of PIDs of data objects in the package
@@ -101,9 +105,11 @@ publish_object <- function(mn,
 #' @param parent_metadata_pid optional identifier for the metadata document of the parent package
 #' @param parent_data_pids optional vector of identifiers of data in the parent package
 #' @param parent_child_pids optional vector of identifiers of child packages in the parent package
+#'
 #' @import dataone
 #' @import datapack
 #' @import EML
+#'
 #' @export
 publish_update <- function(mn,
                            metadata_old_pid,
@@ -352,6 +358,8 @@ create_resource_map <- function(mn,
 #' @param new_resource_map_pid
 #' @param child_pids
 #' @param public Whether or not to make the new resource map public read (logical)
+#'
+#' @export
 update_resource_map <- function(mn,
                                 old_resource_map_pid,
                                 new_resource_map_pid=NULL,

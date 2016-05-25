@@ -7,7 +7,9 @@
 
 #' Get the current environment name.
 #'
-#' @return The environment name (character)
+#' @return (character) The environment name.
+#'
+#' @export (list) A list of environmental variables.
 env_get <- function() {
   env <- Sys.getenv("ARCTICDATA_ENV")
 
@@ -27,8 +29,8 @@ env_get <- function() {
 #'   var_two: some value
 #'   var_three: some value
 #'
-#' @param name (Optional) The environment name (character)
-#' @param path (Optional) Path to an environment file (character)
+#' @param name (character) Optional. The environment name.
+#' @param path (character) Optional. Path to an environment file.
 #'
 #' @return A list of name <-> value pairs.
 #' @export

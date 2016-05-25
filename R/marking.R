@@ -31,9 +31,9 @@
 #'  - package_nfiles
 #'
 #'
-#' @param inventory An inventory (data.frame)
+#' @param inventory (data.frame) An Inventory.
 #'
-#' @return An inventory (data.frame)
+#' @return (data.frame) An Inventory.
 #' @export
 #'
 #' @examples

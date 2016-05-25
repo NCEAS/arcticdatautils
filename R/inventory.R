@@ -27,10 +27,12 @@ inv_init <- function() {
 #'
 #'   you@server:/path/to/acadis$ find . -type f
 #'
-#' @param path Path to a file containing a file listing.
-#' @param inventory A \code{data.frame}.
+#' @param path (character) Path to a file containing a file listing.
+#' @param inventory (character) A \code{data.frame}.
 #'
 #' @return An inventory (data.frame)
+#'
+#' @export
 #'
 #' @examples
 #' inv_load_files("some/file/path.txt", my_inventory)
@@ -100,10 +102,12 @@ inv_load_files <- function(inventory, path) {
 #' Load file sizes into an inventory from a text file. Removes the column
 #' 'size_bytes' from inventory before doing a left join.
 #'
-#' @param path Path to a file containing sizes.
-#' @param inventory A \code{data.frame}.
+#' @param path (character) Path to a file containing sizes.
+#' @param (data.frame) inventory A \code{data.frame}.
 #'
-#' @return An inventory (data.frame)
+#' @return (data.frame) An inventory
+#'
+#' @export
 #'
 #' @examples
 inv_load_sizes <- function(inventory, path) {
@@ -140,10 +144,12 @@ inv_load_sizes <- function(inventory, path) {
 #' removes the column 'checksum_sha256' from inventory before doing a
 #' left join.
 #'
-#' @param path Path to a file containing sizes.
-#' @param inventory An inventory (data.frame)
+#' @param path (character) Path to a file containing sizes.
+#' @param inventory (data.frame) An inventory.
 #'
 #' @return An inventory (data.frame)
+#'
+#' @export
 #'
 #' @examples
 inv_load_checksums <- function(inventory, path) {
@@ -187,9 +193,10 @@ inv_load_checksums <- function(inventory, path) {
 #' Load DOIs from a text file into the Inventory.
 #'
 #' @param path Location of a text file with DOIs and file paths. (character)
-#' @param inventory An inventory (data.frame)
+#' @param inventory (data.frame) An inventory.
 #'
-#' @return The modified Inventory (data.frame)
+#' @return (data.frame) The modified Inventory.
+#'
 #' @export
 #'
 #' @examples
@@ -221,10 +228,12 @@ inv_load_dois <- function(inventory, path) {
 #' removes the column 'identifier' from inventory before doing a
 #' left join.
 #'
-#' @param path Path(s) to files containing identifiers.
-#' @param inventory An inventory (data.frame)
+#' @param path (character) Path(s) to files containing identifiers.
+#' @param inventory (data.frame) An inventory.
 #'
-#' @return An inventory (data.frame)
+#' @return (data.frame) An inventory.
+#'
+#' @export
 #'
 #' @examples
 inv_load_identifiers <- function(inventory, paths) {
@@ -259,9 +268,11 @@ inv_load_identifiers <- function(inventory, paths) {
 #' Adds a set of extra columsn to the inventory that are useful for working
 #' with them.
 #'
-#' @param inventory An inventory (data.frame)
+#' @param inventory (data.frame) An inventory.
 #'
 #' @return An inventory (data.frame)
+#'
+#' @export
 inv_add_extra_columns <- function(inventory) {
   stopifnot(class(inventory) == "data.frame", "file" %in% names(inventory))
 
@@ -352,9 +363,9 @@ inv_add_extra_columns <- function(inventory) {
 
 #' Add a column for parent packages.
 #'
-#' @param inventory An Inventory (data.frame)
+#' @param inventory (data.frame) An Inventory.
 #'
-#' @return inventory An Inventory (data.frame)
+#' @return inventory (data.frame) An Inventory.
 #' @export
 #'
 #' @examples
@@ -422,6 +433,15 @@ inv_add_parent_package_column <- function(inventory) {
 
 
 
+#' Update an Inventory with a new Inventory.
+#'
+#' @param inventory (data.frame) The old Inventory.
+#' @param new_state (data.frame) The new Inventory.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 inv_update <- function(inventory, new_state) {
   stopifnot(is.data.frame(inventory),
             is.data.frame(new_state),

@@ -143,7 +143,6 @@ test_has_bad_enum <- function(path) {
 #' @param path
 #'
 #' @return
-#' @export
 #'
 #' @examples
 fix_bad_enum <- function(path) {
@@ -187,7 +186,6 @@ fix_bad_enum <- function(path) {
 #' @param path
 #'
 #' @return
-#' @export
 #'
 #' @examples
 fix_bad_topic <- function(path) {
@@ -298,7 +296,6 @@ fix_bad_topic <- function(path) {
 #' @param path Path to your file you want pretty-printed. (character)
 #'
 #' @return Returns the result of the `system` command (0 = success)
-#' @export
 #'
 #' @examples
 pretty_print <- function(path) {

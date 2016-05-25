@@ -7,9 +7,11 @@
 
 #' Insert a file from a single row of the Inventory.
 #'
-#' @param inventory An Inventory (data.frame)
-#' @param file The fully-qualified relative path to the file. See examples.
-#' @param env (Optional) Specify an environment (list)
+#' @param inventory (data.frame) An Inventory.
+#' @param file (character) The fully-qualified relative path to the file. See examples.
+#' @param env (list) Optional. Specify an environment.
+#'
+#' @export
 #'
 #' @example insert_file(my_inv, "./acadis-gateway/project/A/iso.xml")
 insert_file <- function(inventory, file, env=NULL) {
@@ -82,12 +84,13 @@ insert_file <- function(inventory, file, env=NULL) {
 
 #' Create a single package Data Package from files in the Inventory.
 #'
-#' @param inventory An Inventory (data.frame)
-#' @param package The package identifier (character)
-#' @param child_pids Resource Map PIDs for child Data Packages (character)
-#' @param env Environment variables (list)
+#' @param inventory (data.frame) An Inventory.
+#' @param package (character) The package identifier.
+#' @param child_pids (character) Resource Map PIDs for child Data Packages.
+#' @param env (list) Environment variables.
 #'
 #' @return A list containing PIDs and whether objects were inserted. (list)
+#'
 #' @export
 #'
 #' @examples
@@ -306,13 +309,14 @@ insert_package <- function(inventory, package, env=NULL) {
 #' Generate a Resource Map. This is a convenience wrapper around the constructor
 #' of the `ResourceMap` class from `DataPackage`.
 #'
-#' @param metadata_pid PID of the metadata Object (character)
-#' @param data_pids PID(s) of the data Objects (character)
-#' @param child_pids (Optional) PID(s) of child Resource Maps (character)
-#' @param resolve_base (Optional) The resolve service base URL (character)
-#' @param resource_ma_pid (Optional) The PID to use for the resource map.
+#' @param metadata_pid (character) PID of the metadata Object.
+#' @param data_pids (character) PID(s) of the data Objects.
+#' @param child_pids (character) Optional. PID(s) of child Resource Maps.
+#' @param resolve_base (character) Optional. The resolve service base URL.
+#' @param resource_ma_pid (character) Optional. The PID to use for the resource map.
 #'
 #' @return Absolute path to the Resource Map on disk (character)
+#'
 #' @export
 #'
 #' @examples
@@ -439,6 +443,14 @@ generate_resource_map <- function(metadata_pid,
   outfilepath
 }
 
+#' Generate a PID for a new resource map by appending "resource_map_" to it.
+#'
+#' @param metadata_pid
+#'
+#' @return
+#' @export
+#'
+#' @examples
 generate_resource_map_pid <- function(metadata_pid) {
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
@@ -452,9 +464,9 @@ generate_resource_map_pid <- function(metadata_pid) {
 
 #' Get the already-minted PID from the inventory or mint a new one.
 #'
-#' @param file A single row from the inventory (data.frame)
-#' @param mn The Member Node that will mint the new PID, if needed. (dataone::MNode)
-#' @param scheme The identifier scheme to use. (character)
+#' @param file (data.frame) A single row from the inventory.
+#' @param mn (MNode) The Member Node that will mint the new PID, if needed.
+#' @param scheme (character) The identifier scheme to use.
 #'
 #' @return The identifier (character)
 #' @export
@@ -506,11 +518,11 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 #' This is a wrapper function around the constructor for a
 #' dataone::SystemMetadata object.
 #'
-#' @param file file A single row from the inventory (data.frame)
-#' @param base_path The path prefix to use with the contents of `file[1,"filename]` that
-#' will be used to locate the file on disk. (character)
-#' @param submitter The submitter DN string for the object. (character)
-#' @param rights_holder The rights holder DN string for the object. (character)
+#' @param file (data.frame) A single row from the inventory.
+#' @param base_path (character) The path prefix to use with the contents of `file[1,"filename]` that
+#' will be used to locate the file on disk.
+#' @param submitter (character) The submitter DN string for the object.
+#' @param rights_holder (character) The rights holder DN string for the object.
 #'
 #' @return The sysmeta object (dataone::SystemMetadata)
 #' @export
@@ -574,10 +586,10 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 
 #' Create an object from a row of the inventory.
 #'
-#' @param file A row from the inventory (data.frame)
-#' @param sysmeta The file's sysmeta (dataone::SystemMetadata)
-#' @param base_path
-#' @param mn
+#' @param file (data.frame)A row from the inventory.
+#' @param sysmeta (SystemMetadata) The file's sysmeta.
+#' @param base_path (character)
+#' @param mn (MNode)
 #'
 #' @return
 #' @export
@@ -649,6 +661,14 @@ create_object <- function(file, sysmeta, base_path, mn) {
 }
 
 
+#' Validate an Inventory.
+#'
+#' @param inventory
+#'
+#' @return
+#' @export
+#'
+#' @examples
 validate_inventory <- function(inventory) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0,
@@ -663,6 +683,14 @@ validate_inventory <- function(inventory) {
                   "ready") %in% names(inventory)))
 }
 
+#' Validate an environment.
+#'
+#' @param env
+#'
+#' @return
+#' @export
+#'
+#' @examples
 validate_environment <- function(env) {
   env_default_components <- c("base_path",
                               "alternate_path",
@@ -681,6 +709,15 @@ validate_environment <- function(env) {
 }
 
 
+#' Calculate a set of child PIDs for a given package.
+#'
+#' @param inventory
+#' @param package
+#'
+#' @return
+#' @export
+#'
+#' @examples
 determine_child_pids <- function(inventory, package) {
   stopifnot(all(c("package", "parent_package", "is_metadata") %in% names(inventory)))
 

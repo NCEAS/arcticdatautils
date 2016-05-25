@@ -8,7 +8,7 @@
 #' This is a function because I add a set of standard set of access rules to
 #' every object and the access rules don't differ across objects.
 #'
-#' @param sysmeta The SystemMetadata to add rules to (SystemMetadata)
+#' @param sysmeta (SystemMetadata) The SystemMetadata to add rules to.
 #'
 #' @return The modified SystemMetadata object
 #' @export
@@ -60,7 +60,7 @@ add_admin_group_access <- function(sysmeta) {
 #'
 #' @param mn
 #' @param pid
-#' @param flatten Whether to flatten the result into a single character vector (logical)
+#' @param flatten (logical) Whether to flatten the result into a single character vector.
 #'
 #' @return Either a character vector or list
 #' @export
@@ -114,9 +114,10 @@ get_related_pids <- function(mn, pid, flatten = TRUE) {
 #' Update the rights holder to the provided subject for the object identified in
 #' the provided system metadata document on the given Member Node.
 #'
-#' @param mn the MNode instance to be changed (MNode)
-#' @param pids the identifiers for the object to be changed (character)
-#' @param subject the identifier of the new rightsHolder, often an ORCID or DN (character)
+#' @param mn (MNode) The MNode instance to be changed.
+#' @param pids (character) The identifiers for the object to be changed.
+#' @param subject (character) The identifier of the new rightsHolder, often an ORCID or DN.
+#'
 #' @import dataone
 #' @import datapack
 #' @export
@@ -172,10 +173,10 @@ update_rights_holder <- function(mn, pids, subject) {
 #' This function only updates the existing System Metadata if a change is
 #' needed.
 #'
-#' @param mn The Member Node to send the query (MNode)
-#' @param pid The PID to set the access rule for (character)
-#' @param subject The subject of the rule(s) (character)
-#' @param permissions The permissions for the rule (character)
+#' @param mn (MNode) The Member Node to send the query.
+#' @param pid (character) The PID to set the access rule for.
+#' @param subject (character)The subject of the rule(s).
+#' @param permissions (character) The permissions for the rule.
 #'
 #' @return Whether an updated was needed.
 #' @export
@@ -254,9 +255,9 @@ set_rights_and_access <- function(mn, pid, subject, permissions) {
 #' existing System Metadata entries but can be used to replace any subject.
 #'
 #'
-#' @param sysmeta The System Metadata object (SystemMetadata)
-#' @param from The DN string to replace (character)
-#' @param to The DN string to put in place of `from` (character)
+#' @param sysmeta (SystemMetadata) The System Metadata object.
+#' @param from (character) The DN string to replace.
+#' @param to (character) The DN string to put in place of `from`.
 #'
 #' @return The modified System Metadata (SystemMetadata)
 #' @export

@@ -35,6 +35,12 @@ get_token <- function() {
 }
 
 
+#' Determine whether the set token is expired.
+#'
+#' @return
+#' @export
+#'
+#' @examples
 is_token_expired <- function() {
   # Check for presence of the token in options()
   if (!is_token_set()) {
@@ -61,6 +67,14 @@ is_token_expired <- function() {
 }
 
 
+#' Get the base URL of the Member Node.
+#'
+#' @param mn
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_mn_base_url <- function(mn) {
   # Determine MN URL. Accept either an MNode or a character string
   if (class(mn) == "MNode") {
@@ -72,10 +86,11 @@ get_mn_base_url <- function(mn) {
 
 #' Update an object
 #'
+#' @param mn
 #' @param oldpid
 #' @param newpid
 #' @param sysmeta
-#' @param object
+#' @param file
 #'
 #' @return
 #' @export
