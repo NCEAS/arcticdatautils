@@ -10,12 +10,11 @@ test_that("a dummy package can be created", {
 
   library(dataone)
 
-  env <- env_load()
-  mn <- MNode(env$mn_base_url)
+  env <- env_load("development")
 
-  result <- create_dummy_package(mn)
+  result <- create_dummy_package(env$mn)
 
-  expect_true(object_exists(mn, result$metadata))
-  expect_true(object_exists(mn, result$data))
-  expect_true(object_exists(mn, result$resource_map))
+  expect_true(object_exists(env$mn, result$metadata))
+  expect_true(object_exists(env$mn, result$data))
+  expect_true(object_exists(env$mn, result$resource_map))
 })
