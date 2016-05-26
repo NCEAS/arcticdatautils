@@ -12,7 +12,7 @@
 create_dummy_metadata <- function(mn, data_pids=NULL) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
-  the_file <- file.path(system.file("tests/data/example-eml.xml", package = "arcticdatautils"))
+  the_file <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
 
   # Add otherEntity elements if needed
   if (!is.null(data_pids)) {
@@ -33,8 +33,6 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 
   log_message(paste0("Creating metadata ", pid))
   dataone::createObject(mn, pid, the_file, sysmeta)
-
-  pid
 }
 
 #' Create a test object.
