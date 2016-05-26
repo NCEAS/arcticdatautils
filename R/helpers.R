@@ -65,11 +65,11 @@ create_dummy_object <- function(mn) {
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
   log_message(paste0("Creating object ", pid))
-  dataone::createObject(mn, pid, tmp, sysmeta)
+  create_response <- dataone::createObject(mn, pid, tmp, sysmeta)
 
   file.remove(tmp)
 
-  pid
+  create_response
 }
 
 #' Create a test package.
@@ -113,11 +113,11 @@ create_dummy_package <- function(mn, size = 2) {
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
   log_message(paste0("Creating resource map ", pid))
-  dataone::createObject(mn, pid, resmap_path, sysmeta)
+  resource_map_pid <- dataone::createObject(mn, pid, resmap_path, sysmeta)
 
   list(metadata = meta_pid,
        data = data_pids,
-       resource_map = pid)
+       resource_map = resource_map_pid)
 }
 
 #' Create a test parent package.
@@ -152,8 +152,8 @@ create_dummy_parent_package <- function(mn, children) {
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
   log_message(paste0("Creating parent package map ", pid))
-  createObject(mn, pid, resmap_path, sysmeta)
+  create_response <- createObject(mn, pid, resmap_path, sysmeta)
 
-  list(parent = pid,
+  list(parent = create_response,
        children = children)
 }

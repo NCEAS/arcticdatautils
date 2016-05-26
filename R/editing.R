@@ -76,9 +76,9 @@ publish_object <- function(mn,
                                            file = filepath,
                                            sysmeta = sysmeta)
 
-  new_pid <- get_identifier(create_response)
-  log_message(paste0("Published file with identifier: ", new_pid))
-  return(new_pid)
+  log_message(paste0("Published file with identifier: ", create_response))
+
+  return(create_response)
 }
 
 
@@ -443,8 +443,7 @@ update_resource_map <- function(mn,
     file.remove(new_rm_path)
   }
 
-  new_pid <- get_identifier(resmap_update_response)
   log_message(paste0("Successfully updated ", old_resource_map_pid, " with ", new_resource_map_pid, "."))
 
-  return(new_pid)
+  return(resmap_update_response)
 }

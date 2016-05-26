@@ -288,7 +288,6 @@ insert_package <- function(inventory, package, env=NULL) {
   }
   else {
     print(create_resource_map_response)
-    created_resource_map_pid <- XML::xmlToList(create_resource_map_response)
     files$resmap_created <- TRUE
   }
 
@@ -638,14 +637,12 @@ create_object <- function(file, sysmeta, base_path, mn) {
   mb_per_s <- round(file_size_mb / time_diff_sec, 2)
   log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
-  created_pid <- XML::xmlToList(response)
-
-  if (is.character(created_pid) && nchar(created_pid) > 0) {
+  if (is.character(response) && nchar(response) > 0) {
     result <- TRUE
-    log_message(paste0("Successfully created object with PID ", created_pid, " for file ", file[1,"file"], ".\n"))
+    log_message(paste0("Successfully created object with PID ", response, " for file ", file[1,"file"], ".\n"))
   } else {
     result <- FALSE
-    log_message(paste0("Failed to created object with PID ", created_pid, " for file ", file[1,"file"], ".\n"))
+    log_message(paste0("Failed to created object with PID ", response, " for file ", file[1,"file"], ".\n"))
   }
 
   result
