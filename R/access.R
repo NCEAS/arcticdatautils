@@ -99,11 +99,11 @@ get_related_pids <- function(mn, pid, flatten = TRUE) {
   if (flatten == TRUE) {
     return(unique(unlist(c(response$identifier,
                     stringr::str_split(response$documents, ","),
-                    response$resourceMap))))
+                    stringr::str_split(response$resourceMap, ",")))))
   } else {
     return(list(pid = response$identifier,
                 documents = stringr::str_split(response$documents, ","),
-                resource_map = response$resourceMap))
+                resource_map = stringr::str_split(response$resourceMap, ",")))
   }
 
 }
