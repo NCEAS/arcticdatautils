@@ -63,3 +63,39 @@ test_that("we can update a resource map", {
   # Also check it's in the Solr index
   expect_true(updated %in% get_related_pids(env$mn, response$metadata))
 })
+
+test_that("otherEntity elements are set when publishing an update", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Setup
+  library(dataone)
+  library(EML)
+  library(stringr)
+  env <- env_load()
+
+  # Create an initial package
+  response <- create_dummy_package(env$mn)
+
+  # Create a new dummy object
+  data_path <- file.path(system.file("tests", "testfiles", "test-data.csv", package = "arcticdatautils"))
+  object <- publish_object(env$mn, data_path, "text/csv")
+
+  # Note I use the wrong data pid argument here. I send the new data pid instead
+  # which lets me update the data in a package when doing a publish_update()
+  # call
+  update <- publish_update(env$mn,
+                           metadata_old_pid = response$metadata,
+                           resmap_old_pid = response$resource_map,
+                           data_old_pids = object)
+
+  tmp <- tempfile()
+  writeLines(rawToChar(getObject(env$mn, update$metadata)), con = tmp)
+  doc <- read_eml(tmp)
+
+  expect_true(length(doc@dataset@otherEntity) == 1)
+  expect_true(str_detect(doc@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]]@online@url@.Data, object))
+
+  file.remove(tmp)
+})
