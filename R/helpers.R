@@ -37,10 +37,12 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
   log_message(paste0("Creating metadata ", pid))
-  dataone::createObject(mn, pid, metadata_file, sysmeta)
+  pid <- dataone::createObject(mn, pid, metadata_file, sysmeta)
 
   # Remove the temporary EML File
   file.remove(metadata_file)
+
+  pid
 }
 
 #' Create a test object.
