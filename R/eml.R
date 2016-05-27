@@ -59,9 +59,9 @@ sysmeta_to_entity <- function(sysmeta) {
   phys@scope <- new("xml_attribute", "document")
 
   if (is.na(sysmeta@fileName)) {
-    phys@objectName <- new("objectName", sysmeta@fileName)
-  } else {
     phys@objectName <- new("objectName", "NA")
+  } else {
+    phys@objectName <- new("objectName", sysmeta@fileName)
   }
 
   phys@size <- new("size", format(sysmeta@size, scientific = FALSE))
