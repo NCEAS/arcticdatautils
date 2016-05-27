@@ -228,7 +228,7 @@ publish_update <- function(mn,
                         file = eml_path,
                         sysmeta = metadata_updated_sysmeta)
 
-  response["metadata_pid"] <- metadata_updated_pid
+  response[["metadata"]] <- metadata_updated_pid
 
   # Set rightsHolder back
   update_rights_holder(mn,
@@ -239,15 +239,15 @@ publish_update <- function(mn,
 
   # Update the resource map
   #########################
-  response["resource_map_pid"] <- update_resource_map(mn,
-                                                      old_resource_map_pid = resmap_old_pid,
-                                                      new_resource_map_pid = resmap_updated_pid,
-                                                      metadata_pid = metadata_updated_pid,
-                                                      data_pids = data_old_pids,
-                                                      child_pids = child_pids,
-                                                      public = TRUE)
+  response[["resource_map"]] <- update_resource_map(mn,
+                                                    old_resource_map_pid = resmap_old_pid,
+                                                    new_resource_map_pid = resmap_updated_pid,
+                                                    metadata_pid = metadata_updated_pid,
+                                                    data_pids = data_old_pids,
+                                                    child_pids = child_pids,
+                                                    public = TRUE)
 
-  update_rights_holder(mn, response[["resource_map_pid"]], metadata_sysmeta@rightsHolder)
+  update_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
   log_message("Updated resource map")
 
@@ -267,14 +267,14 @@ publish_update <- function(mn,
       parent_child_pids <- c(parent_child_pids, resmap_updated_pid)
     }
 
-    response["parent_resource_map_pid"] <- update_resource_map(mn,
-                                                               old_resource_map_pid = parent_resmap_pid,
-                                                               metadata_pid = parent_metadata_pid,
-                                                               data_pids = parent_data_pids,
-                                                               child_pids = parent_child_pids,
-                                                               public = TRUE)
+    response[["parent_resource_map"]] <- update_resource_map(mn,
+                                                             old_resource_map_pid = parent_resmap_pid,
+                                                             metadata_pid = parent_metadata_pid,
+                                                             data_pids = parent_data_pids,
+                                                             child_pids = parent_child_pids,
+                                                             public = TRUE)
 
-    update_rights_holder(mn, response[["parent_resource_map_pid"]], metadata_sysmeta@rightsHolder)
+    update_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
 
   return(response)
