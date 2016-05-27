@@ -214,7 +214,8 @@ publish_update <- function(mn,
                                   checksumAlgorithm = "SHA256",
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
-                                  obsoletes = metadata_old_pid)
+                                  obsoletes = metadata_old_pid,
+                                  fileName = "science_metadata.xml")
 
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
