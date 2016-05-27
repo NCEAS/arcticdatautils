@@ -12,18 +12,23 @@
 create_dummy_metadata <- function(mn, data_pids=NULL) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
-  the_file <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
+
+  # Copy the original EML file to a temporary place
+  original_file <- file.path(system.file(package = "arcticdatautils"),
+                             "example-eml.xml")
+  metadata_file <- tempfile()
+  file.copy(original_file, metadata_file)
 
   # Add otherEntity elements if needed
   if (!is.null(data_pids)) {
-    the_file <- add_other_entities(mn, the_file, data_pids)
+    metadata_file <- add_other_entities(mnmetadata_filethe_file, data_pids)
   }
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
-                 size = file.size(the_file),
-                 checksum = digest::digest(the_file, algo = "sha256"),
+                 size = file.size(metadata_file),
+                 checksum = digest::digest(metadata_file, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me)
@@ -32,7 +37,10 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
   log_message(paste0("Creating metadata ", pid))
-  dataone::createObject(mn, pid, the_file, sysmeta)
+  dataone::createObject(mn, pid, metadata_file, sysmeta)
+
+  # Remove the temporary EML File
+  file.remove(metadata_file)
 }
 
 #' Create a test object.
