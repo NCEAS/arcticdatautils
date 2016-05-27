@@ -230,6 +230,9 @@ publish_update <- function(mn,
 
   response[["metadata"]] <- metadata_updated_pid
 
+  # Clean up temporary EML file
+  file.remove(eml_path)
+
   # Set rightsHolder back
   update_rights_holder(mn,
                        metadata_old_pid,
