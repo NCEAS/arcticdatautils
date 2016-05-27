@@ -201,6 +201,10 @@ publish_update <- function(mn,
   # add_other_entities takes a path to the doc.
   eml_path <- tempfile()
   EML::write_eml(eml, eml_path)
+
+  # Add other entity fields
+  eml <- add_other_entities(mn, eml_path, data_old_pids)
+
   # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
