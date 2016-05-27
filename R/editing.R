@@ -192,6 +192,11 @@ publish_update <- function(mn,
   # Replace packageId
   eml@packageId <- new("xml_attribute", metadata_updated_pid)
 
+  # Replace system if needed
+  if (eml@system != "https://arcticdata.io") {
+    eml@system <- new("xml_attribute", "https://arcticdata.io")
+  }
+
   # Write out the document to disk. We do this in part because
   # add_other_entities takes a path to the doc.
   eml_path <- tempfile()
