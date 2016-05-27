@@ -142,11 +142,9 @@ publish_update <- function(mn,
   response <- list()
 
   # Set up some variables for use later on
-  ########################################
   me <- get_token_subject()
 
   # Get some things from the node
-  ###############################
   if (is.null(metadata_file_path)) {
     # Get the metadata doc
     log_message("Getting metadata from the MN.")
@@ -178,7 +176,6 @@ publish_update <- function(mn,
   log_message("Downloaded EML and sysmeta...")
 
   # Generate PIDs for our updated objects
-  ##################################
   if (use_doi) {
     log_message("Minting a new DOI")
     metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
@@ -191,27 +188,25 @@ publish_update <- function(mn,
   resmap_updated_pid <- paste0("resource_map_",  metadata_updated_pid)
 
   # Update the metadata object
-  ############################
 
+  # Replace packageId
   eml@packageId <- new("xml_attribute", metadata_updated_pid)
-  # TODO: remove any EML access sections, as these are handled in sysmeta
-  # slot(eml, "access") <- new("access)
-  # slot(eml@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]], "access") <- new("access")
-  eml_file <- paste0(tempdir(), "/metadata.xml")
-  EML::write_eml(eml, eml_file)
 
+  # Write out the document to disk. We do this in part because
+  # add_other_entities takes a path to the doc.
+  eml_path <- tempfile()
+  EML::write_eml(eml, eml_path)
+  # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
                                   formatId = "eml://ecoinformatics.org/eml-2.1.1",
-                                  size = file.size(eml_file),
-                                  checksum = digest::digest(eml_file, algo = "sha256"),
+                                  size = file.size(eml_path),
+                                  checksum = digest::digest(eml_path, algo = "sha256"),
                                   checksumAlgorithm = "SHA256",
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
                                   obsoletes = metadata_old_pid)
 
-  metadata_updated_sysmeta@originMemberNode <- mn@identifier
-  metadata_updated_sysmeta@authoritativeMemberNode <- mn@identifier
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
@@ -220,11 +215,12 @@ publish_update <- function(mn,
   dataone::updateObject(mn,
                         pid = metadata_old_pid,
                         newpid = metadata_updated_pid,
-                        file = eml_file,
+                        file = eml_path,
                         sysmeta = metadata_updated_sysmeta)
 
   response["metadata_pid"] <- metadata_updated_pid
 
+  # Set rightsHolder back
   update_rights_holder(mn,
                        metadata_old_pid,
                        metadata_sysmeta@rightsHolder)
