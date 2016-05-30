@@ -26,7 +26,6 @@ Imports:
     xml2,
     XML
 Remotes: DataONEorg/rdataone,
-    ropensci/datapack,
     ropensci/EML
 License: MIT + file LICENSE
 LazyData: true
