@@ -75,7 +75,8 @@ sysmeta_to_entity <- function(sysmeta) {
   phys@distribution <- new("ListOfdistribution", list(new("distribution")))
   phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
   phys@distribution[[1]]@online <- new("online")
-  phys@distribution[[1]]@online@url <- new("url", paste0("ecogrid://knb/", sysmeta@identifier))
+  phys@distribution[[1]]@online@url <- new("url", paste0("ecogrid://knb/", get_doc_id(sysmeta@identifier)))
+
   slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
 
   other_entity@physical <- new("ListOfphysical", list(phys))
@@ -125,4 +126,35 @@ add_other_entities <- function(mn, path, pids) {
   stopifnot(EML::eml_validate(path) == TRUE)
 
   path
+}
+
+#' Get the Metacat docid for the given identifier
+#'
+#' @param identifier (character) The identifier to get the docid for
+#'
+#' @return (character) The docid
+#' @export
+#'
+#' @examples
+get_doc_id <- function(identifier) {
+  stopifnot(is.character(identifier),
+            nchar(identifier) > 0)
+
+  # Get the docID from metacat
+  response <- httr::GET(paste0("https://arcticdata.io/metacat/metacat?action=getdocid&pid=", identifier))
+
+  if (response$status_code != 200) {
+    stop(paste0("Failed to get the doc ID for ", identifier, " from Metacat. (HTTP Status was ", response$status_code, ")."))
+  }
+
+  # Parse the response
+  content <- httr::content(response)
+  stopifnot(inherits(content, "xml_document"))
+
+  # Extract the doc ID
+  doc_id <- xml2::xml_text(xml2::xml_find_one(content, "//docid"))
+  stopifnot(is.character(doc_id),
+            nchar(doc_id) > 0)
+
+  doc_id
 }
