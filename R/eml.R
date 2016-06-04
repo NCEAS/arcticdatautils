@@ -140,7 +140,6 @@ add_other_entities <- function(mn, path, pids) {
 #' @export
 #'
 #' @examples
-get_doc_id <- function(identifier) {
 get_doc_id <- function(sysmeta) {
   stopifnot(class(sysmeta) == "SystemMetadata")
 
