@@ -92,6 +92,14 @@ publish_object <- function(mn,
 
 #' Publish an updated data package.
 #'
+#' This function can be used for a variety of tasks:
+#'
+#' \itemize{
+#'   \item Publish an existing package with a DOI
+#'   \item Update a package with new data objects
+#'   \item Update a package with new metadata
+#' }
+#'
 #' The metadata_old_pid and resmap_old_pid provide the identifier of an EML metadata
 #' document and associated resource map, and the data_old_pids vector provides a list
 #' of PIDs of data objects in the package.  Update the metadata file and resource map
@@ -103,10 +111,10 @@ publish_object <- function(mn,
 #' parent_child_pids as members of the updated package. In all cases, the objects
 #' are made publicly readable.
 #'
-#' @param mn (MNode)The Member Node to update the object on.
+#' @param mn (MNode) The Member Node to update the object on.
 #' @param metadata_old_pid The PID of the EML metadata document to be updated
 #' @param resmap_old_pid The PID of the resource map for the package
-#' @param data_old_pids a vector of PIDs of data objects in the package
+#' @param data_old_pids A vector of PIDs of data objects in the package.
 #' @param metadata_file optional filename  of a replacement EML file for the metadata
 #' @param use_doi boolean indicating if a DOI should be used for the metadata
 #' @param parent_resmap_pid optional PID of a parent package to be updated
