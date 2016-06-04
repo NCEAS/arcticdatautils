@@ -109,11 +109,11 @@ add_other_entities <- function(mn, path, pids) {
 
   # Check for any existing otherEntity elements and quit if any are found
   if (length(doc@dataset@otherEntity) != 0) {
-    warning(paste0("Metadata file already contains one or more otherEntity ",
-                   "elements. All existing otherEntity elements will be ",
-                   "removed. If what you passed to data_old_pids was the ",
-                   "complete list of data objects for the new package, ",
-                   "everythng is probably just fine."))
+    log_message(paste0("Metadata file already contains one or more ",
+                       "otherEntity elements. All existing otherEntity ",
+                      "elements will be removed. If what you passed to ",
+                      "data_old_pids was the complete list of data objects ",
+                      "for the new package everythng is probably just fine."))
   }
 
   # Create the otherEntity elements as a list
