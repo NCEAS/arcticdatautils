@@ -9,14 +9,14 @@ test_that("we can publish an update", {
   env <- env_load()
 
   # Make a test package
-  package <- create_dummy_package(env$mn)
+  package <- suppressWarnings(create_dummy_package(env$mn))
   expect_named(package, c("metadata", "data", "resource_map"))
 
   # Publish an update on it
-  update <- publish_update(env$mn,
-                           metadata_old_pid = package$metadata,
-                           data_old_pids = package$data,
-                           resmap_old_pid = package$resource_map)
+  update <- suppressWarnings(publish_update(env$mn,
+                                            metadata_old_pid = package$metadata,
+                                            data_old_pids = package$data,
+                                            resmap_old_pid = package$resource_map))
 
   expect_named(update, c("metadata", "resource_map"))
   expect_true(all(object_exists(env$mn, unlist(update))))
@@ -53,7 +53,7 @@ test_that("we can update a resource map", {
   env <- env_load()
 
   # Create an initial package
-  response <- create_dummy_package(env$mn)
+  response <- suppressWarnings(create_dummy_package(env$mn))
 
   updated <- update_resource_map(env$mn, old_resource_map_pid = response$resource_map, metadata_pid = response$metadata, data_pids = response$data)
 
@@ -76,7 +76,7 @@ test_that("otherEntity elements are set when publishing an update", {
   env <- env_load()
 
   # Create an initial package
-  response <- create_dummy_package(env$mn)
+  response <- suppressWarnings(create_dummy_package(env$mn))
 
   # Create a new dummy object
   data_path <- file.path(system.file("tests", "testfiles", "test-data.csv", package = "arcticdatautils"))
@@ -85,10 +85,10 @@ test_that("otherEntity elements are set when publishing an update", {
   # Note I use the wrong data pid argument here. I send the new data pid instead
   # which lets me update the data in a package when doing a publish_update()
   # call
-  update <- publish_update(env$mn,
-                           metadata_old_pid = response$metadata,
-                           resmap_old_pid = response$resource_map,
-                           data_old_pids = object)
+  update <- suppressWarnings(publish_update(env$mn,
+                                            metadata_old_pid = response$metadata,
+                                            resmap_old_pid = response$resource_map,
+                                            data_old_pids = object))
 
   tmp <- tempfile()
   writeLines(rawToChar(getObject(env$mn, update$metadata)), con = tmp)
