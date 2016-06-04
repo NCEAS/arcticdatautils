@@ -13,9 +13,10 @@
 #'
 #' @param mn (MNode) The Member Node to publish the object to.
 #' @param filepath the path to the file to be published
-#' @param formatId the dataone format identifier
-#' @param identifier Optional. String to be used as an identifer
-#' @param clone_id optional string identifier or an object whose sysmeta should be cloned
+#' @param format_id (character) The format ID to set for
+#' @param pid (character) Optional. The PID to use with the object.
+#' @param sid (character) Optional. The SID to use with the new object.
+#' @param clone_pid (character) PID of objet to clone System Metadata from
 #'
 #' @import dataone
 #' @import datapack
@@ -24,8 +25,9 @@
 publish_object <- function(mn,
                            filepath,
                            format_id,
-                           identifier=NULL,
-                           clone_id=NULL) {
+                           pid=NULL,
+                           sid=NULL,
+                           clone_pid=NULL) {
 
   stopifnot(class(mn) == "MNode")
   stopifnot(file.exists(filepath))
@@ -36,25 +38,30 @@ publish_object <- function(mn,
   ########################################
   me <- get_token_subject()
 
-  # Get the clone_id sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
-  if (!is.null(clone_id)) {
-    log_message(paste0("Cloning System Metadata for new object from ", clone_id, "."))
-    clone_sysmeta <- dataone::getSystemMetadata(mn, clone_id)
+  # Get the clone_pid sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
+  if (!is.null(clone_pid)) {
+    log_message(paste0("Cloning System Metadata for new object from ", clone_pid, "."))
+    clone_sysmeta <- dataone::getSystemMetadata(mn, clone_pid)
   }
 
   # Generate an identifier if not provided
-  if (is.null(identifier)) {
-    identifier <- new_uuid()
+  if (is.null(pid)) {
+    pid <- new_uuid()
   }
 
   sysmeta <- new("SystemMetadata",
-                 identifier = identifier,
+                 identifier = pid,
                  formatId = format_id,
                  size = file.size(filepath),
                  checksum = digest::digest(filepath, algo="sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me)
+
+  if (!is.null(sid)) {
+    log_message(paste0("Setting SID to '", sid, "'."))
+    sysmeta@seriesId <- sid
+  }
 
   sysmeta@originMemberNode <- mn@identifier
   sysmeta@authoritativeMemberNode <- mn@identifier
@@ -67,12 +74,13 @@ publish_object <- function(mn,
     sysmeta@preferredNodes <- clone_sysmeta@preferredNodes
     sysmeta@blockedNodes <- clone_sysmeta@blockedNodes
   }
+
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   sysmeta@fileName <- basename(filepath)
 
   create_response <- dataone::createObject(mn,
-                                           pid = identifier,
+                                           pid = pid,
                                            file = filepath,
                                            sysmeta = sysmeta)
 
@@ -217,6 +225,11 @@ publish_update <- function(mn,
                                   obsoletes = metadata_old_pid,
                                   fileName = "science_metadata.xml")
 
+  # Set the SID if one existed on old metadata object
+  if (!is.na(metadata_sysmeta@seriesId)) {
+    metadata_updated_sysmeta@seriesId <- metadata_sysmeta@seriesId
+  }
+
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
@@ -328,7 +341,7 @@ create_resource_map <- function(mn,
 
   actual <- publish_object(mn,
                            filepath = path,
-                           identifier = pid,
+                           pid = pid,
                            format_id = "http://www.openarchives.org/ore/terms")
 
   stopifnot(pid == actual)

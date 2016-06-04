@@ -102,3 +102,48 @@ test_that("otherEntity elements are set when publishing an update", {
 
   file.remove(tmp)
 })
+
+test_that("an object can be published with a SID", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Setup
+  env <- env_load()
+  library(dataone)
+
+  # Create a dummy object
+  data_path <- file.path(system.file("tests", "testfiles", "test-data.csv", package = "arcticdatautils"))
+  new_sid <- uuid::UUIDgenerate()
+  pid <- publish_object(env$mn,
+                        filepath = data_path,
+                        format_id = "text/csv",
+                        sid = new_sid)
+
+  sysmeta <- getSystemMetadata(env$mn, pid)
+
+  expect_true(sysmeta@seriesId == new_sid)
+})
+
+test_that("SIDs are maintained when publishing an update to an object with a SID",{
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Setup
+  env <- env_load()
+  library(dataone)
+
+  # Create a dummy object
+  metadata_path <- file.path(system.file("example-eml.xml", package = "arcticdatautils"))
+  new_sid <- uuid::UUIDgenerate()
+  pid <- publish_object(env$mn,
+                        filepath = metadata_path,
+                        format_id = "	eml://ecoinformatics.org/eml-2.1.1",
+                        sid = new_sid)
+  resmap_pid <- create_resource_map(env$mn, metadata_pid = pid)
+
+  response <- publish_update(env$mn, metadata_old_pid = pid, resmap_old_pid = resmap_pid)
+
+  response # Finish this test
+})
