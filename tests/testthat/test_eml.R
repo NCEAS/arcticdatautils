@@ -27,3 +27,15 @@ test_that("an EML otherEntity subtree can be created when the sysmeta doesn't ha
   expect_equal(other_entity@entityName@.Data, "NA")
   expect_equal(other_entity@physical[[1]]@dataFormat@externallyDefinedFormat@formatName, "application/octet-stream")
 })
+
+test_that("a methods step can be added to an EML document", {
+  library(XML)
+  library(EML)
+
+  doc <- new("eml")
+  doc <- add_methods_step(doc, "title", "description")
+  doc@dataset@methods@methodStep[[1]]@description@section[[1]]@.Data[[1]]
+
+  expect_true(XML::xmlValue(doc@dataset@methods@methodStep[[1]]@description@section[[1]]@.Data[[1]]) == "title")
+  expect_true(XML::xmlValue(doc@dataset@methods@methodStep[[1]]@description@section[[1]]@.Data[[2]]) == "description")
+})

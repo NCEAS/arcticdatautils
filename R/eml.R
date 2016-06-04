@@ -158,3 +158,36 @@ get_doc_id <- function(identifier) {
 
   doc_id
 }
+
+#' Adds a step to the methods document
+#'
+#' @param doc (eml) The EML document to add the method step to
+#' @param title (character) The title of the method step
+#' @param description (character) The description of the method
+#'
+#' @return (eml) The modified EML document
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add a method step to a fresh document
+#' my_doc <- new("eml")
+#' my_doc <- add_methods_step(my_doc, "some method", "how I did the method")
+#' }
+add_methods_step <- function(doc, title, description) {
+  stopifnot(is(doc, "eml"))
+  stopifnot(is(doc@dataset, "dataset"))
+  stopifnot(is.character(title),
+            nchar(title) > 0)
+  stopifnot(is.character(description),
+            nchar(description) > 0)
+
+  new_step <- new("methodStep",
+                  description  = new("description",
+                                     section = new("section", list(newXMLNode("title", title),
+                                                                   newXMLNode("para", description)))))
+
+  doc@dataset@methods@methodStep[[length(doc@dataset@methods@methodStep) + 1]] <- new_step
+
+  doc
+}
