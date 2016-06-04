@@ -75,7 +75,7 @@ sysmeta_to_entity <- function(sysmeta) {
   phys@distribution <- new("ListOfdistribution", list(new("distribution")))
   phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
   phys@distribution[[1]]@online <- new("online")
-  phys@distribution[[1]]@online@url <- new("url", paste0("ecogrid://knb/", get_doc_id(sysmeta@identifier)))
+  phys@distribution[[1]]@online@url <- new("url", paste0("ecogrid://knb/", get_doc_id(sysmeta)))
 
   slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
 
@@ -130,21 +130,30 @@ add_other_entities <- function(mn, path, pids) {
 
 #' Get the Metacat docid for the given identifier
 #'
-#' @param identifier (character) The identifier to get the docid for
+#' @param sysmeta (SystemMetadata) The sysmeta of the object you want to find
 #'
 #' @return (character) The docid
 #' @export
 #'
 #' @examples
 get_doc_id <- function(identifier) {
-  stopifnot(is.character(identifier),
-            nchar(identifier) > 0)
+get_doc_id <- function(sysmeta) {
+  stopifnot(class(sysmeta) == "SystemMetadata")
+
+  # Hack: Determine whether we should check production or dev Metacat
+  if (sysmeta@originMemberNode == "urn:node:ARCTIC") {
+    metacat_base_url <- "https://arcticdata.io/metacat/metacat"
+  } else {
+    metacat_base_url <- "https://dev.nceas.ucsb.edu/knb/metacat"
+  }
+  # EndHack
 
   # Get the docID from metacat
-  response <- httr::GET(paste0("https://arcticdata.io/metacat/metacat?action=getdocid&pid=", identifier))
+  request_url <- paste0(metacat_base_url, "?action=getdocid&pid=", URLencode(sysmeta@identifier, reserved = TRUE))
+  response <- httr::GET(request_url)
 
   if (response$status_code != 200) {
-    stop(paste0("Failed to get the doc ID for ", identifier, " from Metacat. (HTTP Status was ", response$status_code, ")."))
+    stop(paste0("Failed to get the doc ID for ", sysmeta@identifier, " from Metacat. (HTTP Status was ", response$status_code, ")."))
   }
 
   # Parse the response

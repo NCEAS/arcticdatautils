@@ -1,6 +1,8 @@
 context("EML")
 
 test_that("an EML otherEntity subtree can be created when the sysmeta has a filename", {
+  skip("This test needs to be skipped until ecogrid URLs support DataONE objects.")
+
   x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")
@@ -15,6 +17,8 @@ test_that("an EML otherEntity subtree can be created when the sysmeta has a file
 })
 
 test_that("an EML otherEntity subtree can be created when the sysmeta doesn't have a filename ", {
+  skip("This test needs to be skipped until ecogrid URLs support DataONE objects.")
+
   x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta-nofilename.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")

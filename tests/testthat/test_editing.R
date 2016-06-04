@@ -95,7 +95,10 @@ test_that("otherEntity elements are set when publishing an update", {
   doc <- read_eml(tmp)
 
   expect_true(length(doc@dataset@otherEntity) == 1)
-  expect_true(str_detect(doc@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]]@online@url@.Data, object))
+
+  sysmeta <- getSystemMetadata(env$mn, object)
+  doc_id <- get_doc_id(sysmeta)
+  expect_true(str_detect(doc@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]]@online@url@.Data, doc_id))
 
   file.remove(tmp)
 })
