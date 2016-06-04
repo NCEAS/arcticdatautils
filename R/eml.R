@@ -164,7 +164,10 @@ get_doc_id <- function(sysmeta) {
   stopifnot(inherits(content, "xml_document"))
 
   # Extract the doc ID
-  doc_id <- xml2::xml_text(xml2::xml_find_one(content, "//docid"))
+  doc_id_nodes <- xml2::xml_find_all(content, "//docid")
+  stopifnot(length(doc_id_nodes) == 1)
+
+  doc_id <- xml2::xml_text(doc_id_nodes[[1]])
   stopifnot(is.character(doc_id),
             nchar(doc_id) > 0)
 
