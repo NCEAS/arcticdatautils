@@ -72,7 +72,7 @@ get_related_pids <- function(mn, pid) {
             nchar(pid) > 0)
 
   # Prepare the query parameters
-  pid_esc <- gsub(":", "?", pid)
+  pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
   queryParams <- list(q = paste0("id:", pid_esc),
                       rows = "1000",
                       fl = "identifier,resourceMap,documents")
