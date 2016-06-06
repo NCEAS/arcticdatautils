@@ -71,6 +71,7 @@ get_related_pids <- function(mn, pid) {
             length(pid) == 1,
             nchar(pid) > 0)
 
+  # Prepare the query parameters
   pid_esc <- gsub(":", "?", pid)
   queryParams <- list(q = paste0("id:", pid_esc),
                       rows = "1000",
