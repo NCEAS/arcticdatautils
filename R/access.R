@@ -60,52 +60,40 @@ add_admin_group_access <- function(sysmeta) {
 #'
 #' @param mn
 #' @param pid
-#' @param flatten (logical) Whether to flatten the result into a single character vector.
 #'
-#' @return Either a character vector or list
+#' @return (character) Named character vector.
 #' @export
 #'
 #' @examples
-get_related_pids <- function(mn, pid, flatten = TRUE) {
+get_related_pids <- function(mn, pid) {
   stopifnot(class(mn) == "MNode",
             is.character(pid),
             nchar(pid) > 0)
 
-  # Escape the PID so we can send it to Solr
-  # Here I escape colons only, and with a ? instead of
   pid_esc <- gsub(":", "?", pid)
-  # pid_esc <- URLencode(pid, reserved = TRUE)
+  queryParams <- list(q = paste0("id:", pid_esc),
+                      rows = "1000",
+                      fl = "identifier,resourceMap,documents")
 
-  response <- solr::solr_search(q = sprintf("id:%s", pid_esc),
-                                fl = "identifier,resourceMap,documents",
-                                rows = 1000,
-                                base = paste0(mn@endpoint, "/query/solr"))
+  # Wrap in a try-catch to handle ParseExceptionsn and the like
+  response <- tryCatch({
+    dataone::query(env$mn, queryParams, as = "list")
+  },
+  error = function(e) {
+    log_message("Error occurred during query.")
+    log_message(e)
+    e
+  })
 
+  # Unlist the response
+  response <- unlist(response)
+
+  # Manually set the response to a zero-length character vector when it's NULL
   if (is.null(response)) {
-    warning(paste0("Response was NULL for pid ", pid, "."))
-    return(character(length = 0))
+    response <- vector(mode = "character", length = 0L)
   }
 
-  if (!is.data.frame(response)) {
-    warning(paste0("Response was not a data.frame but was of class ", class(response), " instead."))
-    return(character(length = 0))
-  }
-
-  if (nrow(response) != 1) {
-    warning(paste0("Response did not have one row, as expected, but had ", nrow(response), " rows."))
-    return(character(length = 0))
-  }
-
-  if (flatten == TRUE) {
-    return(unique(unlist(c(response$identifier,
-                    stringr::str_split(response$documents, ","),
-                    stringr::str_split(response$resourceMap, ",")))))
-  } else {
-    return(list(pid = response$identifier,
-                documents = stringr::str_split(response$documents, ","),
-                resource_map = stringr::str_split(response$resourceMap, ",")))
-  }
-
+  response
 }
 
 
