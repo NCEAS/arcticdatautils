@@ -68,6 +68,7 @@ add_admin_group_access <- function(sysmeta) {
 get_related_pids <- function(mn, pid) {
   stopifnot(class(mn) == "MNode",
             is.character(pid),
+            length(pid) == 1,
             nchar(pid) > 0)
 
   pid_esc <- gsub(":", "?", pid)
