@@ -53,4 +53,15 @@ test_that("multiple method steps can be added to an EML document", {
 
   expect_length(doc@dataset@methods@methodStep, 2)
 })
+
+test_that("methods can be cleared from an EML document", {
+  library(EML)
+
+  doc <- new("eml")
+  doc <- add_methods_step(doc, "title", "description")
+
+  expect_length(doc@dataset@methods@methodStep, 1)
+
+  doc <- clear_methods(doc)
+  expect_length(doc@dataset@methods@methodStep, 0)
 })

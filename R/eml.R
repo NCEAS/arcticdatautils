@@ -206,3 +206,27 @@ add_methods_step <- function(doc, title, description) {
 
   doc
 }
+
+#' Clear all methods from the document.
+#'
+#' @param doc (eml) The document to clear methods from.
+#'
+#' @return (eml) The modified document.
+#' @export
+#'
+#' @examples
+#' # First we create a new EML document and add a method
+#' doc <- new("eml")
+#' doc <- add_method_step(doc, "some lab method", "this is how we did it")
+#' doc
+#'
+#' # Then we clear it
+#' clear_methods(doc)
+clear_methods <- function(doc) {
+  stopifnot(is(doc, "eml"))
+
+  # Clear the methods out
+  doc@dataset@methods <- new("MethodsType")
+
+  doc
+}
