@@ -230,3 +230,43 @@ clear_methods <- function(doc) {
 
   doc
 }
+
+#' Create an EML creator subtree from a first, last, and email.
+#'
+#' @param first (character) The first name
+#' @param last (character) The last name
+#' @param email (character) The email address
+#'
+#' @return (creator) The new creator sub-tree.
+#' @export
+#'
+#' @examples
+#' creator("test", "user", test@user.com")
+creator <- function(first, last, email) {
+  stopifnot(all(is.character(c(first, last, email))),
+            all(nchar(c(first, last, email)) > 0))
+
+  # Creat <givenName>
+  given <- new("givenName")
+  given@.Data <- first
+
+  # Create <surName>
+  sur <- new("surName")
+  sur@.Data <- last
+
+  # Create <individualName>
+  indiv_name <- new("individualName")
+  indiv_name@givenName <- new("ListOfgivenName", list(given))
+  indiv_name@surName <- sur
+
+  # Create <electronicMailAddress>
+  email_address <- new("electronicMailAddress")
+  email_address@.Data <- email
+
+  # Create <creator>
+  creator <- new("creator")
+  creator@individualName <- new("ListOfindividualName", list(indiv_name))
+  creator@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+
+  creator
+}

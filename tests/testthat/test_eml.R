@@ -65,3 +65,7 @@ test_that("methods can be cleared from an EML document", {
   doc <- clear_methods(doc)
   expect_length(doc@dataset@methods@methodStep, 0)
 })
+
+test_that("a creator can be created", {
+  x <- creator("test", "user", "test@email.com")
+})
