@@ -242,7 +242,7 @@ clear_methods <- function(doc) {
 #'
 #' @examples
 #' creator("test", "user", test@user.com")
-creator <- function(first, last, email) {
+eml_creator <- function(first, last, email) {
   stopifnot(all(is.character(c(first, last, email))),
             all(nchar(c(first, last, email)) > 0))
 
@@ -270,3 +270,44 @@ creator <- function(first, last, email) {
 
   creator
 }
+
+#' Create an EML contact subtree from a first, last, and email.
+#'
+#' @param first (character) The first name
+#' @param last (character) The last name
+#' @param email (character) The email address
+#'
+#' @return (contact) The new contact sub-tree.
+#' @export
+#'
+#' @examples
+#' eml_contact("test", "user", test@user.com")
+eml_contact <- function(first, last, email) {
+  stopifnot(all(is.character(c(first, last, email))),
+            all(nchar(c(first, last, email)) > 0))
+
+  # Creat <givenName>
+  given <- new("givenName")
+  given@.Data <- first
+
+  # Create <surName>
+  sur <- new("surName")
+  sur@.Data <- last
+
+  # Create <individualName>
+  indiv_name <- new("individualName")
+  indiv_name@givenName <- new("ListOfgivenName", list(given))
+  indiv_name@surName <- sur
+
+  # Create <electronicMailAddress>
+  email_address <- new("electronicMailAddress")
+  email_address@.Data <- email
+
+  # Create <contact>
+  contact <- new("contact")
+  contact@individualName <- new("ListOfindividualName", list(indiv_name))
+  contact@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+
+  contact
+}
+
