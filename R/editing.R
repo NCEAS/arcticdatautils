@@ -56,7 +56,8 @@ publish_object <- function(mn,
                  checksum = digest::digest(filepath, algo="sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
-                 rightsHolder = me)
+                 rightsHolder = me,
+                 fileName = basename(filepath))
 
   if (!is.null(sid)) {
     log_message(paste0("Setting SID to '", sid, "'."))
