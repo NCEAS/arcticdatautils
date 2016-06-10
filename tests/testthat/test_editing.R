@@ -168,5 +168,6 @@ test_that("SIDs are maintained when publishing an update to an object with a SID
 
   response <- publish_update(env$mn, metadata_old_pid = pid, resmap_old_pid = resmap_pid)
 
-  response # Finish this test
+  sysmeta <- getSystemMetadata(env$mn, response$metadata)
+  expect_equal(sysmeta@seriesId, new_sid)
 })
