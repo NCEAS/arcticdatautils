@@ -22,6 +22,29 @@ test_that("we can publish an update", {
   expect_true(all(object_exists(env$mn, unlist(update))))
 })
 
+test_that("an identifier can be manually specified when publishing an update", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Setup
+  env <- env_load()
+
+  # Make a test package
+  package <- create_dummy_package(env$mn)
+  expect_named(package, c("metadata", "data", "resource_map"))
+
+  # Publish an update on it
+  new_identifier <- uuid::UUIDgenerate()
+  update <- publish_update(env$mn,
+                           metadata_old_pid = package$metadata,
+                           data_old_pids = package$data,
+                           resmap_old_pid = package$resource_map,
+                           identifier = new_identifier)
+
+  expect_equal(update$metadata, new_identifier)
+})
+
 test_that("we can create a resource map", {
   if (!is_token_set()) {
     skip("No token set. Skipping test.")
