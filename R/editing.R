@@ -114,13 +114,15 @@ publish_object <- function(mn,
 #' @param mn (MNode) The Member Node to update the object on.
 #' @param metadata_old_pid The PID of the EML metadata document to be updated
 #' @param resmap_old_pid The PID of the resource map for the package
-#' @param data_old_pids A vector of PIDs of data objects in the package.
-#' @param metadata_file optional filename  of a replacement EML file for the metadata
+#' @param data_old_pids A vector of PIDs of data objects in the package
+#' @param identifier (character) Manually specify the identifier for the new metadata object
 #' @param use_doi boolean indicating if a DOI should be used for the metadata
 #' @param parent_resmap_pid optional PID of a parent package to be updated
 #' @param parent_metadata_pid optional identifier for the metadata document of the parent package
 #' @param parent_data_pids optional vector of identifiers of data in the parent package
 #' @param parent_child_pids optional vector of identifiers of child packages in the parent package
+#' @param child_pids
+#' @param metadata_file_path
 #'
 #' @import dataone
 #' @import datapack
@@ -133,6 +135,7 @@ publish_update <- function(mn,
                            data_old_pids=NULL,
                            child_pids=NULL,
                            metadata_file_path=NULL,
+                           identifier=NULL,
                            use_doi=FALSE,
                            parent_resmap_pid=NULL,
                            parent_metadata_pid=NULL,
@@ -192,12 +195,18 @@ publish_update <- function(mn,
   log_message("Downloaded EML and sysmeta...")
 
   # Generate PIDs for our updated objects
-  if (use_doi) {
-    log_message("Minting a new DOI")
-    metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
-    log_message(paste0("Minted a new DOI of ", metadata_updated_pid))
+  if (is.null(identifier)) {
+    if (use_doi) {
+      log_message("Minting a new DOI")
+      metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
+      log_message(paste0("Minted a new DOI of ", metadata_updated_pid, "."))
+    } else {
+      metadata_updated_pid <- new_uuid()
+      log_message(paste0("Using generated UUID PID of ", metadata_updated_pid, "."))
+    }
   } else {
-    metadata_updated_pid <- new_uuid()
+    log_message(paste0("Using manually-specified identifier of ", identifier, "."))
+    metadata_updated_pid <- identifier
   }
 
   # Generate a resource map PID from the new metadata PID
