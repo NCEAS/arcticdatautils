@@ -512,43 +512,23 @@ add_string_to_title <- function(path, string) {
 #'
 #' @examples
 add_additional_identifiers <- function(path, identifiers) {
-  stopifnot(is.character(file),
-            nchar(file) > 0,
+  stopifnot(is.character(path),
+            nchar(path) > 0,
             file.exists(path),
-            is.data.frame(identifiers),
-            nrow(identifiers) == 1)
+            is.character(identifiers),
+            all(lengths(identifiers) > 0))
 
-  # Gather the identifiers into a usable format
-  identifier_types <- c("file_identifier", "identifier", "primary_key", "alternative_identifier")
-  alternate_identifiers <- c()
+  # Make identifiers unique
+  identifiers <- unique(identifiers)
 
-  for (ident_type in identifier_types) {
-    # Skip NA cells
-    if (!(ident_type %in% names(identifiers)) || is.na(identifiers[1,ident_type])) {
-      next
-    }
+  # Get the doc
+  doc <- EML::read_eml(path)
 
-    alternate_identifiers <- c(alternate_identifiers, identifiers[1,ident_type])
-  }
+  # Add the identifiers
+  doc@dataset@alternateIdentifier <- new("ListOfalternateIdentifier", lapply(identifiers, function(identifier) new("alternateIdentifier", identifier)))
 
-  doc <- XML::xmlParseDoc(file = path)
-  datasets <- XML::getNodeSet(doc, "//dataset/title")
-
-  # Stop here if there are more than one <dataset> elements
-  if (length(datasets) != 1) {
-    return(path)
-  }
-
-  # Uniquify the identifiers
-  alternate_identifiers <- unique(alternate_identifiers)
-
-  for (identifier in alternate_identifiers) {
-    log_message(paste0("Adding alternate identifier of ", identifier, "\n"))
-    new_node <- XML::newXMLNode("alternateIdentifier", identifier)
-    XML::addSibling(datasets[[1]], new_node, after = FALSE)
-  }
-
-  XML::saveXML(doc, path, indent = TRUE)
+  # Save document
+  EML::write_eml(doc, path)
 
   path
 }
