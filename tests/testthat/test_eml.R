@@ -83,3 +83,31 @@ test_that("a contact can be created", {
   expect_equal(contact@individualName[[1]]@surName@.Data, "user")
   expect_equal(contact@electronicMailAddress[[1]]@.Data, "test@email.com")
 })
+
+
+test_that("a project can be created", {
+  project <- eml_project("some title", "12345", "a", "user")
+
+  expect_is(project, "project")
+  expect_equal(project@title[[1]]@.Data, "some title")
+  expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "a")
+  expect_equal(project@personnel[[1]]@individualName[[1]]@surName@.Data, "user")
+  expect_equal(project@funding@para[[1]]@.Data[[1]], "12345")
+})
+
+
+test_that("a project can be created with multiple awards", {
+  project <- eml_project("some title", c("12345", "54321"), "a", "user")
+
+  expect_length(project@funding@para, 2)
+  expect_equal(project@funding@para[[1]]@.Data[[1]], "12345")
+  expect_equal(project@funding@para[[2]]@.Data[[1]], "54321")
+})
+
+test_that("a project can be created with multiple organizations", {
+  project <- eml_project("some title", "12345", "a", "user", organizations = c("org1", "org2"))
+
+  expect_length(project@personnel[[1]]@organizationName, 2)
+  expect_equal(project@personnel[[1]]@organizationName[[1]]@.Data, "org1")
+  expect_equal(project@personnel[[1]]@organizationName[[2]]@.Data, "org2")
+})

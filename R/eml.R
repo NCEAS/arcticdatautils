@@ -246,18 +246,7 @@ eml_creator <- function(first, last, email) {
   stopifnot(all(is.character(c(first, last, email))),
             all(nchar(c(first, last, email)) > 0))
 
-  # Creat <givenName>
-  given <- new("givenName")
-  given@.Data <- first
-
-  # Create <surName>
-  sur <- new("surName")
-  sur@.Data <- last
-
-  # Create <individualName>
-  indiv_name <- new("individualName")
-  indiv_name@givenName <- new("ListOfgivenName", list(given))
-  indiv_name@surName <- sur
+  indiv_name <- eml_individual_name(first, last)
 
   # Create <electronicMailAddress>
   email_address <- new("electronicMailAddress")
@@ -286,18 +275,7 @@ eml_contact <- function(first, last, email) {
   stopifnot(all(is.character(c(first, last, email))),
             all(nchar(c(first, last, email)) > 0))
 
-  # Creat <givenName>
-  given <- new("givenName")
-  given@.Data <- first
-
-  # Create <surName>
-  sur <- new("surName")
-  sur@.Data <- last
-
-  # Create <individualName>
-  indiv_name <- new("individualName")
-  indiv_name@givenName <- new("ListOfgivenName", list(given))
-  indiv_name@surName <- sur
+  indiv_name <- eml_individual_name(first, last)
 
   # Create <electronicMailAddress>
   email_address <- new("electronicMailAddress")
@@ -311,3 +289,70 @@ eml_contact <- function(first, last, email) {
   contact
 }
 
+eml_individual_name <- function(first, last) {
+  given <- new("givenName")
+  given@.Data <- first
+
+  sur <- new("surName")
+  sur@.Data <- last
+
+  # Create <individualName>
+  indiv_name <- new("individualName")
+  indiv_name@givenName <- new("ListOfgivenName", list(given))
+  indiv_name@surName <- sur
+
+  indiv_name
+}
+
+
+#' Create an eml-project section.
+#'
+#' Note: This is super-limited right now.
+#'
+#' @param title (character) Title of the project.
+#' @param awards (character) One or more awards for the project.
+#' @param first (character) First name of the person with role `role`.
+#' @param last (character) Last name of the person with role `role`.
+#' @param organizations (character) Optional. One or more organization strings.
+#' @param role (character) Optional. Specify an alternate role.
+#'
+#' @return (project) The new project section.
+#' @export
+#'
+#' @examples
+#' eml_project("Some title", "51231", "Some", "User")
+eml_project <- function(title, awards, first, last, organizations = NULL, role = "originator") {
+  stopifnot(all(sapply(c(title, awards, first, last), is.character)),
+            all(lengths(c(title, awards, first, last)) > 0))
+
+  # project
+  project <- new("project")
+
+  # title
+  title_ele <- new("title")
+  title_ele@.Data <- title
+  project@title <- new("ListOftitle", list(title_ele))
+
+  # personnel
+  personnel <- new("personnel")
+
+  # individualName
+  personnel@individualName <- new("ListOfindividualName", list(eml_individual_name(first, last)))
+
+  # organizationName
+  if (!is.null(organizations)) {
+    organizations <- lapply(organizations, function(org) { o <- new("organizationName"); o@.Data <- org; o } )
+    personnel@organizationName <- new("ListOforganizationName", organizations)
+  }
+
+  # role
+  personnel@role <- new("ListOfrole", list(new("role", role)))
+
+  project@personnel <- new("ListOfpersonnel", list(personnel))
+
+  # funding
+  funding_paras <- lapply(awards, function(awd) { a <- new("para"); a@.Data <- list(awd); a } )
+  project@funding@para <- new("ListOfpara", funding_paras)
+
+  project
+}
