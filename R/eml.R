@@ -134,7 +134,7 @@ add_other_entities <- function(mn, path, pids) {
 
 #' Get the Metacat docid for the given identifier
 #'
-#' @param sysmeta (SystemMetadata) The sysmeta of the object you want to find
+#' @param sysmeta (SystemMetadata) The sysmeta of the object you want to find.
 #'
 #' @return (character) The docid
 #' @export
@@ -176,9 +176,9 @@ get_doc_id <- function(sysmeta) {
 
 #' Adds a step to the methods document
 #'
-#' @param doc (eml) The EML document to add the method step to
-#' @param title (character) The title of the method step
-#' @param description (character) The description of the method
+#' @param doc (eml) The EML document to add the method step to.
+#' @param title (character) The title of the method step.
+#' @param description (character) The description of the method.
 #'
 #' @return (eml) The modified EML document
 #' @export
@@ -233,9 +233,9 @@ clear_methods <- function(doc) {
 
 #' Create an EML creator subtree from a first, last, and email.
 #'
-#' @param first (character) The first name
-#' @param last (character) The last name
-#' @param email (character) The email address
+#' @param first (character) The first name.
+#' @param last (character) The last name.
+#' @param email (character) The email address.
 #'
 #' @return (creator) The new creator sub-tree.
 #' @export
@@ -243,8 +243,8 @@ clear_methods <- function(doc) {
 #' @examples
 #' creator("test", "user", test@user.com")
 eml_creator <- function(first, last, email) {
-  stopifnot(all(is.character(c(first, last, email))),
-            all(nchar(c(first, last, email)) > 0))
+  stopifnot(all(sapply(c(first, last, email), is.character)),
+            all(lengths(c(first, last, email)) > 0))
 
   indiv_name <- eml_individual_name(first, last)
 
@@ -262,9 +262,9 @@ eml_creator <- function(first, last, email) {
 
 #' Create an EML contact subtree from a first, last, and email.
 #'
-#' @param first (character) The first name
-#' @param last (character) The last name
-#' @param email (character) The email address
+#' @param first (character) The first name.
+#' @param last (character) The last name.
+#' @param email (character) The email address.
 #'
 #' @return (contact) The new contact sub-tree.
 #' @export
@@ -272,8 +272,8 @@ eml_creator <- function(first, last, email) {
 #' @examples
 #' eml_contact("test", "user", test@user.com")
 eml_contact <- function(first, last, email) {
-  stopifnot(all(is.character(c(first, last, email))),
-            all(nchar(c(first, last, email)) > 0))
+  stopifnot(all(sapply(c(first, last, email), is.character)),
+            all(lengths(c(first, last, email)) > 0))
 
   indiv_name <- eml_individual_name(first, last)
 
@@ -289,7 +289,21 @@ eml_contact <- function(first, last, email) {
   contact
 }
 
+
+#' Create an EML individualName section
+#'
+#' @param first (character) First name.
+#' @param last (character) Last name.
+#'
+#' @return (individualName) The new individualName section
+#' @export
+#'
+#' @examples
+#' eml_individual_name("some", "user)
 eml_individual_name <- function(first, last) {
+  stopifnot(all(sapply(c(title, awards, first, last), is.character)),
+            all(lengths(c(title, awards, first, last)) > 0))
+
   given <- new("givenName")
   given@.Data <- first
 
