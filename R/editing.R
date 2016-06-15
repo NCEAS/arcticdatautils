@@ -27,7 +27,8 @@ publish_object <- function(mn,
                            format_id,
                            pid=NULL,
                            sid=NULL,
-                           clone_pid=NULL) {
+                           clone_pid=NULL,
+                           public=TRUE) {
 
   stopifnot(class(mn) == "MNode")
   stopifnot(file.exists(filepath))
@@ -124,6 +125,9 @@ publish_object <- function(mn,
 #' @param parent_child_pids optional vector of identifiers of child packages in the parent package
 #' @param child_pids
 #' @param metadata_file_path
+#' @param public (logical) Optional. Whether or not to make the update public.
+#' This applies to the new metadata PID and its resource map and data object
+#' access policies are not affected.
 #'
 #' @import dataone
 #' @import datapack
@@ -141,7 +145,8 @@ publish_update <- function(mn,
                            parent_resmap_pid=NULL,
                            parent_metadata_pid=NULL,
                            parent_data_pids=NULL,
-                           parent_child_pids=NULL) {
+                           parent_child_pids=NULL,
+                           public=TRUE) {
 
   stopifnot(object_exists(mn, metadata_old_pid))
   stopifnot(object_exists(mn, resmap_old_pid))
@@ -251,7 +256,10 @@ publish_update <- function(mn,
   }
 
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
-  metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
+
+  if (public) {
+    metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
+  }
 
   update_rights_holder(mn, metadata_old_pid, me)
 
@@ -281,7 +289,7 @@ publish_update <- function(mn,
                                                     metadata_pid = metadata_updated_pid,
                                                     data_pids = data_old_pids,
                                                     child_pids = child_pids,
-                                                    public = TRUE)
+                                                    public = public)
 
   update_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
@@ -308,7 +316,7 @@ publish_update <- function(mn,
                                                              metadata_pid = parent_metadata_pid,
                                                              data_pids = parent_data_pids,
                                                              child_pids = parent_child_pids,
-                                                             public = TRUE)
+                                                             public = public)
 
     update_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
