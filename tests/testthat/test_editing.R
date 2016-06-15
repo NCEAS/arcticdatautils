@@ -102,8 +102,11 @@ test_that("otherEntity elements are set when publishing an update", {
   response <- create_dummy_package(env$mn)
 
   # Create a new dummy object
-  data_path <- file.path(system.file("tests", "testfiles", "test-data.csv", package = "arcticdatautils"))
-  object <- publish_object(env$mn, data_path, "text/csv")
+  tmp <- tempfile()
+  dummy_df <- data.frame(x = 1:100, y = 1:100)
+  write.csv(dummy_df, file = tmp)
+  object <- publish_object(env$mn, tmp, "text/csv")
+  file.remove(tmp) # Remove dummy data file
 
   # Note I use the wrong data pid argument here. I send the new data pid instead
   # which lets me update the data in a package when doing a publish_update()
@@ -112,6 +115,7 @@ test_that("otherEntity elements are set when publishing an update", {
                            metadata_old_pid = response$metadata,
                            resmap_old_pid = response$resource_map,
                            data_old_pids = object)
+
 
   tmp <- tempfile()
   writeLines(rawToChar(getObject(env$mn, update$metadata)), con = tmp)
@@ -136,12 +140,16 @@ test_that("an object can be published with a SID", {
   library(dataone)
 
   # Create a dummy object
-  data_path <- file.path(system.file("tests", "testfiles", "test-data.csv", package = "arcticdatautils"))
+  tmp <- tempfile()
+  dummy_df <- data.frame(x = 1:100, y = 1:100)
+  write.csv(dummy_df, file = tmp)
+
   new_sid <- uuid::UUIDgenerate()
   pid <- publish_object(env$mn,
-                        filepath = data_path,
+                        filepath = tmp,
                         format_id = "text/csv",
                         sid = new_sid)
+  file.remove(tmp) # Remove dummy data file
 
   sysmeta <- getSystemMetadata(env$mn, pid)
 
