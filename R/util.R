@@ -670,3 +670,56 @@ get_identifier <- function(dataone_response) {
 new_uuid <- function() {
   paste0("urn:uuid:", uuid::UUIDgenerate())
 }
+
+
+#' Get the current package version.
+#'
+#' This function parses the installed DESCRIPTION file to get the latest
+#' version.
+#'
+#' @return (character) The current package version.
+#' @export
+#'
+#' @examples
+get_current_version <- function() {
+  desc_file <- file.path(system.file("DESCRIPTION", package = "arcticdatautils"))
+  desc_lines <- readLines(desc_file)
+  gsub("Version: ", "", desc_lines[grep("Version:", desc_lines)])
+}
+
+
+#' Use the GitHub API to find the latest release for the package.
+#'
+#' @return (character) The latest release.
+#' @export
+#'
+#' @examples
+get_latest_release <- function() {
+  req <- httr::GET("https://api.github.com/repos/NCEAS/arcticdatautils/releases")
+  content <- httr::content(req)
+
+  releases <- do.call(rbind, lapply(content, function(r) data.frame(name = r$name, published = r$published_at, stringsAsFactors = FALSE)))
+  latest <- releases[order(releases$published, decreasing = TRUE)[1], "name"]
+
+  gsub("v", "", latest)
+}
+
+
+#' Warns if the currently-installed version of the package is not the same
+#' version as the latest release on GitHub.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+warn_current_version <- function() {
+  cat("Checking version...")
+  current <- get_current_version()
+  latest <- get_latest_release()
+
+  if (current != latest) {
+    warning(paste0("Your version of the arcticdatautils package is ", current, " but the latest version is ", latest, ".\n  You should upgrade as there may be important bug fixes in newer versions of the package.\n  See https://github.com/NCEAS/arcticdatautils#installing for instructions."))
+  }
+}
+
+
