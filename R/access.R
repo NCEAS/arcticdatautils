@@ -222,6 +222,72 @@ set_public_read <- function(mn, pids) {
   results
 }
 
+#' Remove public access on a set of objects.
+#'
+#' @param mn (MNode)
+#' @param pids (character) A vector of PIDs to set public access on
+#'
+#' @return
+#' @export
+#'
+#' @examples
+remove_public_read <- function(mn, pids) {
+  stopifnot(class(mn) == "MNode",
+            all(is.character(pids)),
+            all(nchar(pids) > 0))
+
+  # Store the results of each attempted update
+  results <- c()
+
+  # Remove public access for each PID
+  for (pid in pids) {
+    sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, pid)
+    },
+    error = function(e) {
+      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", env$mn_base_url, "'.\n"))
+      log_message(e)
+      e
+    })
+
+    if (inherits(sysmeta, "error")) {
+      stop("Failed to get System Metadata.")
+    }
+
+    # Track whether we have changed the record to avoid an uncessary update call
+    changed <- FALSE
+
+    if (!datapack::hasAccessRule(sysmeta, "public", "read")) {
+      log_message(paste0("Skipping setting public read because ", pid, " is not public."))
+      next
+    }
+
+    changed <- TRUE
+
+    log_message(paste0("Removing public read access on ", pid, "."))
+    sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)),]
+
+    # Update the sysmeta
+    update_response <- tryCatch({
+      dataone::updateSystemMetadata(mn, pid, sysmeta)
+    },
+    error = function(e) {
+      log_message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
+      log_message(e)
+      e
+    })
+
+    if (inherits(update_response, "error")) {
+      stop("Failed update.")
+    }
+
+    # Save the result for this PID
+    results[pid] <- changed
+  }
+
+  results
+}
+
 
 #' Set the given subject as the rightsHolder and subject with write and
 #' changePermission access for the given PID.
