@@ -5,18 +5,20 @@
 \title{Publish an updated data package.}
 \usage{
 publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
-  child_pids = NULL, metadata_file_path = NULL, use_doi = FALSE,
-  parent_resmap_pid = NULL, parent_metadata_pid = NULL,
-  parent_data_pids = NULL, parent_child_pids = NULL)
+  child_pids = NULL, metadata_file_path = NULL, identifier = NULL,
+  use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
+  parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE)
 }
 \arguments{
-\item{mn}{(MNode)The Member Node to update the object on.}
+\item{mn}{(MNode) The Member Node to update the object on.}
 
 \item{metadata_old_pid}{The PID of the EML metadata document to be updated}
 
 \item{resmap_old_pid}{The PID of the resource map for the package}
 
-\item{data_old_pids}{a vector of PIDs of data objects in the package}
+\item{data_old_pids}{A vector of PIDs of data objects in the package}
+
+\item{identifier}{(character) Manually specify the identifier for the new metadata object}
 
 \item{use_doi}{boolean indicating if a DOI should be used for the metadata}
 
@@ -28,9 +30,20 @@ publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
 
 \item{parent_child_pids}{optional vector of identifiers of child packages in the parent package}
 
-\item{metadata_file}{optional filename  of a replacement EML file for the metadata}
+\item{public}{(logical) Optional. Whether or not to make the update public.
+This applies to the new metadata PID and its resource map and data object
+access policies are not affected.}
 }
 \description{
+This function can be used for a variety of tasks:
+}
+\details{
+\itemize{
+  \item Publish an existing package with a DOI
+  \item Update a package with new data objects
+  \item Update a package with new metadata
+}
+
 The metadata_old_pid and resmap_old_pid provide the identifier of an EML metadata
 document and associated resource map, and the data_old_pids vector provides a list
 of PIDs of data objects in the package.  Update the metadata file and resource map

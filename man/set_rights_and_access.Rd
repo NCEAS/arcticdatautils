@@ -5,19 +5,19 @@
 \title{Set the given subject as the rightsHolder and subject with write and
 changePermission access for the given PID.}
 \usage{
-set_rights_and_access(mn, pid, subject, permissions)
+set_rights_and_access(mn, pids, subject, permissions)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to send the query.}
 
-\item{pid}{(character) The PID to set the access rule for.}
+\item{pids}{(character) The PID(s) to set the access rule for.}
 
 \item{subject}{(character)The subject of the rule(s).}
 
 \item{permissions}{(character) The permissions for the rule.}
 }
 \value{
-Whether an updated was needed.
+Whether an update was needed.
 }
 \description{
 This function only updates the existing System Metadata if a change is

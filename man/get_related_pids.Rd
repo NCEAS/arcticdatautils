@@ -4,13 +4,13 @@
 \alias{get_related_pids}
 \title{Get the related PIDs for a given PID (i.e. data files, resource maps).}
 \usage{
-get_related_pids(mn, pid, flatten = TRUE)
+get_related_pids(mn, pid)
 }
 \arguments{
-\item{flatten}{(logical) Whether to flatten the result into a single character vector.}
+\item{pid}{}
 }
 \value{
-Either a character vector or list
+(character) Named character vector.
 }
 \description{
 Get the related PIDs for a given PID (i.e. data files, resource maps).

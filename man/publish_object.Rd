@@ -4,18 +4,21 @@
 \alias{publish_object}
 \title{editing.R}
 \usage{
-publish_object(mn, filepath, format_id, identifier = NULL, clone_id = NULL)
+publish_object(mn, filepath, format_id, pid = NULL, sid = NULL,
+  clone_pid = NULL, public = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to publish the object to.}
 
 \item{filepath}{the path to the file to be published}
 
-\item{identifier}{Optional. String to be used as an identifer}
+\item{format_id}{(character) The format ID to set for}
 
-\item{clone_id}{optional string identifier or an object whose sysmeta should be cloned}
+\item{pid}{(character) Optional. The PID to use with the object.}
 
-\item{formatId}{the dataone format identifier}
+\item{sid}{(character) Optional. The SID to use with the new object.}
+
+\item{clone_pid}{(character) PID of objet to clone System Metadata from}
 }
 \description{
 High-level functions for managing content.
