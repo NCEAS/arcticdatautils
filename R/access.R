@@ -174,7 +174,7 @@ set_public_read <- function(mn, pids) {
   # Store the results of each attempted update
   results <- c()
 
-  # Set rights and access for each PID
+  # Set public read for each PID
   for (pid in pids) {
     sysmeta <- tryCatch({
       dataone::getSystemMetadata(mn, pid)
