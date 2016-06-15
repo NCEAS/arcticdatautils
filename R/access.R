@@ -170,7 +170,6 @@ set_public_read <- function(mn, pids) {
             all(is.character(pids)),
             all(nchar(pids) > 0))
 
-
   # Store the results of each attempted update
   results <- c()
 
