@@ -148,6 +148,25 @@ publish_update <- function(mn,
                            parent_child_pids=NULL,
                            public=TRUE) {
 
+
+  # Do a simple sanity check on the PIDs passed in
+  all_pids <- c(metadata_old_pid,
+                resmap_old_pid,
+                data_old_pids,
+                child_pids,
+                identifier,
+                parent_resmap_pid,
+                parent_metadata_pid,
+                parent_data_pids,
+                parent_child_pids)
+  duped <- duplicated(all_pids)
+
+  if (any(duped)) {
+    stop(paste("The PIDs used in the arguments to this function should all be unique.\nOne or more dupes was found:\n\n",
+               paste(all_pids[duped], collapse=", ")))
+  }
+
+  # Check that objects exist
   stopifnot(object_exists(mn, metadata_old_pid))
   stopifnot(object_exists(mn, resmap_old_pid))
   if (!is.null(data_old_pids))
@@ -162,6 +181,9 @@ publish_update <- function(mn,
     stopifnot(object_exists(mn, parent_data_pids))
   if (!is.null(parent_child_pids))
     stopifnot(object_exists(mn, parent_child_pids))
+
+  rm(all_pids)
+  rm(duped)
 
   # Prepare the response object
   response <- list()

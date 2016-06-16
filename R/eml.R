@@ -306,8 +306,8 @@ eml_contact <- function(first, last, email) {
 #' @examples
 #' eml_individual_name("some", "user)
 eml_individual_name <- function(first, last) {
-  stopifnot(all(sapply(c(title, awards, first, last), is.character)),
-            all(lengths(c(title, awards, first, last)) > 0))
+  stopifnot(all(sapply(c(first, last), is.character)),
+            all(lengths(c(first, last)) > 0))
 
   given <- new("givenName")
   given@.Data <- first

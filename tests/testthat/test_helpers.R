@@ -1,7 +1,8 @@
 #' test_helpers.R
 
-library(testthat)
 context("helpers")
+
+mn <- dataone::MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
 
 test_that("a dummy package can be created", {
   if (!is_token_set()) {
@@ -10,11 +11,9 @@ test_that("a dummy package can be created", {
 
   library(dataone)
 
-  env <- env_load("development")
+  result <- create_dummy_package(mn)
 
-  result <- create_dummy_package(env$mn)
-
-  expect_true(object_exists(env$mn, result$metadata))
-  expect_true(object_exists(env$mn, result$data))
-  expect_true(object_exists(env$mn, result$resource_map))
+  expect_true(object_exists(mn, result$metadata))
+  expect_true(object_exists(mn, result$data))
+  expect_true(object_exists(mn, result$resource_map))
 })

@@ -21,7 +21,7 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 
   # Add otherEntity elements if needed
   if (!is.null(data_pids)) {
-    metadata_file <- add_other_entities(env$mn, metadata_file, data_pids)
+    metadata_file <- add_other_entities(mn, metadata_file, data_pids)
   }
 
   sysmeta <- new("SystemMetadata",
@@ -67,7 +67,8 @@ create_dummy_object <- function(mn) {
                  checksum = digest::digest(tmp, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
-                 rightsHolder = me)
+                 rightsHolder = me,
+                 fileName = "dummy.object")
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")

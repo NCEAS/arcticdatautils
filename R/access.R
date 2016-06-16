@@ -79,7 +79,7 @@ get_related_pids <- function(mn, pid) {
 
   # Wrap in a try-catch to handle ParseExceptionsn and the like
   response <- tryCatch({
-    dataone::query(env$mn, queryParams, as = "list")
+    dataone::query(mn, queryParams, as = "list")
   },
   error = function(e) {
     log_message("Error occurred during query.")
@@ -179,7 +179,7 @@ set_public_read <- function(mn, pids) {
       dataone::getSystemMetadata(mn, pid)
     },
     error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", env$mn_base_url, "'.\n"))
+      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
       log_message(e)
       e
     })
@@ -245,7 +245,7 @@ remove_public_read <- function(mn, pids) {
       dataone::getSystemMetadata(mn, pid)
     },
     error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", env$mn_base_url, "'.\n"))
+      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
       log_message(e)
       e
     })
@@ -320,7 +320,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions) {
       dataone::getSystemMetadata(mn, pid)
     },
     error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", env$mn_base_url, "'.\n"))
+      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
       log_message(e)
       e
     })
