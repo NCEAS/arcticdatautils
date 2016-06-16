@@ -26,6 +26,11 @@ pid_to_entity <- function(mn, pid, sysmeta=NULL) {
     sysmeta <- dataone::getSystemMetadata(mn, pid)
   }
 
+  # Check if the sysmeta has a fileName and stop execution if it does not
+  if (is.na(sysmeta@fileName)) {
+    stop(paste0("System Metadata for object with PID '", pid, "' did not have its fileName property set. This will result in 'NA' being set for the EML entityName and objectName (which we don't want). Edit each data object first to give it a fileName property."))
+  }
+
   sysmeta_to_entity(sysmeta)
 }
 
