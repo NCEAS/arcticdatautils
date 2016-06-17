@@ -1,6 +1,22 @@
+#' inserting.R
+#'
+#' A set of utilities for inserting packages from files and folders on disk.
 
-env <- env_load()
 
+#' Create a package from a folder containing an ISO package (legacy)
+#'
+#' This function  handles the process of inserting the original ISO package
+#' and updating it with an EML package.
+#'
+#' @param mn (MNode) The Member Node to create the packages on.
+#' @param path (character) The path to the folder containing the files.
+#' @param alternate_identifiers (character) A set of EML alternateIdentifiers to add to the package.
+#' @param data_pids (character) Optional. Manually specify the PIDs of data. This is useful if data were inserted outside this function and you want to re-use those objects.
+#'
+#' @return (list) All of the PIDs created.
+#' @export
+#'
+#' @examples
 create_from_folder <- function(mn, path, alternate_identifiers, data_pids=NULL) {
   # Validate args
   stopifnot(file.exists(path))
@@ -56,6 +72,3 @@ create_from_folder <- function(mn, path, alternate_identifiers, data_pids=NULL) 
        eml_resource_map_pid = eml_package$resource_map,
        data_pids = data_pids)
 }
-
-create_from_folder(env$mn, "~/tmp/new_packages/Sea_Ice_Cover_Pacific_Arctic_Region", c("test"))
-
