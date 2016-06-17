@@ -315,7 +315,8 @@ publish_update <- function(mn,
                                                     metadata_pid = metadata_updated_pid,
                                                     data_pids = data_old_pids,
                                                     child_pids = child_pids,
-                                                    public = public)
+                                                    public = public,
+                                                    check_first = check_first)
 
   update_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
@@ -342,7 +343,8 @@ publish_update <- function(mn,
                                                              metadata_pid = parent_metadata_pid,
                                                              data_pids = parent_data_pids,
                                                              child_pids = parent_child_pids,
-                                                             public = public)
+                                                             public = public,
+                                                             check_first = check_first)
 
     update_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
