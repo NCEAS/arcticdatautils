@@ -128,6 +128,8 @@ publish_object <- function(mn,
 #' @param public (logical) Optional. Whether or not to make the update public.
 #' This applies to the new metadata PID and its resource map and data object
 #' access policies are not affected.
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
+
 #'
 #' @import dataone
 #' @import datapack
@@ -146,8 +148,8 @@ publish_update <- function(mn,
                            parent_metadata_pid=NULL,
                            parent_data_pids=NULL,
                            parent_child_pids=NULL,
-                           public=TRUE) {
-
+                           public=TRUE,
+                           check_first=TRUE) {
 
   # Do a simple sanity check on the PIDs passed in
   all_pids <- c(metadata_old_pid,
@@ -166,24 +168,27 @@ publish_update <- function(mn,
                paste(all_pids[duped], collapse=", ")))
   }
 
-  # Check that objects exist
-  stopifnot(object_exists(mn, metadata_old_pid))
-  stopifnot(object_exists(mn, resmap_old_pid))
-  if (!is.null(data_old_pids))
-    stopifnot(object_exists(mn, data_old_pids))
-  if (!is.null(child_pids))
-    stopifnot(object_exists(mn, child_pids))
-  if (!is.null(parent_resmap_pid))
-    stopifnot(object_exists(mn, parent_resmap_pid))
-  if (!is.null(parent_metadata_pid))
-    stopifnot(object_exists(mn, parent_metadata_pid))
-  if (!is.null(parent_data_pids))
-    stopifnot(object_exists(mn, parent_data_pids))
-  if (!is.null(parent_child_pids))
-    stopifnot(object_exists(mn, parent_child_pids))
-
-  rm(all_pids)
+    rm(all_pids)
   rm(duped)
+
+  if (check_first) {
+    # Check that objects exist
+    stopifnot(object_exists(mn, metadata_old_pid))
+    stopifnot(object_exists(mn, resmap_old_pid))
+    if (!is.null(data_old_pids))
+      stopifnot(object_exists(mn, data_old_pids))
+    if (!is.null(child_pids))
+      stopifnot(object_exists(mn, child_pids))
+    if (!is.null(parent_resmap_pid))
+      stopifnot(object_exists(mn, parent_resmap_pid))
+    if (!is.null(parent_metadata_pid))
+      stopifnot(object_exists(mn, parent_metadata_pid))
+    if (!is.null(parent_data_pids))
+      stopifnot(object_exists(mn, parent_data_pids))
+    if (!is.null(parent_child_pids))
+      stopifnot(object_exists(mn, parent_child_pids))
+  }
+
 
   # Prepare the response object
   response <- list()
@@ -356,6 +361,7 @@ publish_update <- function(mn,
 #' @param metadata_pid
 #' @param data_pids
 #' @param child_pids
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
 #'
 #' @return The created resource map's PID (character)
 #' @export
@@ -364,20 +370,24 @@ publish_update <- function(mn,
 create_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,
-                                child_pids=NULL) {
+                                child_pids=NULL,
+                                check_first=TRUE) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
 
-  log_message("Checking all the object passed in as arguments exist before going on...")
+  if (check_first) {
+    log_message("Checking all the object passed in as arguments exist before going on...")
 
-  stopifnot(object_exists(mn, metadata_pid))
-  if (!is.null(data_pids))
-    stopifnot(all(object_exists(mn, data_pids)))
-  if (!is.null(child_pids))
-    stopifnot(all(object_exists(mn, child_pids)))
+    stopifnot(object_exists(mn, metadata_pid))
+    if (!is.null(data_pids))
+      stopifnot(all(object_exists(mn, data_pids)))
+    if (!is.null(child_pids))
+      stopifnot(all(object_exists(mn, child_pids)))
 
-  pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+    pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
+  }
+
 
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -429,6 +439,7 @@ create_resource_map <- function(mn,
 #' @param new_resource_map_pid
 #' @param child_pids
 #' @param public Whether or not to make the new resource map public read (logical)
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
 #'
 #' @export
 update_resource_map <- function(mn,
@@ -437,7 +448,8 @@ update_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,
                                 child_pids=NULL,
-                                public=FALSE) {
+                                public=FALSE,
+                                check_first=TRUE) {
 
   # Check arguments
   stopifnot(class(mn) == "MNode")
@@ -446,16 +458,18 @@ update_resource_map <- function(mn,
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
 
-  log_message("Checking all the object passed in as arguments exist before going on...")
+  if (check_first) {
+    log_message("Checking all the object passed in as arguments exist before going on...")
 
-  stopifnot(object_exists(mn, old_resource_map_pid))
-  stopifnot(object_exists(mn, metadata_pid))
-  if (!is.null(data_pids))
-    stopifnot(object_exists(mn, data_pids))
-  if (!is.null(child_pids))
-    stopifnot(object_exists(mn, child_pids))
+    stopifnot(object_exists(mn, old_resource_map_pid))
+    stopifnot(object_exists(mn, metadata_pid))
+    if (!is.null(data_pids))
+      stopifnot(object_exists(mn, data_pids))
+    if (!is.null(child_pids))
+      stopifnot(object_exists(mn, child_pids))
+    stopifnot(is_resource_map(mn, old_resource_map_pid))
+  }
 
-  stopifnot(is_resource_map(mn, old_resource_map_pid))
 
   # Get the current rightsHolder
   sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
