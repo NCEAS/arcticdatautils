@@ -99,6 +99,51 @@ get_related_pids <- function(mn, pid) {
 }
 
 
+#' Get a structured list of PIDs for the objects in a package.
+#'
+#' @param mn (MNode) The Member Node to run the query on.
+#' @param pid (character) The the metadata PID of the package.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_package <- function(mn, pid) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+
+  # Warn if `pid` looks like a resource map
+  if(grepl("resource", pid)) {
+    warning(paste0("Value of argument PID is ", pid, " which looks like a resource map. This function expects a metadata PID."))
+  }
+
+  # Prepare the query parameters
+  pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
+  queryParams <- list(q = paste0("id:", pid_esc),
+                      rows = "1000",
+                      fl = "identifier,resourceMap,documents")
+
+  response <- dataone::query(mn, queryParams, as = "list")
+
+  if (length(response) == 0) {
+    return(response)
+  }
+
+  # Get all the PIDs we need
+  identifier <- unlist(response[[1]]$identifier)
+  resource_map = unlist(response[[1]]$resourceMap)
+  documents <- unlist(response[[1]]$documents)
+  data_pids <- documents[(!grepl(identifier, documents) & !grepl("resource", documents))]
+  child_packages <- documents[(!grepl(identifier, documents) & grepl("resource", documents))]
+
+  list(metadata = identifier,
+       resource_map = resource_map,
+       data = data_pids,
+       child_packages = child_packages)
+}
+
+
 #' Change the rightsHolder field for a given PID.
 #'
 #' Update the rights holder to the provided subject for the object identified in
