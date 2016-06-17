@@ -168,7 +168,7 @@ publish_update <- function(mn,
                paste(all_pids[duped], collapse=", ")))
   }
 
-    rm(all_pids)
+  rm(all_pids)
   rm(duped)
 
   if (check_first) {
@@ -188,7 +188,6 @@ publish_update <- function(mn,
     if (!is.null(parent_child_pids))
       stopifnot(object_exists(mn, parent_child_pids))
   }
-
 
   # Prepare the response object
   response <- list()
