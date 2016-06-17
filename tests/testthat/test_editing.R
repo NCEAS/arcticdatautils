@@ -186,3 +186,22 @@ test_that("we can publish an update to an object", {
   expect_equal(sm@obsoletes, old)
   expect_equal(sm@formatId, "text/csv")
 })
+
+test_that("we can publish an update to an object and specify our own format id", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  old <- create_dummy_object(mn)
+
+  # Create a CSV to replace it
+  tmp <- tempfile(fileext = ".csv")
+  csv <- data.frame(x=1:50)
+  write.csv(csv, tmp)
+
+  upd <- update_object(mn, old, tmp, "text/plain")
+  file.remove(tmp)
+  sm <- dataone::getSystemMetadata(mn, upd)
+
+  expect_equal(sm@formatId, "text/plain")
+})
