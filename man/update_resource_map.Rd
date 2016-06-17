@@ -5,10 +5,13 @@
 \title{Update an existing Resource Map with a new one.}
 \usage{
 update_resource_map(mn, old_resource_map_pid, new_resource_map_pid = NULL,
-  metadata_pid, data_pids = NULL, child_pids = NULL, public = FALSE)
+  metadata_pid, data_pids = NULL, child_pids = NULL, public = FALSE,
+  check_first = TRUE)
 }
 \arguments{
 \item{public}{Whether or not to make the new resource map public read (logical)}
+
+\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
 }
 \description{
 This function is intended to be used to add a few new child packages to a

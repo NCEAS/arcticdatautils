@@ -4,10 +4,11 @@
 \alias{create_resource_map}
 \title{Create a resource map.}
 \usage{
-create_resource_map(mn, metadata_pid, data_pids = NULL, child_pids = NULL)
+create_resource_map(mn, metadata_pid, data_pids = NULL, child_pids = NULL,
+  check_first = TRUE)
 }
 \arguments{
-\item{child_pids}{}
+\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
 }
 \value{
 The created resource map's PID (character)

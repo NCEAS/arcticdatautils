@@ -7,7 +7,8 @@
 publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
   child_pids = NULL, metadata_file_path = NULL, identifier = NULL,
   use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
-  parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE)
+  parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE,
+  check_first = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
@@ -33,6 +34,8 @@ publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
 \item{public}{(logical) Optional. Whether or not to make the update public.
 This applies to the new metadata PID and its resource map and data object
 access policies are not affected.}
+
+\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
 }
 \description{
 This function can be used for a variety of tasks:
