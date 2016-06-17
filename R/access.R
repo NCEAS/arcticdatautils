@@ -105,6 +105,62 @@ set_rights_holder <- function(mn, pids, subject) {
   return(result)
 }
 
+
+#' Set the access policy for a set of objects.
+#'
+#' For each permission, this function checks if the permission is already set
+#' and moves on. System Metadata are only updated when a change was needed.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The object(s) to set the permissions on.
+#' @param subjects (character) The subject(s) to set permissions for.
+#' @param permissions (character) Optional. Vector of permissions.
+#'
+#' @return (logical) Named
+#' @export
+#'
+#' @examples
+set_access <- function(mn, pids, subjects, permissions=c("read", "write", "changePermission")) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pids),
+            nchar(pids) > 0)
+  stopifnot(is.character(subjects),
+            nchar(subjects) > 0)
+  stopifnot(all(permissions %in% c("read", "write", "changePermission")))
+
+  result <- c()
+
+  for (pid in pids) {
+    changed <- FALSE
+
+    sysmeta <- dataone::getSystemMetadata(mn, pid)
+
+    for (subject in subjects) {
+      for (permission in permissions) {
+        if (!datapack::hasAccessRule(sysmeta, subject, permission)) {
+          sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
+          changed <- TRUE
+        }
+      }
+    }
+
+    if (changed) {
+      result[pid] <- TRUE
+      log_message(paste0("Updating System Metadata for ", pid, "."))
+      dataone::updateSystemMetadata(mn, pid, sysmeta)
+    } else {
+      log_message(paste0("No changes needed for ", pid, ". Not updating."))
+      result[pid] <- FALSE
+    }
+  }
+
+  # Name the result vector
+  names(result) <- pids
+
+  result
+}
+
+
 #' Set public access on a set of objects.
 #'
 #' @param mn (MNode)
@@ -115,60 +171,7 @@ set_rights_holder <- function(mn, pids, subject) {
 #'
 #' @examples
 set_public_read <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode",
-            all(is.character(pids)),
-            all(nchar(pids) > 0))
-
-  # Store the results of each attempted update
-  results <- c()
-
-  # Set public read for each PID
-  for (pid in pids) {
-    sysmeta <- tryCatch({
-      dataone::getSystemMetadata(mn, pid)
-    },
-    error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
-      log_message(e)
-      e
-    })
-
-    if (inherits(sysmeta, "error")) {
-      stop("Failed to get System Metadata.")
-    }
-
-    # Track whether we have changed the record to avoid an uncessary update call
-    changed <- FALSE
-
-    if (datapack::hasAccessRule(sysmeta, "public", "read")) {
-      log_message(paste0("Skipping setting public read because ", pid, " is already public."))
-      next
-    }
-
-    changed <- TRUE
-
-    log_message(paste0("Setting public read access on ", pid, "."))
-    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-
-    # Update the sysmeta
-    update_response <- tryCatch({
-      dataone::updateSystemMetadata(mn, pid, sysmeta)
-    },
-    error = function(e) {
-      log_message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
-      log_message(e)
-      e
-    })
-
-    if (inherits(update_response, "error")) {
-      stop("Failed update.")
-    }
-
-    # Save the result for this PID
-    results[pid] <- changed
-  }
-
-  results
+  set_access(mn, pids, "public", "read")
 }
 
 #' Remove public access on a set of objects.
