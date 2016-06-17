@@ -48,7 +48,7 @@ get_package <- function(mn, pid) {
 }
 
 
-#' Change the rightsHolder field for a given PID.
+#' Set the rightsHolder field for a given PID.
 #'
 #' Update the rights holder to the provided subject for the object identified in
 #' the provided system metadata document on the given Member Node.
@@ -60,7 +60,7 @@ get_package <- function(mn, pid) {
 #' @import dataone
 #' @import datapack
 #' @export
-update_rights_holder <- function(mn, pids, subject) {
+set_rights_holder <- function(mn, pids, subject) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pids),
             all(nchar(pids) > 0))
