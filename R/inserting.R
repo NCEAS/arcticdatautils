@@ -8,19 +8,19 @@
 #' This function  handles the process of inserting the original ISO package
 #' and updating it with an EML package.
 #'
+#' Note: This only works for Gateway packages right now.
+#'
 #' @param mn (MNode) The Member Node to create the packages on.
 #' @param path (character) The path to the folder containing the files.
-#' @param alternate_identifiers (character) A set of EML alternateIdentifiers to add to the package.
 #' @param data_pids (character) Optional. Manually specify the PIDs of data. This is useful if data were inserted outside this function and you want to re-use those objects.
 #'
 #' @return (list) All of the PIDs created.
 #' @export
 #'
 #' @examples
-create_from_folder <- function(mn, path, alternate_identifiers, data_pids=NULL) {
+create_from_folder <- function(mn, path, data_pids=NULL) {
   # Validate args
   stopifnot(file.exists(path))
-  stopifnot(length(alternate_identifiers) > 0)
 
   file_paths <- dir(path, recursive = TRUE, full.names = TRUE)
   metadata_path <- file_paths[grepl("iso19139.xml", file_paths)]
@@ -31,6 +31,10 @@ create_from_folder <- function(mn, path, alternate_identifiers, data_pids=NULL) 
   # Precalculate format IDs
   data_format_ids <- guess_format_id(data_paths)
   names(data_format_ids) <- data_paths
+
+  # Gather alternate identifiers
+  alternate_identifiers <- c(extract_local_identifier("gateway", metadata_path),
+                             basename(path))
 
   # Insert the data objects if needed
   if (!is.null(data_pids)) {
