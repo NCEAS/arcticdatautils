@@ -165,3 +165,24 @@ test_that("SIDs are maintained when publishing an update to an object with a SID
 test_that("publishing an update produces an error when identifiers are duplicated across args", {
   expect_error(publish_update(mn, "XYZ", "XYZ", "XYZ"), "One or more dupes was found")
 })
+
+test_that("we can publish an update to an object", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  old <- create_dummy_object(mn)
+
+  # Create a CSV to replace it
+  tmp <- tempfile(fileext = ".csv")
+  csv <- data.frame(x=1:50)
+  write.csv(csv, tmp)
+
+  upd <- update_object(mn, old, tmp)
+  file.remove(tmp)
+  sm <- dataone::getSystemMetadata(mn, upd)
+
+  expect_equal(sm@fileName, basename(tmp))
+  expect_equal(sm@obsoletes, old)
+  expect_equal(sm@formatId, "text/csv")
+})

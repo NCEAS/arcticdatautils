@@ -91,6 +91,54 @@ publish_object <- function(mn,
   return(create_response)
 }
 
+#' Update an object with a new file.
+#'
+#' This is a convenience wrapper around `dataone::updateObject` which copies in
+#' fields from the old object's System Metadata such as the rightsHolder and
+#' accessPolicy and updates only what needs to be changed.
+#'
+#' @param mn (MNode) The Member Node to update the object on.
+#' @param old_pid (character) The PID of the object to update.
+#' @param path (character) The full path to the file to update with.
+#' @param format_id (character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly.
+#'
+#' @return (character) The PID of the updated object.
+#' @export
+#'
+#' @examples
+update_object <- function(mn, old_pid, path, format_id=NULL) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(object_exists(mn, old_pid))
+  stopifnot(file.exists(path))
+
+  # Decide the format_id
+  if (is.null(format_id)) {
+    format_id <- guess_format_id(path)
+    log_message(paste0("Guessed format ID of ", format_id, "."))
+  }
+
+  # Generate a PID
+  new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
+
+  # Grab and modify the old object's sysmeta
+  sysmeta <- dataone::getSystemMetadata(mn, old_pid)
+  sysmeta@identifier <- new_pid
+  sysmeta@formatId <- format_id
+  sysmeta@size <- file.size(path)
+  sysmeta@checksum <- digest::digest(path, algo = "sha256")
+  sysmeta@checksumAlgorithm <- "SHA256"
+  slot(sysmeta, "obsoletes", check = FALSE) <- NA
+  slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
+  sysmeta@fileName <- basename(path)
+
+  # Make the update
+  dataone::updateObject(mn,
+                        pid = old_pid,
+                        file = path,
+                        newpid = new_pid,
+                        sysmeta = sysmeta)
+}
+
 
 #' Publish an updated data package.
 #'
