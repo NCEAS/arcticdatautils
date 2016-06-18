@@ -4,12 +4,12 @@
 \alias{update_object}
 \title{Update an object with a new file.}
 \usage{
-update_object(mn, old_pid, path, format_id = NULL)
+update_object(mn, pid, path, format_id = NULL)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
 
-\item{old_pid}{(character) The PID of the object to update.}
+\item{pid}{(character) The PID of the object to update.}
 
 \item{path}{(character) The full path to the file to update with.}
 

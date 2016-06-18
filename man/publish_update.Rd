@@ -4,8 +4,8 @@
 \alias{publish_update}
 \title{Publish an updated data package.}
 \usage{
-publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
-  child_pids = NULL, metadata_file_path = NULL, identifier = NULL,
+publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
+  child_pids = NULL, metadata_path = NULL, identifier = NULL,
   use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
   parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE,
   check_first = TRUE)
@@ -13,29 +13,33 @@ publish_update(mn, metadata_old_pid, resmap_old_pid, data_old_pids = NULL,
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
 
-\item{metadata_old_pid}{The PID of the EML metadata document to be updated}
+\item{metadata_pid}{(character) The PID of the EML metadata document to be updated.}
 
-\item{resmap_old_pid}{The PID of the resource map for the package}
+\item{resource_map_pid}{(character)  The PID of the resource map for the package.}
 
-\item{data_old_pids}{A vector of PIDs of data objects in the package}
+\item{data_pids}{(character)  PID(s) of data objects that will go in the updated package.}
 
-\item{identifier}{(character) Manually specify the identifier for the new metadata object}
+\item{child_pids}{(character) Optional. Child packages resource map PIDs.}
 
-\item{use_doi}{boolean indicating if a DOI should be used for the metadata}
+\item{metadata_path}{(character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.}
 
-\item{parent_resmap_pid}{optional PID of a parent package to be updated}
+\item{identifier}{(character) Manually specify the identifier for the new metadata object.}
 
-\item{parent_metadata_pid}{optional identifier for the metadata document of the parent package}
+\item{use_doi}{(logical) Generate and use a DOI as the identifier for the updated metadata object.}
 
-\item{parent_data_pids}{optional vector of identifiers of data in the parent package}
+\item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated.}
 
-\item{parent_child_pids}{optional vector of identifiers of child packages in the parent package}
+\item{parent_metadata_pid}{(character)  Optional. identifier for the metadata document of the parent package.}
 
-\item{public}{(logical) Optional. Whether or not to make the update public.
-This applies to the new metadata PID and its resource map and data object
+\item{parent_child_pids}{(character) Optional. Identifier(s) of child packages in the parent package.}
+
+\item{public}{(logical) Optional. Make the update public.
+This applies to the new metadata PID and its resource map and data object.
 access policies are not affected.}
 
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
+
+\item{parent_data_pids(character)}{Optional. Identifier(s) of data in the parent package.}
 }
 \description{
 This function can be used for a variety of tasks:
@@ -47,8 +51,8 @@ This function can be used for a variety of tasks:
   \item Update a package with new metadata
 }
 
-The metadata_old_pid and resmap_old_pid provide the identifier of an EML metadata
-document and associated resource map, and the data_old_pids vector provides a list
+The metadata_pid and resource_map_pid provide the identifier of an EML metadata
+document and associated resource map, and the data_pids vector provides a list
 of PIDs of data objects in the package.  Update the metadata file and resource map
 by generating a new identifier (a DOI if use_doi is TRUE) and updating the Member
 Node with a public version of the object.  If metadata_file is not missing, it

@@ -12,7 +12,7 @@
 #' the Member Node, and does not add it to a data package, which can be done separately.
 #'
 #' @param mn (MNode) The Member Node to publish the object to.
-#' @param filepath the path to the file to be published
+#' @param path the path to the file to be published
 #' @param format_id (character) The format ID to set for
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
@@ -23,7 +23,7 @@
 #'
 #' @export
 publish_object <- function(mn,
-                           filepath,
+                           path,
                            format_id,
                            pid=NULL,
                            sid=NULL,
@@ -31,7 +31,7 @@ publish_object <- function(mn,
                            public=TRUE) {
 
   stopifnot(class(mn) == "MNode")
-  stopifnot(file.exists(filepath))
+  stopifnot(file.exists(path))
   stopifnot(is.character(format_id),
             nchar(format_id) > 0)
 
@@ -53,12 +53,12 @@ publish_object <- function(mn,
   sysmeta <- new("SystemMetadata",
                  identifier = pid,
                  formatId = format_id,
-                 size = file.size(filepath),
-                 checksum = digest::digest(filepath, algo="sha256"),
+                 size = file.size(path),
+                 checksum = digest::digest(path, algo="sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me,
-                 fileName = basename(filepath))
+                 fileName = basename(path))
 
   if (!is.null(sid)) {
     log_message(paste0("Setting SID to '", sid, "'."))
@@ -79,11 +79,11 @@ publish_object <- function(mn,
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
-  sysmeta@fileName <- basename(filepath)
+  sysmeta@fileName <- basename(path)
 
   create_response <- dataone::createObject(mn,
                                            pid = pid,
-                                           file = filepath,
+                                           file = path,
                                            sysmeta = sysmeta)
 
   log_message(paste0("Published file with identifier: ", create_response))
@@ -98,7 +98,7 @@ publish_object <- function(mn,
 #' accessPolicy and updates only what needs to be changed.
 #'
 #' @param mn (MNode) The Member Node to update the object on.
-#' @param old_pid (character) The PID of the object to update.
+#' @param pid (character) The PID of the object to update.
 #' @param path (character) The full path to the file to update with.
 #' @param format_id (character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly.
 #'
@@ -106,9 +106,9 @@ publish_object <- function(mn,
 #' @export
 #'
 #' @examples
-update_object <- function(mn, old_pid, path, format_id=NULL) {
+update_object <- function(mn, pid, path, format_id=NULL) {
   stopifnot(is(mn, "MNode"))
-  stopifnot(object_exists(mn, old_pid))
+  stopifnot(object_exists(mn, pid))
   stopifnot(file.exists(path))
 
   # Decide the format_id
@@ -121,7 +121,7 @@ update_object <- function(mn, old_pid, path, format_id=NULL) {
   new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
 
   # Grab and modify the old object's sysmeta
-  sysmeta <- dataone::getSystemMetadata(mn, old_pid)
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
   sysmeta@identifier <- new_pid
   sysmeta@formatId <- format_id
   sysmeta@size <- file.size(path)
@@ -133,7 +133,7 @@ update_object <- function(mn, old_pid, path, format_id=NULL) {
 
   # Make the update
   dataone::updateObject(mn,
-                        pid = old_pid,
+                        pid = pid,
                         file = path,
                         newpid = new_pid,
                         sysmeta = sysmeta)
@@ -150,8 +150,8 @@ update_object <- function(mn, old_pid, path, format_id=NULL) {
 #'   \item Update a package with new metadata
 #' }
 #'
-#' The metadata_old_pid and resmap_old_pid provide the identifier of an EML metadata
-#' document and associated resource map, and the data_old_pids vector provides a list
+#' The metadata_pid and resource_map_pid provide the identifier of an EML metadata
+#' document and associated resource map, and the data_pids vector provides a list
 #' of PIDs of data objects in the package.  Update the metadata file and resource map
 #' by generating a new identifier (a DOI if use_doi is TRUE) and updating the Member
 #' Node with a public version of the object.  If metadata_file is not missing, it
@@ -162,22 +162,21 @@ update_object <- function(mn, old_pid, path, format_id=NULL) {
 #' are made publicly readable.
 #'
 #' @param mn (MNode) The Member Node to update the object on.
-#' @param metadata_old_pid The PID of the EML metadata document to be updated
-#' @param resmap_old_pid The PID of the resource map for the package
-#' @param data_old_pids A vector of PIDs of data objects in the package
-#' @param identifier (character) Manually specify the identifier for the new metadata object
-#' @param use_doi boolean indicating if a DOI should be used for the metadata
-#' @param parent_resmap_pid optional PID of a parent package to be updated
-#' @param parent_metadata_pid optional identifier for the metadata document of the parent package
-#' @param parent_data_pids optional vector of identifiers of data in the parent package
-#' @param parent_child_pids optional vector of identifiers of child packages in the parent package
-#' @param child_pids
-#' @param metadata_file_path
-#' @param public (logical) Optional. Whether or not to make the update public.
-#' This applies to the new metadata PID and its resource map and data object
+#' @param metadata_pid (character) The PID of the EML metadata document to be updated.
+#' @param resource_map_pid (character)  The PID of the resource map for the package.
+#' @param data_pids (character)  PID(s) of data objects that will go in the updated package.
+#' @param identifier (character) Manually specify the identifier for the new metadata object.
+#' @param use_doi (logical) Generate and use a DOI as the identifier for the updated metadata object.
+#' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
+#' @param parent_metadata_pid (character)  Optional. identifier for the metadata document of the parent package.
+#' @param parent_data_pids(character)  Optional. Identifier(s) of data in the parent package.
+#' @param parent_child_pids (character) Optional. Identifier(s) of child packages in the parent package.
+#' @param child_pids (character) Optional. Child packages resource map PIDs.
+#' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
+#' @param public (logical) Optional. Make the update public.
+#' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
-
 #'
 #' @import dataone
 #' @import datapack
@@ -185,11 +184,11 @@ update_object <- function(mn, old_pid, path, format_id=NULL) {
 #'
 #' @export
 publish_update <- function(mn,
-                           metadata_old_pid,
-                           resmap_old_pid,
-                           data_old_pids=NULL,
+                           metadata_pid,
+                           resource_map_pid,
+                           data_pids=NULL,
                            child_pids=NULL,
-                           metadata_file_path=NULL,
+                           metadata_path=NULL,
                            identifier=NULL,
                            use_doi=FALSE,
                            parent_resmap_pid=NULL,
@@ -200,15 +199,9 @@ publish_update <- function(mn,
                            check_first=TRUE) {
 
   # Do a simple sanity check on the PIDs passed in
-  all_pids <- c(metadata_old_pid,
-                resmap_old_pid,
-                data_old_pids,
-                child_pids,
-                identifier,
-                parent_resmap_pid,
-                parent_metadata_pid,
-                parent_data_pids,
-                parent_child_pids)
+  all_pids <- c(metadata_pid, resource_map_pid, data_pids, child_pids,
+                identifier, parent_resmap_pid, parent_metadata_pid,
+                parent_data_pids, parent_child_pids)
   duped <- duplicated(all_pids)
 
   if (any(duped)) {
@@ -221,10 +214,10 @@ publish_update <- function(mn,
 
   if (check_first) {
     # Check that objects exist
-    stopifnot(object_exists(mn, metadata_old_pid))
-    stopifnot(object_exists(mn, resmap_old_pid))
-    if (!is.null(data_old_pids))
-      stopifnot(object_exists(mn, data_old_pids))
+    stopifnot(object_exists(mn, metadata_pid))
+    stopifnot(object_exists(mn, resource_map_pid))
+    if (!is.null(data_pids))
+      stopifnot(object_exists(mn, data_pids))
     if (!is.null(child_pids))
       stopifnot(object_exists(mn, child_pids))
     if (!is.null(parent_resmap_pid))
@@ -244,33 +237,33 @@ publish_update <- function(mn,
   me <- get_token_subject()
 
   # Get some things from the node
-  if (is.null(metadata_file_path)) {
+  if (is.null(metadata_path)) {
     # Get the metadata doc
     log_message("Getting metadata from the MN.")
-    eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_old_pid)), asText = TRUE)
+    eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
-    if (!file.exists(metadata_file_path)) {
-      stop(paste0("Metadata doesn't exist: ", metadata_file_path))
+    if (!file.exists(metadata_path)) {
+      stop(paste0("Metadata doesn't exist: ", metadata_path))
     }
 
-    log_message(paste0("Getting metadata from the path: ", metadata_file_path, "."))
-    eml <- EML::read_eml(metadata_file_path)
+    log_message(paste0("Getting metadata from the path: ", metadata_path, "."))
+    eml <- EML::read_eml(metadata_path)
   }
 
   # get the metadata sysmeta from the node
-  metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_old_pid)
+  metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
   #eml_acl <- sysmeta_orig@accessPolicy
   # TODO: error check: md and sm existence
 
   # get the resource_map (not used for now, could be used to get the list of data pids)
-  # resmap <- rawToChar(dataone::getObject(mn, resmap_old_pid))
-  # resmap_sysmeta <- dataone::getSystemMetadata(mn, resmap_old_pid)
+  # resmap <- rawToChar(dataone::getObject(mn, resource_map_pid))
+  # resmap_sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   # TODO: error check: resmap existence, and ensure we don't fail hard
 
   # Get the list of data files from the resource map
   # TODO: parse these from the resource map, rather than taking them as input
-  # TODO: data_old_pids <- as.vector(c("pid1", "pid2", "pid3"))
+  # TODO: data_pids <- as.vector(c("pid1", "pid2", "pid3"))
 
   log_message("Downloaded EML and sysmeta...")
 
@@ -308,8 +301,8 @@ publish_update <- function(mn,
   EML::write_eml(eml, eml_path)
 
   # Add other entity fields (if appropriate)
-  if (!is.null(data_old_pids)) {
-    eml <- add_other_entities(mn, eml_path, data_old_pids)
+  if (!is.null(data_pids)) {
+    eml <- add_other_entities(mn, eml_path, data_pids)
   }
 
   # Create System Metadata for the updated EML file
@@ -321,7 +314,7 @@ publish_update <- function(mn,
                                   checksumAlgorithm = "SHA256",
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
-                                  obsoletes = metadata_old_pid,
+                                  obsoletes = metadata_pid,
                                   fileName = "science_metadata.xml")
 
   # Set the SID if one existed on old metadata object
@@ -335,10 +328,10 @@ publish_update <- function(mn,
     metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
   }
 
-  update_rights_holder(mn, metadata_old_pid, me)
+  set_rights_holder(mn, metadata_pid, me)
 
   dataone::updateObject(mn,
-                        pid = metadata_old_pid,
+                        pid = metadata_pid,
                         newpid = metadata_updated_pid,
                         file = eml_path,
                         sysmeta = metadata_updated_sysmeta)
@@ -349,24 +342,24 @@ publish_update <- function(mn,
   file.remove(eml_path)
 
   # Set rightsHolder back
-  update_rights_holder(mn,
-                       metadata_old_pid,
-                       metadata_sysmeta@rightsHolder)
+  set_rights_holder(mn,
+                    metadata_pid,
+                    metadata_sysmeta@rightsHolder)
 
   log_message("Updated metadata document.")
 
   # Update the resource map
   #########################
   response[["resource_map"]] <- update_resource_map(mn,
-                                                    old_resource_map_pid = resmap_old_pid,
+                                                    old_resource_map_pid = resource_map_pid,
                                                     new_resource_map_pid = resmap_updated_pid,
                                                     metadata_pid = metadata_updated_pid,
-                                                    data_pids = data_old_pids,
+                                                    data_pids = data_pids,
                                                     child_pids = child_pids,
                                                     public = public,
                                                     check_first = check_first)
 
-  update_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
+  set_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
   log_message("Updated resource map")
 
@@ -394,7 +387,7 @@ publish_update <- function(mn,
                                                              public = public,
                                                              check_first = check_first)
 
-    update_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
+    set_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
 
   return(response)
@@ -449,8 +442,8 @@ create_resource_map <- function(mn,
   stopifnot(file.exists(path))
 
   actual <- publish_object(mn,
-                           filepath = path,
-                           pid = pid,
+                           path,
+                           pid,
                            format_id = "http://www.openarchives.org/ore/terms")
 
   stopifnot(pid == actual)
@@ -528,7 +521,7 @@ update_resource_map <- function(mn,
 
   # Set the rightsHolder to us temporarily
   me <- get_token_subject()
-  update_rights_holder(mn, old_resource_map_pid, me)
+  set_rights_holder(mn, old_resource_map_pid, me)
 
   # Create the replacement resource map
   if (is.null(new_resource_map_pid)) {
@@ -572,7 +565,7 @@ update_resource_map <- function(mn,
   )
 
   # Set the rightsHolder back
-  update_rights_holder(mn, old_resource_map_pid, previous_rights_holder)
+  set_rights_holder(mn, old_resource_map_pid, previous_rights_holder)
 
   if (file.exists(new_rm_path)) {
     file.remove(new_rm_path)

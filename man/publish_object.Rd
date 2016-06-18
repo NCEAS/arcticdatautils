@@ -4,13 +4,13 @@
 \alias{publish_object}
 \title{editing.R}
 \usage{
-publish_object(mn, filepath, format_id, pid = NULL, sid = NULL,
+publish_object(mn, path, format_id, pid = NULL, sid = NULL,
   clone_pid = NULL, public = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to publish the object to.}
 
-\item{filepath}{the path to the file to be published}
+\item{path}{the path to the file to be published}
 
 \item{format_id}{(character) The format ID to set for}
 

@@ -13,9 +13,9 @@ test_that("we can publish an update", {
 
   # Publish an update on it
   update <- publish_update(mn,
-                           metadata_old_pid = package$metadata,
-                           data_old_pids = package$data,
-                           resmap_old_pid = package$resource_map)
+                           package$metadata,
+                           package$resource_map,
+                           package$data)
 
   expect_named(update, c("metadata", "resource_map"))
   expect_true(all(object_exists(mn, unlist(update))))
@@ -33,9 +33,9 @@ test_that("an identifier can be manually specified when publishing an update", {
   # Publish an update on it
   new_identifier <- uuid::UUIDgenerate()
   update <- publish_update(mn,
-                           metadata_old_pid = package$metadata,
-                           data_old_pids = package$data,
-                           resmap_old_pid = package$resource_map,
+                           package$metadata,
+                           package$resource_map,
+                           package$data,
                            identifier = new_identifier)
 
   expect_equal(update$metadata, new_identifier)
@@ -98,9 +98,9 @@ test_that("otherEntity elements are set when publishing an update", {
   # which lets me update the data in a package when doing a publish_update()
   # call
   update <- publish_update(mn,
-                           metadata_old_pid = response$metadata,
-                           resmap_old_pid = response$resource_map,
-                           data_old_pids = object)
+                           response$metadata,
+                           response$resource_map,
+                           object)
 
 
   tmp <- tempfile()
@@ -130,8 +130,8 @@ test_that("an object can be published with a SID", {
 
   new_sid <- uuid::UUIDgenerate()
   pid <- publish_object(mn,
-                        filepath = tmp,
-                        format_id = "text/csv",
+                        tmp,
+                        "text/csv",
                         sid = new_sid)
   file.remove(tmp) # Remove dummy data file
 
@@ -151,12 +151,12 @@ test_that("SIDs are maintained when publishing an update to an object with a SID
   metadata_path <- file.path(system.file("example-eml.xml", package = "arcticdatautils"))
   new_sid <- uuid::UUIDgenerate()
   pid <- publish_object(mn,
-                        filepath = metadata_path,
-                        format_id = "	eml://ecoinformatics.org/eml-2.1.1",
+                        metadata_path,
+                        "eml://ecoinformatics.org/eml-2.1.1",
                         sid = new_sid)
   resmap_pid <- create_resource_map(mn, metadata_pid = pid)
 
-  response <- publish_update(mn, metadata_old_pid = pid, resmap_old_pid = resmap_pid)
+  response <- publish_update(mn, pid, resmap_pid)
 
   sysmeta <- getSystemMetadata(mn, response$metadata)
   expect_equal(sysmeta@seriesId, new_sid)
