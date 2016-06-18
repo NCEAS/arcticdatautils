@@ -189,11 +189,6 @@ get_doc_id <- function(sysmeta) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Add a method step to a fresh document
-#' my_doc <- new("eml")
-#' my_doc <- add_methods_step(my_doc, "some method", "how I did the method")
-#' }
 add_methods_step <- function(doc, title, description) {
   stopifnot(is(doc, "eml"))
   stopifnot(is(doc@dataset, "dataset"))
@@ -220,13 +215,6 @@ add_methods_step <- function(doc, title, description) {
 #' @export
 #'
 #' @examples
-#' # First we create a new EML document and add a method
-#' doc <- new("eml")
-#' doc <- add_method_step(doc, "some lab method", "this is how we did it")
-#' doc
-#'
-#' # Then we clear it
-#' clear_methods(doc)
 clear_methods <- function(doc) {
   stopifnot(is(doc, "eml"))
 

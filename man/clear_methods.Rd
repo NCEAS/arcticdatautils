@@ -16,6 +16,7 @@ clear_methods(doc)
 Clear all methods from the document.
 }
 \examples{
+#' \dontrun{
 # First we create a new EML document and add a method
 doc <- new("eml")
 doc <- add_method_step(doc, "some lab method", "this is how we did it")
@@ -23,5 +24,6 @@ doc
 
 # Then we clear it
 clear_methods(doc)
+}
 }
 
