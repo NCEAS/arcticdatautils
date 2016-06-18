@@ -375,3 +375,17 @@ eml_project <- function(title, awards, first, last, organizations = NULL, role =
 
   project
 }
+
+
+eml_geographic_coverage <- function(description, north, east, south, west) {
+  cov <- new("geographicCoverage")
+
+  cov@geographicDescription <- description
+
+  cov@boundingCoordinates@northBoundingCoordinate <- new("northBoundingCoordinate", as.character(north))
+  cov@boundingCoordinates@eastBoundingCoordinate <- new("eastBoundingCoordinate", as.character(east))
+  cov@boundingCoordinates@southBoundingCoordinate <- new("southBoundingCoordinate", as.character(south))
+  cov@boundingCoordinates@westBoundingCoordinate <- new("westBoundingCoordinate", as.character(west))
+
+  cov
+}
