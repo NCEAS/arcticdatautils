@@ -291,23 +291,23 @@ set_rights_and_access <- function(mn, pids, subject, permissions) {
       cat("Setting rights holder to ", subject, ".\n")
       sysmeta@rightsHolder <- subject
     } else {
-      cat("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n")
+      log_message(paste0("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n"))
     }
 
     for (permission in permissions) {
       if (datapack::hasAccessRule(sysmeta, subject, permission)) {
-        cat(paste0("Skipping the addition of permission '", permission, "' for subject '", subject, "'\n"))
+        log_message(paste0("Skipping the addition of permission '", permission, "' for subject '", subject, "'\n"))
         next
       }
 
       changed <- TRUE
 
-      cat(paste0("Adding permission '", permission, "' for subject '", subject, "'\n"))
+      log_message(paste0("Adding permission '", permission, "' for subject '", subject, "'\n"))
       sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
     }
 
     if (changed == TRUE) {
-      cat("Updating sysmeta.\n")
+      log_message(paste0("Updating System Metadata for ", pid, "."))
 
       update_response <- tryCatch({
         dataone::updateSystemMetadata(mn, pid, sysmeta)
@@ -322,7 +322,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions) {
         stop("Failed update.")
       }
     } else {
-      cat("No changes needed.\n")
+      log_message(paste0("No changes needed for ", pid, "."))
     }
 
     # Save the result for this PID
