@@ -31,12 +31,13 @@ env_get <- function() {
 #'
 #' @param name (character) Optional. The environment name.
 #' @param path (character) Optional. Path to an environment file.
+#' @param skip_mn (logical) Optional. Skip contacting the MNode and filling in the $mn element of the environment.
 #'
 #' @return (list) A list of name-value pairs.
 #' @export
 #'
 #' @examples
-env_load <- function(name=NULL, path=NULL) {
+env_load <- function(name=NULL, path=NULL, skip_mn=FALSE) {
   # Determine the environment to load
   if (is.null(name)) {
     name <- env_get()
@@ -60,7 +61,9 @@ env_load <- function(name=NULL, path=NULL) {
   env <- yaml_content[name][[1]]
 
   # Load up the MN
-  env$mn <- dataone::MNode(env$mn_base_url)
+  if (!skip_mn) {
+    env$mn <- dataone::MNode(env$mn_base_url)
+  }
 
   # Return the list of environmental variables
   env

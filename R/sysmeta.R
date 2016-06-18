@@ -23,7 +23,7 @@ add_access_rules <- function(sysmeta) {
   # Add myself explicitly as changePermission/write so I can update objects
   # in the dev environment
   if (env_get() == "development") {
-    sysmeta <- datapack::addAccessRule(sysmeta, env$submitter, "changePermission")
+    sysmeta <- datapack::addAccessRule(sysmeta, env_load(skip_mn = TRUE)$submitter, "changePermission")
   }
 
   sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "read")
