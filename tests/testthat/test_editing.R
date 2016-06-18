@@ -175,7 +175,7 @@ test_that("we can publish an update to an object", {
 
   # Create a CSV to replace it
   tmp <- tempfile(fileext = ".csv")
-  csv <- data.frame(x=1:50)
+  csv <- data.frame(x = 1:50)
   write.csv(csv, tmp)
 
   upd <- update_object(mn, old, tmp)
@@ -196,7 +196,7 @@ test_that("we can publish an update to an object and specify our own format id",
 
   # Create a CSV to replace it
   tmp <- tempfile(fileext = ".csv")
-  csv <- data.frame(x=1:50)
+  csv <- data.frame(x = 1:50)
   write.csv(csv, tmp)
 
   upd <- update_object(mn, old, tmp, "text/plain")
