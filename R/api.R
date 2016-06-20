@@ -55,11 +55,12 @@ is_token_expired <- function() {
   if (inherits(token_info, "try-error") ||
       !is.data.frame(token_info) ||
       !("expired" %in% names(token_info))) {
-    log_message("Failed to get token info.")
-    return(FALSE)
+    stop("Failed to get token info.")
   }
+  stopifnot("dataone_test_token" %in% token_info$name)
+  expired <- token_info[token_info$name == "dataone_test_token","expired"]
 
-  if (token_info$expired == TRUE) {
+  if (expired == TRUE) {
     return(TRUE)
   } else {
     return(FALSE)
