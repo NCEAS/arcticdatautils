@@ -723,3 +723,64 @@ warn_current_version <- function() {
 }
 
 
+#' Get the obsoleted/obsoletedBy properties of an object as a named list.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pid (character) Any object.
+#'
+#' @return (list) A list of the obsoleted/obsoletedBy properties.
+#' @export
+#'
+#' @examples
+get_chain_neighbors <- function(mn, pid) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+
+  sysmeta <- getSystemMetadata(mn, pid)
+  list("obsoletes" = sysmeta@obsoletes,
+       "obsoletedBy" = sysmeta@obsoletedBy)
+}
+
+
+#' Get the PIDs of all versions of an object.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pid (character) Any object in the chain.
+#'
+#' @return (character) A vector of PIDs in the chain, in order.
+#' @export
+#'
+#' @examples
+get_all_versions <- function(mn, pid) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+
+  # Cache obsoletes/obsoletedBy
+  cache <- list()
+
+  # Walk backwards first, caching obsoletes/obsoleteBy, and then walk forward
+  cache[[pid]] <- get_chain_neighbors(mn, pid)
+
+  # Walk backward, looking one step ahead
+  while (!is.na(cache[[pid]]$obsoletes)) {
+    pid <- cache[[pid]]$obsoletes
+    cache[[pid]] <- get_chain_neighbors(mn, pid)
+  }
+
+  # Then walk forward, looking one step ahead
+  while (!is.na(cache[[pid]]$obsoletedBy)) {
+    pid <- cache[[pid]]$obsoletedBy
+
+    if (!(pid %in% names(cache))) {
+      cache[[pid]] <- get_chain_neighbors(mn, pid)
+    }
+  }
+
+  names(rev(cache)) # Reversed so it's in proper order
+}
+
+
+
+
