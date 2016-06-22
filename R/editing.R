@@ -170,7 +170,7 @@ update_object <- function(mn, pid, path, format_id=NULL) {
 #' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
 #' @param parent_metadata_pid (character)  Optional. identifier for the metadata document of the parent package.
 #' @param parent_data_pids(character)  Optional. Identifier(s) of data in the parent package.
-#' @param parent_child_pids (character) Optional. Identifier(s) of child packages in the parent package.
+#' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
 #' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
 #' @param public (logical) Optional. Make the update public.
