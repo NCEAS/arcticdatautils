@@ -778,7 +778,7 @@ get_all_versions <- function(mn, pid) {
     }
   }
 
-  names(rev(cache)) # Reversed so it's in proper order
+  names(cache) # Reversed so it's in proper order
 }
 
 
