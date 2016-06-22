@@ -13,7 +13,7 @@
 #'
 #' @param mn (MNode) The Member Node to publish the object to.
 #' @param path the path to the file to be published
-#' @param format_id (character) The format ID to set for
+#' @param format_id (character) Optional. The format ID to set for the object.
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
 #' @param clone_pid (character) PID of objet to clone System Metadata from
@@ -24,7 +24,7 @@
 #' @export
 publish_object <- function(mn,
                            path,
-                           format_id,
+                           format_id=NULL,
                            pid=NULL,
                            sid=NULL,
                            clone_pid=NULL,
@@ -32,8 +32,12 @@ publish_object <- function(mn,
 
   stopifnot(class(mn) == "MNode")
   stopifnot(file.exists(path))
-  stopifnot(is.character(format_id),
-            nchar(format_id) > 0)
+
+  # Decide the format_id
+  if (is.null(format_id)) {
+    format_id <- guess_format_id(path)
+    log_message(paste0("Guessed format ID of ", format_id, "."))
+  }
 
   # Set up some variables for use later on
   ########################################
