@@ -321,7 +321,7 @@ publish_update <- function(mn,
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
                                   obsoletes = metadata_pid,
-                                  fileName = "science_metadata.xml")
+                                  fileName = metadata_sysmeta@fileName)
 
   # Set the SID if one existed on old metadata object
   if (!is.na(metadata_sysmeta@seriesId)) {
