@@ -121,6 +121,8 @@ update_object <- function(mn, pid, path, format_id=NULL) {
     log_message(paste0("Guessed format ID of ", format_id, "."))
   }
 
+  log_message(paste0("Updating object ", pid, " with the file at ", path, "."))
+
   # Generate a PID
   new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
 
