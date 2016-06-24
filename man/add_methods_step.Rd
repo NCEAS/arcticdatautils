@@ -19,11 +19,4 @@ add_methods_step(doc, title, description)
 \description{
 Adds a step to the methods document
 }
-\examples{
-\dontrun{
-# Add a method step to a fresh document
-my_doc <- new("eml")
-my_doc <- add_methods_step(my_doc, "some method", "how I did the method")
-}
-}
 

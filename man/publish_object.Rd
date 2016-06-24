@@ -4,7 +4,7 @@
 \alias{publish_object}
 \title{editing.R}
 \usage{
-publish_object(mn, path, format_id, pid = NULL, sid = NULL,
+publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
   clone_pid = NULL, public = TRUE)
 }
 \arguments{
@@ -12,7 +12,7 @@ publish_object(mn, path, format_id, pid = NULL, sid = NULL,
 
 \item{path}{the path to the file to be published}
 
-\item{format_id}{(character) The format ID to set for}
+\item{format_id}{(character) Optional. The format ID to set for the object.}
 
 \item{pid}{(character) Optional. The PID to use with the object.}
 

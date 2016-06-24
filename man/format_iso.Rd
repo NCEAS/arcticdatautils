@@ -6,11 +6,23 @@
 \usage{
 format_iso()
 }
+\value{
+(character) The format ID for ISO 19139.
+}
 \description{
 A set of thin functions which return the DataONE format ID string. These are
 to aid in filling in function arguments and can't remember or don't want to
 type in the full format ID. By putting these format ID strings into
 functions, a user's autocompletion routine in their editor can help them
 fill in the format ID they want.
+Helper function to generate the ISO 19139 format ID.w
+}
+\examples{
+format_iso()
+\dontrun{
+# Upload a local ISO19139 XML file:
+env <- env_load()
+publish_object(env$mn, "path_to_some_EML_file", format_iso())
+}
 }
 

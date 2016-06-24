@@ -31,7 +31,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{parent_metadata_pid}{(character)  Optional. identifier for the metadata document of the parent package.}
 
-\item{parent_child_pids}{(character) Optional. Identifier(s) of child packages in the parent package.}
+\item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.}
 
 \item{public}{(logical) Optional. Make the update public.
 This applies to the new metadata PID and its resource map and data object.

@@ -4,12 +4,14 @@
 \alias{env_load}
 \title{Load environmental variables from a YAML-formatted environment file.}
 \usage{
-env_load(name = NULL, path = NULL)
+env_load(name = NULL, path = NULL, skip_mn = FALSE)
 }
 \arguments{
 \item{name}{(character) Optional. The environment name.}
 
 \item{path}{(character) Optional. Path to an environment file.}
+
+\item{skip_mn}{(logical) Optional. Skip contacting the MNode and filling in the $mn element of the environment.}
 }
 \value{
 (list) A list of name-value pairs.
