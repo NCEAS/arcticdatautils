@@ -405,10 +405,10 @@ publish_update <- function(mn,
 #' Similar to but different than update_resource_map in that it uses a create
 #' call instead of an update call.
 #'
-#' @param mn
-#' @param metadata_pid
-#' @param data_pids
-#' @param child_pids
+#' @param mn (MNode) The Member Node
+#' @param metadata_pid (character) The PID of the metadata object to go in the package.
+#' @param data_pids (character) The PID(s) of the data objects to go in the package.
+#' @param child_pids (character) The resource map PIDs of the packages to be nested under the package.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
 #'
 #' @return The created resource map's PID (character)
