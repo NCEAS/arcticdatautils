@@ -346,7 +346,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
     if (subject != sysmeta@rightsHolder) {
       changed <- TRUE
 
-      cat("Setting rights holder to ", subject, ".\n")
+      log_message(paste0("Setting rights holder to ", subject, "."))
       sysmeta@rightsHolder <- subject
     } else {
       log_message(paste0("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n"))
