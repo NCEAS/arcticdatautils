@@ -307,13 +307,14 @@ remove_public_read <- function(mn, pids) {
 #' @param mn (MNode) The Member Node to send the query.
 #' @param pids (character) The PID(s) to set the access rule for.
 #' @param subject (character)The subject of the rule(s).
-#' @param permissions (character) The permissions for the rule.
+#' @param permissions (character) The permissions for the rule. Defaults to
+#' read, write, and changePermission.
 #'
 #' @return Whether an update was needed.
 #' @export
 #'
 #' @examples
-set_rights_and_access <- function(mn, pids, subject, permissions) {
+set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "write", "changePermission")) {
   stopifnot(class(mn) == "MNode",
             all(is.character(pids)),
             all(nchar(pids) > 0),
