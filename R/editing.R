@@ -331,6 +331,7 @@ publish_update <- function(mn,
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
 
   if (public) {
+    # Make the metadata public
     metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
 
     # Make the data objects public
