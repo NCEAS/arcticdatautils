@@ -759,11 +759,12 @@ get_all_versions <- function(mn, pid) {
 
   # Cache obsoletes/obsoletedBy
   cache <- list()
+  cache_order <- c()
 
   # Walk backwards first, caching obsoletes/obsoleteBy, and then walk forward
   cache[[pid]] <- get_chain_neighbors(mn, pid)
 
-  # Walk backward, looking one step ahead
+  # Walk backward, looking one step behind
   while (!is.na(cache[[pid]]$obsoletes)) {
     pid <- cache[[pid]]$obsoletes
     cache[[pid]] <- get_chain_neighbors(mn, pid)
@@ -771,6 +772,7 @@ get_all_versions <- function(mn, pid) {
 
   # Then walk forward, looking one step ahead
   while (!is.na(cache[[pid]]$obsoletedBy)) {
+    cache_order <- c(cache_order, pid)
     pid <- cache[[pid]]$obsoletedBy
 
     if (!(pid %in% names(cache))) {
@@ -778,7 +780,11 @@ get_all_versions <- function(mn, pid) {
     }
   }
 
-  names(cache) # Reversed so it's in proper order
+  # Add the last PID
+  cache_order <- c(cache_order, pid)
+
+  # Print, with formatting
+  paste(cache_order, collapse = " --> ")
 }
 
 
