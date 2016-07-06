@@ -332,6 +332,11 @@ publish_update <- function(mn,
 
   if (public) {
     metadata_updated_sysmeta <- datapack::addAccessRule(metadata_updated_sysmeta, "public", "read")
+
+    # Make the data objects public
+    for (data_pid in data_pids) {
+      set_public_read(mn, data_pid)
+    }
   }
 
   set_rights_holder(mn, metadata_pid, me)
