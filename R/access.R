@@ -18,7 +18,7 @@ get_package <- function(mn, pid) {
             nchar(pid) > 0)
 
   # Warn if `pid` looks like a resource map
-  if(grepl("resource", pid)) {
+  if (grepl("resource", pid)) {
     warning(paste0("Value of argument PID is ", pid, " which looks like a resource map. This function expects a metadata PID."))
   }
 
@@ -36,15 +36,72 @@ get_package <- function(mn, pid) {
 
   # Get all the PIDs we need
   identifier <- unlist(response[[1]]$identifier)
-  resource_map = unlist(response[[1]]$resourceMap)
+  resource_map = filter_obsolete_pids(mn, unlist(response[[1]]$resourceMap))
   documents <- unlist(response[[1]]$documents)
   data_pids <- documents[(!grepl(identifier, documents) & !grepl("resource", documents))]
   child_packages <- documents[(!grepl(identifier, documents) & grepl("resource", documents))]
 
-  list(metadata = identifier,
-       resource_map = resource_map,
-       data = data_pids,
-       child_packages = child_packages)
+  # Look for a parent package
+  pid_esc <- stringi::stri_replace_all_fixed(resource_map, ":", "\\:")
+  queryParams <- list(q = paste0("id:", pid_esc),
+                      rows = "1000",
+                      fl = "identifier,resourceMap")
+  response <- dataone::query(mn, queryParams, as = "list")
+
+  # Filter to just non-obsoleted resource maps
+  parent_package <- NULL
+
+  if (length(response) == 1 && "resourceMap" %in% names(response[[1]])) {
+    non_obsolete_resource_maps <- filter_obsolete_pids(mn, unlist(response[[1]]$resourceMap))
+
+    if (length(non_obsolete_resource_maps) != 1) {
+      warning("Package had multiple non-obsoleted resource maps. This is ambiguous and results may not be as expected.")
+    }
+
+    # Find the metadata PID so we can call get_package() on it
+    pid_esc <- stringi::stri_replace_all_fixed(non_obsolete_resource_maps, ":", "\\:")
+    queryParams <- list(q = paste0("resourceMap:", pid_esc, " AND formatType:METADATA"),
+                        rows = "1000",
+                        fl = "identifier,resourceMap")
+
+    response <- dataone::query(mn, queryParams, as = "list")
+
+    if (length(response) != 1) {
+
+      stop("Query response for the metadata document of the parent package was not length of one which was unexpected.")
+    }
+
+    parent_package <- get_package(mn, response[[1]]$identifier)
+  }
+
+  response <- list(metadata = identifier,
+                   resource_map = resource_map,
+                   data = data_pids,
+                   child_packages = child_packages)
+
+
+  if (!is.null(parent_package)) {
+    response[["parent_package"]] <- parent_package
+  }
+
+  response
+}
+
+
+#' Filters PIDs that are obsolete.
+#'
+#' Whether or not a PID is obsolete is determined by whether its "obsoletedBy"
+#' property is set to another PID (TRUE) or is NA (FALSE).
+#'
+#' @param mn (MNode) The Member Node to query.
+#' @param pids (character) PIDs to check the obsoletion state of.
+#'
+#' @return (character) PIDs that are not obsoleted by another PID.
+#' @export
+#'
+#' @examples
+filter_obsolete_pids <- function(mn, pids) {
+  pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(mn, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
 
 
