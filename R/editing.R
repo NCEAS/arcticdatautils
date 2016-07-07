@@ -587,3 +587,26 @@ update_resource_map <- function(mn,
 
   return(resmap_update_response)
 }
+
+
+#' Set the file name on an object
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pid (character) The PID of the object to set the file name on.
+#' @param name (character) The file name.
+#'
+#' @return (logical) Whether the update succeeded, FALSE means there was an error.
+#' @export
+#'
+#' @examples
+set_file_name <- function(mn, pid, name) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.character(name),
+            nchar(name) > 0)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  sysmeta@fileName <- name
+  dataone::updateSystemMetadata(mn, pid, sysmeta)
+}
