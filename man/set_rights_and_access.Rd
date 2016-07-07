@@ -5,7 +5,8 @@
 \title{Set the given subject as the rightsHolder and subject with write and
 changePermission access for the given PID.}
 \usage{
-set_rights_and_access(mn, pids, subject, permissions)
+set_rights_and_access(mn, pids, subject, permissions = c("read", "write",
+  "changePermission"))
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to send the query.}
@@ -14,7 +15,8 @@ set_rights_and_access(mn, pids, subject, permissions)
 
 \item{subject}{(character)The subject of the rule(s).}
 
-\item{permissions}{(character) The permissions for the rule.}
+\item{permissions}{(character) The permissions for the rule. Defaults to
+read, write, and changePermission.}
 }
 \value{
 Whether an update was needed.
