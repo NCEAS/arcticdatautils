@@ -7,12 +7,15 @@
 #'
 #' @param mn (MNode) The Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
+#' @param parent (logical) Whether to query for the parent package. Setting this
+#' to true will make this function take longer to run so it is turned of by
+#' default.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_package <- function(mn, pid) {
+get_package <- function(mn, pid, parent=FALSE) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -42,6 +45,7 @@ get_package <- function(mn, pid) {
   child_packages <- documents[(!grepl(identifier, documents) & grepl("resource", documents))]
 
   # Look for a parent package
+  stopifnot(nchar(resource_map) > 0)
   pid_esc <- stringi::stri_replace_all_fixed(resource_map, ":", "\\:")
   queryParams <- list(q = paste0("id:", pid_esc),
                       rows = "1000",
@@ -51,13 +55,14 @@ get_package <- function(mn, pid) {
   # Filter to just non-obsoleted resource maps
   parent_package <- NULL
 
-  if (length(response) == 1 && "resourceMap" %in% names(response[[1]])) {
+  if (parent && length(response) == 1 && "resourceMap" %in% names(response[[1]])) {
     non_obsolete_resource_maps <- filter_obsolete_pids(mn, unlist(response[[1]]$resourceMap))
 
     if (length(non_obsolete_resource_maps) != 1) {
       warning("Package had multiple non-obsoleted resource maps. This is ambiguous and results may not be as expected.")
     }
 
+    stopifnot(nchar(non_obsolete_resource_maps) > 0)
     # Find the metadata PID so we can call get_package() on it
     pid_esc <- stringi::stri_replace_all_fixed(non_obsolete_resource_maps, ":", "\\:")
     queryParams <- list(q = paste0("resourceMap:", pid_esc, " AND formatType:METADATA"),
@@ -67,7 +72,6 @@ get_package <- function(mn, pid) {
     response <- dataone::query(mn, queryParams, as = "list")
 
     if (length(response) != 1) {
-
       stop("Query response for the metadata document of the parent package was not length of one which was unexpected.")
     }
 
