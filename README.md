@@ -80,10 +80,10 @@ publish_update(env$mn,
 
 ## Installing
 
-I recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) which should be v0.4:
+I recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) which should be v0.4.1:
 
 ```
-devtools::install_github("NCEAS/arcticdatautils", ref = "v0.4")
+devtools::install_github("NCEAS/arcticdatautils", ref = "v0.4.1")
 ```
 
 If you're feeling adventurous, you can install from the bleeding edge:
