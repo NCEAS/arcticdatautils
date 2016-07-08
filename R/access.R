@@ -11,7 +11,7 @@
 #' to true will make this function take longer to run so it is turned of by
 #' default.
 #'
-#' @return
+#' @return (list) A structured list of the members of the package.
 #' @export
 #'
 #' @examples
