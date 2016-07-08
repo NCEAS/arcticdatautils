@@ -1,6 +1,6 @@
 context("editing")
 
-mn <- dataone::MNode("https://dev.nceas.ucsb.edu/knb/d1/mn/v2")
+mn <- env_load()$mn
 
 test_that("we can publish an update", {
   if (!is_token_set()) {

@@ -152,7 +152,7 @@ get_doc_id <- function(sysmeta) {
   if (sysmeta@originMemberNode == "urn:node:ARCTIC") {
     metacat_base_url <- "https://arcticdata.io/metacat/metacat"
   } else {
-    metacat_base_url <- "https://dev.nceas.ucsb.edu/knb/metacat"
+    metacat_base_url <- "https://test.arcticdata.io/metacat/metacat"
   }
   # EndHack
 
