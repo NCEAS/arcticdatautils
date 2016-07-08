@@ -4,12 +4,19 @@
 \alias{get_package}
 \title{access.R}
 \usage{
-get_package(mn, pid)
+get_package(mn, pid, parent = FALSE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to run the query on.}
 
 \item{pid}{(character) The the metadata PID of the package.}
+
+\item{parent}{(logical) Whether to query for the parent package. Setting this
+to true will make this function take longer to run so it is turned of by
+default.}
+}
+\value{
+(list) A structured list of the members of the package.
 }
 \description{
 Utility functions for getting and setting access rules for DataONE objects.
