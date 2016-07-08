@@ -713,7 +713,6 @@ get_latest_release <- function() {
 #'
 #' @examples
 warn_current_version <- function() {
-  cat("Checking version...")
   current <- get_current_version()
   latest <- get_latest_release()
 
