@@ -497,68 +497,70 @@ create_resource_map <- function(mn,
 #'
 #' @export
 update_resource_map <- function(mn,
-                                old_resource_map_pid,
-                                new_resource_map_pid=NULL,
+                                resource_map_pid,
                                 metadata_pid,
                                 data_pids=NULL,
                                 child_pids=NULL,
+                                identifier=NULL,
                                 public=FALSE,
                                 check_first=TRUE) {
 
   # Check arguments
   stopifnot(class(mn) == "MNode")
-  stopifnot(is.character(old_resource_map_pid),
-            nchar(old_resource_map_pid) > 0)
+  stopifnot(is.character(resource_map_pid),
+            nchar(resource_map_pid) > 0)
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
 
   if (check_first) {
     log_message("Checking all the object passed in as arguments exist before going on...")
 
-    stopifnot(object_exists(mn, old_resource_map_pid))
+    stopifnot(object_exists(mn, resource_map_pid))
     stopifnot(object_exists(mn, metadata_pid))
     if (!is.null(data_pids))
       stopifnot(object_exists(mn, data_pids))
     if (!is.null(child_pids))
       stopifnot(object_exists(mn, child_pids))
-    stopifnot(is_resource_map(mn, old_resource_map_pid))
+    stopifnot(is_resource_map(mn, resource_map_pid))
+    stopifnot(all(is_resource_map(mn, child_pids)))
+
   }
 
 
   # Get the current rightsHolder
-  sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
+  sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(class(sysmeta) == "SystemMetadata")
 
   previous_rights_holder <- sysmeta@rightsHolder
 
   # Set the rightsHolder to us temporarily
   me <- get_token_subject()
-  set_rights_holder(mn, old_resource_map_pid, me)
+  set_rights_holder(mn, resource_map_pid, me)
 
   # Create the replacement resource map
-  if (is.null(new_resource_map_pid)) {
-    new_resource_map_pid <- paste0("resource_map_", new_uuid())
+  if (is.null(identifier)) {
+    identifier <- paste0("resource_map_", new_uuid())
   }
 
   new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
-                                       resource_map_pid = new_resource_map_pid)
+                                       resource_map_pid = identifier)
   stopifnot(file.exists(new_rm_path))
 
   rm(sysmeta)
 
-  log_message(paste("Getting updated copy of System Metadata for ", old_resource_map_pid))
-  sysmeta <- dataone::getSystemMetadata(mn, old_resource_map_pid)
+  log_message(paste("Getting updated copy of System Metadata for ", identifier))
+  sysmeta <- dataone::getSystemMetadata(mn, identifier)
   stopifnot(class(sysmeta) == "SystemMetadata")
 
   new_rm_sysmeta <- sysmeta
-  new_rm_sysmeta@identifier <- new_resource_map_pid
+  new_rm_sysmeta@identifier <- identifier
   new_rm_sysmeta@size <- file.size(new_rm_path)
   new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha256")
   new_rm_sysmeta@checksumAlgorithm <- "SHA256"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
-  new_rm_sysmeta@obsoletes <- old_resource_map_pid
+  new_rm_sysmeta@obsoletes <- resource_map_pid
   slot(new_rm_sysmeta, "obsoletedBy", check = FALSE) <- NA
 
   new_rm_sysmeta <- add_admin_group_access(new_rm_sysmeta)
@@ -570,20 +572,20 @@ update_resource_map <- function(mn,
   # Update it
   log_message(paste0("Updating resource map..."))
   resmap_update_response <- dataone::updateObject(mn,
-                                                  pid = old_resource_map_pid,
-                                                  newpid = new_resource_map_pid,
+                                                  pid = resource_map_pid,
+                                                  newpid = identifier,
                                                   sysmeta = new_rm_sysmeta,
                                                   file = new_rm_path
   )
 
   # Set the rightsHolder back
-  set_rights_holder(mn, old_resource_map_pid, previous_rights_holder)
+  set_rights_holder(mn, resource_map_pid, previous_rights_holder)
 
   if (file.exists(new_rm_path)) {
     file.remove(new_rm_path)
   }
 
-  log_message(paste0("Successfully updated ", old_resource_map_pid, " with ", new_resource_map_pid, "."))
+  log_message(paste0("Successfully updated ", resource_map_pid, " with ", identifier, "."))
 
   return(resmap_update_response)
 }
