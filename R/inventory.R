@@ -28,13 +28,14 @@ inv_init <- function() {
 #'
 #' @param path (character) Path to a file containing a file listing.
 #' @param inventory (character) A \code{data.frame}.
+#' @param filter (logical) Filter out versioned datasets. Default is TRUE.
 #'
 #' @return An inventory (data.frame)
 #'
 #' @export
 #'
 #' @examples
-inv_load_files <- function(inventory, path) {
+inv_load_files <- function(inventory, path, filter=TRUE) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
             is.data.frame(inventory))
@@ -57,11 +58,13 @@ inv_load_files <- function(inventory, path) {
   if (size_diff > 0) { cat("Removed", size_diff, "file(s) that weren't inside acadis-gateway or acadis-field-projects subfolders.\n") }
 
   # Filter out versioned datasets
-  size_before <- nrow(files)
-  files <- files[grep("v_\\d\\.\\d", files$file, invert = TRUE), "file", drop=FALSE]
+  if (filter) {
+    size_before <- nrow(files)
+    files <- files[grep("v_\\d\\.\\d", files$file, invert = TRUE), "file", drop=FALSE]
 
-  size_diff <- size_before - nrow(files)
-  if (size_diff > 0) { cat("Removed", size_diff, "file(s) that were part of versioned datasets.\n") }
+    size_diff <- size_before - nrow(files)
+    if (size_diff > 0) { cat("Removed", size_diff, "file(s) that were part of versioned datasets.\n") }
+  }
 
   # If inventory is empty, just make the inventory the same as filenames
   if (nrow(inventory) == 0) {
