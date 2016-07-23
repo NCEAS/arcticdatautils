@@ -567,53 +567,40 @@ path_join <- function(path_parts=c("")) {
 #' Test whether an object is a particular format ID.
 #'
 #' @param mn (MNode)
-#' @param pid (character)
+#' @param pids (character)
 #' @param format_id (character)
 #'
 #' @return (logical)
 #' @export
 #'
 #' @examples
-is_format_id <- function(mn, pid, format_id) {
+is_format_id <- function(mn, pids, format_id) {
   stopifnot(class(mn) == "MNode")
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
+  stopifnot(all(is.character(pids)),
+            all(lengths(pids) > 0))
   stopifnot(is.character(format_id),
             nchar(format_id) > 0)
 
-  # Get System Metadata
-  sysmeta <- tryCatch({
-    log_message(paste0("Getting System Metadata for PID ", pid, "..."))
-    dataone::getSystemMetadata(mn, pid)
-  },
-  error = function(e) {
-    log_message(paste0("Failed to get System Metadata for PID of ", pid, "."))
-    log_message(e)
-    e
-  })
+  result <- vector("logical", length(pids))
 
-  if (inherits(sysmeta, "error")) {
-    return(FALSE)
+  for (i in seq_along(pids)) {
+    result[i] <- dataone::getSystemMetadata(mn, pids[i])@formatId == format_id
   }
 
-  if (sysmeta@formatId == format_id) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
+  result
 }
 
 #' Determines whether the object with the given PID is a resource map.
 #'
-#' @param mn (MNode)
-#' @param pid (character)
+#' @param mn (MNode) The Member Node
+#' @param pids (character) Vector of PIDs
 #'
-#' @return (logical)
+#' @return (logical) Whether or not the object(s) are resource maps
 #' @export
 #'
 #' @examples
-is_resource_map <- function(mn, pid) {
-  is_format_id(mn, pid, "http://www.openarchives.org/ore/terms")
+is_resource_map <- function(mn, pids) {
+  is_format_id(mn, pids, "http://www.openarchives.org/ore/terms")
 }
 
 
