@@ -47,7 +47,7 @@ sysmeta_to_entity <- function(sysmeta) {
 
   # otherEntity
   other_entity <- new("otherEntity")
-  other_entity@id <- new("xml_attribute", sysmeta@checksum)
+  other_entity@id <- new("xml_attribute", sysmeta@identifier)
   other_entity@scope <- new("xml_attribute", "document")
 
   if (is.na(sysmeta@fileName)) {
