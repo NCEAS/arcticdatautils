@@ -141,10 +141,11 @@ set_rights_holder <- function(mn, pids, subject) {
       log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
       result[i] <- TRUE
     } else {
+      # Update System Metadata
+      log_message(paste0("Updating rightsHolder for PID ", pid, " from ", sysmeta@rightsHolder, " to ", subject, "."))
+
       sysmeta@rightsHolder <- subject
 
-      # Update System Metadata
-      log_message(paste0("Updating rightsHolder for PID ", pid, " to ", subject, "."))
       response <- tryCatch({
         dataone::updateSystemMetadata(mn,
                                       pid = pid,
