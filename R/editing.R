@@ -363,11 +363,11 @@ publish_update <- function(mn,
   # Update the resource map
   #########################
   response[["resource_map"]] <- update_resource_map(mn,
-                                                    old_resource_map_pid = resource_map_pid,
-                                                    new_resource_map_pid = resmap_updated_pid,
+                                                    resource_map_pid = resource_map_pid,
                                                     metadata_pid = metadata_updated_pid,
                                                     data_pids = data_pids,
                                                     child_pids = child_pids,
+                                                    identifier = resmap_updated_pid,
                                                     public = public,
                                                     check_first = check_first)
 
@@ -392,7 +392,7 @@ publish_update <- function(mn,
     }
 
     response[["parent_resource_map"]] <- update_resource_map(mn,
-                                                             old_resource_map_pid = parent_resmap_pid,
+                                                             resource_map_pid = parent_resmap_pid,
                                                              metadata_pid = parent_metadata_pid,
                                                              data_pids = parent_data_pids,
                                                              child_pids = parent_child_pids,
