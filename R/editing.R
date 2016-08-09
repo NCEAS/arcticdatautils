@@ -526,7 +526,6 @@ update_resource_map <- function(mn,
     stopifnot(all(is_resource_map(mn, child_pids)))
   }
 
-
   # Get the current rightsHolder
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(class(sysmeta) == "SystemMetadata")
