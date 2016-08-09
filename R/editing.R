@@ -522,8 +522,8 @@ update_resource_map <- function(mn,
     if (!is.null(child_pids))
       stopifnot(object_exists(mn, child_pids))
     stopifnot(is_resource_map(mn, resource_map_pid))
+    if (!is.null(child_pids))
     stopifnot(all(is_resource_map(mn, child_pids)))
-
   }
 
 
