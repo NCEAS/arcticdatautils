@@ -358,7 +358,7 @@ publish_update <- function(mn,
                     metadata_pid,
                     metadata_sysmeta@rightsHolder)
 
-  log_message("Updated metadata document.")
+  log_message(paste0("Updated metadata document ", metadata_pid, " with ", metadata_updated_pid, "."))
 
   # Update the resource map
   #########################
