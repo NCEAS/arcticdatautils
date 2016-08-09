@@ -65,7 +65,10 @@ test_that("we can update a resource map", {
   # Create an initial package
   response <- create_dummy_package(mn)
 
-  updated <- update_resource_map(mn, old_resource_map_pid = response$resource_map, metadata_pid = response$metadata, data_pids = response$data)
+  updated <- update_resource_map(mn,
+                                 resource_map_pid = response$resource_map,
+                                 metadata_pid = response$metadata,
+                                 data_pids = response$data)
 
   # Check the object exists
   expect_true(object_exists(mn, updated))
