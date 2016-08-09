@@ -549,8 +549,8 @@ update_resource_map <- function(mn,
 
   rm(sysmeta)
 
-  log_message(paste("Getting updated copy of System Metadata for ", identifier))
-  sysmeta <- dataone::getSystemMetadata(mn, identifier)
+  log_message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
+  sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(class(sysmeta) == "SystemMetadata")
 
   new_rm_sysmeta <- sysmeta
