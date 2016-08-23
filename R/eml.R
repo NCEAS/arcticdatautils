@@ -225,59 +225,115 @@ clear_methods <- function(doc) {
 }
 
 #' Create an EML creator subtree from a first, last, and email.
+#
+#' @param given_names (character) One or more given (first) names.
+#' @param sur_name (character) A sur (last) name.
+#' @param organization (character) One or more organization names.
+#' @param email (character) An email address.
+#' @param phone (character) A phone number.
+#' @param address (address) An object of type 'address' (EML).
 #'
-#' @param first (character) The first name.
-#' @param last (character) The last name.
-#' @param email (character) The email address.
-#'
-#' @return (creator) The new creator sub-tree.
+#' @return (creator) The new creator element.
 #' @export
 #'
 #' @examples
 #' creator("test", "user", test@user.com")
-eml_creator <- function(first, last, email) {
-  stopifnot(all(sapply(c(first, last, email), is.character)),
-            all(lengths(c(first, last, email)) > 0))
-
-  indiv_name <- eml_individual_name(first, last)
-
-  # Create <electronicMailAddress>
-  email_address <- new("electronicMailAddress")
-  email_address@.Data <- email
+eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
+  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
+            all(lengths(c(given_names, sur_name)) > 0))
+  if (!is.null(address)) stopifnot(inherits(address, "address"))
 
   # Create <creator>
   creator <- new("creator")
-  creator@individualName <- new("ListOfindividualName", list(indiv_name))
-  creator@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+
+  # Individual Name
+  creator@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+
+  # Organization Name
+  if (!is.null(organization)) {
+    org <- new("organizationName")
+    org@.Data <- organization
+    creator@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Email
+  if (!is.null(email)) {
+    email_address <- new("electronicMailAddress")
+    email_address@.Data <- email
+
+    creator@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+  }
+
+  # Phone
+  if (!is.null(phone)) {
+    phn <- new("phone")
+    phn@phonetype <- new("xml_attribute", "voice")
+    phn@.Data <- phone
+
+    creator@phone <- new("ListOfphone", list(phn))
+  }
+
+  # Address
+  if (!is.null(address)) {
+    creator@address <- new("ListOfaddress", list(address))
+  }
 
   creator
 }
 
 #' Create an EML contact subtree from a first, last, and email.
 #'
-#' @param first (character) The first name.
-#' @param last (character) The last name.
-#' @param email (character) The email address.
+#' @param given_names (character) One or more given (first) names.
+#' @param sur_name (character) A sur (last) name.
+#' @param organization (character) One or more organization names.
+#' @param email (character) An email address.
+#' @param phone (character) A phone number.
+#' @param address (address) An object of type 'address' (EML).
 #'
 #' @return (contact) The new contact sub-tree.
 #' @export
 #'
 #' @examples
 #' eml_contact("test", "user", test@user.com")
-eml_contact <- function(first, last, email) {
-  stopifnot(all(sapply(c(first, last, email), is.character)),
-            all(lengths(c(first, last, email)) > 0))
-
-  indiv_name <- eml_individual_name(first, last)
-
-  # Create <electronicMailAddress>
-  email_address <- new("electronicMailAddress")
-  email_address@.Data <- email
+eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
+  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
+            all(lengths(c(given_names, sur_name)) > 0))
+  if (!is.null(address)) stopifnot(inherits(address, "address"))
 
   # Create <contact>
   contact <- new("contact")
-  contact@individualName <- new("ListOfindividualName", list(indiv_name))
-  contact@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+
+  # Individual Name
+  contact@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+
+  # Organization Name
+  if (!is.null(organization)) {
+    org <- new("organizationName")
+    org@.Data <- organization
+    contact@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Email
+  if (!is.null(email)) {
+    email_address <- new("electronicMailAddress")
+    email_address@.Data <- email
+
+    contact@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+  }
+
+  # Phone
+  if (!is.null(phone)) {
+    phn <- new("phone")
+    phn@phonetype <- new("xml_attribute", "voice")
+    phn@.Data <- phone
+
+    contact@phone <- new("ListOfphone", list(phn))
+  }
+
+  # Address
+  if (!is.null(address)) {
+    creator@address <- new("ListOfaddress", list(address))
+  }
 
   contact
 }
@@ -285,27 +341,30 @@ eml_contact <- function(first, last, email) {
 
 #' Create an EML individualName section
 #'
-#' @param first (character) First name.
-#' @param last (character) Last name.
+#' @param given_names (character) One or more given names.
+#' @param sur_name (character) A sur (last) name.
 #'
 #' @return (individualName) The new individualName section
 #' @export
 #'
 #' @examples
 #' eml_individual_name("some", "user)
-eml_individual_name <- function(first, last) {
-  stopifnot(all(sapply(c(first, last), is.character)),
-            all(lengths(c(first, last)) > 0))
+eml_individual_name <- function(given_names, sur_name) {
+  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
+            all(lengths(c(given_names, sur_name)) > 0))
 
-  given <- new("givenName")
-  given@.Data <- first
+  givens <- lapply(given_names, function(given_name) {
+    x <- new("givenName")
+    x@.Data <- given_name
+    x
+  })
 
   sur <- new("surName")
-  sur@.Data <- last
+  sur@.Data <- sur_name
 
   # Create <individualName>
   indiv_name <- new("individualName")
-  indiv_name@givenName <- new("ListOfgivenName", list(given))
+  indiv_name@givenName <- new("ListOfgivenName", givens)
   indiv_name@surName <- sur
 
   indiv_name
@@ -376,4 +435,41 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
   cov@boundingCoordinates@westBoundingCoordinate <- new("westBoundingCoordinate", as.character(west))
 
   cov
+}
+
+
+eml_address <- function(delivery_points, city, administrative_area, postal_code) {
+  stopifnot(is.character(delivery_points),
+            is.character(city),
+            is.character(administrative_area),
+            (is.character(postal_code) || is.numeric(postal_code)))
+
+  address <- new("address")
+
+  # Delivery point(s)
+  dps <- lapply(delivery_points, function(dp) {
+    x <- new("deliveryPoint")
+    x@.Data <- dp
+    x
+  })
+
+  # City
+  ct <- new("city")
+  ct@.Data <- city
+
+  # Administrative area
+  aa <- new("administrativeArea")
+  aa@.Data <- administrative_area
+
+  # Postal Code
+  pc <- new("postalCode")
+  pc@.Data <- as.character(postal_code)
+
+  # Put them all together
+  address@deliveryPoint <- new("ListOfdeliveryPoint", dps)
+  address@city <- ct
+  address@administrativeArea <- aa
+  address@postalCode <- pc
+
+  address
 }

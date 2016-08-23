@@ -67,21 +67,19 @@ test_that("methods can be cleared from an EML document", {
 })
 
 test_that("a creator can be created", {
-  creator <- eml_creator("test", "user", "test@email.com")
+  creator <- eml_creator("test", "user")
 
   expect_is(creator, "creator")
   expect_equal(creator@individualName[[1]]@givenName[[1]]@.Data, "test")
   expect_equal(creator@individualName[[1]]@surName@.Data, "user")
-  expect_equal(creator@electronicMailAddress[[1]]@.Data, "test@email.com")
 })
 
 test_that("a contact can be created", {
-  contact <- eml_contact("test", "user", "test@email.com")
+  contact <- eml_contact("test", "user")
 
   expect_is(contact, "contact")
   expect_equal(contact@individualName[[1]]@givenName[[1]]@.Data, "test")
   expect_equal(contact@individualName[[1]]@surName@.Data, "user")
-  expect_equal(contact@electronicMailAddress[[1]]@.Data, "test@email.com")
 })
 
 
