@@ -204,6 +204,7 @@ publish_update <- function(mn,
                            parent_child_pids=NULL,
                            public=TRUE,
                            check_first=TRUE,
+                           skip_other_entities=FALSE) {
 
   # Do a simple sanity check on the PIDs passed in
   all_pids <- c(metadata_pid, resource_map_pid, data_pids, child_pids,
