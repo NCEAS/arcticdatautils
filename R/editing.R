@@ -220,6 +220,11 @@ publish_update <- function(mn,
   rm(all_pids)
   rm(duped)
 
+  # Check that we have write permission on the metadata and resource map objects
+  if (!all(is_authorized(mn, ids = c(metadata_pid, resource_map_pid), "write"))) {
+    stop(paste0("You do not have authorization to 'write' to either the metadata PID (", metadata_pid, ") or the resource map PID (", resource_map_pid, ") so your call to this function will not succeed. Check your permissions and try again."))
+  }
+
   if (check_first) {
     # Check that objects exist
     stopifnot(object_exists(mn, metadata_pid))
