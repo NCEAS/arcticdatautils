@@ -175,7 +175,6 @@ update_object <- function(mn, pid, path, format_id=NULL) {
 #' @param use_doi (logical) Generate and use a DOI as the identifier for the updated metadata object.
 #' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
 #' @param parent_metadata_pid (character)  Optional. identifier for the metadata document of the parent package.
-#' @param parent_data_pids(character)  Optional. Identifier(s) of data in the parent package.
 #' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
 #' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
@@ -183,6 +182,8 @@ update_object <- function(mn, pid, path, format_id=NULL) {
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
+#' @param parent_data_pids
+#' @param skip_other_entities (logical) Default FALSE Whether to create all EML otherEntity elements.
 #'
 #' @import dataone
 #' @import datapack
@@ -202,7 +203,7 @@ publish_update <- function(mn,
                            parent_data_pids=NULL,
                            parent_child_pids=NULL,
                            public=TRUE,
-                           check_first=TRUE) {
+                           check_first=TRUE,
 
   # Do a simple sanity check on the PIDs passed in
   all_pids <- c(metadata_pid, resource_map_pid, data_pids, child_pids,
@@ -307,8 +308,12 @@ publish_update <- function(mn,
   EML::write_eml(eml, eml_path)
 
   # Add other entity fields (if appropriate)
-  if (!is.null(data_pids)) {
+  if (!is.null(data_pids) !skip_other_entities) {
     eml <- add_other_entities(mn, eml_path, data_pids)
+  }
+
+  if (skip_other_entities) {
+    log_message("Skipping modifying EML otherEntity elements. This may result packages that is not editable!")
   }
 
   # Create System Metadata for the updated EML file
