@@ -309,7 +309,7 @@ publish_update <- function(mn,
   EML::write_eml(eml, eml_path)
 
   # Add other entity fields (if appropriate)
-  if (!is.null(data_pids) !skip_other_entities) {
+  if (!is.null(data_pids) && !skip_other_entities) {
     eml <- add_other_entities(mn, eml_path, data_pids)
   }
 
