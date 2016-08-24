@@ -4,18 +4,18 @@
 
 #' Check if the user has authorization to perform an action on an object.
 #'
-#' @param base_url (character) The DataONE API REST API base URL to query.
+#' @param mn (MNode) The Member Node to query.
 #' @param ids (character) The PID or SID to check.
 #' @param action (character) One of read, write, or changePermission.
 #'
 #' @export
-is_authorized <- function(base_url, ids, action) {
-  stopifnot(is.character(base_url),
-            length(base_url) == 1)
+is_authorized <- function(mn, ids, action) {
+  stopifnot(class(mn) == "MNode")
   stopifnot(is.character(ids))
   stopifnot(action %in% c("read", "write", "changePermission"))
 
   token <- get_token()
+  base_url <- paste0(mn@baseURL, "/", mn@APIversion)
 
   sapply(ids, function(id) {
     req <- httr::GET(paste0(base_url, "/isAuthorized/", id),
