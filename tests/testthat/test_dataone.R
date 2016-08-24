@@ -1,14 +1,14 @@
 context("dataone")
 
-env <- env_load()
+mn <- env_load()$mn
 
 test_that("permissions can be checked", {
   if (!is_token_set()) {
     skip("No token set. Skipping test.")
   }
 
-  id <- create_dummy_object(env$mn)
-  expect_true(is_authorized(env$mn_base_url, id, "write"))
+  id <- create_dummy_object(mn)
+  expect_true(is_authorized(mn, id, "write"))
 })
 
 test_that("permissions can be checked on multiple objects", {
@@ -16,10 +16,10 @@ test_that("permissions can be checked on multiple objects", {
     skip("No token set. Skipping test.")
   }
 
-  a <- create_dummy_object(env$mn)
-  b <- create_dummy_object(env$mn)
+  a <- create_dummy_object(mn)
+  b <- create_dummy_object(mn)
 
-  expect_true(all(is_authorized(env$mn_base_url, c(a, b), "write")))
+  expect_true(all(is_authorized(mn, c(a, b), "write")))
 })
 
 test_that("checking permissions on a missing object returns an error", {
@@ -30,5 +30,5 @@ test_that("checking permissions on a missing object returns an error", {
   # Create a pid likely to not exist
   id <- paste0(uuid::UUIDgenerate(), uuid::UUIDgenerate())
 
-  expect_error(is_authorized(env$mn_base_url, id, "write"))
+  expect_error(is_authorized(mn, id, "write"))
 })
