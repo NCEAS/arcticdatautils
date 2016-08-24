@@ -8,7 +8,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
   child_pids = NULL, metadata_path = NULL, identifier = NULL,
   use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
   parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE,
-  check_first = TRUE)
+  check_first = TRUE, skip_other_entities = FALSE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
@@ -39,7 +39,7 @@ access policies are not affected.}
 
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
 
-\item{parent_data_pids(character)}{Optional. Identifier(s) of data in the parent package.}
+\item{skip_other_entities}{(logical) Default FALSE Whether to create all EML otherEntity elements.}
 }
 \description{
 This function can be used for a variety of tasks:

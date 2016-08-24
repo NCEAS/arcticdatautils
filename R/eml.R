@@ -438,6 +438,17 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 }
 
 
+#' Create an EML address element.
+#'
+#' @param delivery_points (character) One or more delivery points.
+#' @param city (character) City
+#' @param administrative_area (character) Administrative area
+#' @param postal_code (character) Postal code
+#'
+#' @return (address) An EML address object.
+#' @export
+#'
+#' @examples
 eml_address <- function(delivery_points, city, administrative_area, postal_code) {
   stopifnot(is.character(delivery_points),
             is.character(city),

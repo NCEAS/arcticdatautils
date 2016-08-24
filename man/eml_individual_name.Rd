@@ -4,12 +4,12 @@
 \alias{eml_individual_name}
 \title{Create an EML individualName section}
 \usage{
-eml_individual_name(first, last)
+eml_individual_name(given_names, sur_name)
 }
 \arguments{
-\item{first}{(character) First name.}
+\item{given_names}{(character) One or more given names.}
 
-\item{last}{(character) Last name.}
+\item{sur_name}{(character) A sur (last) name.}
 }
 \value{
 (individualName) The new individualName section

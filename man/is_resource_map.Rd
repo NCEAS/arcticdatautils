@@ -4,15 +4,15 @@
 \alias{is_resource_map}
 \title{Determines whether the object with the given PID is a resource map.}
 \usage{
-is_resource_map(mn, pid)
+is_resource_map(mn, pids)
 }
 \arguments{
-\item{mn}{(MNode)}
+\item{mn}{(MNode) The Member Node}
 
-\item{pid}{(character)}
+\item{pids}{(character) Vector of PIDs}
 }
 \value{
-(logical)
+(logical) Whether or not the object(s) are resource maps
 }
 \description{
 Determines whether the object with the given PID is a resource map.

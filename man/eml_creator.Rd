@@ -4,17 +4,24 @@
 \alias{eml_creator}
 \title{Create an EML creator subtree from a first, last, and email.}
 \usage{
-eml_creator(first, last, email)
+eml_creator(given_names, sur_name, organization = NULL, email = NULL,
+  phone = NULL, address = NULL)
 }
 \arguments{
-\item{first}{(character) The first name.}
+\item{given_names}{(character) One or more given (first) names.}
 
-\item{last}{(character) The last name.}
+\item{sur_name}{(character) A sur (last) name.}
 
-\item{email}{(character) The email address.}
+\item{organization}{(character) One or more organization names.}
+
+\item{email}{(character) An email address.}
+
+\item{phone}{(character) A phone number.}
+
+\item{address}{(address) An object of type 'address' (EML).}
 }
 \value{
-(creator) The new creator sub-tree.
+(creator) The new creator element.
 }
 \description{
 Create an EML creator subtree from a first, last, and email.

@@ -4,12 +4,14 @@
 \alias{inv_load_files}
 \title{Load files into the inventory from a text file.}
 \usage{
-inv_load_files(inventory, path)
+inv_load_files(inventory, path, filter = TRUE)
 }
 \arguments{
 \item{inventory}{(character) A \code{data.frame}.}
 
 \item{path}{(character) Path to a file containing a file listing.}
+
+\item{filter}{(logical) Filter out versioned datasets. Default is TRUE.}
 }
 \value{
 An inventory (data.frame)

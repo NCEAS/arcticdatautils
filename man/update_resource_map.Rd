@@ -4,8 +4,8 @@
 \alias{update_resource_map}
 \title{Update an existing Resource Map with a new one.}
 \usage{
-update_resource_map(mn, old_resource_map_pid, new_resource_map_pid = NULL,
-  metadata_pid, data_pids = NULL, child_pids = NULL, public = FALSE,
+update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
+  child_pids = NULL, identifier = NULL, public = FALSE,
   check_first = TRUE)
 }
 \arguments{

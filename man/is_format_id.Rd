@@ -4,12 +4,12 @@
 \alias{is_format_id}
 \title{Test whether an object is a particular format ID.}
 \usage{
-is_format_id(mn, pid, format_id)
+is_format_id(mn, pids, format_id)
 }
 \arguments{
 \item{mn}{(MNode)}
 
-\item{pid}{(character)}
+\item{pids}{(character)}
 
 \item{format_id}{(character)}
 }
