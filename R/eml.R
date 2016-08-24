@@ -332,7 +332,7 @@ eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 
   # Address
   if (!is.null(address)) {
-    creator@address <- new("ListOfaddress", list(address))
+    contact@address <- new("ListOfaddress", list(address))
   }
 
   contact
