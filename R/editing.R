@@ -319,7 +319,7 @@ publish_update <- function(mn,
   }
 
   if (skip_other_entities) {
-    log_message("Skipping modifying EML otherEntity elements. This may result packages that is not editable!")
+    log_message("Skipping modifying EML otherEntity elements. This may result a data package that is not editable using the registry!")
   }
 
   # Create System Metadata for the updated EML file
