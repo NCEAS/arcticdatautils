@@ -94,12 +94,16 @@ create_dummy_package <- function(mn, size = 2) {
   me <- get_token_subject()
 
   # Data objects
-  data_pids <- sapply(1:(size - 1), function(i) {
-    create_dummy_object(mn)
-  })
+  if (size > 1) {
+    data_pids <- sapply(seq_len(size - 1), function(i) {
+      create_dummy_object(mn)
+    })
 
-  # Filter NA pids (failed creates)
-  data_pids <- data_pids[!is.na(data_pids)]
+    data_pids <- data_pids[!is.na(data_pids)]  # Filter NA pids (failed creates)
+
+  } else {
+    data_pids <- NULL
+  }
 
   # Metadata objects
   meta_pid <- create_dummy_metadata(mn, data_pids = data_pids)
