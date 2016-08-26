@@ -150,9 +150,9 @@ get_doc_id <- function(sysmeta) {
 
   # Hack: Determine whether we should check production or dev Metacat
   if (sysmeta@originMemberNode == "urn:node:ARCTIC") {
-    metacat_base_url <- "https://arcticdata.io/metacat/metacat"
+    metacat_base_url <- env_load("production", skip_mn = TRUE)$metacat_base_url
   } else {
-    metacat_base_url <- "https://test.arcticdata.io/metacat/metacat"
+    metacat_base_url <- env_load("test", skip_mn = TRUE)$metacat_base_url
   }
   # EndHack
 

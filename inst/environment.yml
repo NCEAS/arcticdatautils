@@ -6,6 +6,7 @@ development:
   mn_base_url: https://test.arcticdata.io/metacat/d1/mn/v2
   submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
+  metacat_base_url: https://test.arcticdata.io/metacat/metacat
 
 test:
   base_path: ~/acadis/
@@ -15,6 +16,7 @@ test:
   mn_base_url: https://test.arcticdata.io/metacat/d1/mn/v2
   submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
+  metacat_base_url: https://test.arcticdata.io/metacat/metacat
 
 production:
   base_path: ~/acadis/
@@ -24,3 +26,4 @@ production:
   mn_base_url: https://arcticdata.io/metacat/d1/mn/v2
   submitter: http://orcid.org/0000-0002-0381-3766
   rights_holder: CN=arctic-data-admins,DC=dataone,DC=org
+  metacat_base_url: https://arcticdata.io/metacat/metacat
