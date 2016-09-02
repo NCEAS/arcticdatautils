@@ -56,49 +56,6 @@ add_admin_group_access <- function(sysmeta) {
 }
 
 
-#' Get the related PIDs for a given PID (i.e. data files, resource maps).
-#'
-#' @param mn
-#' @param pid
-#'
-#' @return (character) Named character vector.
-#' @export
-#'
-#' @examples
-get_related_pids <- function(mn, pid) {
-  stopifnot(class(mn) == "MNode",
-            is.character(pid),
-            length(pid) == 1,
-            nchar(pid) > 0)
-
-  # Prepare the query parameters
-  pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
-  queryParams <- list(q = paste0("id:", pid_esc),
-                      rows = "1000",
-                      fl = "identifier,resourceMap,documents")
-
-  # Wrap in a try-catch to handle ParseExceptionsn and the like
-  response <- tryCatch({
-    dataone::query(mn, queryParams, as = "list")
-  },
-  error = function(e) {
-    log_message("Error occurred during query.")
-    log_message(e)
-    e
-  })
-
-  # Unlist the response
-  response <- unlist(response)
-
-  # Manually set the response to a zero-length character vector when it's NULL
-  if (is.null(response)) {
-    response <- vector(mode = "character", length = 0L)
-  }
-
-  response
-}
-
-
 #' Replace subjects in the accessPolicy section of a System Metadata entries.
 #'
 #' This function was written out to fix capitalization errors but in a set of
