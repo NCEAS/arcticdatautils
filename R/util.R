@@ -769,8 +769,7 @@ get_all_versions <- function(mn, pid) {
   # Add the last PID
   cache_order <- c(cache_order, pid)
 
-  # Print, with formatting
-  paste(cache_order, collapse = " --> ")
+  cache_order
 }
 
 
