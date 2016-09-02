@@ -723,7 +723,7 @@ get_chain_neighbors <- function(mn, pid) {
   stopifnot(is.character(pid),
             nchar(pid) > 0)
 
-  sysmeta <- getSystemMetadata(mn, pid)
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
   list("obsoletes" = sysmeta@obsoletes,
        "obsoletedBy" = sysmeta@obsoletedBy)
 }
