@@ -129,8 +129,8 @@ create_dummy_package <- function(mn, size = 2) {
   resource_map_pid <- dataone::createObject(mn, pid, resmap_path, sysmeta)
 
   list(metadata = meta_pid,
-       data = data_pids,
-       resource_map = resource_map_pid)
+       resource_map = resource_map_pid,
+       data = data_pids)
 }
 
 #' Create a test parent package.
