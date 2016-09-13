@@ -29,5 +29,8 @@ Remotes: ropensci/EML
 License: MIT + file LICENSE
 LazyData: true
 Suggests:
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr

@@ -39,6 +39,7 @@ test_has_abstract <- function(path) {
   TRUE
 }
 
+
 test_has_bad_topic <- function(path) {
   stopifnot(file.exists(path))
 
@@ -81,6 +82,7 @@ test_has_bad_topic <- function(path) {
   # Return FALSE as a fall-through
   FALSE
 }
+
 
 test_has_bad_enum <- function(path) {
   stopifnot(file.exists(path))

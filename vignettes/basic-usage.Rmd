@@ -1,0 +1,61 @@
+---
+title: "Basic Usage"
+author: "Bryce Mecum"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic Usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Usage scenarios
+
+For a lot of editing tasks, we'll first want to get some variables set up. For
+the following use cases, we're going to be doing *something* to a package,
+which has a metadata file with the PID 'X' in it. Here's how we set that up:
+
+```{r, eval=FALSE}
+# Set up your environment first
+options(dataone_test_token = "...") # Set your token here
+env <- env_load("production")
+
+# Set up some variables for later
+my_eml_file <- "/path/to/the/file/on/disk/eml.xml"
+pkg <- get_package(env$mn, metadata_pid)
+```
+
+At this point, we can do a number of things.
+
+### Use: I want to update the metadata in a package with an edited EML file I have on my computer
+
+```{r, eval=FALSE}
+publish_update(env$mn,
+               metadata_pid = pkg$metadata,
+               resource_map_pid = pkg$resource_map,
+               data_pids = pkg$data,
+               metadata_file_path = my_eml_file)
+```
+
+### Use: Mint a DOI for the package
+
+```{r, eval=FALSE}
+publish_update(env$mn,
+               metadata_pid = pkg$metadata,
+               resource_map_pid = pkg$resource_map,
+               data_pids = pkg$data,
+               use_doi = TRUE)
+```
+
+### Use: Add a new CSV data file to a package
+
+```{r, eval=FALSE}
+new_object_path <- "/path/to/the/new/file.csv"
+new_data_object_pid <- publish_object(filepath = new_object_path,
+                                      format_id = "text/csv")
+
+publish_update(env$mn,
+               metadata_pid = pkg$metadata,
+               resource_map_pid = pkg$resource_map,
+               data_pids = c(pkg$data, newnew_data_object_pid))
+```

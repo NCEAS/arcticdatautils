@@ -2,7 +2,7 @@
 % Please edit documentation in R/access.R
 \name{set_rights_holder}
 \alias{set_rights_holder}
-\title{Set the rightsHolder field for a given PID.}
+\title{access.R}
 \usage{
 set_rights_holder(mn, pids, subject)
 }
@@ -14,6 +14,11 @@ set_rights_holder(mn, pids, subject)
 \item{subject}{(character) The identifier of the new rightsHolder, often an ORCID or DN.}
 }
 \description{
+High-level utility functions for getting and setting access rules for DataONE
+objects.
+Set the rightsHolder field for a given PID.
+}
+\details{
 Update the rights holder to the provided subject for the object identified in
 the provided system metadata document on the given Member Node.
 }

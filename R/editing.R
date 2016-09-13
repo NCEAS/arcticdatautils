@@ -432,6 +432,7 @@ publish_update <- function(mn,
 #' @export
 #'
 #' @examples
+
 create_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,
@@ -449,14 +450,9 @@ create_resource_map <- function(mn,
       stopifnot(all(object_exists(mn, data_pids)))
     if (!is.null(child_pids))
       stopifnot(all(object_exists(mn, child_pids)))
-
-    pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
   }
 
-
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
-
+  pid <- paste0("resource_map_urn:uuid:", uuid::UUIDgenerate())
   path <- generate_resource_map(metadata_pid = metadata_pid,
                                 data_pids = data_pids,
                                 child_pids = child_pids,
