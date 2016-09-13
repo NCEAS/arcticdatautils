@@ -604,6 +604,31 @@ is_resource_map <- function(mn, pids) {
 }
 
 
+#' Test whether the object is obsoleted by another object.
+#'
+#' @param mn (MNode) The Member Node to query.
+#' @param pids (character) One or more PIDs to query against.
+#'
+#' @return (logical) Whether or not the object is obsoleted by another object.
+#' @export
+#'
+#' @examples
+is_obsolete <- function(mn, pids) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(pids))
+
+  response <- vector(mode = "logical", length = length(pids))
+
+  for (i in seq_along(pids)) {
+    pid <- pids[i]
+    sysmeta <- dataone::getSystemMetadata(mn, pid)
+    response[i] <- is.na(sysmeta@obsoletedBy)
+  }
+
+  response
+}
+
+
 #' Returns the subject of the set dataone_test_token
 #'
 #' @return (character) The token subject.
@@ -770,6 +795,131 @@ get_all_versions <- function(mn, pid) {
   cache_order <- c(cache_order, pid)
 
   cache_order
+}
+
+
+#' Get a structured list of PIDs for the objects in a package.
+#'
+#' @param mn (MNode) The Member Node to run the query on.
+#' @param pid (character) The the metadata PID of the package.
+#' @param parent (logical) Whether to query for the parent package. Setting this
+#' to true will make this function take longer to run so it is turned of by
+#' default.
+#'
+#' @return (list) A structured list of the members of the package.
+#' @export
+#'
+#' @examples
+get_package <- function(mn, pid, parent=FALSE, rows=1000) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
+            rows >= 0)
+
+  resource_map_pids <- ifelse(is_resource_map(mn, pid), pid, get_resource_map(mn, pid))
+  packages <- lapply(resource_map_pids, function(pid) get_package_direct(mn, pid))
+
+  if (length(packages) == 1) {
+    return(packages[[1]])
+  } else {
+    return(packages)
+  }
+}
+
+
+get_package_direct <- function(mn, pid, rows = 1000) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
+            rows >= 0)
+  stopifnot(is_resource_map(mn, pid))
+
+  # Query for the package members
+  pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
+  query_params <- list(q = paste0("resourceMap:", pid_esc),
+                       rows = as.character(rows),
+                       fl = "identifier,formatType")
+
+  response <- dataone::query(mn, query_params, as = "list")
+
+  # Warn if there might be more results
+  if (length(response) >= rows) {
+    warning("Query returned the maximum number of results. It's possible there are more results to get. You can specify a custom number of results with the `rows` argument.")
+  }
+
+  # Stop now if no results were returned
+  if (length(response) == 0) {
+    return(response)
+  }
+
+  # Collect the package's PIDs
+  metadata_pids <- vapply(response[sapply(response, function(x) { x$formatType == "METADATA"})], function(x) x$identifier, "")
+  data_pids <- vapply(response[sapply(response, function(x) { x$formatType == "DATA"})], function(x) x$identifier, "")
+  child_pids <- vapply(response[sapply(response, function(x) { x$formatType == "RESOURCE"})], function(x) x$identifier, "")
+
+  response <- list(metadata = metadata_pids,
+                   resource_map = pid,
+                   data = data_pids,
+                   child_packages = child_pids)
+
+  response
+}
+
+#' Get the resource map(s) for the given object.
+#'
+#' @param mn (MNode) The Member Node to query.
+#' @param pid (character) The object to get the resource map(s) for.
+#' @param rows (numeric) Optional. The number of query results to return. This
+#'   shouldn't need to be modified and the default, 1000, is very likely to be
+#'   more than enough.
+#'
+#' @return (character) The resource map(s) that contain `pid`.
+#' @export
+#'
+#' @examples
+get_resource_map <- function(mn, pid, rows = 1000) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
+  stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
+            rows >= 0)
+
+  pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
+  query_params <- list(q = paste0("id:", pid_esc),
+                       rows = as.character(rows),
+                       fl = "resourceMap")
+
+  response <- dataone::query(mn, query_params, as = "list")
+
+  if (length(response) != 1) {
+    stop(paste0("One document was expected in the query result but ", length(response), " were returned."))
+  }
+
+  pids <- unlist(response[[1]]$resourceMap)
+
+  # Filter obsoleted pids
+  pids <- pids[vapply(pids, function(pid) is_obsolete(mn, pid), TRUE)]
+
+  pids
+}
+
+
+#' Filters PIDs that are obsolete.
+#'
+#' Whether or not a PID is obsolete is determined by whether its "obsoletedBy"
+#' property is set to another PID (TRUE) or is NA (FALSE).
+#'
+#' @param mn (MNode) The Member Node to query.
+#' @param pids (character) PIDs to check the obsoletion state of.
+#'
+#' @return (character) PIDs that are not obsoleted by another PID.
+#' @export
+#'
+#' @examples
+filter_obsolete_pids <- function(mn, pids) {
+  pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(mn, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
 
 
