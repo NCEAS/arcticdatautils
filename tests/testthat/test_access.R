@@ -32,5 +32,8 @@ test_that("get_package works for a package with a child package", {
 test_that("get_package works for an object in two packages",{
   child_pkg <- create_dummy_package(mn)
   second_resmap <- create_resource_map(mn, metadata_pid = child_pkg$metadata, check_first = FALSE)
-  get_package(mn, child_pkg$metadata)
+  pkg <- get_package(mn, child_pkg$metadata)
+
+  expect_length(pkg, 2)
+})
 })

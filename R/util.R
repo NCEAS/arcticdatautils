@@ -817,7 +817,22 @@ get_package <- function(mn, pid, parent=FALSE, rows=1000) {
   stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
             rows >= 0)
 
-  resource_map_pids <- ifelse(is_resource_map(mn, pid), pid, get_resource_map(mn, pid))
+  if (is_resource_map(mn, pid)) {
+    resource_map_pids <- pid
+  } else {
+    resource_map_pids <- get_resource_map(mn, pid)
+  }
+
+  # Stop if no resource map was found
+  if (length(resource_map_pids) == 0) {
+    stop(paste0("No resource map was found for ", pid, "."))
+  }
+
+  # Warn user if multiple resource maps were found
+  if (length(resource_map_pids) > 1) {
+    warning(paste0("Multiple (", length(resource_map_pids), ") non-obsolete resource maps were found. This is valid but is rare so this warning is being issued just as a precaution."))
+  }
+
   packages <- lapply(resource_map_pids, function(pid) get_package_direct(mn, pid))
 
   if (length(packages) == 1) {
