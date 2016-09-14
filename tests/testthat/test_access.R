@@ -3,6 +3,10 @@ context("access")
 mn <- env_load()$mn
 
 test_that("get_package works for a simple package", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
   pkg <- create_dummy_package(mn)
   get_pkg <- get_package(mn, pkg$metadata)
 
@@ -12,6 +16,10 @@ test_that("get_package works for a simple package", {
 })
 
 test_that("get_package works for a package with a child package", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
   pkg <- create_dummy_package(mn)
   child_pkg <- create_dummy_package(mn)
   updated_resource_map <- update_resource_map(mn,
@@ -29,7 +37,11 @@ test_that("get_package works for a package with a child package", {
   expect_true(get_pkg$child_packages == child_pkg$resource_map)
 })
 
-test_that("get_package works for an object in two packages",{
+test_that("get_package works for an object in two packages", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
   child_pkg <- create_dummy_package(mn)
   second_resmap <- create_resource_map(mn, metadata_pid = child_pkg$metadata, check_first = FALSE)
   pkg <- get_package(mn, child_pkg$metadata)
