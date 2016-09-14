@@ -888,6 +888,7 @@ get_package_direct <- function(mn, pid, file_names=FALSE, rows = 1000) {
 
   # Stop now if no results were returned
   if (length(response) == 0) {
+    warning(paste0("No results were found when searching for a package with resource map '", pid, "'.\nThis can be caused by a mis-typed PID, the resource map not existing, or by not having appropriate access to read the resource map."))
     return(response)
   }
 
