@@ -48,4 +48,15 @@ test_that("get_package works for an object in two packages", {
 
   expect_length(pkg, 2)
 })
+
+test_that("get_package works the same when given a metadata pid as it does when given a resource map pid", {
+  if (!is_token_set()) {
+    skip("No token set. Skipping test.")
+  }
+
+  child_pkg <- create_dummy_package(mn)
+  a <- get_package(mn, child_pkg$metadata)
+  b <- get_package(mn, child_pkg$resource_map)
+
+  expect_equal(a, b)
 })
