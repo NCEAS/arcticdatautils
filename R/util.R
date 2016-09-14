@@ -964,7 +964,3 @@ get_resource_map <- function(mn, pid, rows = 1000) {
 filter_obsolete_pids <- function(mn, pids) {
   pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(mn, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
-
-
-
-
