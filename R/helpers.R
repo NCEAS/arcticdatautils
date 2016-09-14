@@ -31,7 +31,8 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
                  checksum = digest::digest(metadata_file, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
-                 rightsHolder = me)
+                 rightsHolder = me,
+                 fileName = "dummy_science_metadata.xml")
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
@@ -68,7 +69,7 @@ create_dummy_object <- function(mn) {
                  checksumAlgorithm = "SHA256",
                  submitter = me,
                  rightsHolder = me,
-                 fileName = "dummy.object")
+                 fileName = "dummy_object")
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
@@ -120,7 +121,8 @@ create_dummy_package <- function(mn, size = 2) {
                  checksum = digest::digest(resmap_path, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
-                 rightsHolder = me)
+                 rightsHolder = me,
+                 fileName = "dummy_resource_map.xml")
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
@@ -159,7 +161,8 @@ create_dummy_parent_package <- function(mn, children) {
                  checksum = digest::digest(resmap_path, algo = "sha256"),
                  checksumAlgorithm = "SHA256",
                  submitter = me,
-                 rightsHolder = me)
+                 rightsHolder = me,
+                 fileName = "dummy_resource_map.xml")
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
