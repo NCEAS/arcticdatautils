@@ -800,6 +800,9 @@ get_all_versions <- function(mn, pid) {
 
 #' Get a structured list of PIDs for the objects in a package.
 #'
+#' This is a wrapper function around `get_package_direct` which takes either
+#' a resource map PID or a metadata PID as its `pid` argument.
+#'
 #' @param mn (MNode) The Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
 #' @param parent (logical) Whether to query for the parent package. Setting this
