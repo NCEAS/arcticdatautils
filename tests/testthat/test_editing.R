@@ -9,7 +9,7 @@ test_that("we can publish an update", {
 
   # Make a test package
   package <- create_dummy_package(mn)
-  expect_named(package, c("metadata", "data", "resource_map"))
+  expect_named(package, c("metadata", "resource_map", "data"))
 
   # Publish an update on it
   update <- publish_update(mn,
@@ -28,7 +28,7 @@ test_that("an identifier can be manually specified when publishing an update", {
 
   # Make a test package
   package <- create_dummy_package(mn)
-  expect_named(package, c("metadata", "data", "resource_map"))
+  expect_named(package, c("metadata", "resource_map", "data"))
 
   # Publish an update on it
   new_identifier <- uuid::UUIDgenerate()
@@ -53,7 +53,7 @@ test_that("we can create a resource map", {
   response <- create_resource_map(mn, metadata_pid, data_pid)
 
   expect_true(object_exists(mn, response))
-  expect_true(response %in% get_related_pids(mn, metadata_pid))
+  expect_equal(response, get_package(mn, metadata_pid)$resource_map)
 
 })
 
@@ -74,7 +74,7 @@ test_that("we can update a resource map", {
   expect_true(object_exists(mn, updated))
 
   # Also check it's in the Solr index
-  expect_true(updated %in% get_related_pids(mn, response$metadata))
+  expect_equal(updated, get_package(mn, response$metadata)$resource_map)
 })
 
 test_that("otherEntity elements are set when publishing an update", {
