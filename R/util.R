@@ -805,15 +805,15 @@ get_all_versions <- function(mn, pid) {
 #'
 #' @param mn (MNode) The Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
-#' @param parent (logical) Whether to query for the parent package. Setting this
-#' to true will make this function take longer to run so it is turned of by
-#' default.
+#' @param file_names (logical) Whether to return file names for all objects.
+#' @param rows (numeric) The number of rows to return in the query. This is only
+#' useful to set if you are warned about the result set being truncated.
 #'
 #' @return (list) A structured list of the members of the package.
 #' @export
 #'
 #' @examples
-get_package <- function(mn, pid, parent=FALSE, rows=1000) {
+get_package <- function(mn, pid, file_names=FALSE, rows=1000) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -836,7 +836,7 @@ get_package <- function(mn, pid, parent=FALSE, rows=1000) {
     warning(paste0("Multiple (", length(resource_map_pids), ") non-obsolete resource maps were found. This is valid but is rare so this warning is being issued just as a precaution."))
   }
 
-  packages <- lapply(resource_map_pids, function(pid) get_package_direct(mn, pid))
+  packages <- lapply(resource_map_pids, function(pid) get_package_direct(mn, pid, file_names, rows))
 
   if (length(packages) == 1) {
     return(packages[[1]])
@@ -846,7 +846,18 @@ get_package <- function(mn, pid, parent=FALSE, rows=1000) {
 }
 
 
-get_package_direct <- function(mn, pid, rows = 1000) {
+#' Get a structured list of PIDs for the objects in a package.
+#'
+#' @param mn (MNode) The Member Node to run the query on.
+#' @param pid (character) The the metadata PID of the package.
+#' @param file_names (logical) Whether to return file names for all objects.
+#' @param rows (numeric) The number of rows to return in the query. This is only
+#' useful to set if you are warned about the result set being truncated.
+#'
+#' @return
+#'
+#' @examples
+get_package_direct <- function(mn, pid, file_names=FALSE, rows = 1000) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -856,9 +867,17 @@ get_package_direct <- function(mn, pid, rows = 1000) {
 
   # Query for the package members
   pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
+
+  # Dynamically create the 'fields' argument to the query
+  if (file_names) {
+    query_fields <- "identifier,formatType,fileName"
+  } else {
+    query_fields <- "identifier,formatType"
+  }
+
   query_params <- list(q = paste0("resourceMap:", pid_esc),
                        rows = as.character(rows),
-                       fl = "identifier,formatType")
+                       fl = query_fields)
 
   response <- dataone::query(mn, query_params, as = "list")
 
@@ -870,6 +889,11 @@ get_package_direct <- function(mn, pid, rows = 1000) {
   # Stop now if no results were returned
   if (length(response) == 0) {
     return(response)
+  }
+
+  # Set up the names on the response vector if they are needed
+  if (file_names) {
+    names(response) <- sapply(response, function(x) ifelse("fileName" %in% names(x), x$fileName, NA))
   }
 
   # Collect the package's PIDs
