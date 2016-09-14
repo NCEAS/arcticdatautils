@@ -11,10 +11,10 @@ Note: The package is intended to be used by NCEAS staff and may not make much se
 
 ## Installing
 
-I recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) which should be v0.4.1:
+I recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) which should be v0.5.0:
 
 ```
-devtools::install_github("NCEAS/arcticdatautils", ref = "v0.4.1")
+devtools::install_github("NCEAS/arcticdatautils", ref = "v0.5.0")
 ```
 
 If you're feeling adventurous, you can install from the bleeding edge:
