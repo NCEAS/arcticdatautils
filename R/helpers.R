@@ -28,8 +28,8 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
                  id = pid,
                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
                  size = file.size(metadata_file),
-                 checksum = digest::digest(metadata_file, algo = "sha256"),
-                 checksumAlgorithm = "SHA256",
+                 checksum = digest::digest(metadata_file, algo = "sha1", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA1",
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_science_metadata.xml")
@@ -65,8 +65,8 @@ create_dummy_object <- function(mn) {
                  id = pid,
                  formatId = "application/octet-stream",
                  size = file.size(tmp),
-                 checksum = digest::digest(tmp, algo = "sha256"),
-                 checksumAlgorithm = "SHA256",
+                 checksum = digest::digest(tmp, algo = "sha1", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA1",
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_object")
@@ -118,8 +118,8 @@ create_dummy_package <- function(mn, size = 2) {
                  identifier = pid,
                  formatId = "http://www.openarchives.org/ore/terms",
                  size = file.size(resmap_path),
-                 checksum = digest::digest(resmap_path, algo = "sha256"),
-                 checksumAlgorithm = "SHA256",
+                 checksum = digest::digest(resmap_path, algo = "sha1", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA1",
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_resource_map.xml")
@@ -158,8 +158,8 @@ create_dummy_parent_package <- function(mn, children) {
                  identifier = pid,
                  formatId = "http://www.openarchives.org/ore/terms",
                  size = file.size(resmap_path),
-                 checksum = digest::digest(resmap_path, algo = "sha256"),
-                 checksumAlgorithm = "SHA256",
+                 checksum = digest::digest(resmap_path, algo = "sha1", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA1",
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_resource_map.xml")

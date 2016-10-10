@@ -58,8 +58,8 @@ publish_object <- function(mn,
                  identifier = pid,
                  formatId = format_id,
                  size = file.size(path),
-                 checksum = digest::digest(path, algo="sha256"),
-                 checksumAlgorithm = "SHA256",
+                 checksum = digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA1",
                  submitter = me,
                  rightsHolder = me,
                  fileName = basename(path))
@@ -131,8 +131,8 @@ update_object <- function(mn, pid, path, format_id=NULL) {
   sysmeta@identifier <- new_pid
   sysmeta@formatId <- format_id
   sysmeta@size <- file.size(path)
-  sysmeta@checksum <- digest::digest(path, algo = "sha256")
-  sysmeta@checksumAlgorithm <- "SHA256"
+  sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
+  sysmeta@checksumAlgorithm <- "SHA1"
   slot(sysmeta, "obsoletes", check = FALSE) <- NA
   slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
   sysmeta@fileName <- basename(path)
@@ -327,8 +327,8 @@ publish_update <- function(mn,
                                   identifier = metadata_updated_pid,
                                   formatId = "eml://ecoinformatics.org/eml-2.1.1",
                                   size = file.size(eml_path),
-                                  checksum = digest::digest(eml_path, algo = "sha256"),
-                                  checksumAlgorithm = "SHA256",
+                                  checksum = digest::digest(eml_path, algo = "sha1", serialize = FALSE, file = TRUE),
+                                  checksumAlgorithm = "SHA1",
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
                                   obsoletes = metadata_pid,
@@ -563,8 +563,8 @@ update_resource_map <- function(mn,
   new_rm_sysmeta <- sysmeta
   new_rm_sysmeta@identifier <- identifier
   new_rm_sysmeta@size <- file.size(new_rm_path)
-  new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha256")
-  new_rm_sysmeta@checksumAlgorithm <- "SHA256"
+  new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha1", serialize = FALSE, file = TRUE)
+  new_rm_sysmeta@checksumAlgorithm <- "SHA1"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
   new_rm_sysmeta@obsoletes <- resource_map_pid
   slot(new_rm_sysmeta, "obsoletedBy", check = FALSE) <- NA
