@@ -643,13 +643,12 @@ get_token_subject <- function() {
     stop("No tokens defined.")
   }
 
-  me <- info[which(info$name == 'dataone_test_token'),]$subject
-
-  if (info[which(info$name == 'dataone_test_token'),]$expired != FALSE) {
-    stop("Stopped processing becuase your token is expired. Please provide a new dataone_test_token.")
+  # Throw an warning if multiple tokens are set
+  if (nrow(info) > 1) {
+    warning(paste0("Multiple tokens are set: ", paste(info$name, collapse = ", "), ". The subject of the first token, ", info[1,"subject"], " was used."))
   }
 
-  return(me)
+  info[1,"subject"]
 }
 
 
