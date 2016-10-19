@@ -315,9 +315,6 @@ convert_iso_to_eml <- function(full_path, isotoeml=NA) {
   transformed_document <- tryCatch({
     xslt::xslt_transform(doc, isotoeml)
   },
-  warning = function(w) {
-    log_message(w)
-  },
   error = function(e) {
     log_message(e)
   })
