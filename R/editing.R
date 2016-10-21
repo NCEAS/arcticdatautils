@@ -110,7 +110,7 @@ publish_object <- function(mn,
 #' @export
 #'
 #' @examples
-update_object <- function(mn, pid, path, format_id=NULL) {
+update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL) {
   stopifnot(is(mn, "MNode"))
   stopifnot(object_exists(mn, pid))
   stopifnot(file.exists(path))
@@ -123,12 +123,20 @@ update_object <- function(mn, pid, path, format_id=NULL) {
 
   log_message(paste0("Updating object ", pid, " with the file at ", path, "."))
 
-  # Generate a PID
-  new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
+  # Generate a PID if needed
+  if (is.null(new_pid)) {
+    new_pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
+  }
 
   # Grab and modify the old object's sysmeta
   sysmeta <- dataone::getSystemMetadata(mn, pid)
   sysmeta@identifier <- new_pid
+
+  # Set a SID if needed
+  if (!is.null(sid)) {
+    sysmeta@seriesId <- sid
+  }
+
   sysmeta@formatId <- format_id
   sysmeta@size <- file.size(path)
   sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
