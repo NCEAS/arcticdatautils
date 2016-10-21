@@ -589,36 +589,36 @@ is_format_id <- function(mn, pids, format_id) {
 
 #' Determines whether the object with the given PID is a resource map.
 #'
-#' @param mn (MNode) The Member Node
+#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pids (character) Vector of PIDs
 #'
 #' @return (logical) Whether or not the object(s) are resource maps
 #' @export
 #'
 #' @examples
-is_resource_map <- function(mn, pids) {
-  is_format_id(mn, pids, "http://www.openarchives.org/ore/terms")
+is_resource_map <- function(node, pids) {
+  is_format_id(node, pids, "http://www.openarchives.org/ore/terms")
 }
 
 
 #' Test whether the object is obsoleted by another object.
 #'
-#' @param mn (MNode) The Member Node to query.
+#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pids (character) One or more PIDs to query against.
 #'
 #' @return (logical) Whether or not the object is obsoleted by another object.
 #' @export
 #'
 #' @examples
-is_obsolete <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode")
+is_obsolete <- function(node, pids) {
+  stopifnot(class(node) == "MNode" || class(node) == "CNode")
   stopifnot(is.character(pids))
 
   response <- vector(mode = "logical", length = length(pids))
 
   for (i in seq_along(pids)) {
     pid <- pids[i]
-    sysmeta <- dataone::getSystemMetadata(mn, pid)
+    sysmeta <- dataone::getSystemMetadata(node, pid)
     response[i] <- is.na(sysmeta@obsoletedBy)
   }
 
@@ -799,7 +799,7 @@ get_all_versions <- function(mn, pid) {
 #' This is a wrapper function around `get_package_direct` which takes either
 #' a resource map PID or a metadata PID as its `pid` argument.
 #'
-#' @param mn (MNode) The Member Node to run the query on.
+#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
@@ -809,17 +809,17 @@ get_all_versions <- function(mn, pid) {
 #' @export
 #'
 #' @examples
-get_package <- function(mn, pid, file_names=FALSE, rows=1000) {
-  stopifnot(is(mn, "MNode"))
+get_package <- function(node, pid, file_names=FALSE, rows=1000) {
+  stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
   stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
             rows >= 0)
 
-  if (is_resource_map(mn, pid)) {
+  if (is_resource_map(node, pid)) {
     resource_map_pids <- pid
   } else {
-    resource_map_pids <- get_resource_map(mn, pid)
+    resource_map_pids <- get_resource_map(node, pid)
   }
 
   # Stop if no resource map was found
@@ -832,7 +832,7 @@ get_package <- function(mn, pid, file_names=FALSE, rows=1000) {
     warning(paste0("Multiple (", length(resource_map_pids), ") non-obsolete resource maps were found. This is valid but is rare so this warning is being issued just as a precaution."))
   }
 
-  packages <- lapply(resource_map_pids, function(pid) get_package_direct(mn, pid, file_names, rows))
+  packages <- lapply(resource_map_pids, function(pid) get_package_direct(node, pid, file_names, rows))
 
   if (length(packages) == 1) {
     return(packages[[1]])
@@ -844,7 +844,7 @@ get_package <- function(mn, pid, file_names=FALSE, rows=1000) {
 
 #' Get a structured list of PIDs for the objects in a package.
 #'
-#' @param mn (MNode) The Member Node to run the query on.
+#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
@@ -853,8 +853,8 @@ get_package <- function(mn, pid, file_names=FALSE, rows=1000) {
 #' @return
 #'
 #' @examples
-get_package_direct <- function(mn, pid, file_names=FALSE, rows = 1000) {
-  stopifnot(is(mn, "MNode"))
+get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
+  stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
   stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
@@ -875,7 +875,7 @@ get_package_direct <- function(mn, pid, file_names=FALSE, rows = 1000) {
                        rows = as.character(rows),
                        fl = query_fields)
 
-  response <- dataone::query(mn, query_params, as = "list")
+  response <- dataone::query(node, query_params, as = "list")
 
   # Warn if there might be more results
   if (length(response) >= rows) {
