@@ -4,10 +4,10 @@
 \alias{is_resource_map}
 \title{Determines whether the object with the given PID is a resource map.}
 \usage{
-is_resource_map(mn, pids)
+is_resource_map(node, pids)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node}
+\item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
 
 \item{pids}{(character) Vector of PIDs}
 }

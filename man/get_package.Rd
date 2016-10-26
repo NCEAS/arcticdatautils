@@ -4,10 +4,10 @@
 \alias{get_package}
 \title{Get a structured list of PIDs for the objects in a package.}
 \usage{
-get_package(mn, pid, file_names = FALSE, rows = 1000)
+get_package(node, pid, file_names = FALSE, rows = 1000)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to run the query on.}
+\item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
 
 \item{pid}{(character) The the metadata PID of the package.}
 

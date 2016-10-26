@@ -13,7 +13,7 @@
 #'
 #' @param mn (MNode) The Member Node to publish the object to.
 #' @param path the path to the file to be published
-#' @param format_id (character) Optional. The format ID to set for the object.
+#' @param format_id (character) Optional. The \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID} to set for the object.
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
 #' @param clone_pid (character) PID of objet to clone System Metadata from
@@ -36,7 +36,7 @@ publish_object <- function(mn,
   # Decide the format_id
   if (is.null(format_id)) {
     format_id <- guess_format_id(path)
-    log_message(paste0("Guessed format ID of ", format_id, "."))
+    warning(paste0("No format_id was specified so one a guess was made based upon the file extension: ", format_id, "."))
   }
 
   # Set up some variables for use later on
@@ -104,7 +104,7 @@ publish_object <- function(mn,
 #' @param mn (MNode) The Member Node to update the object on.
 #' @param pid (character) The PID of the object to update.
 #' @param path (character) The full path to the file to update with.
-#' @param format_id (character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly.
+#' @param format_id (character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
 #'
 #' @return (character) The PID of the updated object.
 #' @export

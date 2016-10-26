@@ -4,7 +4,7 @@
 \alias{update_object}
 \title{Update an object with a new file.}
 \usage{
-update_object(mn, pid, path, format_id = NULL)
+update_object(mn, pid, path, format_id = NULL, new_pid = NULL, sid = NULL)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
@@ -13,7 +13,7 @@ update_object(mn, pid, path, format_id = NULL)
 
 \item{path}{(character) The full path to the file to update with.}
 
-\item{format_id}{(character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly.}
+\item{format_id}{(character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 }
 \value{
 (character) The PID of the updated object.

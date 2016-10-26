@@ -4,10 +4,10 @@
 \alias{is_obsolete}
 \title{Test whether the object is obsoleted by another object.}
 \usage{
-is_obsolete(mn, pids)
+is_obsolete(node, pids)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to query.}
+\item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
 
 \item{pids}{(character) One or more PIDs to query against.}
 }
