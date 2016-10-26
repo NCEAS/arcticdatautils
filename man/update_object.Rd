@@ -13,7 +13,7 @@ update_object(mn, pid, path, format_id = NULL, new_pid = NULL, sid = NULL)
 
 \item{path}{(character) The full path to the file to update with.}
 
-\item{format_id}{(character) Optional. Specify the format ID manually. Use this when `guess_format_id` wont' guess your format correctly. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
+\item{format_id}{(character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 }
 \value{
 (character) The PID of the updated object.

@@ -12,7 +12,7 @@ publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
 
 \item{path}{the path to the file to be published}
 
-\item{format_id}{(character) Optional. The \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID} to set for the object.}
+\item{format_id}{(character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 
 \item{pid}{(character) Optional. The PID to use with the object.}
 
