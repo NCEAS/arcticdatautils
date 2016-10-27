@@ -186,7 +186,7 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
 #' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
-#' @param public (logical) Optional. Make the update public.
+#' @param public (logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
@@ -357,6 +357,8 @@ publish_update <- function(mn,
     for (data_pid in data_pids) {
       set_public_read(mn, data_pid)
     }
+  } else {
+    metadata_updated_sysmeta <- remove_public_access(metadata_updated_sysmeta)
   }
 
   set_rights_holder(mn, metadata_pid, me)
@@ -579,8 +581,10 @@ update_resource_map <- function(mn,
 
   new_rm_sysmeta <- add_admin_group_access(new_rm_sysmeta)
 
-  if (public == TRUE) {
+  if (public) {
     new_rm_sysmeta <- datapack::addAccessRule(new_rm_sysmeta, "public", "read")
+  } else {
+    new_rm_sysmeta <- remove_public_access(new_rm_sysmeta)
   }
 
   # Update it
