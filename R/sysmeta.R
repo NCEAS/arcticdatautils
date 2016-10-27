@@ -16,8 +16,7 @@
 #' @examples
 add_access_rules <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {
-    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
-    return(sysmeta)
+    stop(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
   }
 
   # Add myself explicitly as changePermission/write so I can update objects
