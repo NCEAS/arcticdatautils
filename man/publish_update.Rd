@@ -33,7 +33,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.}
 
-\item{public}{(logical) Optional. Make the update public.
+\item{public}{(logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
 This applies to the new metadata PID and its resource map and data object.
 access policies are not affected.}
 
