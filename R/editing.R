@@ -361,6 +361,10 @@ publish_update <- function(mn,
   }
 
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
+  metadata_updated_sysmeta@replicationAllowed <- metadata_sysmeta@replicationAllowed
+  metadata_updated_sysmeta@numberReplicas <- metadata_sysmeta@numberReplicas
+  metadata_updated_sysmeta@preferredNodes <- metadata_sysmeta@preferredNodes
+  metadata_updated_sysmeta@blockedNodes <- metadata_sysmeta@blockedNodes
 
   if (public) {
     # Make the metadata public
