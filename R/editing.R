@@ -64,6 +64,10 @@ publish_object <- function(mn,
                  rightsHolder = me,
                  fileName = basename(path))
 
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  sysmeta <- clear_replication_policy(sysmeta)
+
   if (!is.null(sid)) {
     log_message(paste0("Setting SID to '", sid, "'."))
     sysmeta@seriesId <- sid
@@ -346,6 +350,10 @@ publish_update <- function(mn,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
                                   obsoletes = metadata_pid,
                                   fileName = metadata_sysmeta@fileName)
+
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  metadata_updated_sysmeta <- clear_replication_policy(metadata_updated_sysmeta)
 
   # Set the SID if one existed on old metadata object
   if (!is.na(metadata_sysmeta@seriesId)) {

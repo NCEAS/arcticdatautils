@@ -34,6 +34,10 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
                  rightsHolder = me,
                  fileName = "dummy_science_metadata.xml")
 
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  sysmeta <- clear_replication_policy(sysmeta)
+
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
@@ -70,6 +74,10 @@ create_dummy_object <- function(mn) {
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_object")
+
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  sysmeta <- clear_replication_policy(sysmeta)
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
@@ -124,6 +132,10 @@ create_dummy_package <- function(mn, size = 2) {
                  rightsHolder = me,
                  fileName = "dummy_resource_map.xml")
 
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  sysmeta <- clear_replication_policy(sysmeta)
+
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
@@ -163,6 +175,10 @@ create_dummy_parent_package <- function(mn, children) {
                  submitter = me,
                  rightsHolder = me,
                  fileName = "dummy_resource_map.xml")
+
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  sysmeta <- clear_replication_policy(sysmeta)
 
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")

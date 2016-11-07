@@ -115,3 +115,23 @@ replace_subject <- function(sysmeta,
 
   sysmeta
 }
+
+
+#' Clear the replication policy from a System Metadata object
+#'
+#' @param sysmeta (SystemMetadata) The System Metadata object to clear the replication policy of.
+#'
+#' @return (SystemMetadata) The modified System Metadata object.
+#' @export
+#'
+#' @examples
+clear_replication_policy <- function(sysmeta) {
+  if (!(class(sysmeta) == "SystemMetadata")) {
+    stop("First argument was not of class SystemMetadata.")
+  }
+
+  slot(sysmeta, "replicationAllowed") <- FALSE
+  slot(sysmeta, "numberReplicas") <- 3
+
+  sysmeta
+}

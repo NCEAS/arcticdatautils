@@ -265,6 +265,10 @@ insert_package <- function(inventory, package, env=NULL) {
                               rightsHolder = env$rights_holder,
                               fileName = resource_map_file_name)
 
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  resource_map_sysmeta <- clear_replication_policy(resource_map_sysmeta)
+
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
   log_message(paste0("Creating resource map for package ", package, ".\n"))
@@ -554,6 +558,10 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
                rightsHolder = rights_holder,
                fileName = file_name)
 
+      # Temporarily clear out the replication policy to work around NCEI not being
+      # Tier 4 MN
+      x <- clear_replication_policy(x)
+
 
       add_access_rules(x)
 
@@ -842,6 +850,10 @@ update_package <- function(inventory,
                    rightsHolder = env$rights_holder,
                    fileName = new_metadata_file_name)
 
+    # Temporarily clear out the replication policy to work around NCEI not being
+    # Tier 4 MN
+    sysmeta <- clear_replication_policy(sysmeta)
+
     sysmeta <- add_access_rules(sysmeta)
 
     update_response <- tryCatch({
@@ -895,6 +907,10 @@ update_package <- function(inventory,
                               submitter = env$submitter,
                               rightsHolder = env$rights_holder,
                               fileName = resource_map_file_name)
+
+  # Temporarily clear out the replication policy to work around NCEI not being
+  # Tier 4 MN
+  resource_map_sysmeta <- clear_replication_policy(resource_map_sysmeta)
 
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
   old_resmap_pid <- generate_resource_map_pid(old_pid)
