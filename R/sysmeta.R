@@ -42,7 +42,7 @@ add_access_rules <- function(sysmeta) {
 #' @examples
 #' library(datapack)
 #' sm <- new("SystemMetadata)
-#' sm <- addAccessRule(sm, "public", "read)
+#' sm <- addAccessRule(sm, "public", "read")
 #' sm@accessPolicy
 #' sm <- remove_public_access(sm)
 #' sm@accessPolicy
