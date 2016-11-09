@@ -15,12 +15,4 @@ remove_public_access(sysmeta)
 \description{
 Remove all public read access rules from a System Metadata document
 }
-\examples{
-library(datapack)
-sm <- new("SystemMetadata)
-sm <- addAccessRule(sm, "public", "read)
-sm@accessPolicy
-sm <- remove_public_access(sm)
-sm@accessPolicy
-}
 
