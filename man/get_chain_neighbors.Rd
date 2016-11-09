@@ -4,10 +4,10 @@
 \alias{get_chain_neighbors}
 \title{Get the obsoleted/obsoletedBy properties of an object as a named list.}
 \usage{
-get_chain_neighbors(mn, pid)
+get_chain_neighbors(node, pid)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node.}
+\item{node}{(MNode|CNode) The node to query.}
 
 \item{pid}{(character) Any object.}
 }

@@ -4,10 +4,10 @@
 \alias{object_exists}
 \title{Check if an object exists on a Member Node.}
 \usage{
-object_exists(mn, pids)
+object_exists(node, pids)
 }
 \arguments{
-\item{mn_base_url}{(character) Member Node to query.}
+\item{node}{(MNode|CNode) The Node to query.}
 
 \item{pid}{(character) PID to check the existence of.}
 }

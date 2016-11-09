@@ -243,22 +243,22 @@ log_message <- function(message=NULL) {
 #' This is a simple check for the HTTP status of a /meta/{PID} call on the
 #' provided member node.
 #'
-#' @param mn_base_url (character) Member Node to query.
+#' @param node (MNode|CNode) The Node to query.
 #' @param pid (character) PID to check the existence of.
 #'
 #' @return (logical) Whether the object exists.
 #' @export
 #'
 #' @examples
-object_exists <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode",
+object_exists <- function(node, pids) {
+  stopifnot(class(node) %in% c("MNode", "CNode"),
             is.character(pids))
 
   result <- vector(mode = "logical", length = length(pids))
 
   for (i in seq_along(pids)) {
     sysmeta <- tryCatch({
-      suppressWarnings(dataone::getSystemMetadata(mn, pids[i]))
+      suppressWarnings(dataone::getSystemMetadata(node, pids[i]))
     },
     error = function(e) {
       e
@@ -563,7 +563,7 @@ path_join <- function(path_parts=c("")) {
 
 #' Test whether an object is a particular format ID.
 #'
-#' @param mn (MNode)
+#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pids (character)
 #' @param format_id (character)
 #'
@@ -571,8 +571,8 @@ path_join <- function(path_parts=c("")) {
 #' @export
 #'
 #' @examples
-is_format_id <- function(mn, pids, format_id) {
-  stopifnot(class(mn) == "MNode")
+is_format_id <- function(node, pids, format_id) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(all(is.character(pids)),
             all(lengths(pids) > 0))
   stopifnot(is.character(format_id),
@@ -581,7 +581,7 @@ is_format_id <- function(mn, pids, format_id) {
   result <- vector("logical", length(pids))
 
   for (i in seq_along(pids)) {
-    result[i] <- dataone::getSystemMetadata(mn, pids[i])@formatId == format_id
+    result[i] <- dataone::getSystemMetadata(node, pids[i])@formatId == format_id
   }
 
   result
@@ -732,19 +732,19 @@ warn_current_version <- function() {
 
 #' Get the obsoleted/obsoletedBy properties of an object as a named list.
 #'
-#' @param mn (MNode) The Member Node.
+#' @param node (MNode|CNode) The node to query.
 #' @param pid (character) Any object.
 #'
 #' @return (list) A list of the obsoleted/obsoletedBy properties.
 #' @export
 #'
 #' @examples
-get_chain_neighbors <- function(mn, pid) {
-  stopifnot(is(mn, "MNode"))
+get_chain_neighbors <- function(node, pid) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
 
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  sysmeta <- dataone::getSystemMetadata(node, pid)
   list("obsoletes" = sysmeta@obsoletes,
        "obsoletedBy" = sysmeta@obsoletedBy)
 }
@@ -752,15 +752,15 @@ get_chain_neighbors <- function(mn, pid) {
 
 #' Get the PIDs of all versions of an object.
 #'
-#' @param mn (MNode) The Member Node.
+#' @param node (MNode|CNode) The node to query.
 #' @param pid (character) Any object in the chain.
 #'
 #' @return (character) A vector of PIDs in the chain, in order.
 #' @export
 #'
 #' @examples
-get_all_versions <- function(mn, pid) {
-  stopifnot(is(mn, "MNode"))
+get_all_versions <- function(node, pid) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
 
@@ -769,12 +769,12 @@ get_all_versions <- function(mn, pid) {
   cache_order <- c()
 
   # Walk backwards first, caching obsoletes/obsoleteBy, and then walk forward
-  cache[[pid]] <- get_chain_neighbors(mn, pid)
+  cache[[pid]] <- get_chain_neighbors(node, pid)
 
   # Walk backward, looking one step behind
   while (!is.na(cache[[pid]]$obsoletes)) {
     pid <- cache[[pid]]$obsoletes
-    cache[[pid]] <- get_chain_neighbors(mn, pid)
+    cache[[pid]] <- get_chain_neighbors(node, pid)
   }
 
   # Then walk forward, looking one step ahead
@@ -783,7 +783,7 @@ get_all_versions <- function(mn, pid) {
     pid <- cache[[pid]]$obsoletedBy
 
     if (!(pid %in% names(cache))) {
-      cache[[pid]] <- get_chain_neighbors(mn, pid)
+      cache[[pid]] <- get_chain_neighbors(node, pid)
     }
   }
 
@@ -859,7 +859,7 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
             nchar(pid) > 0)
   stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
             rows >= 0)
-  stopifnot(is_resource_map(mn, pid))
+  stopifnot(is_resource_map(node, pid))
 
   # Query for the package members
   pid_esc <- stringi::stri_replace_all_fixed(pid, ":", "\\:")
@@ -908,7 +908,7 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
 
 #' Get the resource map(s) for the given object.
 #'
-#' @param mn (MNode) The Member Node to query.
+#' @param node (MNode|CNode) The Node to query.
 #' @param pid (character) The object to get the resource map(s) for.
 #' @param rows (numeric) Optional. The number of query results to return. This
 #'   shouldn't need to be modified and the default, 1000, is very likely to be
@@ -918,8 +918,8 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
 #' @export
 #'
 #' @examples
-get_resource_map <- function(mn, pid, rows = 1000) {
-  stopifnot(is(mn, "MNode"))
+get_resource_map <- function(node, pid, rows = 1000) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
   stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
@@ -930,7 +930,7 @@ get_resource_map <- function(mn, pid, rows = 1000) {
                        rows = as.character(rows),
                        fl = "resourceMap")
 
-  response <- dataone::query(mn, query_params, as = "list")
+  response <- dataone::query(node, query_params, as = "list")
 
   if (length(response) != 1) {
     stop(paste0("One document was expected in the query result but ", length(response), " were returned."))
@@ -939,7 +939,7 @@ get_resource_map <- function(mn, pid, rows = 1000) {
   pids <- unlist(response[[1]]$resourceMap)
 
   # Filter obsoleted pids
-  pids <- pids[vapply(pids, function(pid) is_obsolete(mn, pid), TRUE)]
+  pids <- pids[vapply(pids, function(pid) is_obsolete(node, pid), TRUE)]
 
   pids
 }
@@ -950,13 +950,13 @@ get_resource_map <- function(mn, pid, rows = 1000) {
 #' Whether or not a PID is obsolete is determined by whether its "obsoletedBy"
 #' property is set to another PID (TRUE) or is NA (FALSE).
 #'
-#' @param mn (MNode) The Member Node to query.
+#' @param node (MNode|CNode) The Node to query.
 #' @param pids (character) PIDs to check the obsoletion state of.
 #'
 #' @return (character) PIDs that are not obsoleted by another PID.
 #' @export
 #'
 #' @examples
-filter_obsolete_pids <- function(mn, pids) {
-  pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(mn, pid)@obsoletedBy }, USE.NAMES = FALSE))]
+filter_obsolete_pids <- function(node, pids) {
+  pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(node, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }

@@ -89,18 +89,18 @@ get_mn_base_url <- function(mn) {
 
 #' Check if the user has authorization to perform an action on an object.
 #'
-#' @param mn (MNode) The Member Node to query.
+#' @param node (MNode|CNode) The Node to query.
 #' @param ids (character) The PID or SID to check.
 #' @param action (character) One of read, write, or changePermission.
 #'
 #' @export
-is_authorized <- function(mn, ids, action) {
-  stopifnot(class(mn) == "MNode")
+is_authorized <- function(node, ids, action) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(ids))
   stopifnot(action %in% c("read", "write", "changePermission"))
 
-  token <- get_token()
-  base_url <- paste0(mn@baseURL, "/", mn@APIversion)
+  token <- get_token(node)
+  base_url <- paste0(node@baseURL, "/", mn@APIversion)
 
   sapply(ids, function(id) {
     req <- httr::GET(paste0(base_url, "/isAuthorized/", id),

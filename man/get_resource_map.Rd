@@ -4,10 +4,10 @@
 \alias{get_resource_map}
 \title{Get the resource map(s) for the given object.}
 \usage{
-get_resource_map(mn, pid, rows = 1000)
+get_resource_map(node, pid, rows = 1000)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to query.}
+\item{node}{(MNode|CNode) The Node to query.}
 
 \item{pid}{(character) The object to get the resource map(s) for.}
 

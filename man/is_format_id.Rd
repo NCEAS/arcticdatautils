@@ -4,10 +4,10 @@
 \alias{is_format_id}
 \title{Test whether an object is a particular format ID.}
 \usage{
-is_format_id(mn, pids, format_id)
+is_format_id(node, pids, format_id)
 }
 \arguments{
-\item{mn}{(MNode)}
+\item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
 
 \item{pids}{(character)}
 

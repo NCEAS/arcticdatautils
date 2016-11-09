@@ -4,10 +4,10 @@
 \alias{get_all_versions}
 \title{Get the PIDs of all versions of an object.}
 \usage{
-get_all_versions(mn, pid)
+get_all_versions(node, pid)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node.}
+\item{node}{(MNode|CNode) The node to query.}
 
 \item{pid}{(character) Any object in the chain.}
 }

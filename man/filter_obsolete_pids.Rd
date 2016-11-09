@@ -4,10 +4,10 @@
 \alias{filter_obsolete_pids}
 \title{Filters PIDs that are obsolete.}
 \usage{
-filter_obsolete_pids(mn, pids)
+filter_obsolete_pids(node, pids)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to query.}
+\item{node}{(MNode|CNode) The Node to query.}
 
 \item{pids}{(character) PIDs to check the obsoletion state of.}
 }

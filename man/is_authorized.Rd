@@ -4,10 +4,10 @@
 \alias{is_authorized}
 \title{Check if the user has authorization to perform an action on an object.}
 \usage{
-is_authorized(mn, ids, action)
+is_authorized(node, ids, action)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to query.}
+\item{node}{(MNode|CNode) The Node to query.}
 
 \item{ids}{(character) The PID or SID to check.}
 
