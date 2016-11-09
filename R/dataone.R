@@ -118,7 +118,7 @@ is_authorized <- function(node, ids, action) {
   stopifnot(action %in% c("read", "write", "changePermission"))
 
   token <- get_token(node)
-  base_url <- paste0(node@baseURL, "/", mn@APIversion)
+  base_url <- paste0(node@baseURL, "/", node@APIversion)
 
   sapply(ids, function(id) {
     req <- httr::GET(paste0(base_url, "/isAuthorized/", id),
