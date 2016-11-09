@@ -26,7 +26,7 @@ insert_file <- function(inventory, file, env=NULL) {
 
   validate_environment(env)
 
-  if (is_token_expired()) {
+  if (is_token_expired(env$mn)) {
     log_message("Token is expired. Returning un-modified inventory.")
     return(inventory)
   }
@@ -105,7 +105,7 @@ insert_package <- function(inventory, package, env=NULL) {
 
   validate_environment(env)
 
-  if (is_token_expired()) {
+  if (is_token_expired(env$mn)) {
     log_message("Token is expired. Returning un-modified inventory.")
     return(inventory)
   }
@@ -783,7 +783,7 @@ update_package <- function(inventory,
   stopifnot(nrow(package_files) > 0)
 
   # Check the token
-  if (is_token_expired()) {
+  if (is_token_expired(env$mn)) {
     log_message("Token is expired. Returning un-modified inventory.")
     return(package_files)
   }

@@ -3,7 +3,7 @@ context("access")
 mn <- env_load()$mn
 
 test_that("get_package works for a simple package", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -16,7 +16,7 @@ test_that("get_package works for a simple package", {
 })
 
 test_that("get_package works for a package with a child package", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -38,7 +38,7 @@ test_that("get_package works for a package with a child package", {
 })
 
 test_that("get_package works for an object in two packages", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -52,7 +52,7 @@ test_that("get_package works for an object in two packages", {
 })
 
 test_that("get_package works the same when given a metadata pid as it does when given a resource map pid", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 

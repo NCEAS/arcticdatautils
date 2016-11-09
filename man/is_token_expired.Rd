@@ -4,7 +4,7 @@
 \alias{is_token_expired}
 \title{Determine whether the set token is expired.}
 \usage{
-is_token_expired()
+is_token_expired(node)
 }
 \description{
 Determine whether the set token is expired.

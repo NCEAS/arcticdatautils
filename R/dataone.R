@@ -4,15 +4,17 @@
 
 #' Test whether a token is set.
 #'
-#' @return
+#' @param node (MNode|CNode) The CN or MN you want to find a token for.
+#'
+#' @return (boolean)
 #' @export
 #'
 #' @examples
-is_token_set <- function() {
-  token <- tryCatch(get_token(),
+is_token_set <- function(node) {
+  token <- tryCatch(get_token(node),
                     error = function(e) FALSE)
 
-  if (token == FALSE) {
+  if (is.null(token) || token == FALSE) {
     return(FALSE)
   } else {
     return(TRUE)
@@ -22,17 +24,28 @@ is_token_set <- function() {
 
 #' Gets the currently set authentication token.
 #'
-#' @return
+#' @param node (MNode|CNode) The CN or MN you want to find a token for.
+#'
+#' @return (character) The token.
 #' @export
 #'
 #' @examples
-get_token <- function() {
-  # Get token
-  if (is.null(getOption("dataone_test_token"))) {
-    stop("No authentication token is set in options(). Please set one and try again.")
+get_token <- function(node) {
+  if (!(class(node) %in% c("MNode", "CNode"))) {
+    stop(paste0("Node must be an MNode or CNode. You passed in a '", class(node), "'."))
   }
 
-  getOption("dataone_test_token")
+  if (node@env == "prod") {
+    token <- getOption("dataone_token")
+  } else if (node@env == "test") {
+    token <- getOption("dataone_test_token")
+  }
+
+  if (is.null(token)) {
+    stop("No token could be found. Please set one with options(...).")
+  }
+
+  token
 }
 
 
@@ -42,11 +55,12 @@ get_token <- function() {
 #' @export
 #'
 #' @examples
-is_token_expired <- function() {
+is_token_expired <- function(node) {
+  token_name <- ifelse(node@env == "prod", "dataone_token", "dataone_test_token")
+
   # Check for presence of the token in options()
-  if (!is_token_set()) {
-    log_message("Authentication token not set in options().")
-    return(FALSE)
+  if (!is_token_set(node)) {
+    stop("The appropriate token was not set. You must set a token via options(", token_name, "='...')")
   }
 
   token_info <- try({
@@ -58,8 +72,12 @@ is_token_expired <- function() {
       !("expired" %in% names(token_info))) {
     stop("Failed to get token info.")
   }
-  stopifnot("dataone_test_token" %in% token_info$name)
-  expired <- token_info[token_info$name == "dataone_test_token","expired"]
+
+  if (!(token_name %in% token_info$name)) {
+    stop("The appropriate token was not set. You must set a token via options(", token_name, "='...')")
+  }
+
+  expired <- token_info[token_info$name == token_name,"expired"]
 
   if (expired == TRUE) {
     return(TRUE)

@@ -5,7 +5,7 @@ context("helpers")
 mn <- env_load()$mn
 
 test_that("a dummy package can be created", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 

@@ -4,7 +4,13 @@
 \alias{get_token}
 \title{Gets the currently set authentication token.}
 \usage{
-get_token()
+get_token(node)
+}
+\arguments{
+\item{node}{(MNode|CNode) The CN or MN you want to find a token for.}
+}
+\value{
+(character) The token.
 }
 \description{
 Gets the currently set authentication token.

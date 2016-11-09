@@ -3,7 +3,7 @@ context("editing")
 mn <- env_load()$mn
 
 test_that("we can publish an update", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -22,7 +22,7 @@ test_that("we can publish an update", {
 })
 
 test_that("an identifier can be manually specified when publishing an update", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -42,7 +42,7 @@ test_that("an identifier can be manually specified when publishing an update", {
 })
 
 test_that("we can create a resource map", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -58,7 +58,7 @@ test_that("we can create a resource map", {
 })
 
 test_that("we can update a resource map", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -78,7 +78,7 @@ test_that("we can update a resource map", {
 })
 
 test_that("otherEntity elements are set when publishing an update", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -120,7 +120,7 @@ test_that("otherEntity elements are set when publishing an update", {
 })
 
 test_that("an object can be published with a SID", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -144,7 +144,7 @@ test_that("an object can be published with a SID", {
 })
 
 test_that("SIDs are maintained when publishing an update to an object with a SID",{
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -170,7 +170,7 @@ test_that("publishing an update produces an error when identifiers are duplicate
 })
 
 test_that("we can publish an update to an object", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -191,7 +191,7 @@ test_that("we can publish an update to an object", {
 })
 
 test_that("we can publish an update to an object and specify our own format id", {
-  if (!is_token_set()) {
+  if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
@@ -207,4 +207,67 @@ test_that("we can publish an update to an object and specify our own format id",
   sm <- dataone::getSystemMetadata(mn, upd)
 
   expect_equal(sm@formatId, "text/plain")
+})
+
+test_that("replication policies are set to FALSE on new objects", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  path <- tempfile()
+  writeLines(LETTERS, path)
+  pid <- publish_object(mn, path)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  expect_false(sysmeta@replicationAllowed)
+})
+
+test_that("replication policies are honored when updating objects", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  path <- tempfile()
+  writeLines(LETTERS, path)
+  pid <- publish_object(mn, path)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  expect_false(sysmeta@replicationAllowed)
+
+  sysmeta@replicationAllowed <- TRUE
+  sysmeta <- dataone::updateSystemMetadata(mn, pid = pid, sysmeta = sysmeta)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  expect_true(sysmeta@replicationAllowed)
+
+  new_pid <- update_object(mn, pid, path)
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+  expect_true(sysmeta@replicationAllowed)
+})
+
+
+test_that("replication policies are honored when updating packages", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  pkg <- create_dummy_package(mn)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pkg$metadata)
+  expect_false(sysmeta@replicationAllowed)
+  sysmeta@replicationAllowed <- TRUE
+  sysmeta <- dataone::updateSystemMetadata(mn, pid = pkg$metadata, sysmeta = sysmeta)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pkg$resource_map)
+  expect_false(sysmeta@replicationAllowed)
+  sysmeta@replicationAllowed <- TRUE
+  sysmeta <- dataone::updateSystemMetadata(mn, pid = pkg$resource_map, sysmeta = sysmeta)
+
+  new_pkg <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data)
+
+  sysmeta <- dataone::getSystemMetadata(mn, new_pkg$metadata)
+  expect_true(sysmeta@replicationAllowed)
+
+  sysmeta <- dataone::getSystemMetadata(mn, new_pkg$resource_map)
+  expect_true(sysmeta@replicationAllowed)
 })

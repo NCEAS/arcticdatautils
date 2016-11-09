@@ -4,7 +4,13 @@
 \alias{is_token_set}
 \title{dataone.R}
 \usage{
-is_token_set()
+is_token_set(node)
+}
+\arguments{
+\item{node}{(MNode|CNode) The CN or MN you want to find a token for.}
+}
+\value{
+(boolean)
 }
 \description{
 Helpers for the DataONE R package.
