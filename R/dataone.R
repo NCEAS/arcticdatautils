@@ -117,13 +117,12 @@ is_authorized <- function(node, ids, action) {
   stopifnot(is.character(ids))
   stopifnot(action %in% c("read", "write", "changePermission"))
 
-  token <- get_token(node)
   base_url <- paste0(node@baseURL, "/", node@APIversion)
 
   sapply(ids, function(id) {
     req <- httr::GET(paste0(base_url, "/isAuthorized/", id),
                      query = list(action = action),
-                     httr::add_headers("Authorization" = paste0("Bearer ", token)))
+                     httr::add_headers("Authorization" = paste0("Bearer ", get_token(node))))
 
     if (req$status_code == 200) {
       return(TRUE)
