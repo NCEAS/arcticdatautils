@@ -444,20 +444,27 @@ publish_update <- function(mn,
 }
 
 
-#' Create a resource map Object on a Member Node. This function first generates
-#' a new resource map RDF/XML document locally and then uses the
-#' dataone::createObject function to create the Object on the specified MN.
+#' Create a resource map Object on a Member Node.
+#'
+#' This function first generates a new resource map RDF/XML document locally and
+#' then uses the dataone::createObject function to create the Object on the
+#' specified MN.
 #'
 #' If you only want to generate resource map RDF/XML, see
-#' \link{generate_resource_map}.
+#' \code{\link{generate_resource_map}.}
 #'
 #' @param mn (MNode) The Member Node
-#' @param metadata_pid (character) The PID of the metadata object to go in the package.
-#' @param data_pids (character) The PID(s) of the data objects to go in the package.
-#' @param child_pids (character) The resource map PIDs of the packages to be nested under the package.
-#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
+#' @param metadata_pid (character) The PID of the metadata object to go in the
+#'   package.
+#' @param data_pids (character) The PID(s) of the data objects to go in the
+#'   package.
+#' @param child_pids (character) The resource map PIDs of the packages to be
+#'   nested under the package.
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as
+#'   aruments exist on the MN before continuing. This speeds up the function,
+#'   especially when `data_pids` has many elements.
 #'
-#' @return The created resource map's PID (character)
+#' @return (character) The created resource map's PID
 #' @export
 #'
 #' @examples
@@ -500,15 +507,17 @@ create_resource_map <- function(mn,
 }
 
 
-#' Update an existing resource map Object on a Member Node. This function first
-#' generates a new resource map RDF/XML document locally and then uses the
-#' dataone::updateObject function to update an Object on the specified MN.
+#' Update an existing resource map Object on a Member Node.
+#'
+#' This function first generates a new resource map RDF/XML document locally and
+#' then uses the dataone::updateObject function to update an Object on the
+#' specified MN.
 #'
 #' If you only want to generate resource map RDF/XML, see
-#' \link{generate_resource_map}.
+#' \code{\link{generate_resource_map}.}
 #'
-#' This function also can be used to be used to add a new child packages to
-#' a parent package. For exmaple, if you have:
+#' This function also can be used to be used to add a new child packages to a
+#' parent package. For exmaple, if you have:
 #'
 #' Parent A B
 #'

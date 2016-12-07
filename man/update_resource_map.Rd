@@ -2,9 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{update_resource_map}
 \alias{update_resource_map}
-\title{Update an existing resource map Object on a Member Node. This function first
-generates a new resource map RDF/XML document locally and then uses the
-dataone::updateObject function to update an Object on the specified MN.}
+\title{Update an existing resource map Object on a Member Node.}
 \usage{
 update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
   child_pids = NULL, identifier = NULL, public = FALSE,
@@ -19,12 +17,16 @@ aruments exist on the MN before continuing. This speeds up the function,
 especially when `data_pids` has many elements.}
 }
 \description{
-If you only want to generate resource map RDF/XML, see
-\link{generate_resource_map}.
+This function first generates a new resource map RDF/XML document locally and
+then uses the dataone::updateObject function to update an Object on the
+specified MN.
 }
 \details{
-This function also can be used to be used to add a new child packages to
-a parent package. For exmaple, if you have:
+If you only want to generate resource map RDF/XML, see
+\code{\link{generate_resource_map}.}
+
+This function also can be used to be used to add a new child packages to a
+parent package. For exmaple, if you have:
 
 Parent A B
 
