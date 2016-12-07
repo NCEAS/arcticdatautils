@@ -300,8 +300,9 @@ insert_package <- function(inventory, package, env=NULL) {
   return(files)
 }
 
-#' Generate a Resource Map. This is a convenience wrapper around the constructor
-#' of the `ResourceMap` class from `DataPackage`.
+#' Create a resource map RDF/XML file and save is to a temporary path.
+#' This is a convenience wrapper around the constructor of the `ResourceMap`
+#' class from `DataPackage`.
 #'
 #' @param metadata_pid (character) PID of the metadata Object.
 #' @param data_pids (character) PID(s) of the data Objects.
