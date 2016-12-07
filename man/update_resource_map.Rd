@@ -23,7 +23,7 @@ specified MN.
 }
 \details{
 If you only want to generate resource map RDF/XML, see
-\code{\link{generate_resource_map}.}
+\code{\link{generate_resource_map}}.
 
 This function also can be used to be used to add a new child packages to a
 parent package. For exmaple, if you have:

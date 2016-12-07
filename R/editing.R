@@ -451,7 +451,7 @@ publish_update <- function(mn,
 #' specified MN.
 #'
 #' If you only want to generate resource map RDF/XML, see
-#' \code{\link{generate_resource_map}.}
+#' \code{\link{generate_resource_map}}
 #'
 #' @param mn (MNode) The Member Node
 #' @param metadata_pid (character) The PID of the metadata object to go in the
@@ -514,7 +514,7 @@ create_resource_map <- function(mn,
 #' specified MN.
 #'
 #' If you only want to generate resource map RDF/XML, see
-#' \code{\link{generate_resource_map}.}
+#' \code{\link{generate_resource_map}}.
 #'
 #' This function also can be used to be used to add a new child packages to a
 #' parent package. For exmaple, if you have:

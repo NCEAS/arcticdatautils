@@ -33,6 +33,6 @@ specified MN.
 }
 \details{
 If you only want to generate resource map RDF/XML, see
-\code{\link{generate_resource_map}.}
+\code{\link{generate_resource_map}}
 }
 
