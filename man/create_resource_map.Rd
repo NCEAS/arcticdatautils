@@ -2,7 +2,9 @@
 % Please edit documentation in R/editing.R
 \name{create_resource_map}
 \alias{create_resource_map}
-\title{Create a resource map.}
+\title{Create a resource map Object on a Member Node. This function first generates
+a new resource map RDF/XML document locally and then uses the
+dataone::createObject function to create the Object on the specified MN.}
 \usage{
 create_resource_map(mn, metadata_pid, data_pids = NULL, child_pids = NULL,
   check_first = TRUE)
@@ -22,7 +24,7 @@ create_resource_map(mn, metadata_pid, data_pids = NULL, child_pids = NULL,
 The created resource map's PID (character)
 }
 \description{
-Similar to but different than update_resource_map in that it uses a create
-call instead of an update call.
+If you only want to generate resource map RDF/XML, see
+\link{generate_resource_map}.
 }
 

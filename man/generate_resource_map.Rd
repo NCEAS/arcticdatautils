@@ -2,8 +2,9 @@
 % Please edit documentation in R/packaging.R
 \name{generate_resource_map}
 \alias{generate_resource_map}
-\title{Generate a Resource Map. This is a convenience wrapper around the constructor
-of the `ResourceMap` class from `DataPackage`.}
+\title{Create a resource map RDF/XML file and save is to a temporary path.
+This is a convenience wrapper around the constructor of the `ResourceMap`
+class from `DataPackage`.}
 \usage{
 generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
   resolve_base = "https://cn.dataone.org/cn/v2/resolve",
@@ -24,7 +25,8 @@ generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
 Absolute path to the Resource Map on disk (character)
 }
 \description{
-Generate a Resource Map. This is a convenience wrapper around the constructor
-of the `ResourceMap` class from `DataPackage`.
+Create a resource map RDF/XML file and save is to a temporary path.
+This is a convenience wrapper around the constructor of the `ResourceMap`
+class from `DataPackage`.
 }
 

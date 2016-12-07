@@ -444,10 +444,12 @@ publish_update <- function(mn,
 }
 
 
-#' Create a resource map.
+#' Create a resource map Object on a Member Node. This function first generates
+#' a new resource map RDF/XML document locally and then uses the
+#' dataone::createObject function to create the Object on the specified MN.
 #'
-#' Similar to but different than update_resource_map in that it uses a create
-#' call instead of an update call.
+#' If you only want to generate resource map RDF/XML, see
+#' \link{generate_resource_map}.
 #'
 #' @param mn (MNode) The Member Node
 #' @param metadata_pid (character) The PID of the metadata object to go in the package.
@@ -498,21 +500,21 @@ create_resource_map <- function(mn,
 }
 
 
-#' Update an existing Resource Map with a new one.
+#' Update an existing resource map Object on a Member Node. This function first
+#' generates a new resource map RDF/XML document locally and then uses the
+#' dataone::updateObject function to update an Object on the specified MN.
 #'
-#' This function is intended to be used to add a few new child packages to a
-#' parent package. For exmaple, if you have:
+#' If you only want to generate resource map RDF/XML, see
+#' \link{generate_resource_map}.
 #'
-#' Parent
-#'   A
-#'   B
+#' This function also can be used to be used to add a new child packages to
+#' a parent package. For exmaple, if you have:
 #'
-#'  and want to add C as a sibling package to A and B, e.g.
+#' Parent A B
 #'
-#' Parent
-#'   A
-#'   B
-#'   C
+#' and want to add C as a sibling package to A and B, e.g.
+#'
+#' Parent A B C
 #'
 #' you could use this function.
 #'
@@ -526,8 +528,11 @@ create_resource_map <- function(mn,
 #' @param old_resource_map_pid
 #' @param new_resource_map_pid
 #' @param child_pids
-#' @param public Whether or not to make the new resource map public read (logical)
-#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
+#' @param public Whether or not to make the new resource map public read
+#'   (logical)
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as
+#'   aruments exist on the MN before continuing. This speeds up the function,
+#'   especially when `data_pids` has many elements.
 #'
 #' @export
 update_resource_map <- function(mn,
