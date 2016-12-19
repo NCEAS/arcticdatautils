@@ -131,13 +131,16 @@ add_other_entities <- function(mn, path, pids) {
 
   current_entity_pids <- vapply(doc@dataset@otherEntity, function(x) x@id, "", USE.NAMES = FALSE)
 
-  # Filter out any otherEntity elements for PIDs not in the `pids` argument
+  # Collect otherEntity elements already in the EML for `pids`
   filtered_other_entities <- Filter(function(x) { (x@id %in% pids)}, doc@dataset@otherEntity)
   doc@dataset@otherEntity <- new("ListOfotherEntity", filtered_other_entities)
 
-  # Add any new otherEntity elements that weren't already in the EML
+  # Generate otherEntity elements for any new otherEntity elements that weren't
+  # already in the EML
   new_entities <- lapply(pids[!(pids %in% current_entity_pids)], function(pid) pid_to_entity(mn, pid))
 
+  # Concatenate the existing and new otherEntity elements and put back in the
+  # EML
   if (length(new_entities) > 0) {
     doc@dataset@otherEntity <- new("ListOfotherEntity", c(doc@dataset@otherEntity, new_entities))
   }
