@@ -26,6 +26,10 @@ pid_to_entity <- function(mn, pid, sysmeta=NULL) {
     sysmeta <- dataone::getSystemMetadata(mn, pid)
   }
 
+  if (is.null(sysmeta)) {
+    stop("Failed to download System Metadata for PID '", pid, "'.")
+  }
+
   # Check if the sysmeta has a fileName and stop execution if it does not
   if (is.na(sysmeta@fileName)) {
     stop(paste0("System Metadata for object with PID '", pid, "' did not have its fileName property set. This will result in 'NA' being set for the EML entityName and objectName (which we don't want). You need to give each data object a fileName property in its System Metadata. You can use the arcticdatautils::set_file_name() function to do this or you can use dataone::getSystemMetadata(), change the fileName property, and update it with dataone::updateSystemMetadata()"))
