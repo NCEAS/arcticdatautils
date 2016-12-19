@@ -92,6 +92,13 @@ sysmeta_to_entity <- function(sysmeta) {
 
 #' Creates and adds EML otherEntity elements to an existing EML document.
 #'
+#' This function isn't that smart. It will remove existing otherEntity elements
+#' if what's in their 'id' attribute isn't `pids`. It will then go on to add
+#' any otherEntity elements it needs. If your EML document doesn't store the
+#' PID for the otherEntity in the 'id' attribute, you may be confused when your
+#' otherEntity is removed and then added back. In theory, this isn't too bad
+#' but, in practice, this slows down the execution of the function because each
+#' new otherEntity element requires a network call to find its 'docid'.
 #' @param mn (MNode) The Member Node the objects exist on.
 #' @param path (character) The location on disk of the EML file.
 #' @param pids (character) One or more PIDs for the objects.
@@ -106,31 +113,31 @@ add_other_entities <- function(mn, path, pids) {
   stopifnot(all(is.character(pids)),
             all(nchar(pids) > 0))
 
-  log_message("Adding EML otherEntity elements...")
+  if (length(pids) == 0) {
+    message("Skipped adding EML otherEntity elements because no pids were specified.")
+    return(path)
+  }
 
   # Get the metadata document from the MN and load it as an EML document
   doc <- EML::read_eml(path)
   stopifnot(class(doc) == "eml")
 
-  # Check for any existing otherEntity elements and quit if any are found
-  if (length(doc@dataset@otherEntity) != 0) {
-    log_message(paste0("Metadata file already contains one or more ",
-                       "otherEntity elements. All existing otherEntity ",
-                       "elements will be removed. If what you passed to ",
-                       "data_old_pids was the complete list of data objects ",
-                       "for the new package everythng is probably just fine."))
+  message("Adding EML otherEntity elements...")
+
+  current_entity_pids <- vapply(doc@dataset@otherEntity, function(x) x@id, "", USE.NAMES = FALSE)
+
+  # Filter out any otherEntity elements for PIDs not in the `pids` argument
+  filtered_other_entities <- Filter(function(x) { (x@id %in% pids)}, doc@dataset@otherEntity)
+  doc@dataset@otherEntity <- new("ListOfotherEntity", filtered_other_entities)
+
+  # Add any new otherEntity elements that weren't already in the EML
+  new_entities <- lapply(pids[!(pids %in% current_entity_pids)], function(pid) pid_to_entity(mn, pid))
+
+  if (length(new_entities) > 0) {
+    doc@dataset@otherEntity <- new("ListOfotherEntity", c(doc@dataset@otherEntity, new_entities))
   }
 
-  # Create the otherEntity elements as a list
-  other_entities <- lapply(pids, function(pid) {
-    pid_to_entity(mn, pid)
-  })
-  stopifnot(length(other_entities) > 0)
-
-  doc@dataset@otherEntity <- new("ListOfotherEntity", other_entities)
-  stopifnot(length(doc@dataset@otherEntity) == length(pids))
-
-  # Write the modified document back to disk and stop if it isn't valid
+  # Write the modified document back to disk and stop
   EML::write_eml(doc, path)
   stopifnot(EML::eml_validate(path) == TRUE)
 
@@ -147,6 +154,8 @@ add_other_entities <- function(mn, path, pids) {
 #' @examples
 get_doc_id <- function(sysmeta) {
   stopifnot(class(sysmeta) == "SystemMetadata")
+
+  message("Looking up docid for ", sysmeta@identifier, ".")
 
   # Hack: Determine whether we should check production or dev Metacat
   if (sysmeta@originMemberNode == "urn:node:ARCTIC") {

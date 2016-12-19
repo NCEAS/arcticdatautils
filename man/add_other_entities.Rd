@@ -17,6 +17,12 @@ add_other_entities(mn, path, pids)
 (character) The path to the updated EML file.
 }
 \description{
-Creates and adds EML otherEntity elements to an existing EML document.
+This function isn't that smart. It will remove existing otherEntity elements
+if what's in their 'id' attribute isn't `pids`. It will then go on to add
+any otherEntity elements it needs. If your EML document doesn't store the
+PID for the otherEntity in the 'id' attribute, you may be confused when your
+otherEntity is removed and then added back. In theory, this isn't too bad
+but, in practice, this slows down the execution of the function because each
+new otherEntity element requires a network call to find its 'docid'.
 }
 
