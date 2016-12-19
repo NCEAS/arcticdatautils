@@ -103,6 +103,7 @@ sysmeta_to_entity <- function(sysmeta) {
 #' otherEntity is removed and then added back. In theory, this isn't too bad
 #' but, in practice, this slows down the execution of the function because each
 #' new otherEntity element requires a network call to find its 'docid'.
+#'
 #' @param mn (MNode) The Member Node the objects exist on.
 #' @param path (character) The location on disk of the EML file.
 #' @param pids (character) One or more PIDs for the objects.
