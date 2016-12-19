@@ -440,6 +440,9 @@ publish_update <- function(mn,
     set_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
 
+  response[["data"]] <- data_pids
+  response[["child_pids"]] <- child_pids
+
   return(response)
 }
 
