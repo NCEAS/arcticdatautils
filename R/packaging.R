@@ -425,7 +425,7 @@ generate_resource_map <- function(metadata_pid,
   }
 
   # Add in any custom triples specified by the `statements` argument
-  if (!is.null(other_statements)) {
+  if (is.data.frame(other_statements) && nrow(other_statements) > 0) {
     if (!is.data.frame(other_statements)) {
       warning("other_statements argument was not a data frame so adding other statements was skipped.")
     }
@@ -451,6 +451,12 @@ generate_resource_map <- function(metadata_pid,
     relationships <- rbind(relationships,
                            other_statements)
   }
+
+  # Uniquify the relationships
+  # This catches the case where dc:identifier statements were heldover from a
+  # call to filter_packaging_statements because PROV statements existed
+  # For some reason redland puts any duplicated statements in twice
+  relationships <- unique(relationships)
 
   resource_map <- new("ResourceMap",
                       id = resource_map_pid)
@@ -1061,6 +1067,16 @@ parse_resource_map <- function(path) {
                                    stringsAsFactors = FALSE))
   }
 
+  # Remove < and > around URIs. We do this because redland needs them to be
+  # without those characters or it complains about being unable to convert into
+  # a qname
+  statements$subject <- stringr::str_replace_all(statements$subject, "^[<]", "")
+  statements$predicate <- stringr::str_replace_all(statements$predicate, "^[<]", "")
+  statements$object <- stringr::str_replace_all(statements$object, "^[<]", "")
+  statements$subject <- stringr::str_replace_all(statements$subject, "[>]$", "")
+  statements$predicate <- stringr::str_replace_all(statements$predicate, "[>]$", "")
+  statements$object <- stringr::str_replace_all(statements$object, "[>]$", "")
+
   statements
 }
 
@@ -1091,8 +1107,8 @@ filter_packaging_statements <- function(statements) {
   if (nrow(statements) == 0) return(statements)
 
   # Collect URIs we're going to use to filter by
-  resource_map_uri <- statements[grepl("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", statements$predicate) & grepl("<http://www.openarchives.org/ore/terms/ResourceMap>", statements$object),"subject"]
-  aggregation_uri <- statements[grepl("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", statements$predicate) & grepl("<http://www.openarchives.org/ore/terms/Aggregation>", statements$object),"subject"]
+  resource_map_uri <- statements[grepl("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", statements$predicate) & grepl("http://www.openarchives.org/ore/terms/ResourceMap", statements$object),"subject"]
+  aggregation_uri <- statements[grepl("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", statements$predicate) & grepl("http://www.openarchives.org/ore/terms/Aggregation", statements$object),"subject"]
 
   # Filter statements by subject
   statements <- statements[!(statements$subject %in% c(resource_map_uri, aggregation_uri)),]
@@ -1101,8 +1117,8 @@ filter_packaging_statements <- function(statements) {
   statements <- statements[!(statements$object %in% c(resource_map_uri, aggregation_uri)),]
 
   # Filter cito:documents / cito:isDocumentedBy statements
-  statements <- statements[!(statements$predicate == "<http://purl.org/spar/cito/documents>"),]
-  statements <- statements[!(statements$predicate == "<http://purl.org/spar/cito/isDocumentedBy>"),]
+  statements <- statements[!(statements$predicate == "http://purl.org/spar/cito/documents"),]
+  statements <- statements[!(statements$predicate == "http://purl.org/spar/cito/isDocumentedBy"),]
 
   # If this is a simple package without extra statements, then we should just be
   # left with some dc:identifier statements left over. Here we try to detect
@@ -1110,7 +1126,7 @@ filter_packaging_statements <- function(statements) {
   # statements and filtering statements about subjects with only one statement
   # about them
 
-  dc_identifiers <- unique(statements[statements$predicate == "<http://purl.org/dc/terms/identifier>","subject"])
+  dc_identifiers <- unique(statements[statements$predicate == "http://purl.org/dc/terms/identifier", "subject"])
 
   for (identifier in dc_identifiers) {
     if (nrow(statements[statements$subject == identifier | statements$object == identifier,]) == 1) {

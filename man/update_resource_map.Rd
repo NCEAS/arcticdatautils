@@ -5,10 +5,14 @@
 \title{Update an existing resource map Object on a Member Node.}
 \usage{
 update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
-  child_pids = NULL, identifier = NULL, public = FALSE,
-  check_first = TRUE)
+  child_pids = NULL, other_statements = NULL, identifier = NULL,
+  public = FALSE, check_first = TRUE)
 }
 \arguments{
+\item{other_statements}{(data.frame) Extra statements to add to the Resource Map.}
+
+\item{identifier}{}
+
 \item{public}{Whether or not to make the new resource map public read
 (logical)}
 

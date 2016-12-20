@@ -537,14 +537,15 @@ create_resource_map <- function(mn,
 #' @param mn
 #' @param metadata_pid
 #' @param data_pids
-#' @param old_resource_map_pid
-#' @param new_resource_map_pid
 #' @param child_pids
 #' @param public Whether or not to make the new resource map public read
 #'   (logical)
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as
 #'   aruments exist on the MN before continuing. This speeds up the function,
 #'   especially when `data_pids` has many elements.
+#' @param resource_map_pid
+#' @param other_statements (data.frame) Extra statements to add to the Resource Map.
+#' @param identifier
 #'
 #' @export
 update_resource_map <- function(mn,
@@ -552,6 +553,7 @@ update_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,
                                 child_pids=NULL,
+                                other_statements=NULL,
                                 identifier=NULL,
                                 public=FALSE,
                                 check_first=TRUE) {
@@ -590,9 +592,13 @@ update_resource_map <- function(mn,
   # Get the old resource map so we can extract any statements we need out of it
   # such as PROV statements
   old_resource_map_path <- tempfile()
-  writeLines(rawToChar(getObject(mn, resource_map_pid)), old_resource_map_path)
+  writeLines(rawToChar(dataone::getObject(mn, resource_map_pid)), old_resource_map_path)
   statements <- parse_resource_map(old_resource_map_path)
   statements <- filter_packaging_statements(statements)
+  if (is.data.frame(other_statements)) {
+    statements <- rbind(statements,
+                        other_statements)
+  }
 
   # Create the replacement resource map
   if (is.null(identifier)) {

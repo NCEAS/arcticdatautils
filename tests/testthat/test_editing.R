@@ -271,3 +271,39 @@ test_that("replication policies are honored when updating packages", {
   sysmeta <- dataone::getSystemMetadata(mn, new_pkg$resource_map)
   expect_true(sysmeta@replicationAllowed)
 })
+
+
+test_that("extra statements are maintained between updates", {
+  pkg <- create_dummy_package(mn, 3)
+
+  # Add some PROV triples to the Resource Map
+  rm <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, pkg$resource_map)), rm)
+  # statements <- data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[1], reserved = TRUE)),
+  #                          predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+  #                          object = "http://www.w3.org/ns/prov#Entity")
+  #
+  # statements <- rbind(statements,
+  #                     data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)),
+  #                                predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+  #                                object = "http://www.w3.org/ns/prov#Entity"))
+
+  statements <- data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[1], reserved = TRUE)),
+                           predicate = "http://www.w3.org/ns/prov#wasDerivedFrom",
+                           object = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)))
+
+  new_rm <- update_resource_map(mn, pkg$resource_map, pkg$metadata, pkg$data, other_statements = statements, public = TRUE)
+
+  rm <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, new_rm)), rm)
+  statements <- parse_resource_map(rm)
+  expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
+
+
+  new_new_rm <- update_resource_map(mn, new_rm, pkg$metadata, pkg$data, public = TRUE)
+  rm <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, new_new_rm)), rm)
+  statements <- parse_resource_map(rm)
+  expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
+})
+

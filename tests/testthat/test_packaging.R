@@ -23,7 +23,3 @@ test_that("extra triple can be added to a resource map", {
   statements <- parse_resource_map(path)
   expect_true("<http://example.com/me>" %in% statements$subject)
 })
-
-test_that("extra statements are maintained between updates",{
-
-})
