@@ -30,6 +30,7 @@ LazyData: true
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    xslt
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr

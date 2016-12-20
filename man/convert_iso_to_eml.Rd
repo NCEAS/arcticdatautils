@@ -4,20 +4,17 @@
 \alias{convert_iso_to_eml}
 \title{Convert and ISO document to EML using an XSLT.}
 \usage{
-convert_iso_to_eml(full_path, isotoeml = NA)
+convert_iso_to_eml(path, style = NA)
 }
 \arguments{
-\item{full_path}{(character) Path to the file to convert.}
+\item{path}{(character) Path to the file to convert.}
 
-\item{isotoeml}{(xslt) the XSLT object to be used for transformation.}
+\item{style}{(xslt) The XSLT object to be used for transformation.}
 }
 \value{
 (character) Location of the converted file.
 }
 \description{
-This is a bit of a nasty function right now but it essentially
-takes a file in, loads an XSLT file and does the conversion. The nasty part
-is that I have the XSLT file in a hard-linked directory on my computer
-because we're still actively developing the XSLT.
+Leave style=NA if you want to use the default ISO-to-EML stylesheet.
 }
 

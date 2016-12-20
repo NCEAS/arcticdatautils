@@ -277,60 +277,31 @@ object_exists <- function(node, pids) {
 
 #' Convert and ISO document to EML using an XSLT.
 #'
-#' This is a bit of a nasty function right now but it essentially
-#' takes a file in, loads an XSLT file and does the conversion. The nasty part
-#' is that I have the XSLT file in a hard-linked directory on my computer
-#' because we're still actively developing the XSLT.
-#'
-#' @param full_path (character) Path to the file to convert.
-#' @param isotoeml (xslt) the XSLT object to be used for transformation.
+#' Leave style=NA if you want to use the default ISO-to-EML stylesheet.
+#' @param path (character) Path to the file to convert.
+#' @param style (xslt) The XSLT object to be used for transformation.
 #'
 #' @return (character) Location of the converted file.
 #' @export
 #'
 #' @examples
-convert_iso_to_eml <- function(full_path, isotoeml=NA) {
-  # Load the XSLT from the default location
-  if (is.na(isotoeml)) {
-    xsl_path <- file.path(system.file(package = "arcticdatautils"), "iso2eml.xsl")
-    stopifnot(file.exists(xsl_path))
-    isotoeml <- xslt::read_xslt(xsl_path)
+convert_iso_to_eml <- function(path, style=NA) {
+  # Load the XSLT if needed
+  if (is.na(style)) {
+    style <- xml2::read_xml(file.path(system.file(package = "arcticdatautils"), "iso2eml.xsl"))
   }
 
-  stopifnot(file.exists(full_path))
-  stopifnot(inherits(isotoeml, "xslt_document"))
+  stopifnot(file.exists(path))
+  doc <- xml2::read_xml(path)
 
-  tmpfile <- tempfile(fileext = ".xml")
+  transformed_doc <- xslt::xml_xslt(doc, style)
 
-  doc <- tryCatch({
-    xml2::read_xml(full_path)
-  },
-  warning = function(w) {
-    log_message(w)
-  },
-  error = function(e) {
-    log_message(e)
-  })
+  outpath <- tempfile()
+  xml2::write_xml(transformed_doc, outpath)
 
-  transformed_document <- tryCatch({
-    xslt::xslt_transform(doc, isotoeml)
-  },
-  error = function(e) {
-    log_message(e)
-  })
-
-  if (!inherits(transformed_document, "xml_document")) {
-    log_message(paste0("Full path is ", full_path))
-    log_message(paste0("isotoeml is ", isotoeml))
-    log_message(paste0("doc is ", doc))
-    log_message(paste0("transformed doc is ", transformed_document))
-  } else {
-    xml2::write_xml(transformed_document, tmpfile)
-  }
-
-
-  tmpfile
+  outpath
 }
+
 
 #' Extract the EML responsible-party blocks in a document, and parse the
 #' surName field to create proper givenName/surName structure
