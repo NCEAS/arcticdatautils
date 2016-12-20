@@ -307,23 +307,33 @@ insert_package <- function(inventory, package, env=NULL) {
 #' @param metadata_pid (character) PID of the metadata Object.
 #' @param data_pids (character) PID(s) of the data Objects.
 #' @param child_pids (character) Optional. PID(s) of child Resource Maps.
+#' @param other_statements (data.frame) Extra statements to add to the Resource Map.
+#' @param resource_map_pid
 #' @param resolve_base (character) Optional. The resolve service base URL.
-#' @param resource_ma_pid (character) Optional. The PID to use for the resource map.
 #'
 #' @return Absolute path to the Resource Map on disk (character)
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' generate_resource_map("X", "Y", "Z",
+#'                       other_statements = data.frame(subject="http://example.com/me",
+#'                                                     predicate="http://example.com/foo",
+#'                                                     object="http://example.com/bar"))
+#' }
 generate_resource_map <- function(metadata_pid,
                                   data_pids=NULL,
                                   child_pids=NULL,
+                                  other_statements=NULL,
                                   resolve_base="https://cn.dataone.org/cn/v2/resolve",
                                   resource_map_pid=NULL) {
   stopifnot(length(metadata_pid) == 1)
 
+  # Generate a PID if needed
   if (is.null(resource_map_pid)) {
-    stop("Argument 'resource_map_pid' was NULL (not set). You must set this argument.")
+    message("Automatically generating the resource map PID based on the metadata PID.")
+    resource_map_pid <- generate_resource_map_pid(metadata_pid)
   }
 
   stopifnot(is.character(resource_map_pid),
@@ -414,10 +424,39 @@ generate_resource_map <- function(metadata_pid,
                                       stringsAsFactors = FALSE))
   }
 
+  # Add in any custom triples specified by the `statements` argument
+  if (!is.null(other_statements)) {
+    if (!is.data.frame(other_statements)) {
+      warning("other_statements argument was not a data frame so adding other statements was skipped.")
+    }
+
+    if (nrow(other_statements) == 0) {
+      warning("other_statements argument had zero rows so adding other statements was skipped.")
+    }
+
+    if (!("subjectType" %in% names(other_statements))) {
+      other_statements$subjectType <- "uri"
+    }
+
+    if (!("objectType" %in% names(other_statements))) {
+      other_statements$objectType <- "uri"
+    }
+
+    if (length(setdiff(names(relationships), names(other_statements))) != 0) {
+      warning("The column names of the relationships and other_statements data frames do not match: ", paste(names(relationships), collapse =", "), " vs. ", paste(names(other_statements), collapse = ", "), ".")
+    }
+
+    message("Adding ", nrow(other_statements), " custom statement(s) to the Resource Map.")
+
+    relationships <- rbind(relationships,
+                           other_statements)
+  }
+
   resource_map <- new("ResourceMap",
                       id = resource_map_pid)
 
-  log_message(paste0("Generating resource map with pids ", paste0(head(unlist(c(metadata_pid, data_pids, child_pids)), n = 10), collapse = ", ")))
+  message("Generating resource map with pids ", paste0(head(unlist(c(metadata_pid, data_pids, child_pids)), n = 10), collapse = ", "), ".")
+
   resource_map <- datapack::createFromTriples(resource_map,
                                               relations = relationships,
                                               identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
@@ -978,5 +1017,110 @@ update_package <- function(inventory,
   }
 
   package_files
+}
+
+
+#' Parse a Resource Map into a data.frame
+#'
+#' @param path (character) Path to the resource map (an RDF/XML file)
+#'
+#' @return (data.frame) The statements in the Resource Map
+#' @export
+#'
+#' @examples
+parse_resource_map <- function(path) {
+  stopifnot(file.exists(path))
+
+  world <- new("World")
+  storage <- new("Storage",
+                 world,
+                 "hashes",
+                 name = "",
+                 options = "hash-type='memory'")
+  model <- new("Model", world, storage, options = "")
+  parser <- new("Parser", world)
+
+  redland::parseFileIntoModel(parser, world, path, model)
+
+  query <- new("Query",
+               world,
+               "select ?s ?p ?o where { ?s ?p ?o }",
+               base_uri = NULL,
+               query_language = "sparql",
+               query_uri = NULL)
+
+  queryResult <- redland::executeQuery(query, model)
+
+  statements <- data.frame()
+
+  while(!is.null(result <- redland::getNextResult(queryResult))) {
+    statements <- rbind(statements,
+                        data.frame(subject = result$s,
+                                   predicate = result$p,
+                                   object = result$o,
+                                   stringsAsFactors = FALSE))
+  }
+
+  statements
+}
+
+
+#' Filter statements related to packaging
+#'
+#' This function was written specifically for the case of updating a resource
+#' map while preserving any extra statements that have been added such as PROV
+#' statements. Statements are filtered according to these rules:
+#'
+#' 1. If the subject or object is the ore:ResourceMap resource
+#' 2. If the subject or object is the ore:Aggregation resource
+#' 3. If the predicate is cito:documents or cito:isDocumentedBy
+#' 4. Once filters 1-3 have been executed, any remaining triples are considered
+#'    for removal if they look like dangling dc:identifier statements
+#'
+#' The consequence of filter 4 is that dc:identifier statements are left in if
+#' they are still in use by another statement
+#'
+#' @param statements (data.frame) A set of Statements to be filtered
+#'
+#' @return (data.frame) The filtered Statements
+#' @export
+#'
+#' @examples
+filter_packaging_statements <- function(statements) {
+  stopifnot(is.data.frame(statements))
+  if (nrow(statements) == 0) return(statements)
+
+  # Collect URIs we're going to use to filter by
+  resource_map_uri <- statements[grepl("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", statements$predicate) & grepl("<http://www.openarchives.org/ore/terms/ResourceMap>", statements$object),"subject"]
+  aggregation_uri <- statements[grepl("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>", statements$predicate) & grepl("<http://www.openarchives.org/ore/terms/Aggregation>", statements$object),"subject"]
+
+  # Filter statements by subject
+  statements <- statements[!(statements$subject %in% c(resource_map_uri, aggregation_uri)),]
+
+  # Filter statements by object
+  statements <- statements[!(statements$object %in% c(resource_map_uri, aggregation_uri)),]
+
+  # Filter cito:documents / cito:isDocumentedBy statements
+  statements <- statements[!(statements$predicate == "<http://purl.org/spar/cito/documents>"),]
+  statements <- statements[!(statements$predicate == "<http://purl.org/spar/cito/isDocumentedBy>"),]
+
+  # If this is a simple package without extra statements, then we should just be
+  # left with some dc:identifier statements left over. Here we try to detect
+  # that case by collecting the unique subjects taking part in dc:identifier
+  # statements and filtering statements about subjects with only one statement
+  # about them
+
+  dc_identifiers <- unique(statements[statements$predicate == "<http://purl.org/dc/terms/identifier>","subject"])
+
+  for (identifier in dc_identifiers) {
+    if (nrow(statements[statements$subject == identifier | statements$object == identifier,]) == 1) {
+      statements <- statements[!(statements$subject == identifier | statements$object == identifier),]
+    }
+  }
+
+  # Remove <NA> introduced by the second filter statement
+  statements <- statements[complete.cases(statements),]
+
+  statements
 }
 

@@ -587,6 +587,13 @@ update_resource_map <- function(mn,
   me <- get_token_subject()
   set_rights_holder(mn, resource_map_pid, me)
 
+  # Get the old resource map so we can extract any statements we need out of it
+  # such as PROV statements
+  old_resource_map_path <- tempfile()
+  writeLines(rawToChar(getObject(mn, resource_map_pid)), old_resource_map_path)
+  statements <- parse_resource_map(old_resource_map_path)
+  statements <- filter_packaging_statements(statements)
+
   # Create the replacement resource map
   if (is.null(identifier)) {
     identifier <- paste0("resource_map_", new_uuid())
@@ -595,6 +602,7 @@ update_resource_map <- function(mn,
   new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
+                                       other_statements = statements,
                                        resource_map_pid = identifier)
   stopifnot(file.exists(new_rm_path))
 

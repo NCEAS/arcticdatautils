@@ -7,6 +7,7 @@ This is a convenience wrapper around the constructor of the `ResourceMap`
 class from `DataPackage`.}
 \usage{
 generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
+  other_statements = NULL,
   resolve_base = "https://cn.dataone.org/cn/v2/resolve",
   resource_map_pid = NULL)
 }
@@ -17,9 +18,9 @@ generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
 
 \item{child_pids}{(character) Optional. PID(s) of child Resource Maps.}
 
-\item{resolve_base}{(character) Optional. The resolve service base URL.}
+\item{other_statements}{(data.frame) Extra statements to add to the Resource Map.}
 
-\item{resource_ma_pid}{(character) Optional. The PID to use for the resource map.}
+\item{resolve_base}{(character) Optional. The resolve service base URL.}
 }
 \value{
 Absolute path to the Resource Map on disk (character)
@@ -28,5 +29,13 @@ Absolute path to the Resource Map on disk (character)
 Create a resource map RDF/XML file and save is to a temporary path.
 This is a convenience wrapper around the constructor of the `ResourceMap`
 class from `DataPackage`.
+}
+\examples{
+\dontrun{
+generate_resource_map("X", "Y", "Z",
+                      other_statements = data.frame(subject="http://example.com/me",
+                                                    predicate="http://example.com/foo",
+                                                    object="http://example.com/bar"))
+}
 }
 

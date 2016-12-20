@@ -13,3 +13,17 @@ test_that("child pids are correctly determined", {
   expect_equal(determine_child_pids(inventory, "B"), "resource_map_C")
   expect_equal(determine_child_pids(inventory, "C"), NULL)
 })
+
+
+test_that("extra triple can be added to a resource map", {
+  path <- generate_resource_map("metadata", "data",
+                                other_statements = data.frame(subject="http://example.com/me",
+                                                              predicate="http://example.com/is_related_to",
+                                                              object="http://example.com/myself"))
+  statements <- parse_resource_map(path)
+  expect_true("<http://example.com/me>" %in% statements$subject)
+})
+
+test_that("extra statements are maintained between updates",{
+
+})
