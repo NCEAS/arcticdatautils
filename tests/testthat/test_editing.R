@@ -17,7 +17,7 @@ test_that("we can publish an update", {
                            package$resource_map,
                            package$data)
 
-  expect_named(update, c("metadata", "resource_map"))
+  expect_named(update, c("metadata", "resource_map", "data"))
   expect_true(all(object_exists(mn, unlist(update))))
 })
 

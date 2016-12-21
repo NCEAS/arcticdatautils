@@ -21,5 +21,5 @@ test_that("extra triple can be added to a resource map", {
                                                               predicate="http://example.com/is_related_to",
                                                               object="http://example.com/myself"))
   statements <- parse_resource_map(path)
-  expect_true("<http://example.com/me>" %in% statements$subject)
+  expect_true("http://example.com/me" %in% statements$subject)
 })
