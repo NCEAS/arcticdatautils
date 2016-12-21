@@ -89,14 +89,10 @@ publish_object <- function(mn,
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   sysmeta@fileName <- basename(path)
 
-  create_response <- dataone::createObject(mn,
-                                           pid = pid,
-                                           file = path,
-                                           sysmeta = sysmeta)
-
-  log_message(paste0("Published file with identifier: ", create_response))
-
-  return(create_response)
+  dataone::createObject(mn,
+                        pid = pid,
+                        file = path,
+                        sysmeta = sysmeta)
 }
 
 #' Update an object with a new file.
