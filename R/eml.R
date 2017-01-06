@@ -94,7 +94,7 @@ sysmeta_to_entity <- function(sysmeta) {
 }
 
 
-#' Creates and adds EML otherEntity elements to an existing EML document.
+#' Creates and sets EML otherEntity elements to an existing EML document.
 #'
 #' This function isn't that smart. It will remove existing otherEntity elements
 #' if what's in their 'id' attribute isn't `pids`. It will then go on to add
@@ -112,7 +112,7 @@ sysmeta_to_entity <- function(sysmeta) {
 #' @export
 #'
 #' @examples
-add_other_entities <- function(mn, path, pids) {
+set_other_entities <- function(mn, path, pids) {
   stopifnot(class(mn) == "MNode")
   stopifnot(file.exists(path))
   stopifnot(all(is.character(pids)),
@@ -127,7 +127,7 @@ add_other_entities <- function(mn, path, pids) {
   doc <- EML::read_eml(path)
   stopifnot(class(doc) == "eml")
 
-  message("Adding EML otherEntity elements...")
+  message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
 
   current_entity_pids <- vapply(doc@dataset@otherEntity, function(x) x@id, "", USE.NAMES = FALSE)
 

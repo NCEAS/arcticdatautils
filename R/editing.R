@@ -322,13 +322,13 @@ publish_update <- function(mn,
   }
 
   # Write out the document to disk. We do this in part because
-  # add_other_entities takes a path to the doc.
+  # set_other_entities takes a path to the doc.
   eml_path <- tempfile()
   EML::write_eml(eml, eml_path)
 
   # Add other entity fields (if appropriate)
   if (!is.null(data_pids) && !skip_other_entities) {
-    eml <- add_other_entities(mn, eml_path, data_pids)
+    eml <- set_other_entities(mn, eml_path, data_pids)
   }
 
   if (skip_other_entities) {
