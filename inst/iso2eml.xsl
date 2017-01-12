@@ -12,6 +12,7 @@
     xmlns:doc="eml://ecoinformatics.org/documentation-2.1.1"
     xmlns:res="eml://ecoinformatics.org/resource-2.1.1"
     xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gmi="http://www.isotc211.org/2005/gmi"
     xmlns:gco="http://www.isotc211.org/2005/gco"
     xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:gmx="http://www.isotc211.org/2005/gmx"
@@ -702,7 +703,7 @@
 
     <xsl:strip-space elements="*"/>
 
-    <xsl:template match="/gmd:MD_Metadata">
+    <xsl:template match="/gmd:MD_Metadata | /gmi:MI_Metadata">
         <eml:eml>
 
             <xsl:attribute name="xsi:schemaLocation">eml://ecoinformatics.org/eml-2.1.1 ~/development/eml/eml.xsd</xsl:attribute>
