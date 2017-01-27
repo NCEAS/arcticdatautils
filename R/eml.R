@@ -114,15 +114,11 @@ sysmeta_to_eml_physical <- function(sysmeta) {
   phys
 }
 
-#' Creates and sets EML otherEntity elements to an existing EML document.
+#' Creates and sets EML otherEntity elements to an existing EML document,
+#' replacing any existing otherEntities
 #'
-#' This function isn't that smart. It will remove existing otherEntity elements
-#' if what's in their 'id' attribute isn't `pids`. It will then go on to add
-#' any otherEntity elements it needs. If your EML document doesn't store the
-#' PID for the otherEntity in the 'id' attribute, you may be confused when your
-#' otherEntity is removed and then added back. In theory, this isn't too bad
-#' but, in practice, this slows down the execution of the function because each
-#' new otherEntity element requires a network call to find its 'docid'.
+#' This function is slow because it needs get the System Metadata for each
+#' element of `pids` in order to get the fileName, checksum, etc.
 #'
 #' @param mn (MNode) The Member Node the objects exist on.
 #' @param path (character) The location on disk of the EML file.
@@ -132,6 +128,11 @@ sysmeta_to_eml_physical <- function(sysmeta) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' mn <- MNode(...) # Set up a connection to an MN
+#' eml_path <- "/path/to/your/eml.xml"
+#' set_other_entities(mn, eml_path, "a_data_pid")
+#' }
 set_other_entities <- function(mn, path, pids) {
   stopifnot(class(mn) == "MNode")
   stopifnot(file.exists(path))
@@ -149,20 +150,13 @@ set_other_entities <- function(mn, path, pids) {
 
   message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
 
-  current_entity_pids <- vapply(doc@dataset@otherEntity, function(x) x@id, "", USE.NAMES = FALSE)
-
-  # Collect otherEntity elements already in the EML for `pids`
-  filtered_other_entities <- Filter(function(x) { (x@id %in% pids)}, doc@dataset@otherEntity)
-  doc@dataset@otherEntity <- new("ListOfotherEntity", filtered_other_entities)
-
-  # Generate otherEntity elements for any new otherEntity elements that weren't
-  # already in the EML
-  new_entities <- lapply(pids[!(pids %in% current_entity_pids)], function(pid) pid_to_other_entity(mn, pid))
+  # Generate otherEntity elements
+  other_entities <- lapply(pids, function(pid) pid_to_other_entity(mn, pid))
 
   # Concatenate the existing and new otherEntity elements and put back in the
   # EML
   if (length(new_entities) > 0) {
-    doc@dataset@otherEntity <- new("ListOfotherEntity", c(doc@dataset@otherEntity, new_entities))
+    doc@dataset@otherEntity <- new("ListOfotherEntity", other_entities)
   }
 
   # Write the modified document back to disk and stop
