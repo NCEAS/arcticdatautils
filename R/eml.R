@@ -35,19 +35,18 @@ pid_to_other_entity <- function(mn, pid, sysmeta=NULL) {
     stop(paste0("System Metadata for object with PID '", pid, "' did not have its fileName property set. This will result in 'NA' being set for the EML entityName and objectName (which we don't want). You need to give each data object a fileName property in its System Metadata. You can use the arcticdatautils::set_file_name() function to do this or you can use dataone::getSystemMetadata(), change the fileName property, and update it with dataone::updateSystemMetadata()"))
   }
 
-  sysmeta_to_other_entity(mn, sysmeta)
+  sysmeta_to_other_entity(sysmeta)
 }
 
 #' Create an EML otherEntity sub-tree for the given object.
 #'
-#' @param mn (MemberNode) The Member Node the object lives on.
 #' @param sysmeta (SystemMetadata) The System Metadata of the object.
 #'
 #' @return (otherEntity) The XML sub-tree.
 #' @export
 #'
 #' @examples
-sysmeta_to_other_entity <- function(mn, sysmeta) {
+sysmeta_to_other_entity <- function(sysmeta) {
   stopifnot(class(sysmeta) == "SystemMetadata")
 
   # otherEntity
@@ -65,7 +64,7 @@ sysmeta_to_other_entity <- function(mn, sysmeta) {
   other_entity@entityType <- "Other"
 
   # otherEntity/physical
-  phys <- sysmeta_to_eml_physical(mn, sysmeta)
+  phys <- sysmeta_to_eml_physical(sysmeta)
   other_entity@physical <- new("ListOfphysical", list(phys))
 
   other_entity
@@ -77,7 +76,6 @@ sysmeta_to_other_entity <- function(mn, sysmeta) {
 #' System Metadata of an Object. Note that it sets an Online Distrubtion URL
 #' of the DataONE v2 resolve service for the PID.
 #'
-#' @param mn (MemberNode) The Member Node the object lives on.
 #' @param sysmeta (SystemMetadata) The System Metadata of the object.
 #'
 #' @return
@@ -155,7 +153,7 @@ set_other_entities <- function(mn, path, pids) {
 
   # Concatenate the existing and new otherEntity elements and put back in the
   # EML
-  if (length(new_entities) > 0) {
+  if (length(other_entities) > 0) {
     doc@dataset@otherEntity <- new("ListOfotherEntity", other_entities)
   }
 

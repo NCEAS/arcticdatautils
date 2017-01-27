@@ -1,8 +1,8 @@
 context("EML")
 
-test_that("an EML otherEntity subtree can be created when the sysmeta has a filename", {
-  skip("This test needs to be skipped until ecogrid URLs support DataONE objects.")
+mn <- env_load()$mn
 
+test_that("an EML otherEntity subtree can be created when the sysmeta has a filename", {
   x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")
@@ -17,8 +17,6 @@ test_that("an EML otherEntity subtree can be created when the sysmeta has a file
 })
 
 test_that("an EML otherEntity subtree can be created when the sysmeta doesn't have a filename ", {
-  skip("This test needs to be skipped until ecogrid URLs support DataONE objects.")
-
   x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta-nofilename.xml")
   doc <- XML::xmlParse(x)
   sysmeta <- new("SystemMetadata")
@@ -108,4 +106,26 @@ test_that("a project can be created with multiple organizations", {
   expect_length(project@personnel[[1]]@organizationName, 2)
   expect_equal(project@personnel[[1]]@organizationName[[1]]@.Data, "org1")
   expect_equal(project@personnel[[1]]@organizationName[[2]]@.Data, "org2")
+})
+
+test_that("an other entity can be added from a pid", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  data_path <- tempfile()
+  writeLines(LETTERS, data_path)
+  pid <- publish_object(mn, data_path, "text/plain")
+
+  eml_path <- file.path(system.file("inst", package = "arcticdatautils"), "example-eml.xml")
+
+  doc <- EML::read_eml(eml_path)
+  doc@dataset@otherEntity <- new("ListOfotherEntity", list())
+
+  set_other_entities(mn, eml_path, pid)
+
+  doc <- EML::read_eml(eml_path)
+  testthat::expect_length(doc@dataset@otherEntity, 1)
+
+  unlink(data_path)
 })
