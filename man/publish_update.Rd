@@ -8,7 +8,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
   child_pids = NULL, metadata_path = NULL, identifier = NULL,
   use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
   parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE,
-  check_first = TRUE, skip_other_entities = FALSE)
+  check_first = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
@@ -29,7 +29,9 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated.}
 
-\item{parent_metadata_pid}{(character)  Optional. identifier for the metadata document of the parent package.}
+\item{parent_metadata_pid}{(character)  Optional. Identifier for the metadata document of the parent package.}
+
+\item{parent_data_pids}{(character)  Optional. Identifier for the data objects of the parent package.}
 
 \item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.}
 
@@ -37,9 +39,9 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 This applies to the new metadata PID and its resource map and data object.
 access policies are not affected.}
 
-\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.}
+\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.}
 
-\item{skip_other_entities}{(logical) Default FALSE Whether to create all EML otherEntity elements.}
+\item{parent_data_pids}{}
 }
 \description{
 This function can be used for a variety of tasks:

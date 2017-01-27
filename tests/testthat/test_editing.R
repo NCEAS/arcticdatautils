@@ -77,48 +77,6 @@ test_that("we can update a resource map", {
   expect_equal(updated, get_package(mn, response$metadata)$resource_map)
 })
 
-test_that("otherEntity elements are set when publishing an update", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  # Setup
-  library(dataone)
-  library(EML)
-  library(stringr)
-
-  # Create an initial package
-  response <- create_dummy_package(mn)
-
-  # Create a new dummy object
-  tmp <- tempfile()
-  dummy_df <- data.frame(x = 1:100, y = 1:100)
-  write.csv(dummy_df, file = tmp)
-  object <- publish_object(mn, tmp, "text/csv")
-  file.remove(tmp) # Remove dummy data file
-
-  # Note I use the wrong data pid argument here. I send the new data pid instead
-  # which lets me update the data in a package when doing a publish_update()
-  # call
-  update <- publish_update(mn,
-                           response$metadata,
-                           response$resource_map,
-                           object)
-
-
-  tmp <- tempfile()
-  writeLines(rawToChar(getObject(mn, update$metadata)), con = tmp)
-  doc <- read_eml(tmp)
-
-  expect_true(length(doc@dataset@otherEntity) == 1)
-
-  sysmeta <- getSystemMetadata(mn, object)
-  doc_id <- get_doc_id(sysmeta)
-  expect_true(str_detect(doc@dataset@otherEntity[[1]]@physical[[1]]@distribution[[1]]@online@url@.Data, doc_id))
-
-  file.remove(tmp)
-})
-
 test_that("an object can be published with a SID", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
@@ -274,6 +232,10 @@ test_that("replication policies are honored when updating packages", {
 
 
 test_that("extra statements are maintained between updates", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
   pkg <- create_dummy_package(mn, 3)
 
   # Add some PROV triples to the Resource Map

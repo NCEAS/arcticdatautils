@@ -5,7 +5,7 @@
 
 #' Create an EML otherEntity sub-tree for the given PID.
 #'
-#' Note this is a wrapper around sysmeta_to_entity which handles the task of
+#' Note this is a wrapper around sysmeta_to_other_entity which handles the task of
 #' creating the EML otherEntity sub-ree.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-pid_to_entity <- function(mn, pid, sysmeta=NULL) {
+pid_to_other_entity <- function(mn, pid, sysmeta=NULL) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -35,18 +35,19 @@ pid_to_entity <- function(mn, pid, sysmeta=NULL) {
     stop(paste0("System Metadata for object with PID '", pid, "' did not have its fileName property set. This will result in 'NA' being set for the EML entityName and objectName (which we don't want). You need to give each data object a fileName property in its System Metadata. You can use the arcticdatautils::set_file_name() function to do this or you can use dataone::getSystemMetadata(), change the fileName property, and update it with dataone::updateSystemMetadata()"))
   }
 
-  sysmeta_to_entity(sysmeta)
+  sysmeta_to_other_entity(mn, sysmeta)
 }
 
 #' Create an EML otherEntity sub-tree for the given object.
 #'
-#' @param sysmeta (SystemMetadata) A SystemMedata instance for the object.
+#' @param mn (MemberNode) The Member Node the object lives on.
+#' @param sysmeta (SystemMetadata) The System Metadata of the object.
 #'
 #' @return (otherEntity) The XML sub-tree.
 #' @export
 #'
 #' @examples
-sysmeta_to_entity <- function(sysmeta) {
+sysmeta_to_other_entity <- function(mn, sysmeta) {
   stopifnot(class(sysmeta) == "SystemMetadata")
 
   # otherEntity
@@ -64,6 +65,28 @@ sysmeta_to_entity <- function(sysmeta) {
   other_entity@entityType <- "Other"
 
   # otherEntity/physical
+  phys <- sysmeta_to_eml_physical(mn, sysmeta)
+  other_entity@physical <- new("ListOfphysical", list(phys))
+
+  other_entity
+}
+
+#' Create an EML physical subtree from a System Metadata instance
+#'
+#' This function creates a pre-canned EML physical subtree from what's in the
+#' System Metadata of an Object. Note that it sets an Online Distrubtion URL
+#' of the DataONE v2 resolve service for the PID.
+#'
+#' @param mn (MemberNode) The Member Node the object lives on.
+#' @param sysmeta (SystemMetadata) The System Metadata of the object.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sysmeta_to_eml_physical <- function(sysmeta) {
+  stopifnot(class(sysmeta) == "SystemMetadata")
+
   phys <- new("physical")
   phys@scope <- new("xml_attribute", "document")
 
@@ -84,15 +107,12 @@ sysmeta_to_entity <- function(sysmeta) {
   phys@distribution <- new("ListOfdistribution", list(new("distribution")))
   phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
   phys@distribution[[1]]@online <- new("online")
-  phys@distribution[[1]]@online@url <- new("url", paste0("ecogrid://knb/", get_doc_id(sysmeta)))
+  phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
 
   slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
 
-  other_entity@physical <- new("ListOfphysical", list(phys))
-
-  other_entity
+  phys
 }
-
 
 #' Creates and sets EML otherEntity elements to an existing EML document.
 #'
@@ -137,7 +157,7 @@ set_other_entities <- function(mn, path, pids) {
 
   # Generate otherEntity elements for any new otherEntity elements that weren't
   # already in the EML
-  new_entities <- lapply(pids[!(pids %in% current_entity_pids)], function(pid) pid_to_entity(mn, pid))
+  new_entities <- lapply(pids[!(pids %in% current_entity_pids)], function(pid) pid_to_other_entity(mn, pid))
 
   # Concatenate the existing and new otherEntity elements and put back in the
   # EML

@@ -182,16 +182,16 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
 #' @param use_doi (logical) Generate and use a DOI as the identifier for the updated metadata object.
 #' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
-#' @param parent_metadata_pid (character)  Optional. identifier for the metadata document of the parent package.
+#' @param parent_metadata_pid (character)  Optional. Identifier for the metadata document of the parent package.
+#' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package.
 #' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
 #' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
 #' @param public (logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
-#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. This speeds up the function, especially when `data_pids` has many elements.
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
 #' @param parent_data_pids
-#' @param skip_other_entities (logical) Default FALSE Whether to create all EML otherEntity elements.
 #'
 #' @import dataone
 #' @import datapack
@@ -211,8 +211,7 @@ publish_update <- function(mn,
                            parent_data_pids=NULL,
                            parent_child_pids=NULL,
                            public=TRUE,
-                           check_first=TRUE,
-                           skip_other_entities=FALSE) {
+                           check_first=TRUE) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -279,17 +278,6 @@ publish_update <- function(mn,
 
   # get the metadata sysmeta from the node
   metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
-  #eml_acl <- sysmeta_orig@accessPolicy
-  # TODO: error check: md and sm existence
-
-  # get the resource_map (not used for now, could be used to get the list of data pids)
-  # resmap <- rawToChar(dataone::getObject(mn, resource_map_pid))
-  # resmap_sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
-  # TODO: error check: resmap existence, and ensure we don't fail hard
-
-  # Get the list of data files from the resource map
-  # TODO: parse these from the resource map, rather than taking them as input
-  # TODO: data_pids <- as.vector(c("pid1", "pid2", "pid3"))
 
   log_message("Downloaded EML and sysmeta...")
 
@@ -311,7 +299,7 @@ publish_update <- function(mn,
   # Generate a resource map PID from the new metadata PID
   resmap_updated_pid <- paste0("resource_map_",  metadata_updated_pid)
 
-  # Update the metadata object
+  # Update the metadata
 
   # Replace packageId
   eml@packageId <- new("xml_attribute", metadata_updated_pid)
@@ -325,15 +313,6 @@ publish_update <- function(mn,
   # set_other_entities takes a path to the doc.
   eml_path <- tempfile()
   EML::write_eml(eml, eml_path)
-
-  # Add other entity fields (if appropriate)
-  if (!is.null(data_pids) && !skip_other_entities) {
-    eml <- set_other_entities(mn, eml_path, data_pids)
-  }
-
-  if (skip_other_entities) {
-    log_message("Skipping modifying EML otherEntity elements. This may result a data package that is not editable using the registry!")
-  }
 
   # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",

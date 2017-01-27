@@ -19,11 +19,6 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
   metadata_file <- tempfile()
   file.copy(original_file, metadata_file)
 
-  # Add otherEntity elements if needed
-  if (!is.null(data_pids)) {
-    metadata_file <- set_other_entities(mn, metadata_file, data_pids)
-  }
-
   sysmeta <- new("SystemMetadata",
                  id = pid,
                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
