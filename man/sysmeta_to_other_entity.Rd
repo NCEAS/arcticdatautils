@@ -4,10 +4,12 @@
 \alias{sysmeta_to_other_entity}
 \title{Create an EML otherEntity sub-tree for the given object.}
 \usage{
-sysmeta_to_other_entity(sysmeta)
+sysmeta_to_other_entity(mn, sysmeta)
 }
 \arguments{
-\item{sysmeta}{(SystemMetadata) A SystemMedata instance for the object.}
+\item{mn}{(MemberNode) The Member Node the object lives on.}
+
+\item{sysmeta}{(SystemMetadata) The System Metadata of the object.}
 }
 \value{
 (otherEntity) The XML sub-tree.
