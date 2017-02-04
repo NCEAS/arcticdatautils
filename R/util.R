@@ -953,7 +953,7 @@ filter_obsolete_pids <- function(node, pids) {
 #' likely going to be your ORCID, e.g. http://orcid.org....
 #' @param fields (character) A vector of Solr fields to return.
 #'
-#' @return
+#' @return (data.frame) data.frame with the results.
 #' @export
 #'
 #' @examples
