@@ -368,6 +368,117 @@ eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 }
 
 
+#' Create an EML metadataProvider
+#'
+#' @param given_names (character) One or more given (first) names.
+#' @param sur_name (character) A sur (last) name.
+#' @param organization (character) One or more organization names.
+#' @param email (character) An email address.
+#' @param phone (character) A phone number.
+#' @param address (address) An object of type 'address' (EML).
+#'
+#' @return (metadataProvider) The new metadataProvider.
+#' @export
+#'
+#' @examples
+#' eml_metadata_provider("test", "user", test@user.com")
+eml_metadata_provider <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
+  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
+            all(lengths(c(given_names, sur_name)) > 0))
+  if (!is.null(address)) stopifnot(is(address, "address"))
+
+  provider <- new("metadataProvider")
+
+  # Individual Name
+  provider@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+
+  # Organization Name
+  if (!is.null(organization)) {
+    org <- new("organizationName")
+    org@.Data <- organization
+    provider@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Email
+  if (!is.null(email)) {
+    email_address <- new("electronicMailAddress")
+    email_address@.Data <- email
+
+    provider@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+  }
+
+  # Phone
+  if (!is.null(phone)) {
+    phn <- new("phone")
+    phn@phonetype <- new("xml_attribute", "voice")
+    phn@.Data <- phone
+
+    provider@phone <- new("ListOfphone", list(phn))
+  }
+
+  # Address
+  if (!is.null(address)) {
+    provider@address <- new("ListOfaddress", list(address))
+  }
+
+  provider
+}
+
+#' Create an EML associatedParty
+#'
+#' @param given_names (character) One or more given (first) names.
+#' @param sur_name (character) A sur (last) name.
+#' @param organization (character) One or more organization names.
+#' @param email (character) An email address.
+#' @param phone (character) A phone number.
+#' @param address (address) An object of type 'address' (EML).
+#'
+#' @return (associatedParty) The new associatedParty
+#' @export
+#'
+#' @examples
+#' eml_associated_party("test", "user", test@user.com")
+eml_associated_party <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
+  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
+            all(lengths(c(given_names, sur_name)) > 0))
+  if (!is.null(address)) stopifnot(is(address, "address"))
+
+  associatedParty <- new("associatedParty")
+
+  # Individual Name
+  associatedParty@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+
+  # Organization Name
+  if (!is.null(organization)) {
+    org <- new("organizationName")
+    org@.Data <- organization
+    associatedParty@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Email
+  if (!is.null(email)) {
+    email_address <- new("electronicMailAddress")
+    email_address@.Data <- email
+
+    associatedParty@electronicMailAddress <- new("ListOfelectronicMailAddress", list(email_address))
+  }
+
+  # Phone
+  if (!is.null(phone)) {
+    phn <- new("phone")
+    phn@phonetype <- new("xml_attribute", "voice")
+    phn@.Data <- phone
+
+    associatedParty@phone <- new("ListOfphone", list(phn))
+  }
+
+  # Address
+  if (!is.null(address)) {
+    associatedParty@address <- new("ListOfaddress", list(address))
+  }
+
+  associatedParty
+}
 #' Create an EML individualName section
 #'
 #' @param given_names (character) One or more given names.
