@@ -8,8 +8,6 @@ sysmeta_to_eml_physical(sysmeta)
 }
 \arguments{
 \item{sysmeta}{(SystemMetadata) The System Metadata of the object.}
-
-\item{mn}{(MemberNode) The Member Node the object lives on.}
 }
 \description{
 This function creates a pre-canned EML physical subtree from what's in the
