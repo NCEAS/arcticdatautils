@@ -266,7 +266,7 @@ clear_methods <- function(doc) {
 #' @export
 #'
 #' @examples
-#' creator("test", "user", test@user.com")
+#' creator("test", "user", "test@user.com")
 eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))
@@ -322,7 +322,7 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 #' @export
 #'
 #' @examples
-#' eml_contact("test", "user", test@user.com")
+#' eml_contact("test", "user", "test@user.com")
 eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))
@@ -379,7 +379,7 @@ eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 #' @export
 #'
 #' @examples
-#' eml_metadata_provider("test", "user", test@user.com")
+#' eml_metadata_provider("test", "user", "test@user.com")
 eml_metadata_provider <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))

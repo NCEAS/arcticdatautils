@@ -26,4 +26,7 @@ eml_contact(given_names, sur_name, organization = NULL, email = NULL,
 \description{
 Create an EML contact.
 }
+\examples{
+eml_contact("test", "user", "test@user.com")
+}
 

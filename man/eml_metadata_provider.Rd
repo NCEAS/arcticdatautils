@@ -26,4 +26,7 @@ eml_metadata_provider(given_names, sur_name, organization = NULL,
 \description{
 Create an EML metadataProvider
 }
+\examples{
+eml_metadata_provider("test", "user", "test@user.com")
+}
 
