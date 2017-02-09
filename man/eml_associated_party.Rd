@@ -5,7 +5,7 @@
 \title{Create an EML associatedParty}
 \usage{
 eml_associated_party(given_names, sur_name, organization = NULL,
-  email = NULL, phone = NULL, address = NULL)
+  email = NULL, phone = NULL, address = NULL, role)
 }
 \arguments{
 \item{given_names}{(character) One or more given (first) names.}
@@ -19,11 +19,16 @@ eml_associated_party(given_names, sur_name, organization = NULL,
 \item{phone}{(character) A phone number.}
 
 \item{address}{(address) An object of type 'address' (EML).}
+
+\item{role}{(character) A role}
 }
 \value{
 (associatedParty) The new associatedParty
 }
 \description{
 Create an EML associatedParty
+}
+\examples{
+eml_associated_party("test", "user", "test@user.com", role = "Principal Investigator")
 }
 

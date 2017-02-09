@@ -430,13 +430,18 @@ eml_metadata_provider <- function(given_names, sur_name, organization=NULL, emai
 #' @param email (character) An email address.
 #' @param phone (character) A phone number.
 #' @param address (address) An object of type 'address' (EML).
+#' @param role (character) A role
 #'
 #' @return (associatedParty) The new associatedParty
 #' @export
 #'
 #' @examples
-#' eml_associated_party("test", "user", test@user.com")
-eml_associated_party <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
+#' eml_associated_party("test", "user", "test@user.com", role = "Principal Investigator")
+eml_associated_party <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL, role) {
+  if (missing(role)) {
+    stop("No role provided but it is required.", call. = FALSE)
+  }
+
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))
   if (!is.null(address)) stopifnot(is(address, "address"))
@@ -474,6 +479,9 @@ eml_associated_party <- function(given_names, sur_name, organization=NULL, email
   if (!is.null(address)) {
     associatedParty@address <- new("ListOfaddress", list(address))
   }
+
+  # role
+  associatedParty@role@.Data <- role
 
   associatedParty
 }
