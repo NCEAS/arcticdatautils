@@ -253,7 +253,7 @@ clear_methods <- function(doc) {
   doc
 }
 
-#' Create an EML creator subtree from a first, last, and email.
+#' Create an EML creator
 #
 #' @param given_names (character) One or more given (first) names.
 #' @param sur_name (character) A sur (last) name.
@@ -262,7 +262,7 @@ clear_methods <- function(doc) {
 #' @param phone (character) A phone number.
 #' @param address (address) An object of type 'address' (EML).
 #'
-#' @return (creator) The new creator element.
+#' @return (creator) The new creator
 #' @export
 #'
 #' @examples
@@ -270,9 +270,8 @@ clear_methods <- function(doc) {
 eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))
-  if (!is.null(address)) stopifnot(inherits(address, "address"))
+  if (!is.null(address)) stopifnot(is(address, "address"))
 
-  # Create <creator>
   creator <- new("creator")
 
   # Individual Name
@@ -310,7 +309,7 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
   creator
 }
 
-#' Create an EML contact subtree from a first, last, and email.
+#' Create an EML contact.
 #'
 #' @param given_names (character) One or more given (first) names.
 #' @param sur_name (character) A sur (last) name.
@@ -319,7 +318,7 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 #' @param phone (character) A phone number.
 #' @param address (address) An object of type 'address' (EML).
 #'
-#' @return (contact) The new contact sub-tree.
+#' @return (contact) The new contact
 #' @export
 #'
 #' @examples
@@ -327,9 +326,8 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))
-  if (!is.null(address)) stopifnot(inherits(address, "address"))
+  if (!is.null(address)) stopifnot(is(address, "address"))
 
-  # Create <contact>
   contact <- new("contact")
 
   # Individual Name

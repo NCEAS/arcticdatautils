@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_creator}
 \alias{eml_creator}
-\title{Create an EML creator subtree from a first, last, and email.}
+\title{Create an EML creator}
 \usage{
 eml_creator(given_names, sur_name, organization = NULL, email = NULL,
   phone = NULL, address = NULL)
@@ -21,9 +21,9 @@ eml_creator(given_names, sur_name, organization = NULL, email = NULL,
 \item{address}{(address) An object of type 'address' (EML).}
 }
 \value{
-(creator) The new creator element.
+(creator) The new creator
 }
 \description{
-Create an EML creator subtree from a first, last, and email.
+Create an EML creator
 }
 

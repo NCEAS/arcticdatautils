@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_contact}
 \alias{eml_contact}
-\title{Create an EML contact subtree from a first, last, and email.}
+\title{Create an EML contact.}
 \usage{
 eml_contact(given_names, sur_name, organization = NULL, email = NULL,
   phone = NULL, address = NULL)
@@ -21,9 +21,9 @@ eml_contact(given_names, sur_name, organization = NULL, email = NULL,
 \item{address}{(address) An object of type 'address' (EML).}
 }
 \value{
-(contact) The new contact sub-tree.
+(contact) The new contact
 }
 \description{
-Create an EML contact subtree from a first, last, and email.
+Create an EML contact.
 }
 
