@@ -865,14 +865,22 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
   }
 
   # Collect the package's PIDs
+
+  # Fix pids with no formatType by adding one manually. This is a quick hack
+  # to make the rest of this code work when an object doesn't have a valid
+  # formatId.
+  response <- lapply(response, function(r) { if (!("formatType" %in% names(r))) { r[["formatType"]] = "UNKNOWN" }; r })
+
   metadata_pids <- vapply(response[sapply(response, function(x) { x$formatType == "METADATA"})], function(x) x$identifier, "")
   data_pids <- vapply(response[sapply(response, function(x) { x$formatType == "DATA"})], function(x) x$identifier, "")
   child_pids <- vapply(response[sapply(response, function(x) { x$formatType == "RESOURCE"})], function(x) x$identifier, "")
+  unknown_pids <- vapply(response[sapply(response, function(x) { x$formatType == "UNKNOWN"})], function(x) x$identifier, "")
 
   response <- list(metadata = metadata_pids,
                    resource_map = pid,
                    data = data_pids,
-                   child_packages = child_pids)
+                   child_packages = child_pids,
+                   unknown = unknown_pids)
 
   response
 }
