@@ -795,7 +795,7 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
 
   # Stop if no resource map was found
   if (length(resource_map_pids) == 0) {
-    stop(paste0("No resource map was found for ", pid, "."))
+    stop(paste0("No resource map was found for ", pid, ". This may be because none existed or all that exist are obsoleted."))
   }
 
   # Warn user if multiple resource maps were found
