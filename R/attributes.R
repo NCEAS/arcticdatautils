@@ -18,9 +18,10 @@ get_ncdf4_attributes <- function(nc) {
   }
 
   attributes <- names(nc$var)
-  result <- data.frame()
+  result <- data.frame(attributeName=NA)
 
   for (i in seq_along(attributes)) {
+    result[i,"attributeName"] <- attributes[i]
     attribute <- ncdf4::ncatt_get(nc, attributes[i])
     names <- names(attribute)
 
