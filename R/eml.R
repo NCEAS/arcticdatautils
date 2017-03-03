@@ -655,7 +655,7 @@ set_abstract <- function(doc, text) {
   if (length(text) == 1) {
     doc@dataset@abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
   } else if (length(text) > 1) {
-    doc@dataset@abstract <- new("abstract", para = new("ListOfpara", lapply(paras, function(x) new("para", x))))
+    doc@dataset@abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
   }
 
   doc
