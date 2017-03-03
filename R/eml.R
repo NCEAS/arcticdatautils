@@ -662,3 +662,79 @@ set_abstract <- function(doc, text) {
 }
 
 
+#' Validate an EML attributeList attribute-by-attribute
+#'
+#' The attributes passed into this function are validated one-by-one and the
+#' progress of going through each attribute is printed to the screen along
+#' with any and all validation issues.
+#'
+#' This is done by, for each attribute in the list, creating a minimum valid
+#' EML document and adding a new otherEntity with a new attributeList containing
+#' the single attribute to be validated.
+#'
+#' @param attributes (attributeList) An attributeList
+#'
+#' @return (boolean) Named vector of TRUE/FALSE indicating which attributes
+#' are valid
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' atts_df <- read.csv('attributes_table.csv', stringsAsFactors = F)
+#' enum_domain <- read.csv('enumerated_domain.csv') # optional
+#' attributes <- EML::set_attributes(atts_df, factor = enum_domain)
+#' eml_validate_attributes(attributes)
+#' }
+eml_validate_attributes <- function(attributes) {
+  stopifnot(is(attributes, "attributeList"))
+
+  # Define an interal applyable function to validate each attribute
+  eml_validate_attribute <- function(attribute) {
+    stopifnot(is(attribute, "attribute"))
+
+    doc@dataset@otherEntity[[1]]@attributeList@attribute[[1]] <- attribute
+
+    # Validate!
+    eml_validate(doc)
+  }
+
+
+  # Create a minimum valid EML doc we'll re-use each time we validate a single
+  # attribute
+  doc <- new("eml", packageId = "test", system = " test")
+  doc@dataset@title <- c(new("title", .Data = "test"))
+  doc@dataset@creator <- new("ListOfcreator", list(eml_creator("Test", "test")))
+  doc@dataset@contact <- new("ListOfcontact", list(eml_contact("Test", "test")))
+
+  # Create a dummy otherEntity with our attributeList
+  entity <- new("otherEntity",
+                entityName = "name",
+                entityType = "type")
+  entity@attributeList <- new("attributeList")
+  doc@dataset@otherEntity <- new("ListOfotherEntity", list(entity))
+
+  results <- sapply(attributes@attribute, function(attribute) {
+    cat(paste0("Validating single attribute '", attribute@attributeName@.Data, "': "))
+
+    result <- NULL
+    result <- tryCatch({
+      eml_validate_attribute(attribute)
+    },
+    message = function(m) { m }
+    )
+
+    if (is(result, "simpleMessage")) {
+      cat("FALSE\n")
+      message(trimws(result$message))
+      return(FALSE)
+    } else {
+      cat("TRUE\n")
+      return(TRUE)
+    }
+  })
+
+  names(results) <- sapply(attributes@attribute, function(x) x@attributeName)
+
+  results
+}
+
