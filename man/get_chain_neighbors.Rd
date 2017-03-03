@@ -17,4 +17,3 @@ get_chain_neighbors(node, pid)
 \description{
 Get the obsoleted/obsoletedBy properties of an object as a named list.
 }
-

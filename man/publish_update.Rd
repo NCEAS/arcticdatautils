@@ -64,4 +64,3 @@ should be updated as well, using the parent_medata_pid, parent_data_pids, and
 parent_child_pids as members of the updated package. In all cases, the objects
 are made publicly readable.
 }
-

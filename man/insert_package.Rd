@@ -21,4 +21,3 @@ A list containing PIDs and whether objects were inserted. (list)
 \description{
 Create a single package Data Package from files in the Inventory.
 }
-

@@ -14,4 +14,3 @@ set_public_read(mn, pids)
 \description{
 Set public access on a set of objects.
 }
-

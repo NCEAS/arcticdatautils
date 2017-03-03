@@ -12,4 +12,3 @@ determine_child_pids(inventory, package)
 \description{
 Calculate a set of child PIDs for a given package.
 }
-

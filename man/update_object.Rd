@@ -23,4 +23,3 @@ This is a convenience wrapper around `dataone::updateObject` which copies in
 fields from the old object's System Metadata such as the rightsHolder and
 accessPolicy and updates only what needs to be changed.
 }
-

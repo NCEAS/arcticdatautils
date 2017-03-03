@@ -22,4 +22,3 @@ Example:
   <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
 </gmd:topicCategory>
 }
-

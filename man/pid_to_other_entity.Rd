@@ -24,4 +24,3 @@ Create an EML otherEntity sub-tree for the given PID.
 Note this is a wrapper around sysmeta_to_other_entity which handles the task of
 creating the EML otherEntity sub-ree.
 }
-

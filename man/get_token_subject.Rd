@@ -12,4 +12,3 @@ get_token_subject()
 \description{
 Returns the subject of the set dataone_test_token
 }
-

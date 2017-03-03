@@ -20,4 +20,3 @@ Add access rules to the sysmeta object
 This is a function because I add a set of standard set of access rules to
 every object and the access rules don't differ across objects.
 }
-

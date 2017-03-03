@@ -29,4 +29,3 @@ Note: This is super-limited right now.
 \examples{
 eml_project("Some title", "51231", "Some", "User")
 }
-

@@ -25,4 +25,3 @@ env <- env_load()
 publish_object(env$mn, "path_to_some_EML_file", format_iso())
 }
 }
-

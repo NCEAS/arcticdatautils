@@ -17,4 +17,3 @@ path (character) Path to the converted EML file.
 Extract the EML responsible-party blocks in a document, and parse the
 surName field to create proper givenName/surName structure
 }
-

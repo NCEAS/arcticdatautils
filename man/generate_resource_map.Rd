@@ -38,4 +38,3 @@ generate_resource_map("X", "Y", "Z",
                                                     object="http://example.com/bar"))
 }
 }
-

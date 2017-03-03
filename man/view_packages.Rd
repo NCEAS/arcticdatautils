@@ -10,4 +10,3 @@ view_packages(inventory)
 \description{
 Functions for interactive viewing of the Inventory and other objects.
 }
-

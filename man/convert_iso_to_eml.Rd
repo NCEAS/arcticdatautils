@@ -17,4 +17,3 @@ convert_iso_to_eml(path, style = NA)
 \description{
 Leave style=NA if you want to use the default ISO-to-EML stylesheet.
 }
-

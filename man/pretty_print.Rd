@@ -27,4 +27,3 @@ shell redirection file (`> somefile.txt`). If you try to run `xmlstarlet
 format` on the same file as you redirect to, you get a weird parse error from
 xmlstarlet.
 }
-

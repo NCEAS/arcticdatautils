@@ -16,4 +16,3 @@ is_authorized(node, ids, action)
 \description{
 Check if the user has authorization to perform an action on an object.
 }
-

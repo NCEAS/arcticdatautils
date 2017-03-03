@@ -21,4 +21,3 @@ more than enough.}
 \description{
 Get the resource map(s) for the given object.
 }
-

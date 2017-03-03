@@ -15,4 +15,3 @@ parse_resource_map(path)
 \description{
 Parse a Resource Map into a data.frame
 }
-

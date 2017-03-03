@@ -12,4 +12,3 @@ validate_environment(env)
 \description{
 Validate an environment.
 }
-

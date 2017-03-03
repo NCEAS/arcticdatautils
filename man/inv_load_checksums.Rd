@@ -21,4 +21,3 @@ Load checksums into the inventory file from a text file. This function
 removes the column 'checksum_sha256' from inventory before doing a
 left join.
 }
-

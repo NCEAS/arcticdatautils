@@ -23,4 +23,3 @@ useful to set if you are warned about the result set being truncated.}
 This is a wrapper function around `get_package_direct` which takes either
 a resource map PID or a metadata PID as its `pid` argument.
 }
-

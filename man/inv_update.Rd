@@ -14,4 +14,3 @@ inv_update(inventory, new_state)
 \description{
 Update an Inventory with a new Inventory.
 }
-

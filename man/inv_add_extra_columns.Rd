@@ -17,4 +17,3 @@ An inventory (data.frame)
 Adds a set of extra columsn to the inventory that are useful for working
 with them.
 }
-

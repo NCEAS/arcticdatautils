@@ -29,4 +29,3 @@ Create an EML contact.
 \examples{
 eml_contact("test", "user", "test@user.com")
 }
-

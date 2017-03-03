@@ -16,4 +16,3 @@ replace_package_id(path, replacement)
 Replace the EML 'packageId' attribute on the root element with a
 certain value.
 }
-

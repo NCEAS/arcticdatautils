@@ -19,4 +19,3 @@ add_methods_step(doc, title, description)
 \description{
 Adds a step to the methods document
 }
-

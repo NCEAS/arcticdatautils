@@ -14,4 +14,3 @@ remove_public_read(mn, pids)
 \description{
 Remove public access on a set of objects.
 }
-

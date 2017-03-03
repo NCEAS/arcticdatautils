@@ -15,4 +15,3 @@ sysmeta_to_other_entity(sysmeta)
 \description{
 Create an EML otherEntity sub-tree for the given object.
 }
-

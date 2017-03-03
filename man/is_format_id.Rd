@@ -19,4 +19,3 @@ is_format_id(node, pids, format_id)
 \description{
 Test whether an object is a particular format ID.
 }
-

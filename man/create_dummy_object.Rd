@@ -12,4 +12,3 @@ create_dummy_object(mn)
 \description{
 Create a test object.
 }
-

@@ -35,4 +35,3 @@ specified MN.
 If you only want to generate resource map RDF/XML, see
 \code{\link{generate_resource_map}}
 }
-

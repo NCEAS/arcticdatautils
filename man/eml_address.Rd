@@ -21,4 +21,3 @@ eml_address(delivery_points, city, administrative_area, postal_code)
 \description{
 Create an EML address element.
 }
-

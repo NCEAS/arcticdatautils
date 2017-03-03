@@ -15,4 +15,3 @@ clear_methods(doc)
 \description{
 Clear all methods from the document.
 }
-

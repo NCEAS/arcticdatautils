@@ -21,4 +21,3 @@ around that text which causes a check for string equality to fail. i.e.
 \details{
 'oceans' != '     oceans     '
 }
-

@@ -17,4 +17,3 @@ is_obsolete(node, pids)
 \description{
 Test whether the object is obsoleted by another object.
 }
-

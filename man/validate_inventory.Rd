@@ -12,4 +12,3 @@ validate_inventory(inventory)
 \description{
 Validate an Inventory.
 }
-

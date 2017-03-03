@@ -12,4 +12,3 @@ add_admin_group_access(sysmeta)
 \description{
 Adds access to the given System Metadata for the arctic-data-admins group
 }
-

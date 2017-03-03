@@ -17,4 +17,3 @@ add_additional_identifiers(path, identifiers)
 \description{
 Add a set of additional identifiers to an EML document.
 }
-

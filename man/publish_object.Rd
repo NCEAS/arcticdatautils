@@ -31,4 +31,3 @@ system metadata for that identifier and use it to provide rightsHolder, accessPo
 and replicationPolicy metadata. Note that this function only uploads the object to
 the Member Node, and does not add it to a data package, which can be done separately.
 }
-

@@ -12,4 +12,3 @@ generate_resource_map_pid(metadata_pid)
 \description{
 Generate a PID for a new resource map by appending "resource_map_" to it.
 }
-

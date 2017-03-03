@@ -13,4 +13,3 @@ get_current_version()
 This function parses the installed DESCRIPTION file to get the latest
 version.
 }
-

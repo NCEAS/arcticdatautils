@@ -29,4 +29,3 @@ Create an EML metadataProvider
 \examples{
 eml_metadata_provider("test", "user", "test@user.com")
 }
-

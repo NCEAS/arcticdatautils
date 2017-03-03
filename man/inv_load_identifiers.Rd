@@ -21,4 +21,3 @@ Load identifiers into the inventory file(s) from a text file. This function
 removes the column 'identifier' from inventory before doing a
 left join.
 }
-

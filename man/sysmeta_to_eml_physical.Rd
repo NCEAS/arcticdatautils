@@ -14,4 +14,3 @@ This function creates a pre-canned EML physical subtree from what's in the
 System Metadata of an Object. Note that it sets an Online Distrubtion URL
 of the DataONE v2 resolve service for the PID.
 }
-

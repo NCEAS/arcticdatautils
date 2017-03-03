@@ -23,4 +23,3 @@ The sysmeta object (dataone::SystemMetadata)
 This is a wrapper function around the constructor for a
 dataone::SystemMetadata object.
 }
-

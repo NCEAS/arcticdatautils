@@ -17,4 +17,3 @@ is_resource_map(node, pids)
 \description{
 Determines whether the object with the given PID is a resource map.
 }
-

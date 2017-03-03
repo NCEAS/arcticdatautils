@@ -22,4 +22,3 @@ Files should be the output of the command:
 \details{
 you@server:/path/to/acadis$ find . -type f
 }
-

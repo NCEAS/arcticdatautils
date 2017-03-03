@@ -19,4 +19,3 @@ Create an empty inventory data.frame. This doesn't need to be a function
 but I'm making it one in case the initialization routine becomes more
 complicated.
 }
-

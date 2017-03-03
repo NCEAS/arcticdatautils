@@ -27,4 +27,3 @@ Example usage:
 the_files <- dir(mydir)
 bad_enums <- the_files[which(sapply(the_files, test_has_bad_enum))]
 }
-

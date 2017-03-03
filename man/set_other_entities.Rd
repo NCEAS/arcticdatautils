@@ -28,4 +28,3 @@ eml_path <- "/path/to/your/eml.xml"
 set_other_entities(mn, eml_path, "a_data_pid")
 }
 }
-

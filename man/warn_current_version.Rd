@@ -11,4 +11,3 @@ warn_current_version()
 Warns if the currently-installed version of the package is not the same
 version as the latest release on GitHub.
 }
-

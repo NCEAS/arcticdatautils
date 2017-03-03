@@ -16,4 +16,3 @@ path_join(path_parts = c(""))
 Joins path strings like "./" to "./my/dir" as "./my/dir" instead of as
 "././my/dir.
 }
-

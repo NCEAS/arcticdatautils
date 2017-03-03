@@ -18,4 +18,3 @@ insert_file(inventory, file, env = NULL)
 Code related to inserting datasets as Data Packages.
 Insert a file from a single row of the Inventory.
 }
-

@@ -15,4 +15,3 @@ Functions related to loading configuriation based upon the environment
 the code is being run under.
 Get the current environment name.
 }
-

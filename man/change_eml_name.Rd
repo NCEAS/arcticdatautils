@@ -17,4 +17,3 @@ the modified XML node
 Utility function to extract a name string from an XML individualName node,
 parse it into tokens,and reformat the individualName with new children nodes
 }
-

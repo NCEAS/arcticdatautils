@@ -14,4 +14,3 @@ create_dummy_package(mn, size = 2)
 \description{
 Create a test package.
 }
-

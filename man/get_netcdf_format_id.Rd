@@ -15,4 +15,3 @@ get_netcdf_format_id(path)
 \description{
 Determine the DataONE format ID for the NetCDF file provided by path.
 }
-

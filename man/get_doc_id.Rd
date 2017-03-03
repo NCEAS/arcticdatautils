@@ -15,4 +15,3 @@ get_doc_id(sysmeta)
 \description{
 Get the Metacat docid for the given identifier
 }
-

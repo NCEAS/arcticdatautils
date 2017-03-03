@@ -20,4 +20,3 @@ Get a data.frame of attributes from a NetCDF object
 get_ncdf4_attributes("./path/to/my.nc")
 }
 }
-

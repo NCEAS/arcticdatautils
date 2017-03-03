@@ -17,4 +17,3 @@ eml_individual_name(given_names, sur_name)
 \description{
 Create an EML individualName section
 }
-

@@ -15,4 +15,3 @@ guess_format_id(filenames)
 \description{
 Guess format from filename for a vector of filenames.
 }
-

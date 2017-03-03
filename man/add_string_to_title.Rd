@@ -14,4 +14,3 @@ add_string_to_title(path, string)
 \description{
 Adds a string to the title element in the given file.
 }
-

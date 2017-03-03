@@ -16,4 +16,3 @@ extract_local_identifier(type, file)
 General utility functions that may be later merged into other files.
 Extracts the local identifier for an ACADIS ISO metadata XML file.
 }
-

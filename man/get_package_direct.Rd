@@ -22,4 +22,3 @@ useful to set if you are warned about the result set being truncated.}
 \description{
 Get a structured list of PIDs for the objects in a package.
 }
-

@@ -17,4 +17,3 @@ get_all_versions(node, pid)
 \description{
 Get the PIDs of all versions of an object.
 }
-

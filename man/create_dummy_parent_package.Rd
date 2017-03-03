@@ -14,4 +14,3 @@ create_dummy_parent_package(mn, children)
 \description{
 Create a test parent package.
 }
-

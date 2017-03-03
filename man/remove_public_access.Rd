@@ -15,4 +15,3 @@ remove_public_access(sysmeta)
 \description{
 Remove all public read access rules from a System Metadata document
 }
-

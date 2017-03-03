@@ -18,4 +18,3 @@ filter_obsolete_pids(node, pids)
 Whether or not a PID is obsolete is determined by whether its "obsoletedBy"
 property is set to another PID (TRUE) or is NA (FALSE).
 }
-

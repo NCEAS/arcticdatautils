@@ -17,4 +17,3 @@ Reads from the environment variable 'LOG_PATH' and uses the value set there
 to decide the location of the log file. If that envvar isn't set, it defaults
 to 'arcticdata-log.txt'.
 }
-

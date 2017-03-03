@@ -26,4 +26,3 @@ and updating it with an EML package.
 
 Note: This only works for Gateway packages right now.
 }
-

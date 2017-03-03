@@ -16,4 +16,3 @@ is_token_set(node)
 Helpers for the DataONE R package.
 Test whether a token is set.
 }
-

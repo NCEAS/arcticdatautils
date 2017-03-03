@@ -12,4 +12,3 @@ get_latest_release()
 \description{
 Use the GitHub API to find the latest release for the package.
 }
-

@@ -25,4 +25,3 @@ some_environment:
   var_two: some value
   var_three: some value
 }
-

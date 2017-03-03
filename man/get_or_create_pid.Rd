@@ -19,4 +19,3 @@ The identifier (character)
 \description{
 Get the already-minted PID from the inventory or mint a new one.
 }
-

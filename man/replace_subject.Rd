@@ -21,4 +21,3 @@ The modified System Metadata (SystemMetadata)
 This function was written out to fix capitalization errors but in a set of
 existing System Metadata entries but can be used to replace any subject.
 }
-

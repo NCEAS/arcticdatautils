@@ -17,4 +17,3 @@ inv_load_dois(inventory, path)
 \description{
 Load DOIs from a text file into the Inventory.
 }
-

@@ -25,4 +25,3 @@ Whether an update was needed.
 This function only updates the existing System Metadata if a change is
 needed.
 }
-

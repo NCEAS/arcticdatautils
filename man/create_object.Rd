@@ -18,4 +18,3 @@ create_object(file, sysmeta, base_path, mn)
 \description{
 Create an object from a row of the inventory.
 }
-

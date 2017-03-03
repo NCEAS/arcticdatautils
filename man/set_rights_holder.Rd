@@ -22,4 +22,3 @@ Set the rightsHolder field for a given PID.
 Update the rights holder to the provided subject for the object identified in
 the provided system metadata document on the given Member Node.
 }
-

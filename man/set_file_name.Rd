@@ -19,4 +19,3 @@ set_file_name(mn, pid, name)
 \description{
 Set the file name on an object
 }
-

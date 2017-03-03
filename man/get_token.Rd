@@ -15,4 +15,3 @@ get_token(node)
 \description{
 Gets the currently set authentication token.
 }
-

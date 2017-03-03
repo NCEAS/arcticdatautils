@@ -23,4 +23,3 @@ set_access(mn, pids, subjects, permissions = c("read", "write",
 For each permission, this function checks if the permission is already set
 and moves on. System Metadata are only updated when a change was needed.
 }
-

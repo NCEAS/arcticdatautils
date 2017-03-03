@@ -19,4 +19,3 @@ inv_load_sizes(inventory, path)
 Load file sizes into an inventory from a text file. Removes the column
 'size_bytes' from inventory before doing a left join.
 }
-

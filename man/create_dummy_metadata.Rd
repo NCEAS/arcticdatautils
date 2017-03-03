@@ -15,4 +15,3 @@ create_dummy_metadata(mn, data_pids = NULL)
 Various helper functions for things like testing the package.
 Create a test metadata object.
 }
-

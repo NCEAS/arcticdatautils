@@ -44,4 +44,3 @@ Note: This function currently replaces the rightsHolder on the Resource Map
 temporarily to allow updating but sets it back to the rightsHolder that was
 in place before the update.
 }
-

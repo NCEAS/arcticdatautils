@@ -15,4 +15,3 @@ clear_replication_policy(sysmeta)
 \description{
 Clear the replication policy from a System Metadata object
 }
-

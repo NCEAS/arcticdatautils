@@ -37,4 +37,3 @@ Note that this function checks if the old objects (metadata and resource map)
 exist on the Member Node before doing their work and will call createObject()
 instead of updateObject() if the object didn't already exist.
 }
-

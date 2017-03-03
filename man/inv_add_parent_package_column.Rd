@@ -15,4 +15,3 @@ inventory (data.frame) An Inventory.
 \description{
 Add a column for parent packages.
 }
-

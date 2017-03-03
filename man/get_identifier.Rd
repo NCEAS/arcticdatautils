@@ -20,4 +20,3 @@ Example resposne:
   urn:uuid:12aaf494-5840-434d-9cdb-c2597d58543e
 </d1:identifier>
 }
-

@@ -31,4 +31,3 @@ Create an EML associatedParty
 \examples{
 eml_associated_party("test", "user", "test@user.com", role = "Principal Investigator")
 }
-

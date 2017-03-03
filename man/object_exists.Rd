@@ -18,4 +18,3 @@ object_exists(node, pids)
 This is a simple check for the HTTP status of a /meta/{PID} call on the
 provided member node.
 }
-

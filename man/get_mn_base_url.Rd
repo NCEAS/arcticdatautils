@@ -12,4 +12,3 @@ get_mn_base_url(mn)
 \description{
 Get the base URL of the Member Node.
 }
-

@@ -27,4 +27,3 @@ statements. Statements are filtered according to these rules:
 The consequence of filter 4 is that dc:identifier statements are left in if
 they are still in use by another statement
 }
-
