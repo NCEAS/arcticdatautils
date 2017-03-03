@@ -14,7 +14,14 @@ eml_validate_attributes(attributes)
 are valid
 }
 \description{
-Validate an EML attributeList attribute-by-attribute
+The attributes passed into this function are validated one-by-one and the
+progress of going through each attribute is printed to the screen along
+with any and all validation issues.
+}
+\details{
+This is done by, for each attribute in the list, creating a minimum valid
+EML document and adding a new otherEntity with a new attributeList containing
+the single attribute to be validated.
 }
 \examples{
 \dontrun{
