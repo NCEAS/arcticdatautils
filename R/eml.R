@@ -738,3 +738,107 @@ eml_validate_attributes <- function(attributes) {
   results
 }
 
+
+#' Add new otherEntity elements to an EML document from a table
+#'
+#' @param doc (eml) An EML document
+#' @param entities (data.frame) A data.frame with columns path, pid, and
+#' format_id
+#' @param resolve_base (character) Optional. Specify a DataONE CN resolve base
+#' URI which will be used for serializing download URLs into the EML. Most users
+#'  should not override the default value.
+#'
+#' @return (eml) The modified EML document.
+#' @export
+#'
+#' @examples
+#' # Create entities from files on disk
+#' paths <- list.files(system.file("", package = "arcticdatautils"), full.names = TRUE) # Get full paths to some files
+#' pids <- vapply(paths, function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) }, "") # Generate some UUID PIDs
+#' format_ids <- guess_format_id(paths) # Try to guess format IDs, you should check this afterwards
+#' entity_df <- data.frame(path = paths, pid = pids, format_id = format_ids, stringsAsFactors = FALSE)
+#'
+#' doc <- new("eml")
+#' doc <- eml_add_other_entities(doc, entity_df)
+#'
+#' # Read in a CSV containing the info
+#' \dontrun{
+#'   entity_df <- read.csv("./my_entities.csv", stringsAsFactors = FALSE)
+#'   doc <- new("eml")
+#'   doc <- eml_add_other_entities(doc, entity_df)
+#' }
+eml_add_other_entities <- function(doc, entities, resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
+  stopifnot(is(doc, "eml"))
+
+  if (!is(entities, "data.frame")) {
+    stop("The argument 'entities' must be a 'data.frame'.")
+  }
+
+  if (!identical(sort(names(entities)), c("format_id", "path", "pid"))) {
+    stop("The columns in the data.frame you passed in for the 'entities' argument did not have the expected column names of path, pid, format_id and it must.", call. = FALSE)
+  }
+
+  if (length(doc@dataset@otherEntity) > 0) {
+    warning("The document already has otherEntity elements. This function only **adds** entities and does not update or replace any existing otherEntity elements. If any of the existing otherEntity elements are for the same Objects you're adding you may not want to ignore this warning.", call. = FALSE)
+  }
+
+  current_entities <- doc@dataset@otherEntity
+
+  eml_other_entity <- function(path, pid, format_id) {
+    # Convert args to character vectors if needed
+    if (is.factor(path)) path <- as.character(path)
+    if (is.factor(pid)) path <- as.character(pid)
+    if (is.factor(format_id)) path <- as.character(format_id)
+
+    stopifnot(file.exists(path))
+    stopifnot(is.character(path), nchar(path) > 0)
+    stopifnot(is.character(pid), nchar(pid) > 0)
+    stopifnot(is.character(format_id), nchar(format_id) > 0)
+
+    file_name <- basename(path)
+
+    other_entity <- new("otherEntity")
+    other_entity@id <- new("xml_attribute", pid)
+    other_entity@scope <- new("xml_attribute", "document")
+
+    other_entity@entityName <- new("entityName", .Data = file_name)
+    other_entity@entityType <- "Other"
+
+    # otherEntity/physical
+    physical <- new("physical")
+    physical@scope <- new("xml_attribute", "document")
+    physical@objectName <- new("objectName", file_name)
+
+    physical@size <- new("size", format(file.size(path), scientific = FALSE))
+    physical@authentication <- new("ListOfauthentication", list(new("authentication", digest::digest(path, algo = "sha1", file = TRUE))))
+    physical@authentication[[1]]@method <- new("xml_attribute", "SHA-1")
+
+    physical@dataFormat <- new("dataFormat")
+    physical@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
+    physical@dataFormat@externallyDefinedFormat@formatName <- format_id
+
+    physical@distribution <- new("ListOfdistribution", list(new("distribution")))
+    physical@distribution[[1]]@scope  <- new("xml_attribute", "document")
+    physical@distribution[[1]]@online <- new("online")
+    physical@distribution[[1]]@online@url <- new("url", paste0(resolve_base, pid))
+
+    slot(physical@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
+
+    other_entity@physical <- new("ListOfphysical", list(physical))
+
+    other_entity
+  }
+
+  new_entities <- lapply(seq_len(nrow(entities)), function(i) {
+    cat(paste0("Creating otherEntity ", i, " of ", nrow(entities), "...\n"))
+    eml_other_entity(entities[i,"path"],
+                     entities[i,"pid"],
+                     entities[i,"format_id"])
+  })
+
+  doc@dataset@otherEntity <- new("ListOfotherEntity", c(current_entities,
+                                                        new("ListOfotherEntity", new_entities)))
+
+  doc
+}
+
