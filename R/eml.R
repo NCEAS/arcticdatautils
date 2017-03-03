@@ -630,3 +630,35 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 
   address
 }
+
+
+
+#' Set the abstract on an EML document
+#'
+#' @param doc (eml) An EML document
+#' @param text (character) The abstract text. If \code{text} is length one, an
+#' abstract without \code{<para>} or \code{section} elements will be created.
+#' If \code{text} is greater than one in length, \code{para} elementes will be
+#' used for each element.
+#'
+#' @return (eml) The modified EML document
+#' @export
+#'
+#' @examples
+#' set_abstract(doc, c("Test abstract..."))
+#' set_abstract(doc, c("First para", "second para"))
+set_abstract <- function(doc, text) {
+  stopifnot(is(doc, "eml"))
+  stopifnot(is.character(text),
+            length(text) > 0)
+
+  if (length(text) == 1) {
+    doc@dataset@abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
+  } else if (length(text) > 1) {
+    doc@dataset@abstract <- new("abstract", para = new("ListOfpara", lapply(paras, function(x) new("para", x))))
+  }
+
+  doc
+}
+
+
