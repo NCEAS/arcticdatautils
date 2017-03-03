@@ -266,7 +266,7 @@ clear_methods <- function(doc) {
 #' @export
 #'
 #' @examples
-#' creator("test", "user", "test@user.com")
+#' eml_creator("test", "user", "test@user.com")
 eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
   stopifnot(all(sapply(c(given_names, sur_name), is.character)),
             all(lengths(c(given_names, sur_name)) > 0))

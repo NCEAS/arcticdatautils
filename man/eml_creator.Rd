@@ -27,5 +27,5 @@ eml_creator(given_names, sur_name, organization = NULL, email = NULL,
 Create an EML creator
 }
 \examples{
-creator("test", "user", "test@user.com")
+eml_creator("test", "user", "test@user.com")
 }
