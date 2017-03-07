@@ -879,8 +879,11 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
   response <- list(metadata = metadata_pids,
                    resource_map = pid,
                    data = data_pids,
-                   child_packages = child_pids,
-                   unknown = unknown_pids)
+                   child_packages = child_pids)
+
+  if (length(unknown_pids) != 0) {
+    response[["unknnown_pids"]] <- unknown_pids
+  }
 
   response
 }
