@@ -1033,9 +1033,9 @@ filter_obsolete_pids <- function(node, pids) {
 #' profile(mn, me)
 #'
 #' // Get a custom set of fields
-#' profile(mn, me, "origin")
+#' view_profile(mn, me, "origin")
 #' }
-profile <- function(mn, subject, fields=c("identifier", "title")) {
+view_profile <- function(mn, subject, fields=c("identifier", "title")) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(subject),
             length(subject) == 1,
