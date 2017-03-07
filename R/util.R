@@ -790,7 +790,7 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
   if (is_resource_map(node, pid)) {
     resource_map_pids <- pid
   } else {
-    resource_map_pids <- get_resource_map(node, pid)
+    resource_map_pids <- find_newest_resource_map(node, pid)
   }
 
   # Stop if no resource map was found
@@ -897,7 +897,7 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
 #' @export
 #'
 #' @examples
-get_resource_map <- function(node, pid, rows = 1000) {
+find_newest_resource_map <- function(node, pid, rows = 1000) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -911,16 +911,74 @@ get_resource_map <- function(node, pid, rows = 1000) {
 
   response <- dataone::query(node, query_params, as = "list")
 
-  if (length(response) != 1) {
-    stop(paste0("One document was expected in the query result but ", length(response), " were returned."))
+  if (length(response) == 0) {
+    stop(paste0("No resource map found for ", pid, "."))
   }
 
-  pids <- unlist(response[[1]]$resourceMap)
+  if (length(response) > 1) {
+    stop(paste0("More than one Solr document was returned which is unexpected."), call. = FALSE)
+  }
 
-  # Filter obsoleted pids
-  pids <- pids[vapply(pids, function(pid) is_obsolete(node, pid), TRUE)]
+  all_resource_map_pids <- unlist(lapply(response, function(x) {
+    if ("resourceMap" %in% names(x)) {
+      return(x$resourceMap)
+    } else {
+      return(NA)
+    }
+  }))
 
-  pids
+  all_resource_map_pids <- as.character(na.omit(all_resource_map_pids))
+
+  if (length(all_resource_map_pids) == 0) {
+    stop("Of the PIDs queried, no PIDs were for resource maps.", call. = FALSE)
+  }
+
+  if (length(all_resource_map_pids) > 1) {
+    warning("Multiple possible resource maps found for. Choosing the newest based on dateUploaded.")
+  }
+
+  find_newest_object(node, all_resource_map_pids)
+}
+
+#' Find the newest (by dateUploaded) object within a given set of objects.
+#'
+#' @param node (MNode | CNode) The node to query
+#' @param identiifers (character) One or more identifiers
+#' @param rows (numeric) Optional. Specify the size of the query result set.
+#'
+#' @return (character) The PID of the newest object. In the case of a tie (very
+#' unlikely) the first element, in natural order, is returned.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' mn <- MNode(...)
+#' find_newest_object(mn, c("PIDX", "PIDY", "PIDZ"))
+#' }
+find_newest_object <- function(node, identifiers, rows=1000) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
+  stopifnot(is.character(identifiers),
+            length(identifiers) > 0,
+            all(nchar(identifiers)) > 0)
+  stopifnot(is.numeric(rows) || is.numeric(as.numeric(rows)),
+            rows >= 0)
+
+  response <- dataone::query(node, list(q = paste0("identifier:", paste0("\"", identifiers, "\""), collapse = " OR "),
+                                        fl = "identifier,dateUploaded",
+                                        rows = as.character(rows),
+                                        sort = "dateUploaded+desc"),
+                             as = "data.frame")
+
+
+
+
+  if (nrow(response) == 0) {
+    stop("No objects found for ", paste(identifiers, collapse = ", "), call. = FALSE)
+  }
+
+  response[1,"identifier"]
+
 }
 
 
