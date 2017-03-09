@@ -95,6 +95,8 @@ sysmeta_to_eml_physical <- function(sysmeta) {
   }
 
   phys@size <- new("size", format(sysmeta@size, scientific = FALSE))
+  phys@size@unit <- new("xml_attribute", "bytes")
+
   phys@authentication <- new("ListOfauthentication", list(new("authentication", sysmeta@checksum)))
   phys@authentication[[1]]@method <- new("xml_attribute", sysmeta@checksumAlgorithm)
 
@@ -810,6 +812,7 @@ eml_add_other_entities <- function(doc, entities, resolve_base="https://cn.datao
     physical@objectName <- new("objectName", file_name)
 
     physical@size <- new("size", format(file.size(path), scientific = FALSE))
+    physical@size@unit <- new("xml_attribute", "bytes")
     physical@authentication <- new("ListOfauthentication", list(new("authentication", digest::digest(path, algo = "sha1", file = TRUE))))
     physical@authentication[[1]]@method <- new("xml_attribute", "SHA-1")
 
