@@ -741,7 +741,7 @@ eml_validate_attributes <- function(attributes) {
 }
 
 
-#' Add new otherEntity elements to an EML document from a table
+#' Add new entity (otherEntity, dataTable, etc) elements to an EML document from a table.
 #'
 #' @param doc (eml) An EML document
 #' @param entities (data.frame) A data.frame with columns path, pid, and
@@ -755,42 +755,52 @@ eml_validate_attributes <- function(attributes) {
 #'
 #' @examples
 #' # Create entities from files on disk
-#' paths <- list.files(system.file("", package = "arcticdatautils"), full.names = TRUE) # Get full paths to some files
-#' pids <- vapply(paths, function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) }, "") # Generate some UUID PIDs
-#' format_ids <- guess_format_id(paths) # Try to guess format IDs, you should check this afterwards
-#' entity_df <- data.frame(path = paths, pid = pids, format_id = format_ids, stringsAsFactors = FALSE)
-#'
-#' doc <- new("eml")
-#' doc <- eml_add_other_entities(doc, entity_df)
-#'
-#' # Read in a CSV containing the info
 #' \dontrun{
-#'   entity_df <- read.csv("./my_entities.csv", stringsAsFactors = FALSE)
+#'   types <- c("dataTable")
+#'   paths <- list.files(., full.names = TRUE) # Get full paths to some files
+#'   pids <- vapply(paths, function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) }, "") # Generate some UUID PIDs
+#'   format_ids <- guess_format_id(paths) # Try to guess format IDs, you should check this afterwards
+#'
+#'   entity_df <- data.frame(type = types,
+#'                           path = paths,
+#'                           pid = pids,
+#'                           format_id = format_ids,
+#'                           stringsAsFactors = FALSE)
+#'
 #'   doc <- new("eml")
-#'   doc <- eml_add_other_entities(doc, entity_df)
-#' }
-eml_add_other_entities <- function(doc, entities, resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
+#'   doc <- eml_add_entities(doc, entity_df)
+#'}
+eml_add_entities <- function(doc, entities, resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
   stopifnot(is(doc, "eml"))
 
   if (!is(entities, "data.frame")) {
     stop("The argument 'entities' must be a 'data.frame'.")
   }
 
-  if (!identical(sort(names(entities)), c("format_id", "path", "pid"))) {
-    stop("The columns in the data.frame you passed in for the 'entities' argument did not have the expected column names of path, pid, format_id and it must.", call. = FALSE)
+  if (!identical(sort(names(entities)), c("format_id", "path", "pid", "type"))) {
+    stop("The columns in the data.frame you passed in for the 'entities' argument did not have the expected column names of type, path, pid, format_id and it must.", call. = FALSE)
   }
 
-  if (length(doc@dataset@otherEntity) > 0) {
-    warning("The document already has otherEntity elements. This function only **adds** entities and does not update or replace any existing otherEntity elements. If any of the existing otherEntity elements are for the same Objects you're adding you may not want to ignore this warning.", call. = FALSE)
+  entity_types <- c("dataTable", "spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity")
+
+  if (!all(entities$type %in% entity_types)) {
+    stop(call. = FALSE, paste0("The `type` column must only include values from: ", paste(entity_types, collapse = ", "), "."))
   }
 
-  current_entities <- doc@dataset@otherEntity
+  # Warn about existing entities
+  for(type in entity_types) {
+    if (type %in% entities$type && length(slot(doc@dataset, type)) > 0) {
+      warning(paste0("You are adding one or more ", type, " elements. This function only adds entities and does not remove/replace them."))
+    }
+  }
 
-  eml_other_entity <- function(path, pid, format_id) {
+  # Internal function to create a single entity
+  eml_entity <- function(type, path, pid, format_id) {
     # Convert args to character vectors if needed
+    if (is.factor(type)) type <- as.character(type)
     if (is.factor(path)) path <- as.character(path)
-    if (is.factor(pid)) path <- as.character(pid)
-    if (is.factor(format_id)) path <- as.character(format_id)
+    if (is.factor(pid)) pid <- as.character(pid)
+    if (is.factor(format_id)) format_id <- as.character(format_id)
 
     stopifnot(file.exists(path))
     stopifnot(is.character(path), nchar(path) > 0)
@@ -799,12 +809,15 @@ eml_add_other_entities <- function(doc, entities, resolve_base="https://cn.datao
 
     file_name <- basename(path)
 
-    other_entity <- new("otherEntity")
-    other_entity@id <- new("xml_attribute", pid)
-    other_entity@scope <- new("xml_attribute", "document")
+    entity <- new(type)
+    entity@id <- new("xml_attribute", pid)
+    entity@scope <- new("xml_attribute", "document")
 
-    other_entity@entityName <- new("entityName", .Data = file_name)
-    other_entity@entityType <- "Other"
+    entity@entityName <- new("entityName", .Data = file_name)
+
+    if (type == "otherEntity") {
+      entity@entityType <- "Other"
+    }
 
     # otherEntity/physical
     physical <- new("physical")
@@ -827,20 +840,28 @@ eml_add_other_entities <- function(doc, entities, resolve_base="https://cn.datao
 
     slot(physical@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
 
-    other_entity@physical <- new("ListOfphysical", list(physical))
+    entity@physical <- new("ListOfphysical", list(physical))
 
-    other_entity
+    entity
   }
 
-  new_entities <- lapply(seq_len(nrow(entities)), function(i) {
-    cat(paste0("Creating otherEntity ", i, " of ", nrow(entities), "...\n"))
-    eml_other_entity(entities[i,"path"],
-                     entities[i,"pid"],
-                     entities[i,"format_id"])
+  # Create new entities
+  new_entities <- lapply(entity_types, function(type) {
+    lapply(which(entities$type == type), function(i) {
+      eml_entity(entities[i, "type"],
+                 entities[i,"path"],
+                 entities[i,"pid"],
+                 entities[i,"format_id"])
+    })
   })
 
-  doc@dataset@otherEntity <- new("ListOfotherEntity", c(current_entities,
-                                                        new("ListOfotherEntity", new_entities)))
+  names(new_entities) <- entity_types # Name the list so we can [[ by type
+
+  # Merge new entities into existing
+  for (type in entity_types) {
+    slot(doc@dataset, type) <- new(paste0("ListOf", type), c(slot(doc@dataset, type),
+                                                             new(paste0("ListOf", type), new_entities[[type]])))
+  }
 
   doc
 }
