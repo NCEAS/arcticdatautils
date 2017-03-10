@@ -744,7 +744,7 @@ eml_validate_attributes <- function(attributes) {
 #' Add new entity (otherEntity, dataTable, etc) elements to an EML document from a table.
 #'
 #' @param doc (eml) An EML document
-#' @param entities (data.frame) A data.frame with columns path, pid, and
+#' @param entities (data.frame) A data.frame with columns type, path, pid, and
 #' format_id
 #' @param resolve_base (character) Optional. Specify a DataONE CN resolve base
 #' URI which will be used for serializing download URLs into the EML. Most users
@@ -770,6 +770,13 @@ eml_validate_attributes <- function(attributes) {
 #'   doc <- new("eml")
 #'   doc <- eml_add_entities(doc, entity_df)
 #'}
+#'
+#' # Read in a CSV containing the info about files on disk
+#' \dontrun{
+#'   entity_df <- read.csv("./my_entities.csv", stringsAsFactors = FALSE)
+#'   doc <- new("eml")
+#'   doc <- eml_add_entities(doc, entity_df)
+#' }
 eml_add_entities <- function(doc, entities, resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
   stopifnot(is(doc, "eml"))
 
