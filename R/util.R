@@ -933,11 +933,11 @@ find_newest_resource_map <- function(node, pid, rows = 1000) {
   all_resource_map_pids <- as.character(na.omit(all_resource_map_pids))
 
   if (length(all_resource_map_pids) == 0) {
-    stop("Of the PIDs queried, no PIDs were for resource maps.", call. = FALSE)
+    stop(paste0("No resource map(s) found for ", pid, "."), call. = FALSE)
   }
 
   if (length(all_resource_map_pids) > 1) {
-    warning("Multiple possible resource maps found for. Choosing the newest based on dateUploaded.")
+    warning("Multiple possible resource maps found for. Choosing the newest based on dateUploaded. This is probably what you want.")
   }
 
   find_newest_object(node, all_resource_map_pids)
