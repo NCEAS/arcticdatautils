@@ -36,6 +36,11 @@ publish_object <- function(mn,
   # Decide the format_id
   if (is.null(format_id)) {
     format_id <- guess_format_id(path)
+
+    if (format_id == "application/xml") {
+      stop(call. = FALSE, "No format_id was specified and this appears to be an XML document. Please specify the format_id and run this call again.")
+    }
+
     warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
   }
 
