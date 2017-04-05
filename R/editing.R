@@ -36,7 +36,7 @@ publish_object <- function(mn,
   # Decide the format_id
   if (is.null(format_id)) {
     format_id <- guess_format_id(path)
-    warning(paste0("No format_id was specified so one a guess was made based upon the file extension: ", format_id, "."))
+    warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
   }
 
   # Set up some variables for use later on
