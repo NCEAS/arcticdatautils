@@ -3,16 +3,16 @@
 #' Helpers for creating EML.
 
 
-#' Create an EML otherEntity sub-tree for the given PID.
+#' Create an EML otherEntity object for the given PID.
 #'
 #' Note this is a wrapper around sysmeta_to_other_entity which handles the task of
-#' creating the EML otherEntity sub-ree.
+#' creating the EML otherEntity.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
 #' @param sysmeta (SystemMetadata) Optional. Manually pass in System Metadata. This avoids an extra network request if the calling environment has already loaded the System Metadata.
 #'
-#' @return (otherEntity) The XML sub-tree.
+#' @return (otherEntity) The otherEntity object
 #' @export
 #'
 #' @examples
@@ -38,11 +38,11 @@ pid_to_other_entity <- function(mn, pid, sysmeta=NULL) {
   sysmeta_to_other_entity(sysmeta)
 }
 
-#' Create an EML otherEntity sub-tree for the given object.
+#' Create an EML otherEntity for the given object from the System Metadata
 #'
 #' @param sysmeta (SystemMetadata) The System Metadata of the object.
 #'
-#' @return (otherEntity) The XML sub-tree.
+#' @return (otherEntity) The otherEntity object
 #' @export
 #'
 #' @examples
@@ -70,9 +70,9 @@ sysmeta_to_other_entity <- function(sysmeta) {
   other_entity
 }
 
-#' Create an EML physical subtree from a System Metadata instance
+#' Create an EML physical object from System Metadata
 #'
-#' This function creates a pre-canned EML physical subtree from what's in the
+#' This function creates a pre-canned EML physical object from what's in the
 #' System Metadata of an Object. Note that it sets an Online Distrubtion URL
 #' of the DataONE v2 resolve service for the PID.
 #'
