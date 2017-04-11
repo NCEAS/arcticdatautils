@@ -9,65 +9,65 @@
 #' creating the EML otherEntity.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pid (character) The PID of the object to create the sub-tree for.
-#' @param sysmeta (SystemMetadata) Optional. Manually pass in System Metadata. This avoids an extra network request if the calling environment has already loaded the System Metadata.
+#' @param pids (character) The PID of the object to create the sub-tree for.
 #'
-#' @return (otherEntity) The otherEntity object
+#' @return (list of otherEntity) The otherEntity object(s)
 #' @export
 #'
 #' @examples
-pid_to_other_entity <- function(mn, pid, sysmeta=NULL) {
+#' \dontrun{
+#' Generate EML otherEntity objects for all the data in a package
+#' pkg <- get_package(mn, pid)
+#' pid_to_other_entity(mn, pkg$data)
+#' }
+pid_to_other_entity <- function(mn, pids) {
   stopifnot(class(mn) == "MNode")
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
+  stopifnot(is.character(pids),
+            all(nchar(pids)) > 0)
 
-  # Get the System Metadata if needed
-  if (is.null(sysmeta)) {
-    sysmeta <- dataone::getSystemMetadata(mn, pid)
-  }
-
-  if (is.null(sysmeta)) {
-    stop("Failed to download System Metadata for PID '", pid, "'.")
-  }
-
-  # Check if the sysmeta has a fileName and stop execution if it does not
-  if (is.na(sysmeta@fileName)) {
-    stop(paste0("System Metadata for object with PID '", pid, "' did not have its fileName property set. This will result in 'NA' being set for the EML entityName and objectName (which we don't want). You need to give each data object a fileName property in its System Metadata. You can use the arcticdatautils::set_file_name() function to do this or you can use dataone::getSystemMetadata(), change the fileName property, and update it with dataone::updateSystemMetadata()"))
-  }
-
+  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
   sysmeta_to_other_entity(sysmeta)
 }
 
 #' Create an EML otherEntity for the given object from the System Metadata
 #'
-#' @param sysmeta (SystemMetadata) The System Metadata of the object.
+#' @param sysmeta (SystemMetadata) One or more System Metadata objects
 #'
-#' @return (otherEntity) The otherEntity object
+#' @return (list of otherEntity) The otherEntity object(s)
 #' @export
 #'
 #' @examples
+#' \dontrun {
+#' # Generate EML otherEntity objects for all the data in a package
+#' pkg <- get_package(mn, pid)
+#' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
+#' sysmeta_to_other_entity(sm)
+#' }
 sysmeta_to_other_entity <- function(sysmeta) {
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  work <- function(x) {
+    other_entity <- new("otherEntity")
+    other_entity@id <- new("xml_attribute", x@identifier)
+    other_entity@scope <- new("xml_attribute", "document")
 
-  # otherEntity
-  other_entity <- new("otherEntity")
-  other_entity@id <- new("xml_attribute", sysmeta@identifier)
-  other_entity@scope <- new("xml_attribute", "document")
+    if (is.na(x@fileName)) {
+      other_entity@entityName <- new("entityName", "NA")
+    }
+    else {
+      other_entity@entityName <- new("entityName", x@fileName)
+    }
 
-  if (is.na(sysmeta@fileName)) {
-    other_entity@entityName <- new("entityName", "NA")
+    other_entity@entityType <- "Other"
+
+    phys <- sysmeta_to_eml_physical(x)
+    other_entity@physical <- new("ListOfphysical", phys)
+
+    other_entity
   }
-  else {
-    other_entity@entityName <- new("entityName", sysmeta@fileName)
-  }
 
-  other_entity@entityType <- "Other"
 
-  # otherEntity/physical
-  phys <- sysmeta_to_eml_physical(sysmeta)
-  other_entity@physical <- new("ListOfphysical", list(phys))
+  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
 
-  other_entity
+  lapply(sysmeta, work)
 }
 
 #' Create an EML physical object from System Metadata
@@ -76,42 +76,52 @@ sysmeta_to_other_entity <- function(sysmeta) {
 #' System Metadata of an Object. Note that it sets an Online Distrubtion URL
 #' of the DataONE v2 resolve service for the PID.
 #'
-#' @param sysmeta (SystemMetadata) The System Metadata of the object.
+#' @param sysmeta (SystemMetadata) One or more System Metadata objects
 #'
-#' @return
+#' @return (list of physical) The physical objects for each sysmeta
 #' @export
 #'
 #' @examples
+#' #' \dontrun {
+#' # Generate EML physical objects for all the data in a package
+#' pkg <- get_package(mn, pid)
+#' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
+#' sysmeta_to_eml_physical(sm)
+#' }
 sysmeta_to_eml_physical <- function(sysmeta) {
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  work <- function(x) {
+    phys <- new("physical")
+    phys@scope <- new("xml_attribute", "document")
 
-  phys <- new("physical")
-  phys@scope <- new("xml_attribute", "document")
+    if (is.na(x@fileName)) {
+      phys@objectName <- new("objectName", "NA")
+    } else {
+      phys@objectName <- new("objectName", x@fileName)
+    }
 
-  if (is.na(sysmeta@fileName)) {
-    phys@objectName <- new("objectName", "NA")
-  } else {
-    phys@objectName <- new("objectName", sysmeta@fileName)
+    phys@size <- new("size", format(x@size, scientific = FALSE))
+    phys@size@unit <- new("xml_attribute", "bytes")
+
+    phys@authentication <- new("ListOfauthentication", list(new("authentication", x@checksum)))
+    phys@authentication[[1]]@method <- new("xml_attribute", x@checksumAlgorithm)
+
+    phys@dataFormat <- new("dataFormat")
+    phys@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
+    phys@dataFormat@externallyDefinedFormat@formatName <- x@formatId
+
+    phys@distribution <- new("ListOfdistribution", list(new("distribution")))
+    phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
+    phys@distribution[[1]]@online <- new("online")
+    phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
+
+    slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
+
+    phys
   }
 
-  phys@size <- new("size", format(sysmeta@size, scientific = FALSE))
-  phys@size@unit <- new("xml_attribute", "bytes")
+  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
 
-  phys@authentication <- new("ListOfauthentication", list(new("authentication", sysmeta@checksum)))
-  phys@authentication[[1]]@method <- new("xml_attribute", sysmeta@checksumAlgorithm)
-
-  phys@dataFormat <- new("dataFormat")
-  phys@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
-  phys@dataFormat@externallyDefinedFormat@formatName <- sysmeta@formatId
-
-  phys@distribution <- new("ListOfdistribution", list(new("distribution")))
-  phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
-  phys@distribution[[1]]@online <- new("online")
-  phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
-
-  slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
-
-  phys
+  lapply(sysmeta, work)
 }
 
 #' Creates and sets EML otherEntity elements to an existing EML document,
@@ -151,7 +161,7 @@ set_other_entities <- function(mn, path, pids) {
   message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
 
   # Generate otherEntity elements
-  other_entities <- lapply(pids, function(pid) pid_to_other_entity(mn, pid))
+  other_entities <- pid_to_other_entity(mn, pids)
 
   # Concatenate the existing and new otherEntity elements and put back in the
   # EML

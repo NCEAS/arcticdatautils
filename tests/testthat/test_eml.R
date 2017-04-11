@@ -8,7 +8,7 @@ test_that("an EML otherEntity subtree can be created when the sysmeta has a file
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
 
-  other_entity <- sysmeta_to_other_entity(sysmeta)
+  other_entity <- sysmeta_to_other_entity(sysmeta)[[1]]
 
   # Check some rough properties of the subtree
   expect_is(other_entity, "otherEntity")
@@ -22,7 +22,7 @@ test_that("an EML otherEntity subtree can be created when the sysmeta doesn't ha
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
 
-  other_entity <- sysmeta_to_other_entity(sysmeta)
+  other_entity <- sysmeta_to_other_entity(sysmeta)[[1]]
 
   # Check some rough properties of the subtree
   expect_is(other_entity, "otherEntity")
