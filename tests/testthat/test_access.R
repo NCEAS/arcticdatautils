@@ -29,7 +29,9 @@ test_that("get_package works for a package with a child package", {
                                               child_pids = child_pkg$resource_map,
                                               check_first = FALSE)
 
-  get_pkg <- get_package(mn, pkg$metadata)
+  suppressWarnings({
+    get_pkg <- get_package(mn, pkg$metadata)
+  })
 
   expect_true(pkg$metadata == get_pkg$metadata)
   expect_true(pkg$resource_map != get_pkg$resource_map)
@@ -48,7 +50,7 @@ test_that("get_package works for an object in two packages", {
     pkg <- get_package(mn, child_pkg$metadata)
   })
 
-  expect_length(pkg, 2)
+  expect_length(pkg, 4)
 })
 
 test_that("get_package works the same when given a metadata pid as it does when given a resource map pid", {

@@ -74,7 +74,11 @@ test_that("we can update a resource map", {
   expect_true(object_exists(mn, updated))
 
   # Also check it's in the Solr index
-  expect_equal(updated, get_package(mn, response$metadata)$resource_map)
+  suppressWarnings({
+    pkg <- get_package(mn, response$metadata)
+  })
+
+  expect_equal(updated, pkg$resource_map)
 })
 
 test_that("an object can be published with a SID", {
@@ -166,70 +170,6 @@ test_that("we can publish an update to an object and specify our own format id",
 
   expect_equal(sm@formatId, "text/plain")
 })
-
-test_that("replication policies are set to FALSE on new objects", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  path <- tempfile()
-  writeLines(LETTERS, path)
-  pid <- publish_object(mn, path)
-
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
-  expect_false(sysmeta@replicationAllowed)
-})
-
-test_that("replication policies are honored when updating objects", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  path <- tempfile()
-  writeLines(LETTERS, path)
-  pid <- publish_object(mn, path)
-
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
-  expect_false(sysmeta@replicationAllowed)
-
-  sysmeta@replicationAllowed <- TRUE
-  sysmeta <- dataone::updateSystemMetadata(mn, pid = pid, sysmeta = sysmeta)
-
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
-  expect_true(sysmeta@replicationAllowed)
-
-  new_pid <- update_object(mn, pid, path)
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
-  expect_true(sysmeta@replicationAllowed)
-})
-
-
-test_that("replication policies are honored when updating packages", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  pkg <- create_dummy_package(mn)
-
-  sysmeta <- dataone::getSystemMetadata(mn, pkg$metadata)
-  expect_false(sysmeta@replicationAllowed)
-  sysmeta@replicationAllowed <- TRUE
-  sysmeta <- dataone::updateSystemMetadata(mn, pid = pkg$metadata, sysmeta = sysmeta)
-
-  sysmeta <- dataone::getSystemMetadata(mn, pkg$resource_map)
-  expect_false(sysmeta@replicationAllowed)
-  sysmeta@replicationAllowed <- TRUE
-  sysmeta <- dataone::updateSystemMetadata(mn, pid = pkg$resource_map, sysmeta = sysmeta)
-
-  new_pkg <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data)
-
-  sysmeta <- dataone::getSystemMetadata(mn, new_pkg$metadata)
-  expect_true(sysmeta@replicationAllowed)
-
-  sysmeta <- dataone::getSystemMetadata(mn, new_pkg$resource_map)
-  expect_true(sysmeta@replicationAllowed)
-})
-
 
 test_that("extra statements are maintained between updates", {
   if (!is_token_set(mn)) {
