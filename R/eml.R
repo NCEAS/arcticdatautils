@@ -43,7 +43,7 @@ pid_to_other_entity <- function(mn, pids) {
 #' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
 #' sysmeta_to_other_entity(sm)
 #' }
-sysmeta_to_other_entity <- function(sysmeta) {
+sysmeta_to_eml_other_entity <- function(sysmeta) {
   work <- function(x) {
     other_entity <- new("otherEntity")
     other_entity@id <- new("xml_attribute", x@identifier)
@@ -68,6 +68,12 @@ sysmeta_to_other_entity <- function(sysmeta) {
   if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
 
   lapply(sysmeta, work)
+}
+
+sysmeta_to_other_entity <- function(sysmeta) {
+  .Deprecated("sysmeta_to_eml_other_entity",
+              package = "arcticdtautils",
+              old = "sysmeta_to_other_entity")
 }
 
 #' Create an EML physical object from System Metadata
