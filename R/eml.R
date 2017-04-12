@@ -20,7 +20,7 @@
 #' pkg <- get_package(mn, pid)
 #' pid_to_other_entity(mn, pkg$data)
 #' }
-pid_to_other_eml_entity <- function(mn, pids) {
+pid_to_eml_other_entity <- function(mn, pids) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
