@@ -10,7 +10,7 @@ eml_add_entities(doc, entities,
 \arguments{
 \item{doc}{(eml) An EML document}
 
-\item{entities}{(data.frame) A data.frame with columns path, pid, and
+\item{entities}{(data.frame) A data.frame with columns type, path, pid, and
 format_id}
 
 \item{resolve_base}{(character) Optional. Specify a DataONE CN resolve base
@@ -37,6 +37,13 @@ Add new entity (otherEntity, dataTable, etc) elements to an EML document from a 
                           format_id = format_ids,
                           stringsAsFactors = FALSE)
 
+  doc <- new("eml")
+  doc <- eml_add_entities(doc, entity_df)
+}
+
+# Read in a CSV containing the info about files on disk
+\dontrun{
+  entity_df <- read.csv("./my_entities.csv", stringsAsFactors = FALSE)
   doc <- new("eml")
   doc <- eml_add_entities(doc, entity_df)
 }

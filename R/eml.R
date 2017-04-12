@@ -3,7 +3,7 @@
 #' Helpers for creating EML.
 
 
-#' Create an EML otherEntity object for the given PID.
+#' Create EML otherEntity objects for a set of PIDs
 #'
 #' Note this is a wrapper around sysmeta_to_other_entity which handles the task of
 #' creating the EML otherEntity.
@@ -20,13 +20,52 @@
 #' pkg <- get_package(mn, pid)
 #' pid_to_other_entity(mn, pkg$data)
 #' }
-pid_to_other_entity <- function(mn, pids) {
+pid_to_other_eml_entity <- function(mn, pids) {
   stopifnot(class(mn) == "MNode")
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
 
   sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
-  sysmeta_to_other_entity(sysmeta)
+  sysmeta_to_eml_other_entity(sysmeta)
+}
+
+#' This function is deprecated. See \link{pid_to_other_eml_entity}.
+#'
+#' @param mn (MNode)
+#' @param pids (character)
+#'
+#' @return
+#' @export
+sysmeta_to_other_entity <- function(mn, pids) {
+  .Deprecated("pid_to_other_eml_entity",
+              package = "arcticdtautils",
+              old = "pid_to_other_entity")
+}
+
+#' Create EML physical objects for the given set of PIDs
+#'
+#' Note this is a wrapper around sysmeta_to_eml_physical which handles the task of
+#' creating the EML physical
+#'
+#' @param mn (MNode) Member Node where the PID is associated with an object.
+#' @param pids (character) The PID of the object to create the sub-tree for.
+#'
+#' @return (list of otherEntity) The otherEntity object(s)
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' Generate EML physical objects for all the data in a package
+#' pkg <- get_package(mn, pid)
+#' pid_to_eml_physical(mn, pkg$data)
+#' }
+pid_to_eml_physical <- function(mn, pids) {
+  stopifnot(class(mn) == "MNode")
+  stopifnot(is.character(pids),
+            all(nchar(pids)) > 0)
+
+  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
+  sysmeta_to_eml_physical(sysmeta)
 }
 
 #' Create an EML otherEntity for the given object from the System Metadata
@@ -70,6 +109,13 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
   lapply(sysmeta, work)
 }
 
+
+#' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
+#'
+#' @param sysmeta (SystemMetadata)
+#'
+#' @return
+#' @export
 sysmeta_to_other_entity <- function(sysmeta) {
   .Deprecated("sysmeta_to_eml_other_entity",
               package = "arcticdtautils",
