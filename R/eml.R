@@ -792,8 +792,8 @@ eml_validate_attributes <- function(attributes) {
       message(trimws(result$message))
       return(FALSE)
     } else {
-      cat("TRUE\n")
-      return(TRUE)
+      cat(result, "\n")
+      return(result)
     }
   })
 
