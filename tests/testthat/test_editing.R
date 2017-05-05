@@ -209,3 +209,17 @@ test_that("extra statements are maintained between updates", {
   expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
 })
 
+
+test_that("rightsholder is properly set back after publishing an update", {
+  pkg <- create_dummy_package(mn)
+
+  set_result <- set_rights_holder(mn, unlist(pkg), "CN=arctic-data-admins,DC=dataone,DC=org")
+  expect_true(all(set_result))
+
+  new_pkg <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data)
+  rhs <- lapply(unlist(pkg), function(pid) {
+    dataone::getSystemMetadata(mn, pid)@rightsHolder
+  })
+
+  expect_true(all(unlist(rhs) == "CN=arctic-data-admins,DC=dataone,DC=org"))
+})
