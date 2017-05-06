@@ -701,26 +701,6 @@ warn_current_version <- function() {
 }
 
 
-#' Get the obsoleted/obsoletedBy properties of an object as a named list.
-#'
-#' @param node (MNode|CNode) The node to query.
-#' @param pid (character) Any object.
-#'
-#' @return (list) A list of the obsoleted/obsoletedBy properties.
-#' @export
-#'
-#' @examples
-get_chain_neighbors <- function(node, pid) {
-  stopifnot(class(node) %in% c("MNode", "CNode"))
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
-
-  sysmeta <- dataone::getSystemMetadata(node, pid)
-  list("obsoletes" = sysmeta@obsoletes,
-       "obsoletedBy" = sysmeta@obsoletedBy)
-}
-
-
 #' Get the PIDs of all versions of an object.
 #'
 #' @param node (MNode|CNode) The node to query.
@@ -735,33 +715,25 @@ get_all_versions <- function(node, pid) {
   stopifnot(is.character(pid),
             nchar(pid) > 0)
 
-  # Cache obsoletes/obsoletedBy
-  cache <- list()
-  cache_order <- c()
+  pids <- c(pid)
 
-  # Walk backwards first, caching obsoletes/obsoleteBy, and then walk forward
-  cache[[pid]] <- get_chain_neighbors(node, pid)
+  # Walk backward
+  sm <- getSystemMetadata(mn, pid)
 
-  # Walk backward, looking one step behind
-  while (!is.na(cache[[pid]]$obsoletes)) {
-    pid <- cache[[pid]]$obsoletes
-    cache[[pid]] <- get_chain_neighbors(node, pid)
+  while (!is.na(sm@obsoletes)) {
+    sm <- getSystemMetadata(mn, sm@obsoletes)
+    pids <- c(sm@identifier, pids)
   }
 
-  # Then walk forward, looking one step ahead
-  while (!is.na(cache[[pid]]$obsoletedBy)) {
-    cache_order <- c(cache_order, pid)
-    pid <- cache[[pid]]$obsoletedBy
+  # Then forward from the start pid
+  sm <- getSystemMetadata(mn, pid)
 
-    if (!(pid %in% names(cache))) {
-      cache[[pid]] <- get_chain_neighbors(node, pid)
-    }
+  while (!is.na(sm@obsoletedBy)) {
+    sm <- getSystemMetadata(mn, sm@obsoletedBy)
+    pids <- c(pids, sm@identifier)
   }
 
-  # Add the last PID
-  cache_order <- c(cache_order, pid)
-
-  cache_order
+  pids
 }
 
 
