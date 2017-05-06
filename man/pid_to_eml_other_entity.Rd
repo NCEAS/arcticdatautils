@@ -24,7 +24,7 @@ creating the EML otherEntity.
 }
 \examples{
 \dontrun{
-Generate EML otherEntity objects for all the data in a package
+# Generate EML otherEntity objects for all the data in a package
 pkg <- get_package(mn, pid)
 pid_to_other_entity(mn, pkg$data)
 }

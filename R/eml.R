@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' Generate EML otherEntity objects for all the data in a package
+#' # Generate EML otherEntity objects for all the data in a package
 #' pkg <- get_package(mn, pid)
 #' pid_to_other_entity(mn, pkg$data)
 #' }
@@ -55,7 +55,7 @@ sysmeta_to_other_entity <- function(mn, pids) {
 #'
 #' @examples
 #' \dontrun{
-#' Generate EML physical objects for all the data in a package
+#' # Generate EML physical objects for all the data in a package
 #' pkg <- get_package(mn, pid)
 #' pid_to_eml_physical(mn, pkg$data)
 #' }
