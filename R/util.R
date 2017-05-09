@@ -718,18 +718,18 @@ get_all_versions <- function(node, pid) {
   pids <- c(pid)
 
   # Walk backward
-  sm <- getSystemMetadata(mn, pid)
+  sm <- getSystemMetadata(node, pid)
 
   while (!is.na(sm@obsoletes)) {
-    sm <- getSystemMetadata(mn, sm@obsoletes)
+    sm <- getSystemMetadata(node, sm@obsoletes)
     pids <- c(sm@identifier, pids)
   }
 
   # Then forward from the start pid
-  sm <- getSystemMetadata(mn, pid)
+  sm <- getSystemMetadata(node, pid)
 
   while (!is.na(sm@obsoletedBy)) {
-    sm <- getSystemMetadata(mn, sm@obsoletedBy)
+    sm <- getSystemMetadata(node, sm@obsoletedBy)
     pids <- c(pids, sm@identifier)
   }
 
