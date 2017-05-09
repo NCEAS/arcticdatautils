@@ -627,7 +627,12 @@ eml_project <- function(title, awards, first, last, organizations = NULL, role =
   project@personnel <- new("ListOfpersonnel", list(personnel))
 
   # funding
-  funding_paras <- lapply(awards, function(awd) { a <- new("para"); a@.Data <- list(awd); a } )
+  funding_paras <- lapply(awards, function(awd) {
+    a <- new("para");
+    a@.Data <- list(awd);
+    a@.Data <- list(xml2::xml_new_root("para", as.character(awd)))
+    a
+  })
   project@funding@para <- new("ListOfpara", funding_paras)
 
   project
