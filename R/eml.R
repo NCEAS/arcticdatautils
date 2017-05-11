@@ -322,6 +322,7 @@ clear_methods <- function(doc) {
 #' @param given_names (character) One or more given (first) names.
 #' @param sur_name (character) A sur (last) name.
 #' @param organization (character) One or more organization names.
+#' @param position (character) The creator's position.
 #' @param email (character) An email address.
 #' @param phone (character) A phone number.
 #' @param address (address) An object of type 'address' (EML).
@@ -331,21 +332,35 @@ clear_methods <- function(doc) {
 #'
 #' @examples
 #' eml_creator("test", "user", "test@user.com")
-eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
-  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
-            all(lengths(c(given_names, sur_name)) > 0))
+eml_creator <- function(given_names=NULL,
+                        sur_name=NULL,
+                        organization=NULL,
+                        position=NULL,
+                        email=NULL,
+                        phone=NULL,
+                        address=NULL) {
+  if (all(sapply(c(sur_name, organization, position), is.null))) {
+    stop(call. = FALSE,
+         "You must specify at least one of sur_name, organization, or position to make a valid creator")
+  }
   if (!is.null(address)) stopifnot(is(address, "address"))
 
   creator <- new("creator")
 
   # Individual Name
-  creator@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
-
+  if (!is.null(sur_name)) {
+    creator@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+  }
   # Organization Name
   if (!is.null(organization)) {
     org <- new("organizationName")
     org@.Data <- organization
     creator@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Position
+  if (!is.null(position)) {
+    creator@positionName <- c(new("positionName", .Data = position))
   }
 
   # Email
@@ -378,6 +393,7 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 #' @param given_names (character) One or more given (first) names.
 #' @param sur_name (character) A sur (last) name.
 #' @param organization (character) One or more organization names.
+#' @param position (character) The contact's position.
 #' @param email (character) An email address.
 #' @param phone (character) A phone number.
 #' @param address (address) An object of type 'address' (EML).
@@ -387,21 +403,36 @@ eml_creator <- function(given_names, sur_name, organization=NULL, email=NULL, ph
 #'
 #' @examples
 #' eml_contact("test", "user", "test@user.com")
-eml_contact <- function(given_names, sur_name, organization=NULL, email=NULL, phone=NULL, address=NULL) {
-  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
-            all(lengths(c(given_names, sur_name)) > 0))
+eml_contact <- function(given_names=NULL,
+                        sur_name=NULL,
+                        organization=NULL,
+                        position=NULL,
+                        email=NULL,
+                        phone=NULL,
+                        address=NULL) {
+  if (all(sapply(c(sur_name, organization, position), is.null))) {
+    stop(call. = FALSE,
+         "You must specify at least one of sur_name, organization, or position to make a valid contact.")
+  }
   if (!is.null(address)) stopifnot(is(address, "address"))
 
   contact <- new("contact")
 
   # Individual Name
-  contact@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+  if (!is.null(sur_name)) {
+    contact@individualName <- new("ListOfindividualName", list(eml_individual_name(given_names, sur_name)))
+  }
 
   # Organization Name
   if (!is.null(organization)) {
     org <- new("organizationName")
     org@.Data <- organization
     contact@organizationName <- new("ListOforganizationName", list(org))
+  }
+
+  # Position
+  if (!is.null(position)) {
+    contact@positionName <- c(new("positionName", .Data = position))
   }
 
   # Email
@@ -559,23 +590,26 @@ eml_associated_party <- function(given_names, sur_name, organization=NULL, email
 #'
 #' @examples
 #' eml_individual_name("some", "user)
-eml_individual_name <- function(given_names, sur_name) {
-  stopifnot(all(sapply(c(given_names, sur_name), is.character)),
-            all(lengths(c(given_names, sur_name)) > 0))
-
-  givens <- lapply(given_names, function(given_name) {
-    x <- new("givenName")
-    x@.Data <- given_name
-    x
-  })
-
-  sur <- new("surName")
-  sur@.Data <- sur_name
+eml_individual_name <- function(given_names=NULL, sur_name) {
+  stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
 
   # Create <individualName>
   indiv_name <- new("individualName")
-  indiv_name@givenName <- new("ListOfgivenName", givens)
-  indiv_name@surName <- sur
+
+  if (!is.null(given_names)) {
+    stopifnot(all(sapply(given_names, is.character)))
+    stopifnot(all(lengths(given_names) > 0))
+
+      givens <- lapply(given_names, function(given_name) {
+        x <- new("givenName")
+        x@.Data <- given_name
+        x
+    })
+
+    indiv_name@givenName <- new("ListOfgivenName", givens)
+  }
+
+  indiv_name@surName <- new("surName", .Data = sur_name)
 
   indiv_name
 }
