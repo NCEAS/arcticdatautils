@@ -76,12 +76,12 @@ pid_to_eml_physical <- function(mn, pids) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' # Generate EML otherEntity objects for all the data in a package
 #' pkg <- get_package(mn, pid)
 #' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
 #' sysmeta_to_other_entity(sm)
-#' }
+#'}
 sysmeta_to_eml_other_entity <- function(sysmeta) {
   work <- function(x) {
     other_entity <- new("otherEntity")
