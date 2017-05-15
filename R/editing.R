@@ -44,6 +44,12 @@ publish_object <- function(mn,
     warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
   }
 
+  # Check if format ID is valid
+  if (!(format_id %in% D1_FORMATS)) {
+    stop(call. = FALSE,
+         paste0("The format_id of '", format_id, "' is not a valid format ID. See https://cn.dataone.org/cn/v2/formats for the current list. This package stores a copy and may be out of date with that list so please email the author if needed."))
+  }
+
   # Set up some variables for use later on
   ########################################
   me <- get_token_subject()
