@@ -129,7 +129,18 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
   # Decide the format_id
   if (is.null(format_id)) {
     format_id <- guess_format_id(path)
-    log_message(paste0("Guessed format ID of ", format_id, "."))
+
+    if (format_id == "application/xml") {
+      stop(call. = FALSE, "No format_id was specified and this appears to be an XML document. Please specify the format_id and run this call again.")
+    }
+
+    warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
+  }
+
+  # Check if format ID is valid
+  if (!(format_id %in% D1_FORMATS)) {
+    stop(call. = FALSE,
+         paste0("The format_id of '", format_id, "' is not a valid format ID. See https://cn.dataone.org/cn/v2/formats for the current list. This package stores a copy and may be out of date with that list so please email the author if needed."))
   }
 
   log_message(paste0("Updating object ", pid, " with the file at ", path, "."))
