@@ -20,7 +20,7 @@ creating the EML physical
 }
 \examples{
 \dontrun{
-#Generate EML physical objects for all the data in a package
+# Generate EML physical objects for all the data in a package
 pkg <- get_package(mn, pid)
 pid_to_eml_physical(mn, pkg$data)
 }

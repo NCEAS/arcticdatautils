@@ -4,7 +4,7 @@
 \alias{eml_individual_name}
 \title{Create an EML individualName section}
 \usage{
-eml_individual_name(given_names, sur_name)
+eml_individual_name(given_names = NULL, sur_name)
 }
 \arguments{
 \item{given_names}{(character) One or more given names.}

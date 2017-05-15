@@ -4,8 +4,8 @@
 \alias{eml_contact}
 \title{Create an EML contact.}
 \usage{
-eml_contact(given_names, sur_name, organization = NULL, email = NULL,
-  phone = NULL, address = NULL)
+eml_contact(given_names = NULL, sur_name = NULL, organization = NULL,
+  position = NULL, email = NULL, phone = NULL, address = NULL)
 }
 \arguments{
 \item{given_names}{(character) One or more given (first) names.}
@@ -13,6 +13,8 @@ eml_contact(given_names, sur_name, organization = NULL, email = NULL,
 \item{sur_name}{(character) A sur (last) name.}
 
 \item{organization}{(character) One or more organization names.}
+
+\item{position}{(character) The contact's position.}
 
 \item{email}{(character) An email address.}
 
