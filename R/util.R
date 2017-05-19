@@ -1051,7 +1051,7 @@ view_profile <- function(mn, subject, fields=c("identifier", "title")) {
 #' Show the indexing status of a set of PIDs
 #'
 #' @param mn (MNode) The Member Node to query
-#' @param pids (character) One or more PIDs (or list of PIDs)
+#' @param pids (character|list) One or more PIDs (or list of PIDs)
 #'
 #' @return Nothing
 #' @export

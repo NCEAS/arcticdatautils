@@ -9,7 +9,7 @@ show_indexing_status(mn, pids)
 \arguments{
 \item{mn}{(MNode) The Member Node to query}
 
-\item{pids}{(character) One or more PIDs (or list of PIDs)}
+\item{pids}{(character|list) One or more PIDs (or list of PIDs)}
 }
 \value{
 Nothing
