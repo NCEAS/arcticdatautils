@@ -1048,3 +1048,63 @@ view_profile <- function(mn, subject, fields=c("identifier", "title")) {
   results
 }
 
+#' Show the indexing status of a set of PIDs
+#'
+#' @param mn (MNode) The Member Node to query
+#' @param pids (character) One or more PIDs (or list of PIDs)
+#'
+#' @return Nothing
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create a package then check its indexing status
+#' library(dataone)
+#' library(arcticdatautils)
+#' mn <- MNode(...)
+#' pkg <- create_dummy_package(mn)
+#' show_indexing_status(mn, pkg)
+#' }
+show_indexing_status <- function(mn, pids) {
+  # Automatically try to convert a list of pids to a vector of pids so the user
+  # can pass in the results of publish_update / get_package / etc
+  if (is(pids, "list")) {
+    pids <- unlist(pids, use.names = FALSE)
+  }
+
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pids),
+            length(pids) > 0)
+
+  expected_pids <- unlist(pkg, use.names = FALSE)
+  indexed_pids <- c() # Accumulates the PIDs we find in the index
+
+  pb <- txtProgressBar(min = 0, max = length(expected_pids), style = 3)
+
+  while (!all(expected_pids %in% indexed_pids)) {
+    unresolved_pids <- setdiff(expected_pids, indexed_pids)
+
+    # Query for the pids in chunks of 10, with rate-limiting
+    find_pids_in_index <- function(mn, pids, delay = 0.1, group_size = 10) {
+      groups <- split(pids, ceiling(seq_along(pids)/group_size  ))
+
+      result <- lapply(groups, function(group) {
+        r <- query(mn, paste0("q=identifier:(", paste(paste0('"', unlist(group, use.names = FALSE), '"'), collapse="+OR+"), ")&fl=identifier"))
+        Sys.sleep(delay)
+        return(unlist(r))
+      })
+
+      unlist(result, use.names = FALSE)
+    }
+
+    result <- find_pids_in_index(mn, unresolved_pids)
+    indexed_pids <- c(indexed_pids, unlist(result))
+
+    setTxtProgressBar(pb, length(indexed_pids))
+
+    Sys.sleep(1)
+  }
+
+  close(pb)
+}
+
