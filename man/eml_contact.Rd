@@ -2,32 +2,19 @@
 % Please edit documentation in R/eml.R
 \name{eml_contact}
 \alias{eml_contact}
-\title{Create an EML contact.}
+\title{Create an EML contact}
 \usage{
-eml_contact(given_names = NULL, sur_name = NULL, organization = NULL,
-  position = NULL, email = NULL, phone = NULL, address = NULL)
+eml_contact(...)
 }
 \arguments{
-\item{given_names}{(character) One or more given (first) names.}
-
-\item{sur_name}{(character) A sur (last) name.}
-
-\item{organization}{(character) One or more organization names.}
-
-\item{position}{(character) The contact's position.}
-
-\item{email}{(character) An email address.}
-
-\item{phone}{(character) A phone number.}
-
-\item{address}{(address) An object of type 'address' (EML).}
+\item{...}{Arguments passed on to eml_party}
 }
 \value{
 (contact) The new contact
 }
 \description{
-Create an EML contact.
+See \code{\link{eml_party}} for details.
 }
 \examples{
-eml_contact("test", "user", "test@user.com")
+eml_contact("test", "user", email = "test@user.com")
 }

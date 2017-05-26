@@ -4,28 +4,17 @@
 \alias{eml_metadata_provider}
 \title{Create an EML metadataProvider}
 \usage{
-eml_metadata_provider(given_names, sur_name, organization = NULL,
-  email = NULL, phone = NULL, address = NULL)
+eml_metadata_provider(...)
 }
 \arguments{
-\item{given_names}{(character) One or more given (first) names.}
-
-\item{sur_name}{(character) A sur (last) name.}
-
-\item{organization}{(character) One or more organization names.}
-
-\item{email}{(character) An email address.}
-
-\item{phone}{(character) A phone number.}
-
-\item{address}{(address) An object of type 'address' (EML).}
+\item{...}{Arguments passed on to eml_party}
 }
 \value{
-(metadataProvider) The new metadataProvider.
+(metadataProvider) The new metadataProvider
 }
 \description{
-Create an EML metadataProvider
+See \code{\link{eml_party}} for details.
 }
 \examples{
-eml_metadata_provider("test", "user", "test@user.com")
+eml_metadata_provider("test", "user", email = "test@user.com")
 }

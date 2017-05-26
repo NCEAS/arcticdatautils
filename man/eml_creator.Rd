@@ -4,30 +4,17 @@
 \alias{eml_creator}
 \title{Create an EML creator}
 \usage{
-eml_creator(given_names = NULL, sur_name = NULL, organization = NULL,
-  position = NULL, email = NULL, phone = NULL, address = NULL)
+eml_creator(...)
 }
 \arguments{
-\item{given_names}{(character) One or more given (first) names.}
-
-\item{sur_name}{(character) A sur (last) name.}
-
-\item{organization}{(character) One or more organization names.}
-
-\item{position}{(character) The creator's position.}
-
-\item{email}{(character) An email address.}
-
-\item{phone}{(character) A phone number.}
-
-\item{address}{(address) An object of type 'address' (EML).}
+\item{...}{Arguments passed on to eml_party}
 }
 \value{
 (creator) The new creator
 }
 \description{
-Create an EML creator
+See \code{\link{eml_party}} for details.
 }
 \examples{
-eml_creator("test", "user", "test@user.com")
+eml_creator("test", "user", email = "test@user.com")
 }

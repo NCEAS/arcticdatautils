@@ -4,30 +4,17 @@
 \alias{eml_associated_party}
 \title{Create an EML associatedParty}
 \usage{
-eml_associated_party(given_names, sur_name, organization = NULL,
-  email = NULL, phone = NULL, address = NULL, role)
+eml_associated_party(...)
 }
 \arguments{
-\item{given_names}{(character) One or more given (first) names.}
-
-\item{sur_name}{(character) A sur (last) name.}
-
-\item{organization}{(character) One or more organization names.}
-
-\item{email}{(character) An email address.}
-
-\item{phone}{(character) A phone number.}
-
-\item{address}{(address) An object of type 'address' (EML).}
-
-\item{role}{(character) A role}
+\item{...}{Arguments passed on to eml_party}
 }
 \value{
 (associatedParty) The new associatedParty
 }
 \description{
-Create an EML associatedParty
+See \code{\link{eml_party}} for details.
 }
 \examples{
-eml_associated_party("test", "user", "test@user.com", role = "Principal Investigator")
+eml_associated_party("test", "user", email = "test@user.com", role = "Principal Investigator")
 }
