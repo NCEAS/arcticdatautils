@@ -9,10 +9,26 @@ eml_party(type = "associatedParty", given_names = NULL, sur_name = NULL,
   address = NULL, role = NULL)
 }
 \arguments{
-\item{role}{}
+\item{type}{(character) The type of party (e.g. 'contact')}
+
+\item{given_names}{(character) The party's given name(s)}
+
+\item{sur_name}{(character) The party's surname}
+
+\item{organization}{(character) The party's organization name}
+
+\item{position}{(character) The party's position}
+
+\item{email}{(character) The party's email address(es)}
+
+\item{phone}{(character) The party's phone number(s)}
+
+\item{address}{(character) The party's address(es)}
+
+\item{role}{(character) The party's role}
 }
 \value{
-The party set in \code{type}
+An instance of the party specified by the in \code{type} argument
 }
 \description{
 You usually will want to use the high-level functions such as

@@ -323,17 +323,17 @@ clear_methods <- function(doc) {
 #'\code{\link{eml_creator}} and \code{\link{eml_contact}} but using this is
 #' fine.
 #'
-#' @param type
-#' @param given_names
-#' @param sur_name
-#' @param organization
-#' @param position
-#' @param email
-#' @param phone
-#' @param address
-#' @param role
+#' @param type (character) The type of party (e.g. 'contact')
+#' @param given_names (character) The party's given name(s)
+#' @param sur_name (character) The party's surname
+#' @param organization (character) The party's organization name
+#' @param position (character) The party's position
+#' @param email (character) The party's email address(es)
+#' @param phone (character) The party's phone number(s)
+#' @param address (character) The party's address(es)
+#' @param role (character) The party's role
 #'
-#' @return The party set in \code{type}
+#' @return An instance of the party specified by the in \code{type} argument
 #' @export
 #'
 #' @examples
