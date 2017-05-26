@@ -317,6 +317,27 @@ clear_methods <- function(doc) {
   doc
 }
 
+#' Low-level helper for creating EML parties
+#'
+#' You usually will want to use the high-level functions such as
+#'\code{\link{eml_creator}} and \code{\link{eml_contact}} but using this is
+#' fine.
+#'
+#' @param type
+#' @param given_names
+#' @param sur_name
+#' @param organization
+#' @param position
+#' @param email
+#' @param phone
+#' @param address
+#' @param role
+#'
+#' @return The party set in \code{type}
+#' @export
+#'
+#' @examples
+#' eml_party("creator", "Test", "User)
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
                       sur_name=NULL,
