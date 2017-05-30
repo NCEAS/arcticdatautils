@@ -721,7 +721,15 @@ get_all_versions <- function(node, pid) {
   sm <- getSystemMetadata(node, pid)
 
   while (!is.na(sm@obsoletes)) {
+    oldsm <- sm # Save a copy for better warning messages
     sm <- getSystemMetadata(node, sm@obsoletes)
+
+    if (is.null(sm)) {
+      warning(call. = FALSE,
+              paste0("An incomplete version chain has been returned. ", oldsm@identifier, " obsoletes ", oldsm@obsoletes, " but ", oldsm@obsoletes, " could not be found. This can be due to the object not existing or not having correct permission to view it."))
+      break
+    }
+
     pids <- c(sm@identifier, pids)
   }
 
@@ -729,7 +737,15 @@ get_all_versions <- function(node, pid) {
   sm <- getSystemMetadata(node, pid)
 
   while (!is.na(sm@obsoletedBy)) {
+    oldsm <- sm # Save a copy for better warning messages
     sm <- getSystemMetadata(node, sm@obsoletedBy)
+
+    if (is.null(sm)) {
+      warning(call. = FALSE,
+              paste0("An incomplete version chain has been returned. ", oldsm@identifier, " is obsoleted by ", oldsm@obsoletedBy, " but ", oldsm@obsoletedBy, " could not be found. This can be due to the object not existing or not having correct permission to view it."))
+      break
+    }
+
     pids <- c(pids, sm@identifier)
   }
 
