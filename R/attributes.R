@@ -16,8 +16,19 @@ get_ncdf4_attributes <- function(nc) {
   if (is.character(nc)) {
     nc <- ncdf4::nc_open(nc)
   }
+  dims <- nc$dim
 
-  attributes <- names(nc$var)
+
+  unitlist <- c()
+  for (i in 1:length(dims)){
+    unitlist[i] <- dims[[i]]$units
+  }
+  inds <- which(unitlist != '')
+  dims <- dims[inds]
+
+
+  attributes <- c(names(nc$var), attributes(dims)$names)
+
   result <- data.frame(attributeName=NA)
 
   for (i in seq_along(attributes)) {
