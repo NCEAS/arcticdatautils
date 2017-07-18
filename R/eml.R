@@ -213,7 +213,7 @@ set_other_entities <- function(mn, path, pids) {
   message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
 
   # Generate otherEntity elements
-  other_entities <- pid_to_other_entity(mn, pids)
+  other_entities <- pid_to_eml_other_entity(mn, pids)
 
   # Concatenate the existing and new otherEntity elements and put back in the
   # EML
