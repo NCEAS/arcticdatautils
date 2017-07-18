@@ -211,6 +211,10 @@ test_that("extra statements are maintained between updates", {
 
 
 test_that("rightsholder is properly set back after publishing an update", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
   pkg <- create_dummy_package(mn)
 
   set_result <- set_rights_holder(mn, unlist(pkg), "CN=arctic-data-admins,DC=dataone,DC=org")

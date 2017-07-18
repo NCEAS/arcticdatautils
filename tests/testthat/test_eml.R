@@ -8,7 +8,7 @@ test_that("an EML otherEntity subtree can be created when the sysmeta has a file
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
 
-  other_entity <- sysmeta_to_other_entity(sysmeta)[[1]]
+  other_entity <- sysmeta_to_eml_other_entity(sysmeta)[[1]]
 
   # Check some rough properties of the subtree
   expect_is(other_entity, "otherEntity")
@@ -22,7 +22,7 @@ test_that("an EML otherEntity subtree can be created when the sysmeta doesn't ha
   sysmeta <- new("SystemMetadata")
   sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
 
-  other_entity <- sysmeta_to_other_entity(sysmeta)[[1]]
+  other_entity <- sysmeta_to_eml_other_entity(sysmeta)[[1]]
 
   # Check some rough properties of the subtree
   expect_is(other_entity, "otherEntity")
@@ -88,7 +88,7 @@ test_that("a project can be created", {
   expect_equal(project@title[[1]]@.Data, "some title")
   expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "a")
   expect_equal(project@personnel[[1]]@individualName[[1]]@surName@.Data, "user")
-  expect_equal(project@funding@para[[1]]@.Data[[1]], "12345")
+  expect_equal(xml2::xml_text(project@funding@para[[1]]@.Data[[1]]), "12345")
 })
 
 
@@ -96,8 +96,8 @@ test_that("a project can be created with multiple awards", {
   project <- eml_project("some title", c("12345", "54321"), "a", "user")
 
   expect_length(project@funding@para, 2)
-  expect_equal(project@funding@para[[1]]@.Data[[1]], "12345")
-  expect_equal(project@funding@para[[2]]@.Data[[1]], "54321")
+  expect_equal(xml2::xml_text(project@funding@para[[1]]@.Data[[1]]), "12345")
+  expect_equal(xml2::xml_text(project@funding@para[[2]]@.Data[[1]]), "54321")
 })
 
 test_that("a project can be created with multiple organizations", {
