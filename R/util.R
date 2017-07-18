@@ -1092,7 +1092,7 @@ show_indexing_status <- function(mn, pids) {
   stopifnot(is.character(pids),
             length(pids) > 0)
 
-  expected_pids <- unlist(pkg, use.names = FALSE)
+  expected_pids <- unlist(pids, use.names = FALSE)
   indexed_pids <- c() # Accumulates the PIDs we find in the index
 
   pb <- txtProgressBar(min = 0, max = length(expected_pids), style = 3)
