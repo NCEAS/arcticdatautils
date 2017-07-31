@@ -131,7 +131,8 @@ clear_replication_policy <- function(sysmeta) {
   }
 
   slot(sysmeta, "replicationAllowed") <- FALSE
-  slot(sysmeta, "numberReplicas") <- 3
+  slot(sysmeta, "numberReplicas") <- 0
+  slot(sysmeta, "blockedNodes") <- list('urn:node:KNB', 'urn:node:mnUCSB1')
 
   sysmeta
 }
