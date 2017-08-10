@@ -241,9 +241,41 @@ publish_update <- function(mn,
   }
 
   # Do a simple sanity check on the PIDs passed in
+  stopifnot(is.character(metadata_pid))
+  stopifnot(is.character(resource_map_pid))
+
+  if (!is.null(data_pids)) {
+    stopifnot(all(is.character(data_pids)))
+  }
+
+  if (!is.null(child_pids)) {
+    stopifnot(all(is.character(child_pids)))
+  }
+
+  if (!is.null(identifier)) {
+    stopifnot(is.character(identifier))
+  }
+
+  if (!is.null(parent_resmap_pid)) {
+    stopifnot(is.character(parent_resmap_pid))
+  }
+
+  if (!is.null(parent_metadata_pid)) {
+    stopifnot(is.character(parent_metadata_pid))
+  }
+
+  if (!is.null(parent_data_pids)) {
+    stopifnot(all(is.character(parent_data_pids)))
+  }
+
+  if (!is.null(parent_child_pids)) {
+    stopifnot(all(is.character(parent_child_pids)))
+  }
+
   all_pids <- c(metadata_pid, resource_map_pid, data_pids, child_pids,
                 identifier, parent_resmap_pid, parent_metadata_pid,
                 parent_data_pids, parent_child_pids)
+
   duped <- duplicated(all_pids)
 
   if (any(duped)) {

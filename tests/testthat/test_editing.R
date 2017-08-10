@@ -227,3 +227,8 @@ test_that("rightsholder is properly set back after publishing an update", {
 
   expect_true(all(unlist(rhs) == "CN=arctic-data-admins,DC=dataone,DC=org"))
 })
+
+test_that("publish update returns an error if its arguments are malformed", {
+  expect_error(publish_update(mn, metadata_pid = 1))
+  expect_error(publish_update(mn, metadata_pid = "a", resource_map_pid = "b", data_pids = list(1, 2, 3)))
+})
