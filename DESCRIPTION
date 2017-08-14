@@ -3,7 +3,8 @@ Title: Arctic Data Utilities
 Version: 0.6
 Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
-  person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb")
+  person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb"),
+  person("Jeanette", "Clark", email = "jclark@nceas.ucsb.edu", role = "ctb")
   )
 Description: This package provides a set of utility methods for uploading
   and  editing data on the Arctic Data Catalog.
