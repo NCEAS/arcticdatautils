@@ -167,6 +167,9 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
   slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
   sysmeta@fileName <- basename(path)
 
+  # Set the replication policy back to default
+  sysmeta <- clear_replication_policy(sysmeta)
+
   # Make the update
   dataone::updateObject(mn,
                         pid = pid,
@@ -380,20 +383,20 @@ publish_update <- function(mn,
                                   obsoletes = metadata_pid,
                                   fileName = metadata_sysmeta@fileName)
 
-  # Temporarily clear out the replication policy to work around NCEI not being
-  # Tier 4 MN
-  metadata_updated_sysmeta <- clear_replication_policy(metadata_updated_sysmeta)
-
   # Set the SID if one existed on old metadata object
   if (!is.na(metadata_sysmeta@seriesId)) {
     metadata_updated_sysmeta@seriesId <- metadata_sysmeta@seriesId
   }
 
+  # Copy access and replication details from object we're updating
   metadata_updated_sysmeta@accessPolicy <- metadata_sysmeta@accessPolicy
   metadata_updated_sysmeta@replicationAllowed <- metadata_sysmeta@replicationAllowed
   metadata_updated_sysmeta@numberReplicas <- metadata_sysmeta@numberReplicas
   metadata_updated_sysmeta@preferredNodes <- metadata_sysmeta@preferredNodes
   metadata_updated_sysmeta@blockedNodes <- metadata_sysmeta@blockedNodes
+
+  # Set the replication information to the defaults
+  metadata_updated_sysmeta <- clear_replication_policy(metadata_updated_sysmeta)
 
   if (public) {
     # Make the metadata public
@@ -655,6 +658,9 @@ update_resource_map <- function(mn,
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
   new_rm_sysmeta@obsoletes <- resource_map_pid
   slot(new_rm_sysmeta, "obsoletedBy", check = FALSE) <- NA
+
+  # Set the replication policy back to default
+  new_rm_sysmeta <- clear_replication_policy(new_rm_sysmeta)
 
   new_rm_sysmeta <- add_admin_group_access(new_rm_sysmeta)
 
