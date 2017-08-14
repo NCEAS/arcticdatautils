@@ -8,6 +8,7 @@ test_that("get_package works for a simple package", {
   }
 
   pkg <- create_dummy_package(mn)
+  Sys.sleep(1)
   get_pkg <- get_package(mn, pkg$metadata)
 
   expect_true(pkg$metadata == get_pkg$metadata)
