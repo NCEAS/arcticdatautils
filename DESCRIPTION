@@ -1,6 +1,6 @@
 Package: arcticdatautils
 Title: Arctic Data Utilities
-Version: 0.5.13
+Version: 0.6
 Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
   person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb")
