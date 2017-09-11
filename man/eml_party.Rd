@@ -25,7 +25,7 @@ eml_party(type = "associatedParty", given_names = NULL, sur_name = NULL,
 
 \item{address}{(character) The party's address(es)}
 
-\item{userId}{(character) The party's userId, eg: LDAP or ORCID}
+\item{userId}{(character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ}
 
 \item{role}{(character) The party's role}
 }
