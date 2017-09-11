@@ -323,6 +323,8 @@ clear_methods <- function(doc) {
 #'\code{\link{eml_creator}} and \code{\link{eml_contact}} but using this is
 #' fine.
 #'
+#' The \code{userId} argument assumes an ORCID so be sure to adjust for that.
+#'
 #' @param type (character) The type of party (e.g. 'contact')
 #' @param given_names (character) The party's given name(s)
 #' @param sur_name (character) The party's surname
@@ -339,6 +341,7 @@ clear_methods <- function(doc) {
 #'
 #' @examples
 #' eml_party("creator", "Test", "User)
+#' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
                       sur_name=NULL,
@@ -347,7 +350,7 @@ eml_party <- function(type="associatedParty",
                       email=NULL,
                       phone=NULL,
                       address=NULL,
-                      userId = NULL,
+                      userId=NULL,
                       role=NULL) {
   if (all(sapply(c(sur_name, organization, position), is.null))) {
     stop(call. = FALSE,
@@ -403,8 +406,12 @@ eml_party <- function(type="associatedParty",
 
   # userId
   if (!is.null(userId)) {
-    party@userId <- c(new("userId", .Data = userId, directory="https://orcid.org"))
-    #need to put warning statement here
+    # Warn if the userId doesn't look like an ORCID
+    if (!grepl("^https:\\/\\/orcid\\.org", userId)) {
+      warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
+    }
+
+    party@userId <- c(new("userId", .Data = userId, directory = "https://orcid.org"))
   }
 
   # Role

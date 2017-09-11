@@ -37,3 +37,6 @@ You usually will want to use the high-level functions such as
 \code{\link{eml_creator}} and \code{\link{eml_contact}} but using this is
 fine.
 }
+\details{
+The \code{userId} argument assumes an ORCID so be sure to adjust for that.
+}
