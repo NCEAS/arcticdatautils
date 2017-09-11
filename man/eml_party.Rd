@@ -6,7 +6,7 @@
 \usage{
 eml_party(type = "associatedParty", given_names = NULL, sur_name = NULL,
   organization = NULL, position = NULL, email = NULL, phone = NULL,
-  address = NULL, role = NULL)
+  address = NULL, userId = NULL, role = NULL)
 }
 \arguments{
 \item{type}{(character) The type of party (e.g. 'contact')}
@@ -24,6 +24,8 @@ eml_party(type = "associatedParty", given_names = NULL, sur_name = NULL,
 \item{phone}{(character) The party's phone number(s)}
 
 \item{address}{(character) The party's address(es)}
+
+\item{userId}{(character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ}
 
 \item{role}{(character) The party's role}
 }

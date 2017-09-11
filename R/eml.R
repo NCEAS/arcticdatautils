@@ -331,6 +331,7 @@ clear_methods <- function(doc) {
 #' @param email (character) The party's email address(es)
 #' @param phone (character) The party's phone number(s)
 #' @param address (character) The party's address(es)
+#' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ
 #' @param role (character) The party's role
 #'
 #' @return An instance of the party specified by the in \code{type} argument
@@ -346,6 +347,7 @@ eml_party <- function(type="associatedParty",
                       email=NULL,
                       phone=NULL,
                       address=NULL,
+                      userId = NULL,
                       role=NULL) {
   if (all(sapply(c(sur_name, organization, position), is.null))) {
     stop(call. = FALSE,
@@ -397,6 +399,12 @@ eml_party <- function(type="associatedParty",
     }
 
     party@phone <- phone
+  }
+
+  # userId
+  if (!is.null(userId)) {
+    party@userId <- c(new("userId", .Data = userId, directory="https://orcid.org"))
+    #need to put warning statement here
   }
 
   # Role
