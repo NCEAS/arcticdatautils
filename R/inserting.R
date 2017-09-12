@@ -47,7 +47,7 @@ create_from_folder <- function(mn, path, data_pids=NULL) {
         publish_object(mn, data_path, data_format_ids[data_path])
       },
       error = function(e) {
-        log_message(e)
+        message(e)
         e
       })
 

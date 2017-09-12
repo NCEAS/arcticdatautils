@@ -33,11 +33,11 @@ set_rights_holder <- function(mn, pids, subject) {
 
     # Change rightsHolder (if needed)
     if (sysmeta@rightsHolder == subject) {
-      log_message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
+      message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
       result[i] <- TRUE
     } else {
       # Update System Metadata
-      log_message(paste0("Updating rightsHolder for PID ", pid, " from ", sysmeta@rightsHolder, " to ", subject, "."))
+      message(paste0("Updating rightsHolder for PID ", pid, " from ", sysmeta@rightsHolder, " to ", subject, "."))
 
       sysmeta@rightsHolder <- subject
 
@@ -47,7 +47,7 @@ set_rights_holder <- function(mn, pids, subject) {
                                       sysmeta = sysmeta)
       },
       error = function(e) {
-        log_message(e)
+        message(e)
         e
       })
 
@@ -103,10 +103,10 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
 
     if (changed) {
       result[pid] <- TRUE
-      log_message(paste0("Updating System Metadata for ", pid, "."))
+      message(paste0("Updating System Metadata for ", pid, "."))
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     } else {
-      log_message(paste0("No changes needed for ", pid, ". Not updating."))
+      message(paste0("No changes needed for ", pid, ". Not updating."))
       result[pid] <- FALSE
     }
   }
@@ -154,8 +154,8 @@ remove_public_read <- function(mn, pids) {
       dataone::getSystemMetadata(mn, pid)
     },
     error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
-      log_message(e)
+      message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
+      message(e)
       e
     })
 
@@ -167,13 +167,13 @@ remove_public_read <- function(mn, pids) {
     changed <- FALSE
 
     if (!datapack::hasAccessRule(sysmeta, "public", "read")) {
-      log_message(paste0("Skipping setting public read because ", pid, " is not public."))
+      message(paste0("Skipping setting public read because ", pid, " is not public."))
       next
     }
 
     changed <- TRUE
 
-    log_message(paste0("Removing public read access on ", pid, "."))
+    message(paste0("Removing public read access on ", pid, "."))
     sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)),]
 
     # Update the sysmeta
@@ -181,8 +181,8 @@ remove_public_read <- function(mn, pids) {
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     },
     error = function(e) {
-      log_message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
-      log_message(e)
+      message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
+      message(e)
       e
     })
 
@@ -230,8 +230,8 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
       dataone::getSystemMetadata(mn, pid)
     },
     error = function(e) {
-      log_message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
-      log_message(e)
+      message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
+      message(e)
       e
     })
 
@@ -246,33 +246,33 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
     if (subject != sysmeta@rightsHolder) {
       changed <- TRUE
 
-      log_message(paste0("Setting rights holder to ", subject, "."))
+      message(paste0("Setting rights holder to ", subject, "."))
       sysmeta@rightsHolder <- subject
     } else {
-      log_message(paste0("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n"))
+      message(paste0("Skipping setting rightsHolder as rightsHolder is already ", sysmeta@rightsHolder, ".\n"))
     }
 
     for (permission in permissions) {
       if (datapack::hasAccessRule(sysmeta, subject, permission)) {
-        log_message(paste0("Skipping the addition of permission '", permission, "' for subject '", subject, "'\n"))
+        message(paste0("Skipping the addition of permission '", permission, "' for subject '", subject, "'\n"))
         next
       }
 
       changed <- TRUE
 
-      log_message(paste0("Adding permission '", permission, "' for subject '", subject, "'\n"))
+      message(paste0("Adding permission '", permission, "' for subject '", subject, "'\n"))
       sysmeta <- datapack::addAccessRule(sysmeta, subject, permission)
     }
 
     if (changed == TRUE) {
-      log_message(paste0("Updating System Metadata for ", pid, "."))
+      message(paste0("Updating System Metadata for ", pid, "."))
 
       update_response <- tryCatch({
         dataone::updateSystemMetadata(mn, pid, sysmeta)
       },
       error = function(e) {
-        log_message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
-        log_message(e)
+        message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
+        message(e)
         e
       })
 
@@ -280,7 +280,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
         stop("Failed update.")
       }
     } else {
-      log_message(paste0("No changes needed for ", pid, "."))
+      message(paste0("No changes needed for ", pid, "."))
     }
 
     # Save the result for this PID

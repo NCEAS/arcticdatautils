@@ -36,7 +36,7 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
-  log_message(paste0("Creating metadata ", pid))
+  message(paste0("Creating metadata ", pid))
   pid <- dataone::createObject(mn, pid, metadata_file, sysmeta)
 
   # Remove the temporary EML File
@@ -77,7 +77,7 @@ create_dummy_object <- function(mn) {
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
-  log_message(paste0("Creating object ", pid))
+  message(paste0("Creating object ", pid))
   create_response <- dataone::createObject(mn, pid, tmp, sysmeta)
 
   file.remove(tmp)
@@ -134,7 +134,7 @@ create_dummy_package <- function(mn, size = 2) {
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
-  log_message(paste0("Creating resource map ", pid))
+  message(paste0("Creating resource map ", pid))
   resource_map_pid <- dataone::createObject(mn, pid, resmap_path, sysmeta)
 
   list(metadata = meta_pid,
@@ -178,7 +178,7 @@ create_dummy_parent_package <- function(mn, children) {
   sysmeta <- add_admin_group_access(sysmeta)
   sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
 
-  log_message(paste0("Creating parent package map ", pid))
+  message(paste0("Creating parent package map ", pid))
   create_response <- createObject(mn, pid, resmap_path, sysmeta)
 
   list(parent = create_response,

@@ -67,7 +67,7 @@ remove_public_access <- function(sysmeta) {
 #' @examples
 add_admin_group_access <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {
-    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+    message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
     return(sysmeta)
   }
 
@@ -97,7 +97,7 @@ replace_subject <- function(sysmeta,
                             from="cn=arctic-data-admins,dc=dataone,dc=org",
                             to="CN=arctic-data-admins,DC=dataone,DC=org") {
   if (!inherits(sysmeta, "SystemMetadata")) {
-    log_message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+    message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
     return(sysmeta)
   }
 

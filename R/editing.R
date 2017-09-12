@@ -56,7 +56,7 @@ publish_object <- function(mn,
 
   # Get the clone_pid sysmeta to use for the rightsHolder and accessPolicy, and replicationPolicy
   if (!is.null(clone_pid)) {
-    log_message(paste0("Cloning System Metadata for new object from ", clone_pid, "."))
+    message(paste0("Cloning System Metadata for new object from ", clone_pid, "."))
     clone_sysmeta <- dataone::getSystemMetadata(mn, clone_pid)
   }
 
@@ -80,7 +80,7 @@ publish_object <- function(mn,
   sysmeta <- clear_replication_policy(sysmeta)
 
   if (!is.null(sid)) {
-    log_message(paste0("Setting SID to '", sid, "'."))
+    message(paste0("Setting SID to '", sid, "'."))
     sysmeta@seriesId <- sid
   }
 
@@ -143,7 +143,7 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
          paste0("The format_id of '", format_id, "' is not a valid format ID. See https://cn.dataone.org/cn/v2/formats for the current list. This package stores a copy and may be out of date with that list so please email the author if needed."))
   }
 
-  log_message(paste0("Updating object ", pid, " with the file at ", path, "."))
+  message(paste0("Updating object ", pid, " with the file at ", path, "."))
 
   # Generate a PID if needed
   if (is.null(new_pid)) {
@@ -321,7 +321,7 @@ publish_update <- function(mn,
   # Get some things from the node
   if (is.null(metadata_path)) {
     # Get the metadata doc
-    log_message("Getting metadata from the MN.")
+    message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
   } else {
     # Alternatively, read an edited metadata file from disk if provided
@@ -329,27 +329,27 @@ publish_update <- function(mn,
       stop(paste0("Metadata doesn't exist: ", metadata_path))
     }
 
-    log_message(paste0("Getting metadata from the path: ", metadata_path, "."))
+    message(paste0("Getting metadata from the path: ", metadata_path, "."))
     eml <- EML::read_eml(metadata_path)
   }
 
   # get the metadata sysmeta from the node
   metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
 
-  log_message("Downloaded EML and sysmeta...")
+  message("Downloaded EML and sysmeta...")
 
   # Generate PIDs for our updated objects
   if (is.null(identifier)) {
     if (use_doi) {
-      log_message("Minting a new DOI")
+      message("Minting a new DOI")
       metadata_updated_pid <- dataone::generateIdentifier(mn, scheme = "DOI")
-      log_message(paste0("Minted a new DOI of ", metadata_updated_pid, "."))
+      message(paste0("Minted a new DOI of ", metadata_updated_pid, "."))
     } else {
       metadata_updated_pid <- new_uuid()
-      log_message(paste0("Using generated UUID PID of ", metadata_updated_pid, "."))
+      message(paste0("Using generated UUID PID of ", metadata_updated_pid, "."))
     }
   } else {
-    log_message(paste0("Using manually-specified identifier of ", identifier, "."))
+    message(paste0("Using manually-specified identifier of ", identifier, "."))
     metadata_updated_pid <- identifier
   }
 
@@ -428,7 +428,7 @@ publish_update <- function(mn,
                     metadata_pid,
                     metadata_sysmeta@rightsHolder)
 
-  log_message(paste0("Updated metadata document ", metadata_pid, " with ", metadata_updated_pid, "."))
+  message(paste0("Updated metadata document ", metadata_pid, " with ", metadata_updated_pid, "."))
 
   # Update the resource map
   #########################
@@ -443,7 +443,7 @@ publish_update <- function(mn,
 
   set_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
-  log_message("Updated resource map")
+  message("Updated resource map")
 
   # Update the parent resource map to add the new package
   #######################################################
@@ -452,12 +452,12 @@ publish_update <- function(mn,
       stop("Missing required parameters to update parent package.")
     }
 
-    log_message("Updating parent resource map...")
+    message("Updating parent resource map...")
 
     # Check to see if the just-updated package is in the list of
     # parent_child_pids, notify the user, and add it to the list
     if (!(resmap_updated_pid %in% parent_child_pids)) {
-      log_message("Adding the new resource map to the list of child PIDs in the parent package.")
+      message("Adding the new resource map to the list of child PIDs in the parent package.")
       parent_child_pids <- c(parent_child_pids, resmap_updated_pid)
     }
 
@@ -514,7 +514,7 @@ create_resource_map <- function(mn,
             nchar(metadata_pid) > 0)
 
   if (check_first) {
-    log_message("Checking all the object passed in as arguments exist before going on...")
+    message("Checking all the object passed in as arguments exist before going on...")
 
     stopifnot(object_exists(mn, metadata_pid))
     if (!is.null(data_pids))
@@ -598,7 +598,7 @@ update_resource_map <- function(mn,
             nchar(metadata_pid) > 0)
 
   if (check_first) {
-    log_message("Checking all the object passed in as arguments exist before going on...")
+    message("Checking all the object passed in as arguments exist before going on...")
 
     stopifnot(object_exists(mn, resource_map_pid))
     stopifnot(object_exists(mn, metadata_pid))
@@ -646,7 +646,7 @@ update_resource_map <- function(mn,
 
   rm(sysmeta)
 
-  log_message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
+  message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(class(sysmeta) == "SystemMetadata")
 
@@ -671,7 +671,7 @@ update_resource_map <- function(mn,
   }
 
   # Update it
-  log_message(paste0("Updating resource map..."))
+  message(paste0("Updating resource map..."))
   resmap_update_response <- dataone::updateObject(mn,
                                                   pid = resource_map_pid,
                                                   newpid = identifier,
@@ -686,7 +686,7 @@ update_resource_map <- function(mn,
     file.remove(new_rm_path)
   }
 
-  log_message(paste0("Successfully updated ", resource_map_pid, " with ", identifier, "."))
+  message(paste0("Successfully updated ", resource_map_pid, " with ", identifier, "."))
 
   return(resmap_update_response)
 }

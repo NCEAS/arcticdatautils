@@ -27,7 +27,7 @@ insert_file <- function(inventory, file, env=NULL) {
   validate_environment(env)
 
   if (is_token_expired(env$mn)) {
-    log_message("Token is expired. Returning un-modified inventory.")
+    message("Token is expired. Returning un-modified inventory.")
     return(inventory)
   }
 
@@ -42,7 +42,7 @@ insert_file <- function(inventory, file, env=NULL) {
     identifier_scheme <- env$data_identifier_scheme
   }
 
-  log_message(paste0("Using identifier scheme ", identifier_scheme, "."))
+  message(paste0("Using identifier scheme ", identifier_scheme, "."))
 
   # Determine the PID to use
   inventory_file[1,"pid"] <- get_or_create_pid(inventory_file[1,],
@@ -50,7 +50,7 @@ insert_file <- function(inventory, file, env=NULL) {
                                                scheme = identifier_scheme)
 
   if (is.na(inventory_file[1,"pid"])) {
-    log_message(paste0("PID was NA for file ", file, ".\n"))
+    message(paste0("PID was NA for file ", file, ".\n"))
     return(inventory_file)
   }
 
@@ -61,7 +61,7 @@ insert_file <- function(inventory, file, env=NULL) {
                             env$rights_holder)
 
   if (is.null(sysmeta)) {
-    log_message(paste0("System Metadata creation failed for file ", file, ".\n"))
+    message(paste0("System Metadata creation failed for file ", file, ".\n"))
     return(inventory_file)
   }
 
@@ -73,7 +73,7 @@ insert_file <- function(inventory, file, env=NULL) {
   }
 
   if (inventory_file[1,"created"] == FALSE) {
-    log_message(paste0("Object creation failed for file ", file, ".\n"))
+    message(paste0("Object creation failed for file ", file, ".\n"))
     return(inventory_file)
   }
 
@@ -106,7 +106,7 @@ insert_package <- function(inventory, package, env=NULL) {
   validate_environment(env)
 
   if (is_token_expired(env$mn)) {
-    log_message("Token is expired. Returning un-modified inventory.")
+    message("Token is expired. Returning un-modified inventory.")
     return(inventory)
   }
 
@@ -148,7 +148,7 @@ insert_package <- function(inventory, package, env=NULL) {
                                                          scheme = env$metadata_identifier_scheme)
 
     if (is.na(files[files_idx_metadata,"pid"])) {
-      log_message(paste0("Metadata PID was NA for package ", package, ".\n"))
+      message(paste0("Metadata PID was NA for package ", package, ".\n"))
       return(files)
     }
 
@@ -159,7 +159,7 @@ insert_package <- function(inventory, package, env=NULL) {
                                        env$rights_holder)
 
     if (is.null(metadata_sysmeta)) {
-      log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
+      message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
       return(files)
     }
 
@@ -177,11 +177,11 @@ insert_package <- function(inventory, package, env=NULL) {
     }
 
     if (files[files_idx_metadata,"created"] == FALSE) {
-      log_message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
+      message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
       return(files)
     }
   } else {
-    log_message("Skipped creating metadata because it was already created.")
+    message("Skipped creating metadata because it was already created.")
   }
 
   # Insert data files if needed
@@ -190,11 +190,11 @@ insert_package <- function(inventory, package, env=NULL) {
     for (data_idx in files_idx_data) {
       # Skip if already created
       if (files[data_idx,"created"] == TRUE) {
-        log_message(paste0("File ", files[data_idx,"filename"], " in package ", package, " already created. Moving on to the next data object.\n"))
+        message(paste0("File ", files[data_idx,"filename"], " in package ", package, " already created. Moving on to the next data object.\n"))
         next
       }
 
-      log_message(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
+      message(paste0("Processing data index ", data_idx, " in package ", package, "\n"))
 
       # Determine the PID to use for the data
       files[data_idx,"pid"] <- get_or_create_pid(files[data_idx,],
@@ -202,7 +202,7 @@ insert_package <- function(inventory, package, env=NULL) {
                                                  scheme = env$data_identifier_scheme)
 
       if (is.na(files[data_idx,"pid"])) {
-        log_message(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
+        message(paste0("Data PID was NA for file ", files[data_idx,'filename'], " in package ", package, ". Stopping early.\n"))
         return(files)
       }
 
@@ -213,7 +213,7 @@ insert_package <- function(inventory, package, env=NULL) {
                                      env$rights_holder)
 
       if (is.null(metadata_sysmeta)) {
-        log_message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
+        message(paste0("System Metadata creation failed for metadata object in package ", package, ".\n"))
         return(files)
       }
 
@@ -226,35 +226,35 @@ insert_package <- function(inventory, package, env=NULL) {
       }
 
       if (files[data_idx,"created"] == FALSE) {
-        log_message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
+        message(paste0("Object creation failed for metadata object in package ", package, ".\n"))
         return(files)
       }
     }
   } else {
-    log_message("Skipped creating data files because they were all created.")
+    message("Skipped creating data files because they were all created.")
   }
 
   # At this point, all of the metadata and data should be created, let's check
   if (!all(is.character(files[,"pid"])) && !all(files[,"created"] == TRUE)) {
-    log_message(paste0("Not all files in package ", package, " have PIDs and are created. Skipping Resource Map creation.\n"))
+    message(paste0("Not all files in package ", package, " have PIDs and are created. Skipping Resource Map creation.\n"))
     return(files)
   }
 
   # Generate and create() the Resource Map
-  log_message(paste0("Generating resource map for package ", package, ".\n"))
+  message(paste0("Generating resource map for package ", package, ".\n"))
   resource_map_pid <- generate_resource_map_pid(files[files_idx_metadata,"pid"])
   resource_map_filepath <- generate_resource_map(files[files_idx_metadata,"pid"],
                                                  files[files_idx_data,"pid"],
                                                  child_pids)
 
-  log_message(paste0("Resource map PID is ", resource_map_pid, " for package with metadata file ", files[files_idx_metadata,"file"], ".\n"))
+  message(paste0("Resource map PID is ", resource_map_pid, " for package with metadata file ", files[files_idx_metadata,"file"], ".\n"))
 
   resource_map_format_id <- "http://www.openarchives.org/ore/terms"
   resource_map_checksum <- digest::digest(resource_map_filepath, algo = "sha256")
   resource_map_size_bytes <- file.info(resource_map_filepath)$size
   resource_map_file_name <- paste0(stringr::str_replace_all(resource_map_pid, ":", "_"), ".xml")
 
-  log_message(paste0("Generating system metadata for resource map for package ", package, ".\n"))
+  message(paste0("Generating system metadata for resource map for package ", package, ".\n"))
   resource_map_sysmeta <- new("SystemMetadata",
                               identifier = resource_map_pid,
                               formatId = resource_map_format_id,
@@ -271,7 +271,7 @@ insert_package <- function(inventory, package, env=NULL) {
 
   resource_map_sysmeta <- add_access_rules(resource_map_sysmeta)
 
-  log_message(paste0("Creating resource map for package ", package, ".\n"))
+  message(paste0("Creating resource map for package ", package, ".\n"))
   create_resource_map_response <- NULL
   create_resource_map_response <- tryCatch({
     dataone::createObject(env$mn,
@@ -280,8 +280,8 @@ insert_package <- function(inventory, package, env=NULL) {
                           sysmeta = resource_map_sysmeta)
   },
   error = function(e) {
-    log_message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
-    log_message(e$message)
+    message(paste0("Error encountered while calling create() on the Resource Map for package ", package, ".\n"))
+    message(e$message)
     e
   }
   )
@@ -295,7 +295,7 @@ insert_package <- function(inventory, package, env=NULL) {
     files$resmap_created <- TRUE
   }
 
-  log_message(print(files))
+  message(print(files))
 
   return(files)
 }
@@ -522,11 +522,11 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 
   # Check if the existing PID is a valid one
   if (!is.na(pid) && is.character(pid) && nchar(pid) > 0) {
-    log_message(paste0("Using existing PID of ", pid, "\n"))
+    message(paste0("Using existing PID of ", pid, "\n"))
     return(pid)
   }
 
-  log_message(paste0("Minting new PID with scheme ", scheme, "\n"))
+  message(paste0("Minting new PID with scheme ", scheme, "\n"))
 
   if (scheme == "UUID") {
     pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
@@ -538,8 +538,8 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
         dataone::generateIdentifier(mn, scheme)
       },
       error = function(e) {
-        log_message(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
-        log_message(e$message)
+        message(paste0("Error generating identifier for file ", file[1,"file"], ".\n"))
+        message(e$message)
         e
       }
     )
@@ -613,8 +613,8 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 
     },
     error = function(e) {
-      log_message(paste0("Error generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
-      log_message(e$message)
+      message(paste0("Error generated during the call to create_sysmeta() for the metadata file ", file[1,"file"], "\n"))
+      message(e$message)
       e
     }
   )
@@ -673,8 +673,8 @@ create_object <- function(file, sysmeta, base_path, mn) {
                             sysmeta = sysmeta)
     },
     error = function(e) {
-      log_message(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
-      log_message(e$message)
+      message(paste0("Error generated during the call to MNStorage.create() for the metadata file ", file[1,"file"], "\n"))
+      message(e$message)
       e
     })
 
@@ -689,14 +689,14 @@ create_object <- function(file, sysmeta, base_path, mn) {
   # Print out the insert rate
   time_diff_sec <- round(as.numeric(Sys.time() - before_time, "secs"), 2)
   mb_per_s <- round(file_size_mb / time_diff_sec, 2)
-  log_message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
+  message(paste0("Inserted ", file_size_mb, " MB in ", time_diff_sec, " s (", mb_per_s, " MB/s)\n"))
 
   if (is.character(response) && nchar(response) > 0) {
     result <- TRUE
-    log_message(paste0("Successfully created object with PID ", response, " for file ", file[1,"file"], ".\n"))
+    message(paste0("Successfully created object with PID ", response, " for file ", file[1,"file"], ".\n"))
   } else {
     result <- FALSE
-    log_message(paste0("Failed to created object with PID ", response, " for file ", file[1,"file"], ".\n"))
+    message(paste0("Failed to created object with PID ", response, " for file ", file[1,"file"], ".\n"))
   }
 
   result
@@ -830,7 +830,7 @@ update_package <- function(inventory,
 
   # Check the token
   if (is_token_expired(env$mn)) {
-    log_message("Token is expired. Returning un-modified inventory.")
+    message("Token is expired. Returning un-modified inventory.")
     return(package_files)
   }
 
@@ -839,28 +839,28 @@ update_package <- function(inventory,
   data_file_idx <- which(package_files$is_metadata == FALSE)
   stopifnot(length(metadata_file_idx) == 1)
 
-  log_message(paste0("Updating package ", package, "\n"))
+  message(paste0("Updating package ", package, "\n"))
 
   # Find the converted EML documente
   if (!file.exists(env$alternate_path)) {
-    log_message(paste0("Alternate path location of ", env$alternate_path, " does not exist. Returning.\n"))
+    message(paste0("Alternate path location of ", env$alternate_path, " does not exist. Returning.\n"))
     return(package_files)
   }
 
   eml_file_path <- path_join(c(env$alternate_path, package_files[metadata_file_idx,"file"]))
 
   if (!file.exists(eml_file_path)) {
-    log_message(paste0("EML file not found at path ", eml_file_path, ".\n"))
+    message(paste0("EML file not found at path ", eml_file_path, ".\n"))
     return(package_files)
   }
 
-  log_message(paste0("Converted document is at ", eml_file_path, "\n"))
+  message(paste0("Converted document is at ", eml_file_path, "\n"))
 
   # Get a new PID and replace the packageId
   new_pid <- package_files[metadata_file_idx,"pid"]
   old_pid <- package_files[metadata_file_idx,"pid_old"]
 
-  log_message(paste0("Updating object with old PID ", old_pid, " with new PID ", new_pid, ".\n"))
+  message(paste0("Updating object with old PID ", old_pid, " with new PID ", new_pid, ".\n"))
 
   stopifnot(!is.na(new_pid),
             is.character(new_pid),
@@ -878,12 +878,12 @@ update_package <- function(inventory,
   # Call MNStorage.update on the metadata object
   # Does this PID even exist? Stop now if it doesn't.
   if (!object_exists(env$mn_base_url, old_pid)) {
-    log_message(paste0("Object with PID ", old_pid, " not found. Returning package.\n"))
+    message(paste0("Object with PID ", old_pid, " not found. Returning package.\n"))
     return(package_files)
   }
 
   # Update the object if it doesn't exist on the MN
-  log_message(paste0("Checking if metadata object with pid ", new_pid, " already exists.\n"))
+  message(paste0("Checking if metadata object with pid ", new_pid, " already exists.\n"))
 
   if (!object_exists(env$mn_base_url, new_pid)) {
     sysmeta <- new("SystemMetadata",
@@ -910,8 +910,8 @@ update_package <- function(inventory,
                             sysmeta = sysmeta)
     },
     error = function(e) {
-      log_message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
-      log_message(e)
+      message(paste0("Error produced during call to updateObject for metadata ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+      message(e)
       e
     })
 
@@ -923,10 +923,10 @@ update_package <- function(inventory,
     # Set the updated flag to TRUE
     package_files$updated <- TRUE
 
-    log_message(paste0("Inserted updated metadata object for package ", package, "\n"))
+    message(paste0("Inserted updated metadata object for package ", package, "\n"))
   }
   else {
-    log_message(paste0("Metadata object already exists. Moving on to the resource map.\n"))
+    message(paste0("Metadata object already exists. Moving on to the resource map.\n"))
   }
 
 
@@ -973,12 +973,12 @@ update_package <- function(inventory,
   # Check if the new resource map already exists
 
   if (object_exists(env$mn_base_url, resource_map_pid)) {
-    log_message(paste0("The new resource map with PID ", resource_map_pid, " already exists. Finishing up.\n"))
+    message(paste0("The new resource map with PID ", resource_map_pid, " already exists. Finishing up.\n"))
   } else {
     # Now check if the OLD resource map exists
 
     if (!object_exists(env$mn_base_url, old_resmap_pid)) {
-      log_message(paste0("Old resource map with PID ", resource_map_pid, " doesn't exist. Using createObject instead of updateObject.\n"))
+      message(paste0("Old resource map with PID ", resource_map_pid, " doesn't exist. Using createObject instead of updateObject.\n"))
 
       create_response <- tryCatch({
         dataone::createObject(x = env$mn,
@@ -987,17 +987,17 @@ update_package <- function(inventory,
                               sysmeta = resource_map_sysmeta)
       },
       error = function(e) {
-        log_message(paste0("Error produced during call to createObject for resource map ", resource_map_pid, " in package ", package, "\n"))
-        log_message(e)
+        message(paste0("Error produced during call to createObject for resource map ", resource_map_pid, " in package ", package, "\n"))
+        message(e)
         e
       })
 
       if (inherits(create_response, "error")) {
-        log_message("There was an error calling createObject. Returning package files as is.\n")
+        message("There was an error calling createObject. Returning package files as is.\n")
         return(package_files)
       }
 
-      log_message(create_response)
+      message(create_response)
     } else {
       # Update the old resource map
       update_response <- tryCatch({
@@ -1008,17 +1008,17 @@ update_package <- function(inventory,
                               sysmeta = resource_map_sysmeta)
       },
       error = function(e) {
-        log_message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
-        log_message(e)
+        message(paste0("Error produced during call to updateObject for resource map ", package_files[metadata_file_idx,"file"], " in package ", package, "\n"))
+        message(e)
         e
       })
 
       if (inherits(update_response, "error")) {
-        log_message("There was an error calling updateObject Returning package files as is.\n")
+        message("There was an error calling updateObject Returning package files as is.\n")
         return(package_files)
       }
 
-      log_message(update_response)
+      message(update_response)
     }
   }
 
