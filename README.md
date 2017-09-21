@@ -31,13 +31,24 @@ Please submit suggestions or bugs as [Issues](https://github.com/NCEAS/arcticdat
 
 ## Testing
 
-Some tests are dependent on an authentication token being set and be skipped if one is not set.
+Note: The test suite contains a set of tests that call out to a remote server and whether or not these tests are run depends on whether `is_token_set()` returns true which just checks whether the `dataone_test_token` option is set.
 
+If you don't want to run integration tests:
+
+```r
+devtools::test() 
 ```
-# Skips tests that depend on a Metacat instance:
-devtools::test()
 
-# Set a token to run skipped tests:
-options(dataone_test_token = "...")
+If you *do* want to run integration tests
+
+1. Visit https://test.arcticdata.io 
+2. Log in
+3. Navigate to My Profile > Settings > Authentication Token
+4. Click the "Token for DataONE R" tab
+5. Copy the code snippet
+6. Modify the first line in the snippet below:
+
+```r
+options(dataone_test_token = "{YOUR_TOKEN_HERE}") # <- Modify this line
 devtools::test()
 ```
