@@ -21,7 +21,7 @@
 #' pid_to_other_entity(mn, pkg$data)
 #' }
 pid_to_eml_other_entity <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
 
@@ -60,7 +60,7 @@ sysmeta_to_other_entity <- function(mn, pids) {
 #' pid_to_eml_physical(mn, pkg$data)
 #' }
 pid_to_eml_physical <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
 
@@ -196,7 +196,7 @@ sysmeta_to_eml_physical <- function(sysmeta) {
 #' set_other_entities(mn, eml_path, "a_data_pid")
 #' }
 set_other_entities <- function(mn, path, pids) {
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(file.exists(path))
   stopifnot(all(is.character(pids)),
             all(nchar(pids) > 0))
@@ -208,7 +208,7 @@ set_other_entities <- function(mn, path, pids) {
 
   # Get the metadata document from the MN and load it as an EML document
   doc <- EML::read_eml(path)
-  stopifnot(class(doc) == "eml")
+  stopifnot(is(doc, "eml"))
 
   message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
 
@@ -237,7 +237,7 @@ set_other_entities <- function(mn, path, pids) {
 #'
 #' @examples
 get_doc_id <- function(sysmeta) {
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  stopifnot(is(sysmeta, "SystemMetadata"))
 
   message("Looking up docid for ", sysmeta@identifier, ".")
 

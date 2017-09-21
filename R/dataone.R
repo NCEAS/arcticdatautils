@@ -97,7 +97,7 @@ is_token_expired <- function(node) {
 #' @examples
 get_mn_base_url <- function(mn) {
   # Determine MN URL. Accept either an MNode or a character string
-  if (class(mn) == "MNode") {
+  if (is(mn, "MNode")) {
     mn_base_url <- mn$base_url
   }
 

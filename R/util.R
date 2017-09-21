@@ -264,7 +264,7 @@ object_exists <- function(node, pids) {
       e
     })
 
-    if (inherits(sysmeta, "error") || class(sysmeta) != "SystemMetadata") {
+    if (inherits(sysmeta, "error") || !is(sysmeta, "SystemMetadata")) {
       result[i] <- FALSE
     } else {
       result[i] <- TRUE
@@ -425,7 +425,7 @@ replace_package_id <- function(path, replacement) {
             nchar(replacement) > 0)
 
   doc <- EML::read_eml(path)
-  stopifnot(class(doc) == "eml")
+  stopifnot(is(doc, "eml"))
 
   doc@packageId <- new("xml_attribute", replacement)
   doc@system <- new("xml_attribute", "arcticdata")
@@ -582,7 +582,7 @@ is_resource_map <- function(node, pids) {
 #'
 #' @examples
 is_obsolete <- function(node, pids) {
-  stopifnot(class(node) == "MNode" || class(node) == "CNode")
+  stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pids))
 
   response <- vector(mode = "logical", length = length(pids))
