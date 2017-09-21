@@ -645,12 +645,12 @@ create_object <- function(file, sysmeta, base_path, mn) {
             "pid" %in% names(file),
             "file" %in% names(file))
 
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  stopifnot(is(sysmeta, "SystemMetadata"))
 
   stopifnot(is.character(base_path),
             nchar(base_path) > 0)
 
-  stopifnot(class(env$mn) == "MNode")
+  stopifnot(is(env$mn, "MNode"))
 
   # Set the return value to FALSE by default
   result <- FALSE
@@ -741,7 +741,7 @@ validate_environment <- function(env) {
                               "mn_base_url",
                               "submitter",
                               "rights_holder")
-  stopifnot(class(env) == "list",
+  stopifnot(is(env, "list"),
             length(env) > 0)
   stopifnot(!is.null(env), length(env) > 0)
   stopifnot(all(env_default_components %in% names(env)))

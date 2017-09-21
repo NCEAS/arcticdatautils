@@ -274,7 +274,7 @@ inv_load_identifiers <- function(inventory, paths) {
 #'
 #' @export
 inv_add_extra_columns <- function(inventory) {
-  stopifnot(class(inventory) == "data.frame", "file" %in% names(inventory))
+  stopifnot(is(inventory, "data.frame"), "file" %in% names(inventory))
 
   # Mark metadata files
   cat("Adding 'is_metadata' column.\n")

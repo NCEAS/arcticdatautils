@@ -30,7 +30,7 @@ publish_object <- function(mn,
                            clone_pid=NULL,
                            public=TRUE) {
 
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(file.exists(path))
 
   # Decide the format_id
@@ -509,7 +509,7 @@ create_resource_map <- function(mn,
                                 data_pids=NULL,
                                 child_pids=NULL,
                                 check_first=TRUE) {
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
 
@@ -591,7 +591,7 @@ update_resource_map <- function(mn,
                                 check_first=TRUE) {
 
   # Check arguments
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(is.character(resource_map_pid),
             nchar(resource_map_pid) > 0)
   stopifnot(is.character(metadata_pid),
@@ -613,7 +613,7 @@ update_resource_map <- function(mn,
 
   # Get the current rightsHolder
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  stopifnot(is(sysmeta, "SystemMetadata"))
 
   previous_rights_holder <- sysmeta@rightsHolder
 
@@ -648,7 +648,7 @@ update_resource_map <- function(mn,
 
   message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
-  stopifnot(class(sysmeta) == "SystemMetadata")
+  stopifnot(is(sysmeta, "SystemMetadata"))
 
   new_rm_sysmeta <- sysmeta
   new_rm_sysmeta@identifier <- identifier

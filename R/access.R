@@ -17,7 +17,7 @@
 #' @import datapack
 #' @export
 set_rights_holder <- function(mn, pids, subject) {
-  stopifnot(class(mn) == "MNode")
+  stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pids),
             all(nchar(pids) > 0))
   stopifnot(is.character(subject),
@@ -141,7 +141,7 @@ set_public_read <- function(mn, pids) {
 #'
 #' @examples
 remove_public_read <- function(mn, pids) {
-  stopifnot(class(mn) == "MNode",
+  stopifnot(is(mn, "MNode"),
             all(is.character(pids)),
             all(nchar(pids) > 0))
 
@@ -215,7 +215,7 @@ remove_public_read <- function(mn, pids) {
 #'
 #' @examples
 set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "write", "changePermission")) {
-  stopifnot(class(mn) == "MNode",
+  stopifnot(is(mn, "MNode"),
             all(is.character(pids)),
             all(nchar(pids) > 0),
             is.character(subject),

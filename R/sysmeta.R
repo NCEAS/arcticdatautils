@@ -126,7 +126,7 @@ replace_subject <- function(sysmeta,
 #'
 #' @examples
 clear_replication_policy <- function(sysmeta) {
-  if (!(class(sysmeta) == "SystemMetadata")) {
+  if (!(is(sysmeta, "SystemMetadata"))) {
     stop("First argument was not of class SystemMetadata.")
   }
 
