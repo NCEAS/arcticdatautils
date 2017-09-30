@@ -45,9 +45,9 @@ publish_object <- function(mn,
   }
 
   # Check if format ID is valid
-  if (!(format_id %in% D1_FORMATS)) {
+  if (!is.null(D1_FORMATS) && !(format_id %in% D1_FORMATS)) {
     stop(call. = FALSE,
-         paste0("The format_id of '", format_id, "' is not a valid format ID. See https://cn.dataone.org/cn/v2/formats for the current list. This package stores a copy and may be out of date with that list so please email the author if needed."))
+         paste0("The provided format_id of '", format_id, "' is not a valid format ID. Check what you entered against the list of format IDs on https://cn.dataone.org/cn/v2/formats. Note that this list is cached when arcticdatautils is loaded so if you haven't restarted your R session in a while you may have an outdated copy and restarting your session may fix this."))
   }
 
   # Set up some variables for use later on
@@ -138,9 +138,9 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
   }
 
   # Check if format ID is valid
-  if (!(format_id %in% D1_FORMATS)) {
+  if (!is.null(D1_FORMATS) && !(format_id %in% D1_FORMATS)) {
     stop(call. = FALSE,
-         paste0("The format_id of '", format_id, "' is not a valid format ID. See https://cn.dataone.org/cn/v2/formats for the current list. This package stores a copy and may be out of date with that list so please email the author if needed."))
+         paste0("The provided format_id of '", format_id, "' is not a valid format ID. Check what you entered against the list of format IDs on https://cn.dataone.org/cn/v2/formats. Note that this list is cached when arcticdatautils is loaded so if you haven't restarted your R session in a while you may have an outdated copy and restarting your session may fix this."))
   }
 
   message(paste0("Updating object ", pid, " with the file at ", path, "."))
