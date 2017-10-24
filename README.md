@@ -8,7 +8,6 @@ editing objects and Data Packages
 
 Note: The package is intended to be used by NCEAS staff and may not make much sense to others.
 
-
 ## Installing
 
 I recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) (aka tag) instead of from `master`. Install the latest release with the [`remotes`](https://github.com/r-lib/remotes) package:
@@ -19,15 +18,13 @@ remotes::install_github("nceas/arcticdatautils@*release")
 
 If you're feeling adventurous, you can install from the bleeding edge:
 
+```r
+remotes::install_github("nceas/arcticdatautils")
 ```
-devtools::install_github("NCEAS/arcticdatautils")
-```
-
 
 ## Contributing
 
 Please submit suggestions or bugs as [Issues](https://github.com/NCEAS/arcticdatautils/issues).
-
 
 ## Testing
 
@@ -36,12 +33,12 @@ Note: The test suite contains a set of tests that call out to a remote server an
 If you don't want to run integration tests:
 
 ```r
-devtools::test() 
+devtools::test()
 ```
 
 If you *do* want to run integration tests
 
-1. Visit https://test.arcticdata.io 
+1. Visit [https://test.arcticdata.io](https://test.arcticdata.io)
 2. Log in
 3. Navigate to My Profile > Settings > Authentication Token
 4. Click the "Token for DataONE R" tab
