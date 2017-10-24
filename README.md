@@ -1,10 +1,9 @@
 # arcticadatautils
 
-The `articadatautils` R package contains code for:
+The `articadatautils` R package contains code for doing lots of useful stuff that's too specific for the [dataone](https://github.com/DataONEorg/rdataone) package:
 
 - Inserting large numbers of files into Metacat
-- High-level [rdataone](https://github.com/DataONEorg/rdataone) wrappers for
-editing objects and Data Packages
+- High-level [dataone](https://github.com/DataONEorg/rdataone) wrappers for working with Objects and Data Packages
 
 Note: The package is intended to be used by NCEAS staff and may not make much sense to others.
 
