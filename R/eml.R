@@ -463,7 +463,7 @@ eml_contact <- function(...) {
 #' @examples
 #' eml_metadata_provider("test", "user", email = "test@user.com")
 eml_metadata_provider <- function(...) {
-  eml_party("metadata_provider", ...)
+  eml_party("metadataProvider", ...)
 }
 
 #' Create an EML associatedParty
