@@ -15,7 +15,8 @@ test_that("we can publish an update", {
   update <- publish_update(mn,
                            package$metadata,
                            package$resource_map,
-                           package$data)
+                           package$data,
+                           check_first = FALSE)
 
   expect_named(update, c("metadata", "resource_map", "data"))
   expect_true(all(object_exists(mn, unlist(update))))
@@ -36,7 +37,8 @@ test_that("an identifier can be manually specified when publishing an update", {
                            package$metadata,
                            package$resource_map,
                            package$data,
-                           identifier = new_identifier)
+                           identifier = new_identifier,
+                           check_first = FALSE)
 
   expect_equal(update$metadata, new_identifier)
 })
@@ -53,7 +55,7 @@ test_that("we can create a resource map", {
   response <- create_resource_map(mn, metadata_pid, data_pid)
 
   expect_true(object_exists(mn, response))
-  expect_equal(response, get_package(mn, metadata_pid)$resource_map)
+  expect_equal(response, get_package(mn, response)$resource_map)
 
 })
 
@@ -121,7 +123,7 @@ test_that("SIDs are maintained when publishing an update to an object with a SID
                         sid = new_sid)
   resmap_pid <- create_resource_map(mn, metadata_pid = pid)
 
-  response <- publish_update(mn, pid, resmap_pid)
+  response <- publish_update(mn, pid, resmap_pid, check_first = FALSE)
 
   sysmeta <- getSystemMetadata(mn, response$metadata)
   expect_equal(sysmeta@seriesId, new_sid)
@@ -143,7 +145,10 @@ test_that("we can publish an update to an object", {
   csv <- data.frame(x = 1:50)
   write.csv(csv, tmp)
 
-  upd <- update_object(mn, old, tmp)
+  suppressWarnings({
+    upd <- update_object(mn, old, tmp)
+  })
+
   file.remove(tmp)
   sm <- dataone::getSystemMetadata(mn, upd)
 
@@ -181,26 +186,25 @@ test_that("extra statements are maintained between updates", {
   # Add some PROV triples to the Resource Map
   rm <- tempfile()
   writeLines(rawToChar(dataone::getObject(mn, pkg$resource_map)), rm)
-  # statements <- data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[1], reserved = TRUE)),
-  #                          predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-  #                          object = "http://www.w3.org/ns/prov#Entity")
-  #
-  # statements <- rbind(statements,
-  #                     data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)),
-  #                                predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-  #                                object = "http://www.w3.org/ns/prov#Entity"))
 
   statements <- data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[1], reserved = TRUE)),
                            predicate = "http://www.w3.org/ns/prov#wasDerivedFrom",
-                           object = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)))
+                           object = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)),
+                           subjectType = "uri",
+                           objectType = "uri",
+                           dataTypeURI = NA)
 
-  new_rm <- update_resource_map(mn, pkg$resource_map, pkg$metadata, pkg$data, other_statements = statements, public = TRUE)
+  new_rm <- update_resource_map(mn,
+                                pkg$resource_map,
+                                pkg$metadata,
+                                pkg$data,
+                                other_statements = statements,
+                                public = TRUE)
 
   rm <- tempfile()
   writeLines(rawToChar(dataone::getObject(mn, new_rm)), rm)
   statements <- parse_resource_map(rm)
   expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
-
 
   new_new_rm <- update_resource_map(mn, new_rm, pkg$metadata, pkg$data, public = TRUE)
   rm <- tempfile()
@@ -220,7 +224,7 @@ test_that("rightsholder is properly set back after publishing an update", {
   set_result <- set_rights_holder(mn, unlist(pkg), "CN=arctic-data-admins,DC=dataone,DC=org")
   expect_true(all(set_result))
 
-  new_pkg <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data)
+  new_pkg <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data, check_first = FALSE)
   rhs <- lapply(unlist(pkg), function(pid) {
     dataone::getSystemMetadata(mn, pid)@rightsHolder
   })
