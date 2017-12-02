@@ -176,44 +176,6 @@ test_that("we can publish an update to an object and specify our own format id",
   expect_equal(sm@formatId, "text/plain")
 })
 
-test_that("extra statements are maintained between updates", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  pkg <- create_dummy_package(mn, 3)
-
-  # Add some PROV triples to the Resource Map
-  rm <- tempfile()
-  writeLines(rawToChar(dataone::getObject(mn, pkg$resource_map)), rm)
-
-  statements <- data.frame(subject = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[1], reserved = TRUE)),
-                           predicate = "http://www.w3.org/ns/prov#wasDerivedFrom",
-                           object = paste0("https://cn.dataone.org/cn/v2/resolve/", URLencode(pkg$data[2], reserved = TRUE)),
-                           subjectType = "uri",
-                           objectType = "uri",
-                           dataTypeURI = NA)
-
-  new_rm <- update_resource_map(mn,
-                                pkg$resource_map,
-                                pkg$metadata,
-                                pkg$data,
-                                other_statements = statements,
-                                public = TRUE)
-
-  rm <- tempfile()
-  writeLines(rawToChar(dataone::getObject(mn, new_rm)), rm)
-  statements <- parse_resource_map(rm)
-  expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
-
-  new_new_rm <- update_resource_map(mn, new_rm, pkg$metadata, pkg$data, public = TRUE)
-  rm <- tempfile()
-  writeLines(rawToChar(dataone::getObject(mn, new_new_rm)), rm)
-  statements <- parse_resource_map(rm)
-  expect_true("http://www.w3.org/ns/prov#wasDerivedFrom" %in% statements$predicate)
-})
-
-
 test_that("rightsholder is properly set back after publishing an update", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
