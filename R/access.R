@@ -22,7 +22,7 @@ set_rights_holder <- function(mn, pids, subject) {
             all(nchar(pids) > 0))
   stopifnot(is.character(subject),
             nchar(subject) > 0)
-  stopifnot(!grepl("https", subject))
+  stopifnot(grepl("http:", subject))
 
 
   result <- vector(mode = "logical", length = length(pids))
@@ -85,7 +85,7 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
             nchar(pids) > 0)
   stopifnot(is.character(subjects),
             nchar(subjects) > 0)
-  stopifnot(!grepl("https", subjects))
+  stopifnot(grepl("http:", subjects))
   stopifnot(all(permissions %in% c("read", "write", "changePermission")))
 
 
@@ -223,7 +223,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
             all(is.character(pids)),
             all(nchar(pids) > 0),
             is.character(subject),
-            !grepl("https", subject),
+            grepl("http:", subject),
             is.character(permissions))
 
   # Store the results of each attempted update
