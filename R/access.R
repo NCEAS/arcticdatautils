@@ -17,12 +17,23 @@
 #' @import datapack
 #' @export
 set_rights_holder <- function(mn, pids, subject) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids) > 0))
-  stopifnot(is.character(subject),
-            nchar(subject) > 0)
-  stopifnot(grepl("http:", subject))
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (!all(is.character(subject),
+           nchar(subject) > 0)){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (grepl("^https:\\/\\/orcid\\.org", subject)) {
+    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+  }
 
 
   result <- vector(mode = "logical", length = length(pids))
@@ -80,13 +91,27 @@ set_rights_holder <- function(mn, pids, subject) {
 #'
 #' @examples
 set_access <- function(mn, pids, subjects, permissions=c("read", "write", "changePermission")) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            nchar(pids) > 0)
-  stopifnot(is.character(subjects),
-            nchar(subjects) > 0)
-  stopifnot(grepl("http:", subjects))
-  stopifnot(all(permissions %in% c("read", "write", "changePermission")))
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (!all(is.character(subjects),
+           all(nchar(subjects)) > 0)){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (any(grepl("^https:\\/\\/orcid\\.org", subjects))) {
+    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+  }
+
+  if (!all(permissions %in% c("read", "write", "changePermission"))) {
+    stop("Argument 'permissions' must be one or more of: 'read', 'write', 'changePermission'")
+  }
 
 
   result <- c()
@@ -145,9 +170,15 @@ set_public_read <- function(mn, pids) {
 #'
 #' @examples
 remove_public_read <- function(mn, pids) {
-  stopifnot(is(mn, "MNode"),
-            all(is.character(pids)),
-            all(nchar(pids) > 0))
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
 
   # Store the results of each attempted update
   results <- c()
@@ -219,12 +250,27 @@ remove_public_read <- function(mn, pids) {
 #'
 #' @examples
 set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "write", "changePermission")) {
-  stopifnot(is(mn, "MNode"),
-            all(is.character(pids)),
-            all(nchar(pids) > 0),
-            is.character(subject),
-            grepl("http:", subject),
-            is.character(permissions))
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (!all(is.character(subject),
+           nchar(subject) > 0)){
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (grepl("^https:\\/\\/orcid\\.org", subject)) {
+    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+  }
+
+  if (!all(permissions %in% c("read", "write", "changePermission"))) {
+    stop("Argument 'permissions' must be one or more of: 'read', 'write', 'changePermission'")
+  }
 
   # Store the results of each attempted update
   results <- c()
