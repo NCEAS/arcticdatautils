@@ -170,6 +170,14 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
   # Set the replication policy back to default
   sysmeta <- clear_replication_policy(sysmeta)
 
+  # Add packageId to metadata if the object is an xml file
+  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml", format_id)) {
+    eml <- EML::read_eml(path)
+    eml@packageId <- new("xml_attribute", new_pid)
+    path <- tempfile()
+    EML::write_eml(eml, path)
+  }
+
   # Make the update
   dataone::updateObject(mn,
                         pid = pid,
