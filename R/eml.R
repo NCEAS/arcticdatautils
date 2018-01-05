@@ -660,11 +660,12 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 set_abstract <- function(doc, text) {
   stopifnot(is(doc, "eml"))
   stopifnot(is.character(text),
-            nchar(text) > 0)
+            length(text) > 0,
+            all(nchar(text)) > 0)
 
-  if (nchar(text) == 1) {
+  if (length(text) == 1) {
     doc@dataset@abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
-  } else if (nchar(text) > 1) {
+  } else if (length(text) > 1) {
     doc@dataset@abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
   }
 
