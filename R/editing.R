@@ -176,6 +176,8 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
     eml@packageId <- new("xml_attribute", new_pid)
     path <- tempfile()
     EML::write_eml(eml, path)
+    # File changed - update checksum
+    sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
   }
 
   # Make the update
