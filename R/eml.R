@@ -660,7 +660,8 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 set_abstract <- function(doc, text) {
   stopifnot(is(doc, "eml"))
   stopifnot(is.character(text),
-            length(text) > 0)
+            length(text) > 0,
+            all(nchar(text)) > 0)
 
   if (length(text) == 1) {
     doc@dataset@abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
