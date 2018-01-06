@@ -23,7 +23,8 @@ remotes::install_github("nceas/arcticdatautils")
 
 ## Contributing
 
-Please submit suggestions or bugs as [Issues](https://github.com/NCEAS/arcticdatautils/issues).
+- Please submit suggestions or bugs as [Issues](https://github.com/NCEAS/arcticdatautils/issues).
+- Pull Requestss should target the `master` branch
 
 ## Testing
 
