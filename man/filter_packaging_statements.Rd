@@ -13,17 +13,11 @@ filter_packaging_statements(statements)
 (data.frame) The filtered Statements
 }
 \description{
+This is intended to be called after `datapack::getTriples` has been called
+on a ResourceMap.
+}
+\details{
 This function was written specifically for the case of updating a resource
 map while preserving any extra statements that have been added such as PROV
 statements. Statements are filtered according to these rules:
-}
-\details{
-1. If the subject or object is the ore:ResourceMap resource
-2. If the subject or object is the ore:Aggregation resource
-3. If the predicate is cito:documents or cito:isDocumentedBy
-4. Once filters 1-3 have been executed, any remaining triples are considered
-   for removal if they look like dangling dc:identifier statements
-
-The consequence of filter 4 is that dc:identifier statements are left in if
-they are still in use by another statement
 }
