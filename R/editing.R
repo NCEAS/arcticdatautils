@@ -116,6 +116,8 @@ publish_object <- function(mn,
 #' @param pid (character) The PID of the object to update.
 #' @param path (character) The full path to the file to update with.
 #' @param format_id (character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
+#' @param new_pid (character) Optional. Specify the PID for the new Object. Defaults to automatically generating a new, random UUID-style PID.
+#' @param sid (character) Optiona. Specify a Series ID (SID) to use for the new Object.
 #'
 #' @return (character) The PID of the updated object.
 #' @export
