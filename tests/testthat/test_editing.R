@@ -198,3 +198,20 @@ test_that("publish update returns an error if its arguments are malformed", {
   expect_error(publish_update(mn, metadata_pid = 1))
   expect_error(publish_update(mn, metadata_pid = "a", resource_map_pid = "b", data_pids = list(1, 2, 3)))
 })
+
+test_that("update_object updates the packageId for EML object updates", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  eml_pid <- create_dummy_metadata(mn)
+  eml_path <- tempfile(fileext = ".xml")
+  writeBin(dataone::getObject(mn, eml_pid), eml_path)
+
+  new_pid <- update_object(mn, eml_pid, eml_path, format_id = format_eml())
+  updated_eml_path <- tempfile(fileext = ".xml")
+  writeBin(dataone::getObject(mn, new_pid), updated_eml_path)
+
+  doc <- xml2::read_xml(updated_eml_path)
+  expect_equal(new_pid, xml2::xml_attr(xml2::xml_root(doc), "packageId"))
+})
