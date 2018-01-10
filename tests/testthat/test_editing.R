@@ -215,3 +215,25 @@ test_that("update_object updates the packageId for EML object updates", {
   doc <- xml2::read_xml(updated_eml_path)
   expect_equal(new_pid, xml2::xml_attr(xml2::xml_root(doc), "packageId"))
 })
+
+test_that("publish_update removes the deprecated eml@access element", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  pids <- create_dummy_package(mn)
+  eml_path <- tempfile(fileext = ".xml")
+  writeBin(dataone::getObject(mn, pids$metadata), eml_path)
+
+  eml <- EML::read_eml(eml_path)
+  # Populate dummy access element
+  eml@access@allow <- c(new("allow", .Data = "hello"))
+  write_eml(eml, eml_path)
+
+  new_pids <- publish_update(mn, pids$metadata, pids$resource_map, metadata_path = eml_path)
+  updated_eml_path <- tempfile(fileext = ".xml")
+  writeBin(dataone::getObject(mn, new_pids$metadata), updated_eml_path)
+
+  new_eml <- EML::read_eml(updated_eml_path)
+  expect_equal(0, length(new_eml@access@allow))
+})
