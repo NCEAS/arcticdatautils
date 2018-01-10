@@ -378,6 +378,11 @@ publish_update <- function(mn,
     eml@system <- new("xml_attribute", "https://arcticdata.io")
   }
 
+  # Replace access if needed
+  if (length(eml@access@allow) & (!is.null(metadata_path))) {
+    eml@access <- new("access")
+  }
+
   # Write out the document to disk. We do this in part because
   # set_other_entities takes a path to the doc.
   eml_path <- tempfile()
