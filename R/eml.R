@@ -416,12 +416,16 @@ eml_party <- function(type="associatedParty",
 
   # Role
   if (!is.null(role)) {
-    if (type != "associatedParty") {
+    if (type != "associatedParty" && type != "personnel") {
       stop(call. = FALSE,
-           paste0("Setting a role is only valid on an associatedParty, not a ", type, "."))
+           paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
     }
-
-    party@role <- new("role", .Data = role)
+    
+    if (type == "personnel") {
+      party@role <- new("ListOfrole", list(new("role", role)))
+    } else {
+      party@role <- new("role", .Data = role)
+    }
   }
 
   party
@@ -542,20 +546,21 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #'
 #' Note: This is super-limited right now.
 #'
-#' @param title (character) Title of the project.
+#' @param title (character) Title of the project (Required).
+#' @param personnelList (list of eml_personnel objects) Personnel involved with the project (Originator required).
 #' @param abstract (character) Project abstract.
-#' @param personnelList (list of eml_personnel objects) Personnel involved with the project.
-#' @param awards (character) One or more awards for the project.
+#' @param funding (character) Funding sources for the project such as grant and contract numbers.
 #'
 #' @return (project) The new project section.
 #' @export
 #'
 #' @examples
-#' eml_project("Some title", "Abstract", "list(personnel1, personnel2)", "#1 Best Human Award")
-eml_project <- function(title, abstract, personnelList, awards=NULL) {
+#' eml_project("Some title", list(personnel1, personnel2), "Abstract", "#1 Best Scientist Award")
+eml_project <- function(title, personnelList, abstract=NULL, funding=NULL) {
   
-  # stopifnot(all(sapply(c(title, awards, first, last), is.character)),
-  #           all(lengths(c(title, awards, first, last)) > 0))
+  stopifnot(is.character(title),
+            nchar(title) > 0)
+  stopifnot(length(personnelList) > 0)
 
   # Project
   project <- new("project")
@@ -563,18 +568,39 @@ eml_project <- function(title, abstract, personnelList, awards=NULL) {
   # Title
   project@title <- c(new("title", .Data = title))
 
-  # Abstract 
-  # Apparently we can accept many abstracts though, so I guess this needs to be changed? 
-  project@abstract <- new("abstract", .Data = abstract)
-  
   # Personnel
+  if(!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
+    stop(call. = FALSE,
+         "All personnel in the list must be of type 'personnel'")
+  }
+  
+  if(!all(sapply(personnelList, function(x) { length(x@role) > 0 }))) {
+    stop(call. = FALSE,
+         "You must specify a role for each personnel on the project.")
+  }
+  
+  if (!any(sapply(personnelList, function(x) { x@role == "originator" }))) {
+    stop(call. = FALSE,
+         "You must specify at least one personnel with role type originator on the project.")
+  }
+
   personnel <- new("personnel")
   project@personnel <- new("ListOfpersonnel", personnelList)
-
+  
+  # Abstract 
+  if(!is.null(abstract)) {
+    project@abstract <- new("abstract", .Data = abstract)
+    
+    if (length(abstract) == 1) {
+      project@abstract <- new("abstract", .Data = new("TextType", .Data = abstract))
+    } else if (length(abstract) > 1) {
+      project@abstract <- new("abstract", para = new("ListOfpara", lapply(abstract, function(x) new("para", x))))
+    }
+  }
+  
   # Funding
-  if(!is.null(awards))
-  {
-    funding_paras <- lapply(awards, function(awd) {
+  if(!is.null(funding)) {
+    funding_paras <- lapply(funding, function(awd) {
       a <- new("para");
       a@.Data <- list(awd);
       a@.Data <- list(xml2::xml_new_root("para", as.character(awd)))
