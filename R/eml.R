@@ -487,6 +487,22 @@ eml_metadata_provider <- function(...) {
 eml_associated_party <- function(...) {
   eml_party("associatedParty", ...)
 }
+
+#' Create an EML personnel
+#'
+#' See \code{\link{eml_party}} for details.
+#'
+#' @param ... Arguments passed on to eml_party
+#'
+#' @return (personnel) The new personnel
+#' @export
+#'
+#' @examples
+#' eml_personnel("test", "user", email = "test@user.com", role = "Principal Investigator")
+eml_personnel <- function(...) {
+  eml_party("personnel", ...)
+}
+
 #' Create an EML individualName section
 #'
 #' @param given_names (character) One or more given names.
@@ -527,54 +543,45 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' Note: This is super-limited right now.
 #'
 #' @param title (character) Title of the project.
+#' @param abstract (character) Project abstract.
+#' @param personnelList (list of eml_personnel objects) Personnel involved with the project.
 #' @param awards (character) One or more awards for the project.
-#' @param first (character) First name of the person with role `role`.
-#' @param last (character) Last name of the person with role `role`.
-#' @param organizations (character) Optional. One or more organization strings.
-#' @param role (character) Optional. Specify an alternate role.
 #'
 #' @return (project) The new project section.
 #' @export
 #'
 #' @examples
-#' eml_project("Some title", "51231", "Some", "User")
-eml_project <- function(title, awards, first, last, organizations = NULL, role = "originator") {
-  stopifnot(all(sapply(c(title, awards, first, last), is.character)),
-            all(lengths(c(title, awards, first, last)) > 0))
+#' eml_project("Some title", "Abstract", "list(personnel1, personnel2)", "#1 Best Human Award")
+eml_project <- function(title, abstract, personnelList, awards=NULL) {
+  
+  # stopifnot(all(sapply(c(title, awards, first, last), is.character)),
+  #           all(lengths(c(title, awards, first, last)) > 0))
 
-  # project
+  # Project
   project <- new("project")
 
-  # title
-  title_ele <- new("title")
-  title_ele@.Data <- title
-  project@title <- new("ListOftitle", list(title_ele))
+  # Title
+  project@title <- c(new("title", .Data = title))
 
-  # personnel
+  # Abstract 
+  # Apparently we can accept many abstracts though, so I guess this needs to be changed? 
+  project@abstract <- new("abstract", .Data = abstract)
+  
+  # Personnel
   personnel <- new("personnel")
+  project@personnel <- new("ListOfpersonnel", personnelList)
 
-  # individualName
-  personnel@individualName <- new("ListOfindividualName", list(eml_individual_name(first, last)))
-
-  # organizationName
-  if (!is.null(organizations)) {
-    organizations <- lapply(organizations, function(org) { o <- new("organizationName"); o@.Data <- org; o } )
-    personnel@organizationName <- new("ListOforganizationName", organizations)
+  # Funding
+  if(!is.null(awards))
+  {
+    funding_paras <- lapply(awards, function(awd) {
+      a <- new("para");
+      a@.Data <- list(awd);
+      a@.Data <- list(xml2::xml_new_root("para", as.character(awd)))
+      a
+    })
+    project@funding@para <- new("ListOfpara", funding_paras)
   }
-
-  # role
-  personnel@role <- new("ListOfrole", list(new("role", role)))
-
-  project@personnel <- new("ListOfpersonnel", list(personnel))
-
-  # funding
-  funding_paras <- lapply(awards, function(awd) {
-    a <- new("para");
-    a@.Data <- list(awd);
-    a@.Data <- list(xml2::xml_new_root("para", as.character(awd)))
-    a
-  })
-  project@funding@para <- new("ListOfpara", funding_paras)
 
   project
 }
