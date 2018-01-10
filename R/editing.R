@@ -379,7 +379,7 @@ publish_update <- function(mn,
   }
 
   # Replace access if needed
-  if (length(eml@access@allow)) {
+  if (length(eml@access@allow) & (!is.null(metadata_path))) {
     eml@access <- new("access")
   }
 
