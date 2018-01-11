@@ -416,11 +416,13 @@ eml_party <- function(type="associatedParty",
 
   # Role
   if (!is.null(role)) {
+    # Only allow roles to be set if type is associatedParty or personnel
     if (type != "associatedParty" && type != "personnel") {
       stop(call. = FALSE,
            paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
     }
     
+    # If type is personnel, role needs to be ListOfrole, otherwise just role
     if (type == "personnel") {
       roles <- lapply(role, function(x) { r <- new("role"); r@.Data <- x; r } )
       party@role <- new("ListOfrole", roles)
@@ -542,23 +544,24 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
   indiv_name
 }
 
-eml_study_area_description
-
 #' Create an eml-project section.
 #'
-#' Note: This is super-limited right now.
+#' Note - studyAreaDescription, designDescription, and relatedProject are not fully fleshed out. Need to pass these objects in directly if you want to use them.
 #'
 #' @param title (character) Title of the project (Required).
-#' @param personnelList (list of eml_personnel objects) Personnel involved with the project (Originator required).
+#' @param personnelList (list of eml_personnel) Personnel involved with the project (role:originator required).
 #' @param abstract (character) Project abstract.
 #' @param funding (character) Funding sources for the project such as grant and contract numbers.
+#' @param studyAreaDescription (studyAreaDescription) 
+#' @param designDescription (designDescription) 
+#' @param relatedProject (project) 
 #'
 #' @return (project) The new project section.
 #' @export
 #'
 #' @examples
 #' eml_project("Some title", list(personnel1, personnel2), "Abstract", "#1 Best Scientist Award")
-eml_project <- function(title, personnelList, abstract=NULL, funding=NULL) {
+eml_project <- function(title, personnelList, abstract=NULL, funding=NULL, studyAreaDescription=NULL, designDescription=NULL, relatedProject=NULL) {
   
   stopifnot(is.character(title),
             nchar(title) > 0)
@@ -580,35 +583,44 @@ eml_project <- function(title, personnelList, abstract=NULL, funding=NULL) {
     stop(call. = FALSE,
          "You must specify a role for each personnel on the project.")
   }
-  
-  if (!any(sapply(personnelList, function(x) { x@role == "originator" }))) {
-    stop(call. = FALSE,
-         "You must specify at least one personnel with role type originator on the project.")
-  }
 
-  personnel <- new("personnel")
-  project@personnel <- new("ListOfpersonnel", personnelList)
+  project@personnel <- new("ListOfpersonnel", .Data = personnelList)
   
-  # Abstract 
+  # Abstract
   if(!is.null(abstract)) {
-    project@abstract <- new("abstract", .Data = abstract)
-    
-    if (length(abstract) == 1) {
-      project@abstract <- new("abstract", .Data = new("TextType", .Data = abstract))
-    } else if (length(abstract) > 1) {
-      project@abstract <- new("abstract", para = new("ListOfpara", lapply(abstract, function(x) new("para", x))))
-    }
+    abstract_paras <- lapply(abstract, function(x) {
+      para <- new("para");
+      para@.Data <- list(x);
+      para@.Data <- list(xml2::xml_new_root("para", as.character(x)))
+      para
+    })
+    project@abstract@para <- new("ListOfpara", .Data = abstract_paras)
   }
   
   # Funding
   if(!is.null(funding)) {
-    funding_paras <- lapply(funding, function(awd) {
-      a <- new("para");
-      a@.Data <- list(awd);
-      a@.Data <- list(xml2::xml_new_root("para", as.character(awd)))
-      a
+    funding_paras <- lapply(funding, function(x) {
+      para <- new("para");
+      para@.Data <- list(x);
+      para@.Data <- list(xml2::xml_new_root("para", as.character(x)))
+      para
     })
-    project@funding@para <- new("ListOfpara", funding_paras)
+    project@funding@para <- new("ListOfpara", .Data = funding_paras)
+  }
+  
+  # Study area description
+  if(!is.null(studyAreaDescription)) {
+    project@studyAreaDescription <- studyAreaDescription
+  }
+  
+  # Design description
+  if(!is.null(designDescription)) {
+    project@designDescription <- designDescription
+  }
+  
+  # Related Project
+  if(!is.null(relatedProject)) {
+    project@relatedProject <- relatedProject
   }
 
   project
