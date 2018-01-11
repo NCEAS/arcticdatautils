@@ -422,7 +422,8 @@ eml_party <- function(type="associatedParty",
     }
     
     if (type == "personnel") {
-      party@role <- new("ListOfrole", list(new("role", role)))
+      roles <- lapply(role, function(x) { r <- new("role"); r@.Data <- x; r } )
+      party@role <- new("ListOfrole", roles)
     } else {
       party@role <- new("role", .Data = role)
     }
@@ -541,6 +542,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
   indiv_name
 }
 
+eml_study_area_description
 
 #' Create an eml-project section.
 #'
