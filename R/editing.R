@@ -715,6 +715,12 @@ set_file_name <- function(mn, pid, name) {
             nchar(name) > 0)
 
   sysmeta <- dataone::getSystemMetadata(mn, pid)
+
+  if (!is.na(sysmeta@fileName)) {
+    if (sysmeta@fileName == name)
+      stop(paste0("fileName for object ", pid, "is already set to: ", name))
+  }
+
   sysmeta@fileName <- name
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
