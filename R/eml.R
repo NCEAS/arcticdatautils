@@ -561,7 +561,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #'
 #' @examples
 #' eml_project("Some title", list(personnel1, personnel2), "Abstract", "#1 Best Scientist Award")
-eml_project <- function(title, personnelList, abstract=NULL, funding=NULL, studyAreaDescription=NULL, designDescription=NULL, relatedProject=NULL) {
+eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, studyAreaDescription = NULL, designDescription = NULL, relatedProject = NULL) {
   
   stopifnot(is.character(title),
             nchar(title) > 0)
