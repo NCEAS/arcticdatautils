@@ -424,10 +424,9 @@ eml_party <- function(type="associatedParty",
     
     # If type is personnel, role needs to be ListOfrole, otherwise just role
     if (type == "personnel") {
-      roles <- lapply(role, function(x) { r <- new("role"); r@.Data <- x; r } )
-      party@role <- new("ListOfrole", roles)
+      party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
     } else {
-      party@role <- new("role", .Data = role)
+      party@role <- as(role, as, Class = "role")
     }
   }
 
@@ -506,8 +505,13 @@ eml_associated_party <- function(...) {
 #'
 #' @examples
 #' eml_personnel("test", "user", email = "test@user.com", role = "Principal Investigator")
-eml_personnel <- function(...) {
-  eml_party("personnel", ...)
+eml_personnel <- function(role = NULL, ...) {
+  if(is.null(role)) {
+    stop(call. = FALSE,
+         "You must specify a role for a personnel.")
+  }
+  
+  eml_party("personnel", role = role, ...)
 }
 
 #' Create an EML individualName section
@@ -549,9 +553,9 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' Note - studyAreaDescription, designDescription, and relatedProject are not fully fleshed out. Need to pass these objects in directly if you want to use them.
 #'
 #' @param title (character) Title of the project (Required).
-#' @param personnelList (list of eml_personnel) Personnel involved with the project (role:originator required).
-#' @param abstract (character) Project abstract.
-#' @param funding (character) Funding sources for the project such as grant and contract numbers.
+#' @param personnelList (list of personnel) Personnel involved with the project.
+#' @param abstract (character) Project abstract. Can pass as a character vector for separate paragraphs.
+#' @param funding (character) Funding sources for the project such as grant and contract numbers. Can pass as a character vector for separate paragraphs.
 #' @param studyAreaDescription (studyAreaDescription) 
 #' @param designDescription (designDescription) 
 #' @param relatedProject (project) 
@@ -560,7 +564,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' eml_project("Some title", list(personnel1, personnel2), "Abstract", "#1 Best Scientist Award")
+#' eml_project("Some title", list(personnel1, personnel2), c("Abstract paragraph 1", "Abstract paragraph 2"), "#1 Best Scientist Award")
 eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, studyAreaDescription = NULL, designDescription = NULL, relatedProject = NULL) {
   
   stopifnot(is.character(title),
@@ -571,41 +575,30 @@ eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, s
   project <- new("project")
 
   # Title
-  project@title <- c(new("title", .Data = title))
+  project@title <- c(as(title, "title"))
 
   # Personnel
   if(!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
     stop(call. = FALSE,
          "All personnel in the list must be of type 'personnel'")
   }
-  
-  if(!all(sapply(personnelList, function(x) { length(x@role) > 0 }))) {
-    stop(call. = FALSE,
-         "You must specify a role for each personnel on the project.")
-  }
 
-  project@personnel <- new("ListOfpersonnel", .Data = personnelList)
+  project@personnel <- as(personnelList, "ListOfpersonnel")
   
   # Abstract
   if(!is.null(abstract)) {
     abstract_paras <- lapply(abstract, function(x) {
-      para <- new("para");
-      para@.Data <- list(x);
-      para@.Data <- list(xml2::xml_new_root("para", as.character(x)))
-      para
+      as(list(xml2::xml_new_root("para", as.character(x))), "para")
     })
-    project@abstract@para <- new("ListOfpara", .Data = abstract_paras)
+    project@abstract@para <- as(abstract_paras, "ListOfpara")
   }
   
   # Funding
   if(!is.null(funding)) {
     funding_paras <- lapply(funding, function(x) {
-      para <- new("para");
-      para@.Data <- list(x);
-      para@.Data <- list(xml2::xml_new_root("para", as.character(x)))
-      para
+      as(list(xml2::xml_new_root("para", as.character(x))), "para")
     })
-    project@funding@para <- new("ListOfpara", .Data = funding_paras)
+    project@funding@para <- as(funding_paras, "ListOfpara")
   }
   
   # Study area description
