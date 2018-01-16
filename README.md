@@ -1,5 +1,7 @@
 # arcticadatautils
 
+[![Travis build status](https://travis-ci.org/NCEAS/arcticdatautils.svg?branch=master)](https://travis-ci.org/NCEAS/arcticdatautils)
+
 The `articadatautils` R package contains code for doing lots of useful stuff that's too specific for the [dataone](https://github.com/DataONEorg/rdataone) package:
 
 - Inserting large numbers of files into Metacat

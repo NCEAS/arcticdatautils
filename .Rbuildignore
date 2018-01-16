@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^etc$
 ^docs$
+^\.travis\.yml$
