@@ -7,9 +7,6 @@ r:
   - devel
 sudo: false
 cache: packages
-r_binary_packages:
-  - redland
-  - ncdf4
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y librdf0-dev libnetcdf-dev
+  - sudo apt-get install -y librdf0-dev libnetcdf-dev r-cran-ncdf4
