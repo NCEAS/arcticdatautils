@@ -81,12 +81,12 @@ test_that("a contact can be created", {
 })
 
 test_that("a personnel can be created", {
-  personnel <- eml_personnel("test", "user", role=c("author", "originator"))
+  personnel <- eml_personnel(given_names="test", sur_name="user", role="principalInvestigator")
   
   expect_is(personnel, "personnel")
-  expect_equal(contact@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(contact@individualName[[1]]@surName@.Data, "user")
-  expect_equal(contact@individualName[[1]]@role[[1]]@.Data, "author")
+  expect_equal(personnel@individualName[[1]]@givenName[[1]]@.Data, "test")
+  expect_equal(personnel@individualName[[1]]@surName@.Data, "user")
+  expect_equal(personnel@role[[1]]@.Data, "principalInvestigator")
 })
 
 test_that("a project can be created", {
@@ -102,7 +102,7 @@ test_that("a project can be created", {
   expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "A")
   expect_equal(project@personnel[[1]]@individualName[[1]]@surName@.Data, "User")
   expect_equal(project@personnel[[1]]@organizationName[[1]]@.Data, "NCEAS")
-  expect_equal(project@personnel[[1]]@role, "originator")
+  expect_equal(project@personnel[[1]]@role[[1]]@.Data, "originator")
   expect_equal(xml2::xml_text(project@funding@para[[1]]@.Data[[1]]), "I won an award, yay")
 })
 
@@ -118,9 +118,9 @@ test_that("a project can be created with multiple personnel, an abstract can be 
   expect_is(project, "project")
   expect_equal(project@title[[1]]@.Data, "some title")
   expect_equal(project@personnel[[2]]@individualName[[1]]@givenName[[1]]@.Data, "Testy")
-  expect_equal(project@personnel[[2]]@individualName[[1]]@surName@.Data, "Macterterson")
+  expect_equal(project@personnel[[2]]@individualName[[1]]@surName@.Data, "Mactesterson")
   expect_equal(project@personnel[[2]]@organizationName[[1]]@.Data, "A Test Org")
-  expect_equal(project@personnel[[2]]@role[[2]], "author")
+  expect_equal(project@personnel[[2]]@role[[2]]@.Data, "author")
   expect_equal(xml2::xml_text(project@abstract@para[[2]]@.Data[[1]]), "This is the second paragraph")
   expect_equal(xml2::xml_text(project@funding@para[[2]]@.Data[[1]]), "I won a second award, wow")
 })
