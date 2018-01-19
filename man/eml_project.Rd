@@ -4,28 +4,31 @@
 \alias{eml_project}
 \title{Create an eml-project section.}
 \usage{
-eml_project(title, awards, first, last, organizations = NULL,
-  role = "originator")
+eml_project(title, personnelList, abstract = NULL, funding = NULL,
+  studyAreaDescription = NULL, designDescription = NULL,
+  relatedProject = NULL)
 }
 \arguments{
-\item{title}{(character) Title of the project.}
+\item{title}{(character) Title of the project (Required).}
 
-\item{awards}{(character) One or more awards for the project.}
+\item{personnelList}{(list of personnel) Personnel involved with the project.}
 
-\item{first}{(character) First name of the person with role `role`.}
+\item{abstract}{(character) Project abstract. Can pass as a character vector for separate paragraphs.}
 
-\item{last}{(character) Last name of the person with role `role`.}
+\item{funding}{(character) Funding sources for the project such as grant and contract numbers. Can pass as a character vector for separate paragraphs.}
 
-\item{organizations}{(character) Optional. One or more organization strings.}
+\item{studyAreaDescription}{(studyAreaDescription)}
 
-\item{role}{(character) Optional. Specify an alternate role.}
+\item{designDescription}{(designDescription)}
+
+\item{relatedProject}{(project)}
 }
 \value{
 (project) The new project section.
 }
 \description{
-Note: This is super-limited right now.
+Note - studyAreaDescription, designDescription, and relatedProject are not fully fleshed out. Need to pass these objects in directly if you want to use them.
 }
 \examples{
-eml_project("Some title", "51231", "Some", "User")
+eml_project("Some title", list(personnel1, personnel2), c("Abstract paragraph 1", "Abstract paragraph 2"), "#1 Best Scientist Award")
 }
