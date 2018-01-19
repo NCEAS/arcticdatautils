@@ -26,7 +26,14 @@ remotes::install_github("nceas/arcticdatautils")
 ## Contributing
 
 - Please submit suggestions or bugs as [Issues](https://github.com/NCEAS/arcticdatautils/issues).
-- Pull Requestss should target the `master` branch
+- Pull Requestss (PR) should target the `master` branch
+- Before submitting a PR, please:
+  - Re-document and commit any `*.Rd` file changes
+    > `devtools::document()`
+  - R CMD CHECK and fix any issues related to your changes
+    > `devtools::check()`
+  - Run the tests and make sure they all pass
+    > `devtools::test()`
 
 ## Testing
 
