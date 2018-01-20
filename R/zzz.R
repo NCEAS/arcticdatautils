@@ -1,6 +1,5 @@
 .onLoad <- function(libname, pkgname) {
   load_d1_formats_list("https://cn.dataone.org/cn/v2/formats")
-  warn_if_outdated()
 
   invisible()
 }
