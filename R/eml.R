@@ -571,7 +571,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #'
 #' @examples
 #' eml_project("Some title",
-#'             list(personnel1, personnel2),
+#'             c(eml_personnel("Bryce", "Mecum", role = "Test")),
 #'             c("Abstract paragraph 1", "Abstract paragraph 2"),
 #'             "#1 Best Scientist Award")
 eml_project <- function(title,
