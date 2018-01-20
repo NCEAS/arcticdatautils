@@ -18,10 +18,12 @@ System Metadata of an Object. Note that it sets an Online Distrubtion URL
 of the DataONE v2 resolve service for the PID.
 }
 \examples{
-#' \dontrun {
+\dontrun {
 # Generate EML physical objects for all the data in a package
 pkg <- get_package(mn, pid)
-sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
+sm <- lapply(pkg$data, function(pid) {
+  getSystemMetadata(mn, pid)
+})
 sysmeta_to_eml_physical(sm)
 }
 }

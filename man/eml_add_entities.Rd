@@ -28,8 +28,11 @@ Add new entity (otherEntity, dataTable, etc) elements to an EML document from a 
 \dontrun{
   types <- c("dataTable")
   paths <- list.files(., full.names = TRUE) # Get full paths to some files
-  pids <- vapply(paths, function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) }, "") # Generate some UUID PIDs
-  format_ids <- guess_format_id(paths) # Try to guess format IDs, you should check this afterwards
+  pids <- vapply(paths, function(x) {
+    paste0("urn:uuid:", uuid::UUIDgenerate())
+  }, "") # Generate some UUID PIDs
+Try to guess format IDs, you should check this afterwards
+  format_ids <- guess_format_id(paths) 
 
   entity_df <- data.frame(type = types,
                           path = paths,
