@@ -35,7 +35,7 @@ them.
 }
 \examples{
 eml_project("Some title",
-            list(personnel1, personnel2),
+            c(eml_personnel("Bryce", "Mecum", role = "Test")),
             c("Abstract paragraph 1", "Abstract paragraph 2"),
             "#1 Best Scientist Award")
 }
