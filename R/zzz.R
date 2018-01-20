@@ -27,7 +27,7 @@ load_d1_formats_list <- function(url) {
 }
 
 warn_if_outdated <- function() {
-  installed_version <- packageVersion("arcticdatautils")
+  installed_version <- utils::packageVersion("arcticdatautils")
 
   req <- httr::GET("https://api.github.com/repos/nceas/arcticdatautils/releases/latest",
                    httr::add_headers("Accept", "application/vnd.github.v3+json"))
