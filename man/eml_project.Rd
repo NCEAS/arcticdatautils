@@ -13,9 +13,11 @@ eml_project(title, personnelList, abstract = NULL, funding = NULL,
 
 \item{personnelList}{(list of personnel) Personnel involved with the project.}
 
-\item{abstract}{(character) Project abstract. Can pass as a character vector for separate paragraphs.}
+\item{abstract}{(character) Project abstract. Can pass as a character vector
+for separate paragraphs.}
 
-\item{funding}{(character) Funding sources for the project such as grant and contract numbers. Can pass as a character vector for separate paragraphs.}
+\item{funding}{(character) Funding sources for the project such as grant and
+contract numbers. Can pass as a character vector for separate paragraphs.}
 
 \item{studyAreaDescription}{(studyAreaDescription)}
 
@@ -27,8 +29,13 @@ eml_project(title, personnelList, abstract = NULL, funding = NULL,
 (project) The new project section.
 }
 \description{
-Note - studyAreaDescription, designDescription, and relatedProject are not fully fleshed out. Need to pass these objects in directly if you want to use them.
+Note - studyAreaDescription, designDescription, and relatedProject are not
+fully fleshed out. Need to pass these objects in directly if you want to use
+them.
 }
 \examples{
-eml_project("Some title", list(personnel1, personnel2), c("Abstract paragraph 1", "Abstract paragraph 2"), "#1 Best Scientist Award")
+eml_project("Some title",
+            list(personnel1, personnel2),
+            c("Abstract paragraph 1", "Abstract paragraph 2"),
+            "#1 Best Scientist Award")
 }
