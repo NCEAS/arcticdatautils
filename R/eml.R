@@ -428,7 +428,7 @@ eml_party <- function(type="associatedParty",
     if (type == "personnel") {
       party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
     } else {
-      party@role <- as(role, as, Class = "role")
+      party@role <- as(role, "role")
     }
   }
 
