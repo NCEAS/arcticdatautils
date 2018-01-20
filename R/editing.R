@@ -287,6 +287,14 @@ publish_update <- function(mn,
     stopifnot(all(is.character(parent_child_pids)))
   }
 
+  # Check to see if the obsoleted package is in the list of parent_child_pids
+  # If it is notify the user and remove it from the list
+  if (resource_map_pid %in% parent_child_pids) {
+    message("Removing the old resource map from the list of child PIDs in the parent package.")
+    resource_map_pid_index <- which(resource_map_pid == parent_child_pids)
+    parent_child_pids <- parent_child_pids[-resource_map_pid_index]
+  }
+
   all_pids <- c(metadata_pid, resource_map_pid, data_pids, child_pids,
                 identifier, parent_resmap_pid, parent_metadata_pid,
                 parent_data_pids, parent_child_pids)
