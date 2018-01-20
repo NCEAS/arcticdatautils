@@ -32,6 +32,7 @@ License: MIT + file LICENSE
 LazyData: true
 Suggests:
     testthat,
+    humaniformat,
     knitr,
     rmarkdown,
     xslt
