@@ -134,7 +134,7 @@ sysmeta_to_other_entity <- function(sysmeta) {
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' # Generate EML physical objects for all the data in a package
 #' pkg <- get_package(mn, pid)
 #' sm <- lapply(pkg$data, function(pid) {
