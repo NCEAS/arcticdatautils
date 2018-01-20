@@ -1,16 +1,10 @@
-#' util.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
-#'
-#' General utility functions that may be later merged into other files.
-
-
-#' Extracts the local identifier for an ACADIS ISO metadata XML file.
+#' Extract the local identifier for an ACADIS ISO metadata XML file.
 #'
 #' @param type (character) A string, one of "gateway" or "field-projects".
-#' @param file (character) A string, a connection, or raw vector (same as xml2::read_xml).
+#' @param file (character) A string, a connection, or raw vector
+#' (same as \code{\link[xml2]{read_xml}}).
 #'
-#' @returns The identifier string. (character)
-
+#' @return The identifier string. (character)
 extract_local_identifier <- function(type, file) {
   stopifnot(is.character(type), length(type) == 1)
   stopifnot(type %in% c("gateway", "field-projects"))
