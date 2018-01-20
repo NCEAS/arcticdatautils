@@ -1043,7 +1043,7 @@ parse_resource_map <- function(path) {
 
   rm <- new("ResourceMap")
   datapack::parseRDF(rm, path)
-  datapack:::getTriples(rm)
+  datapack::getTriples(rm)
 }
 
 
