@@ -134,10 +134,12 @@ sysmeta_to_other_entity <- function(sysmeta) {
 #' @export
 #'
 #' @examples
-#' #' \dontrun {
+#' \dontrun {
 #' # Generate EML physical objects for all the data in a package
 #' pkg <- get_package(mn, pid)
-#' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
+#' sm <- lapply(pkg$data, function(pid) {
+#'   getSystemMetadata(mn, pid)
+#' })
 #' sysmeta_to_eml_physical(sm)
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
@@ -421,7 +423,7 @@ eml_party <- function(type="associatedParty",
       stop(call. = FALSE,
            paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
     }
-    
+
     # If type is personnel, role needs to be ListOfrole, otherwise just role
     if (type == "personnel") {
       party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
@@ -510,7 +512,7 @@ eml_personnel <- function(role = NULL, ...) {
     stop(call. = FALSE,
          "You must specify a role for a personnel.")
   }
-  
+
   eml_party("personnel", role = role, ...)
 }
 
@@ -550,23 +552,36 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 
 #' Create an eml-project section.
 #'
-#' Note - studyAreaDescription, designDescription, and relatedProject are not fully fleshed out. Need to pass these objects in directly if you want to use them.
+#' Note - studyAreaDescription, designDescription, and relatedProject are not
+#' fully fleshed out. Need to pass these objects in directly if you want to use
+#' them.
 #'
 #' @param title (character) Title of the project (Required).
 #' @param personnelList (list of personnel) Personnel involved with the project.
-#' @param abstract (character) Project abstract. Can pass as a character vector for separate paragraphs.
-#' @param funding (character) Funding sources for the project such as grant and contract numbers. Can pass as a character vector for separate paragraphs.
-#' @param studyAreaDescription (studyAreaDescription) 
-#' @param designDescription (designDescription) 
-#' @param relatedProject (project) 
+#' @param abstract (character) Project abstract. Can pass as a character vector
+#' for separate paragraphs.
+#' @param funding (character) Funding sources for the project such as grant and
+#' contract numbers. Can pass as a character vector for separate paragraphs.
+#' @param studyAreaDescription (studyAreaDescription)
+#' @param designDescription (designDescription)
+#' @param relatedProject (project)
 #'
 #' @return (project) The new project section.
 #' @export
 #'
 #' @examples
-#' eml_project("Some title", list(personnel1, personnel2), c("Abstract paragraph 1", "Abstract paragraph 2"), "#1 Best Scientist Award")
-eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, studyAreaDescription = NULL, designDescription = NULL, relatedProject = NULL) {
-  
+#' eml_project("Some title",
+#'             list(personnel1, personnel2),
+#'             c("Abstract paragraph 1", "Abstract paragraph 2"),
+#'             "#1 Best Scientist Award")
+eml_project <- function(title,
+                        personnelList,
+                        abstract = NULL,
+                        funding = NULL,
+                        studyAreaDescription = NULL,
+                        designDescription = NULL,
+                        relatedProject = NULL) {
+
   stopifnot(is.character(title),
             nchar(title) > 0)
   stopifnot(length(personnelList) > 0)
@@ -584,7 +599,7 @@ eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, s
   }
 
   project@personnel <- as(personnelList, "ListOfpersonnel")
-  
+
   # Abstract
   if(!is.null(abstract)) {
     abstract_paras <- lapply(abstract, function(x) {
@@ -592,7 +607,7 @@ eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, s
     })
     project@abstract@para <- as(abstract_paras, "ListOfpara")
   }
-  
+
   # Funding
   if(!is.null(funding)) {
     funding_paras <- lapply(funding, function(x) {
@@ -600,17 +615,17 @@ eml_project <- function(title, personnelList, abstract = NULL, funding = NULL, s
     })
     project@funding@para <- as(funding_paras, "ListOfpara")
   }
-  
+
   # Study area description
   if(!is.null(studyAreaDescription)) {
     project@studyAreaDescription <- studyAreaDescription
   }
-  
+
   # Design description
   if(!is.null(designDescription)) {
     project@designDescription <- designDescription
   }
-  
+
   # Related Project
   if(!is.null(relatedProject)) {
     project@relatedProject <- relatedProject
@@ -807,8 +822,11 @@ eml_validate_attributes <- function(attributes) {
 #' \dontrun{
 #'   types <- c("dataTable")
 #'   paths <- list.files(., full.names = TRUE) # Get full paths to some files
-#'   pids <- vapply(paths, function(x) { paste0("urn:uuid:", uuid::UUIDgenerate()) }, "") # Generate some UUID PIDs
-#'   format_ids <- guess_format_id(paths) # Try to guess format IDs, you should check this afterwards
+#'   pids <- vapply(paths, function(x) {
+#'     paste0("urn:uuid:", uuid::UUIDgenerate())
+#'   }, "") # Generate some UUID PIDs
+#' Try to guess format IDs, you should check this afterwards
+#'   format_ids <- guess_format_id(paths)
 #'
 #'   entity_df <- data.frame(type = types,
 #'                           path = paths,
@@ -826,7 +844,9 @@ eml_validate_attributes <- function(attributes) {
 #'   doc <- new("eml")
 #'   doc <- eml_add_entities(doc, entity_df)
 #' }
-eml_add_entities <- function(doc, entities, resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
+eml_add_entities <- function(doc,
+                             entities,
+                             resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
   stopifnot(is(doc, "eml"))
 
   if (!is(entities, "data.frame")) {
