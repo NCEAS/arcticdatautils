@@ -2,17 +2,19 @@
 % Please edit documentation in R/util.R
 \name{extract_local_identifier}
 \alias{extract_local_identifier}
-\title{util.R
-Author: Bryce Mecum <mecum@nceas.ucsb.edu>}
+\title{Extract the local identifier for an ACADIS ISO metadata XML file.}
 \usage{
 extract_local_identifier(type, file)
 }
 \arguments{
 \item{type}{(character) A string, one of "gateway" or "field-projects".}
 
-\item{file}{(character) A string, a connection, or raw vector (same as xml2::read_xml).}
+\item{file}{(character) A string, a connection, or raw vector
+(same as \code{\link[xml2]{read_xml}}).}
+}
+\value{
+The identifier string. (character)
 }
 \description{
-General utility functions that may be later merged into other files.
-Extracts the local identifier for an ACADIS ISO metadata XML file.
+Extract the local identifier for an ACADIS ISO metadata XML file.
 }
