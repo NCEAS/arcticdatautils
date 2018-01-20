@@ -375,6 +375,12 @@ change_eml_name <- function(party) {
 
   # Replace commas with spaces
   user_name <- stringr::str_replace_all(user_name, ",", "")
+
+  if (!requireNamespace("humaniformat")) {
+    stop("The package 'humaniformat' is required to run this function. ",
+         "Please install it.")
+  }
+
   parsed_name <- humaniformat::parse_names(user_name)
 
   # Create the new node to hold the parts of the name
