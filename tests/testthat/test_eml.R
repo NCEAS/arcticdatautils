@@ -2,34 +2,6 @@ context("EML")
 
 mn <- env_load()$mn
 
-test_that("an EML otherEntity subtree can be created when the sysmeta has a filename", {
-  x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta.xml")
-  doc <- XML::xmlParse(x)
-  sysmeta <- new("SystemMetadata")
-  sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
-
-  other_entity <- sysmeta_to_eml_other_entity(sysmeta)[[1]]
-
-  # Check some rough properties of the subtree
-  expect_is(other_entity, "otherEntity")
-  expect_equal(other_entity@entityName@.Data, "some_file.bin")
-  expect_equal(other_entity@physical[[1]]@dataFormat@externallyDefinedFormat@formatName, "application/octet-stream")
-})
-
-test_that("an EML otherEntity subtree can be created when the sysmeta doesn't have a filename ", {
-  x <- file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "example-sysmeta-nofilename.xml")
-  doc <- XML::xmlParse(x)
-  sysmeta <- new("SystemMetadata")
-  sysmeta <- datapack::parseSystemMetadata(sysmeta, XML::xmlRoot(doc))
-
-  other_entity <- sysmeta_to_eml_other_entity(sysmeta)[[1]]
-
-  # Check some rough properties of the subtree
-  expect_is(other_entity, "otherEntity")
-  expect_equal(other_entity@entityName@.Data, "NA")
-  expect_equal(other_entity@physical[[1]]@dataFormat@externallyDefinedFormat@formatName, "application/octet-stream")
-})
-
 test_that("a methods step can be added to an EML document", {
   library(XML)
   library(EML)
@@ -82,7 +54,7 @@ test_that("a contact can be created", {
 
 test_that("a personnel can be created", {
   personnel <- eml_personnel(given_names="test", sur_name="user", role="principalInvestigator")
-  
+
   expect_is(personnel, "personnel")
   expect_equal(personnel@individualName[[1]]@givenName[[1]]@.Data, "test")
   expect_equal(personnel@individualName[[1]]@surName@.Data, "user")
@@ -91,12 +63,12 @@ test_that("a personnel can be created", {
 
 test_that("a project can be created", {
   test_personnel_1 <- eml_personnel(given_names="A", sur_name="User", organization="NCEAS", role="originator")
-  
-  project <- eml_project("some title", 
-                         list(test_personnel_1), 
+
+  project <- eml_project("some title",
+                         list(test_personnel_1),
                          "This is a test abstract",
                          "I won an award, yay")
-  
+
   expect_is(project, "project")
   expect_equal(project@title[[1]]@.Data, "some title")
   expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "A")
@@ -109,12 +81,12 @@ test_that("a project can be created", {
 test_that("a project can be created with multiple personnel, an abstract can be created with multiple paragraphs, awards with multiple awards", {
   test_personnel_1 <- eml_personnel(given_names="A", sur_name="User", organization="NCEAS", role="originator")
   test_personnel_2 <- eml_personnel(given_names="Testy", sur_name="Mactesterson", organization="A Test Org", role=c("user", "author"))
-  
-  project <- eml_project("some title", 
-                         list(test_personnel_1, test_personnel_2), 
+
+  project <- eml_project("some title",
+                         list(test_personnel_1, test_personnel_2),
                          c("This is a test abstract", "This is the second paragraph"),
                          c("I won an award, yay", "I won a second award, wow"))
-  
+
   expect_is(project, "project")
   expect_equal(project@title[[1]]@.Data, "some title")
   expect_equal(project@personnel[[2]]@individualName[[1]]@givenName[[1]]@.Data, "Testy")
@@ -134,7 +106,7 @@ test_that("an other entity can be added from a pid", {
   writeLines(LETTERS, data_path)
   pid <- publish_object(mn, data_path, "text/plain")
 
-  eml_path <- file.path(system.file("inst", package = "arcticdatautils"), "example-eml.xml")
+  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
 
   doc <- EML::read_eml(eml_path)
   doc@dataset@otherEntity <- new("ListOfotherEntity", list())
