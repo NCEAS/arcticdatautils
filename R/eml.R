@@ -710,8 +710,15 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 #' @export
 #'
 #' @examples
+#' # Create a new EML document
+#' library(EML)
+#' doc <- new("eml")
+#'
+#' # Set an abstract with a single paragraph
 #' set_abstract(doc, c("Test abstract..."))
-#' set_abstract(doc, c("First para", "second para"))
+#'
+#' # Or one with multiple paragraphs
+#' set_abstract(doc, c("First para...", "second para..."))
 set_abstract <- function(doc, text) {
   stopifnot(is(doc, "eml"))
   stopifnot(is.character(text),

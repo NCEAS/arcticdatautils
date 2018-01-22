@@ -21,6 +21,13 @@ used for each element.}
 Set the abstract on an EML document
 }
 \examples{
+# Create a new EML document
+library(EML)
+doc <- new("eml")
+
+# Set an abstract with a single paragraph
 set_abstract(doc, c("Test abstract..."))
-set_abstract(doc, c("First para", "second para"))
+
+# Or one with multiple paragraphs
+set_abstract(doc, c("First para...", "second para..."))
 }
