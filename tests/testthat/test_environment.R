@@ -5,7 +5,7 @@
 context("environment")
 
 test_that("can load a simple environment file", {
-  x <- yaml::yaml.load_file(file.path(system.file("tests", "testfiles", package = "arcticdatautils"), "test_environment.yml"))
+  x <- yaml::yaml.load_file(system.file("./environment.yml", package = "arcticdatautils"))
 
   expect_true(length(x) == 3)
   expect_true(length(setdiff(c("development", "test", "production"), names(x))) == 0)
