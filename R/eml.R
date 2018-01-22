@@ -721,17 +721,43 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 #' set_abstract(doc, c("First para...", "second para..."))
 set_abstract <- function(doc, text) {
   stopifnot(is(doc, "eml"))
+
+  if (length(text) == 1) {
+    doc@dataset@abstract <- eml_abstract(text)
+  } else if (length(text) > 1) {
+    doc@dataset@abstract <- eml_abstract(text)
+  }
+
+  doc
+}
+
+
+#' Minimalistic helper function to generate EML abstracts
+#'
+#' @param text (character) Paragraphs of text, one paragraph per element in the
+#' character vector
+#'
+#' @return (abstract) An EML abstract
+#' @export
+#'
+#' @examples
+#' # Set an abstract with a single paragraph
+#' eml_abstract("Test abstract...")
+#'
+#' # Or one with multiple paragraphs
+#' eml_abstract(c("First para...", "second para..."))
+eml_abstract <- function(text) {
   stopifnot(is.character(text),
             length(text) > 0,
             all(nchar(text)) > 0)
 
   if (length(text) == 1) {
-    doc@dataset@abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
+    abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
   } else if (length(text) > 1) {
-    doc@dataset@abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
+    abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
   }
 
-  doc
+  abstract
 }
 
 
