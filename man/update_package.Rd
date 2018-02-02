@@ -7,9 +7,9 @@
 update_package(inventory, package, env = NULL)
 }
 \arguments{
-\item{inventory}{(data.frame)}
+\item{inventory}{(data.frame) An inventory.}
 
-\item{package}{(character)}
+\item{package}{(character) The package identifier.}
 }
 \value{
 TRUE or FALSE depending on sucess (logical)

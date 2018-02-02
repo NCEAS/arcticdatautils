@@ -7,7 +7,9 @@
 determine_child_pids(inventory, package)
 }
 \arguments{
-\item{package}{}
+\item{inventory}{(data.frame) An Inventory.}
+
+\item{package}{(character) The package identifier.}
 }
 \description{
 Calculate a set of child PIDs for a given package.
