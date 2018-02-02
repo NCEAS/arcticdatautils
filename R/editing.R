@@ -244,6 +244,7 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
 #' @param parent_data_pids
+#' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 #'
 #' @import dataone
 #' @import datapack
