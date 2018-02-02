@@ -29,6 +29,59 @@ pid_to_eml_other_entity <- function(mn, pids) {
   sysmeta_to_eml_other_entity(sysmeta)
 }
 
+#' Create an EML dataTable object for a given PID. 
+#' This function generates an attributeList object and physical and constructs a dataTable.
+#'
+#' @param mn (MNode) Member Node where the PID is associated with an object.
+#' @param pids (character) The PID of the object to create the sub-tree for.
+#' @param attributes (data.frame) Data frame of attributes.
+#' @param enumeratedValues (data.frame) Data frame of enumerated attribute values.
+#' @param name (character) Optional field to specify entityName, otherwise will be extracted from system metadata.
+#' @param description (character) Optional field to specify entityDescription.
+#' 
+#' @return (dataTable) The dataTable object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate a dataTable for a given pid
+#' pid <- "urn:uuid:xxxx"
+#' attributes <- data.frame(attributeName = ..., attributeDefinition = ..., ...)
+#' factors <- data.frame(attributeName = ..., code = ..., definition = ...)
+#' name <- "1234.csv"
+#' description <- "A description of this entity."
+#' dataTable <- pid_to_eml_datatable(mn, pid, attributes, factors, name, description)
+#' }
+pid_to_eml_datatable <- function(mn, pid, attributes, factors=NULL, name=NULL, description=NULL) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pids),
+            all(nchar(pids)) > 0)
+  stopifnot(is.data.frame(attributes))
+  
+  if (is.null(factors)) {
+    attributes <- set_attributes(attributes)
+  } else {
+    stopifnot(is.data.frame(factors))
+    attributes <- set_attributes(attributes, factors)
+  }
+  
+  if (is.null(name)) {
+    name <- getSystemMetadata(pid)@fileName
+  }
+  
+  stopifnot(eml_validate_attributes(attributes))
+  
+  physicalObj <- pid_to_eml_physical(mn, pid)
+  
+  dataTable <- new("dataTable",
+                   entityName = name,
+                   entityDescription = description,
+                   physical = physicalObj,
+                   attributeList = attributes)
+  
+  dataTable
+}
+
 #' This function is deprecated. See \link{pid_to_other_eml_entity}.
 #'
 #' @param mn (MNode)
