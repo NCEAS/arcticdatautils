@@ -16,6 +16,13 @@
 #' @import dataone
 #' @import datapack
 #' @export
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' set_rights_holder(mn, pids, subjects = "http://orcid.org/0000-000X-XXXX-XXXX")
+#'}
 set_rights_holder <- function(mn, pids, subject) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
@@ -90,6 +97,12 @@ set_rights_holder <- function(mn, pids, subject) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' set_access(mn, pids, subjects = "http://orcid.org/0000-000X-XXXX-XXXX", permissions = c("read", "write", "changePermission"))
+#'}
 set_access <- function(mn, pids, subjects, permissions=c("read", "write", "changePermission")) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
@@ -152,10 +165,15 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
 #' @param mn (MNode)
 #' @param pids (character) A vector of PIDs to set public access on
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' set_public_read(mn, pids)
+#'}
 set_public_read <- function(mn, pids) {
   set_access(mn, pids, "public", "read")
 }
@@ -165,10 +183,15 @@ set_public_read <- function(mn, pids) {
 #' @param mn (MNode)
 #' @param pids (character) A vector of PIDs to set public access on
 #'
-#' @return
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' remove_public_read(mn, pids)
+#'}
 remove_public_read <- function(mn, pids) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
@@ -249,6 +272,12 @@ remove_public_read <- function(mn, pids) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' set_rights_and_access(mn, pids, "http://orcid.org/0000-000X-XXXX-XXXX", permissions = c("read", "write", "changePermission"))
+#'}
 set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "write", "changePermission")) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))

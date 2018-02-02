@@ -15,3 +15,9 @@ clear_methods(doc)
 \description{
 Clear all methods from the document.
 }
+\examples{
+\dontrun{
+eml <- read_eml("~/Documents/metadata.xml")
+eml <- clear_methods(eml)
+}
+}

@@ -35,7 +35,7 @@ pid_to_eml_other_entity <- function(mn, pids) {
 #' @param pids (character)
 #'
 #' @return
-#' @export
+#'
 sysmeta_to_other_entity <- function(mn, pids) {
   .Deprecated("pid_to_other_eml_entity",
               package = "arcticdtautils",
@@ -115,7 +115,7 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
 #' @param sysmeta (SystemMetadata)
 #'
 #' @return
-#' @export
+#'
 sysmeta_to_other_entity <- function(sysmeta) {
   .Deprecated("sysmeta_to_eml_other_entity",
               package = "arcticdtautils",
@@ -235,9 +235,9 @@ set_other_entities <- function(mn, path, pids) {
 #' @param sysmeta (SystemMetadata) The sysmeta of the object you want to find.
 #'
 #' @return (character) The docid
-#' @export
 #'
-#' @examples
+#'
+#'
 get_doc_id <- function(sysmeta) {
   stopifnot(is(sysmeta, "SystemMetadata"))
 
@@ -284,6 +284,10 @@ get_doc_id <- function(sysmeta) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' eml <- read_eml("~/Documents/metadata.xml")
+#' eml <- add_methods_step(eml, "Field Sampling", "Samples were collected using a niskin water sampler.")
+#' }
 add_methods_step <- function(doc, title, description) {
   stopifnot(is(doc, "eml"))
   stopifnot(is(doc@dataset, "dataset"))
@@ -310,6 +314,10 @@ add_methods_step <- function(doc, title, description) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' eml <- read_eml("~/Documents/metadata.xml")
+#' eml <- clear_methods(eml)
+#' }
 clear_methods <- function(doc) {
   stopifnot(is(doc, "eml"))
 
@@ -342,7 +350,7 @@ clear_methods <- function(doc) {
 #' @export
 #'
 #' @examples
-#' eml_party("creator", "Test", "User)
+#' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
@@ -525,7 +533,7 @@ eml_personnel <- function(role = NULL, ...) {
 #' @export
 #'
 #' @examples
-#' eml_individual_name("some", "user)
+#' eml_individual_name("some", "user")
 eml_individual_name <- function(given_names=NULL, sur_name) {
   stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
 
@@ -660,6 +668,8 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #' @export
 #'
 #' @examples
+#' NCEASadd <- eml_address("735 State St #300", "Santa Barbara," "CA", "93101")
+
 eml_address <- function(delivery_points, city, administrative_area, postal_code) {
   stopifnot(is.character(delivery_points),
             is.character(city),

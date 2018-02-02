@@ -20,8 +20,16 @@
 #'
 #' @import dataone
 #' @import datapack
+#' @return pid (character). The PID of the published object.
 #'
 #' @export
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' my_path <- "/home/Documents/myfile.csv"
+#' pid <- publish_object(mn, path = my_path, format_id = "text/csv", public = FALSE)
+#'}
 publish_object <- function(mn,
                            path,
                            format_id=NULL,
@@ -123,6 +131,13 @@ publish_object <- function(mn,
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' my_path <- "/home/Documents/myfile.csv"
+#' new_pid <- update_object(mn, pid, my_path, format_id = "text/csv")
+#'}
 update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL) {
   stopifnot(is(mn, "MNode"))
   stopifnot(object_exists(mn, pid))
@@ -228,13 +243,27 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
-#' @param parent_data_pids
+#' @param parent_data_pids (character) Optional. Data pids of a parent package to be updated.
+#' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 #'
 #' @import dataone
 #' @import datapack
 #' @import EML
 #'
 #' @export
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#'
+#' meta_path <- "/home/Documents/myMetadata.xml"
+#'
+#' publish_update(mn, meta_pid, rm_pid, data_pids, meta_path, public = TRUE)
+#'}
 publish_update <- function(mn,
                            metadata_pid,
                            resource_map_pid,
@@ -528,7 +557,16 @@ publish_update <- function(mn,
 #' @export
 #'
 #' @examples
-
+#'\dontrun{
+#' cn <- CNode('STAGING2')
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
+#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
+#'
+#'
+#' create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
+#'}
 create_resource_map <- function(mn,
                                 metadata_pid,
                                 data_pids=NULL,
@@ -591,20 +629,36 @@ create_resource_map <- function(mn,
 #' temporarily to allow updating but sets it back to the rightsHolder that was
 #' in place before the update.
 #'
-#' @param mn
-#' @param metadata_pid
-#' @param data_pids
-#' @param child_pids
+#' @param mn (MNode) The Member Node
+#' @param metadata_pid (character) The PID of the metadata object to go in the
+#'   package.
+#' @param data_pids (character) The PID(s) of the data objects to go in the
+#'   package.
+#' @param child_pids child_pids (character) The resource map PIDs of the packages to be
+#'   nested under the package.
 #' @param public Whether or not to make the new resource map public read
 #'   (logical)
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as
 #'   aruments exist on the MN before continuing. This speeds up the function,
 #'   especially when `data_pids` has many elements.
-#' @param resource_map_pid
+#' @param resource_map_pid (character) The PID of the resource map to be updated.
 #' @param other_statements (data.frame) Extra statements to add to the Resource Map.
-#' @param identifier
+#' @param identifier (character) Manually specify the identifier for the new metadata object.
+#' @return pid (character) Updated resource map PID.
 #'
 #' @export
+#' @examples
+#'\dontrun{
+#' cn <- CNode('STAGING2')
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#'
+#'
+#' rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
+#'}
 update_resource_map <- function(mn,
                                 resource_map_pid,
                                 metadata_pid,
@@ -715,6 +769,13 @@ update_resource_map <- function(mn,
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn, "urn:node:mnTestKNB")
+#'
+#' pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+#' set_file_name(mn, pid, "myfile.csv")
+#' }
 set_file_name <- function(mn, pid, name) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),

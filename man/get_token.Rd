@@ -15,3 +15,10 @@ get_token(node)
 \description{
 Gets the currently set authentication token.
 }
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+get_token(mn)
+}
+}
