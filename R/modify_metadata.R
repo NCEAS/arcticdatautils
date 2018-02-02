@@ -21,6 +21,7 @@
 #  sapply(bad_enums, fix_bad_enums)
 
 
+
 test_has_abstract <- function(path) {
   stopifnot(file.exists(path))
 
@@ -144,9 +145,7 @@ test_has_bad_enum <- function(path) {
 #'
 #' @param path
 #'
-#' @return
-#'
-#' @examples
+
 fix_bad_enum <- function(path) {
   stopifnot(file.exists(path))
 
@@ -189,7 +188,7 @@ fix_bad_enum <- function(path) {
 #'
 #' @return
 #'
-#' @examples
+
 fix_bad_topic <- function(path) {
   stopifnot(file.exists(path))
 
@@ -299,7 +298,7 @@ fix_bad_topic <- function(path) {
 #'
 #' @return Returns the result of the `system` command (0 = success)
 #'
-#' @examples
+
 pretty_print <- function(path) {
   stopifnot(file.exists(path),
             file.info(path)$size > 0)
