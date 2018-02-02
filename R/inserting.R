@@ -15,9 +15,6 @@
 #' @param data_pids (character) Optional. Manually specify the PIDs of data. This is useful if data were inserted outside this function and you want to re-use those objects.
 #'
 #' @return (list) All of the PIDs created.
-#' @export
-#'
-#' @examples
 create_from_folder <- function(mn, path, data_pids=NULL) {
   # Validate args
   stopifnot(file.exists(path))
