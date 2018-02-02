@@ -17,3 +17,9 @@ convert_iso_to_eml(path, style = NA)
 \description{
 Leave style=NA if you want to use the default ISO-to-EML stylesheet.
 }
+\examples{
+\dontrun{
+iso_path <- "~/Docuements/ISO_metadata.xml"
+eml_path <- convert_iso_to_eml(iso_path)
+}
+}

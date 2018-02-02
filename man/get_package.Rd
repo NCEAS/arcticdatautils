@@ -23,3 +23,13 @@ useful to set if you are warned about the result set being truncated.}
 This is a wrapper function around `get_package_direct` which takes either
 a resource map PID or a metadata PID as its `pid` argument.
 }
+\examples{
+\dontrun{
+#Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+pid <- "resource_map_urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+
+ids <- get_package(mn, pid)
+}
+}

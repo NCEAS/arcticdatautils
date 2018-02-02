@@ -9,9 +9,6 @@ fix_bad_enum(path)
 \arguments{
 \item{path}{}
 }
-\value{
-
-}
 \description{
 This is the case where the ISO schema says what's inside a
 gmd:MD_TopicCategoryCode element should match items from a controlled

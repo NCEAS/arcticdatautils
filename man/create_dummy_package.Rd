@@ -9,8 +9,20 @@ create_dummy_package(mn, size = 2)
 \arguments{
 \item{mn}{(MNode) The Member Node.}
 
-\item{size}{(numeric) The number of files in the package.}
+\item{size}{(numeric) The number of files in the package, including the metadata file.}
+}
+\value{
+pids (character) A named character vector of the data pids in the package.
 }
 \description{
 Create a test package.
+}
+\examples{
+\dontrun{
+# Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+#Create dummy package with 5 data objects and 1 metadata object
+pids <- create_dummy_package(mn, 6)
+}
 }
