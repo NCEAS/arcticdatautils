@@ -16,3 +16,10 @@ is_token_set(node)
 Helpers for the DataONE R package.
 Test whether a token is set.
 }
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+is_token_set(mn)
+}
+}

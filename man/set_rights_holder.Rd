@@ -22,3 +22,11 @@ Set the rightsHolder field for a given PID.
 Update the rights holder to the provided subject for the object identified in
 the provided system metadata document on the given Member Node.
 }
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+pids <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
+set_rights_holder(mn, pids, subjects = 'http://orcid.org/0000-000X-XXXX-XXXX')
+}
+}
