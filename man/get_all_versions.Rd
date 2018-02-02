@@ -17,3 +17,13 @@ get_all_versions(node, pid)
 \description{
 Get the PIDs of all versions of an object.
 }
+\examples{
+\dontrun{
+#Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+pid <- "urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+
+ids <- get_all_versions(mn, pid)
+}
+}

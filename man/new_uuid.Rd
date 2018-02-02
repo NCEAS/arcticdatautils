@@ -12,3 +12,6 @@ new_uuid()
 \description{
 Helper function to generate a new UUID PID.
 }
+\examples{
+id <- new_uuid()
+}

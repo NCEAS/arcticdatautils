@@ -11,9 +11,7 @@
 #' complicated.
 #'
 #' @return An empty data frame
-#' @export
-#'
-#' @examples
+
 inv_init <- function() {
   inventory <- data.frame(stringsAsFactors = FALSE)
 
@@ -31,10 +29,7 @@ inv_init <- function() {
 #' @param filter (logical) Filter out versioned datasets. Default is TRUE.
 #'
 #' @return An inventory (data.frame)
-#'
-#' @export
-#'
-#' @examples
+
 inv_load_files <- function(inventory, path, filter=TRUE) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -108,9 +103,7 @@ inv_load_files <- function(inventory, path, filter=TRUE) {
 #'
 #' @return (data.frame) An inventory
 #'
-#' @export
-#'
-#' @examples
+
 inv_load_sizes <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -150,9 +143,7 @@ inv_load_sizes <- function(inventory, path) {
 #'
 #' @return An inventory (data.frame)
 #'
-#' @export
-#'
-#' @examples
+
 inv_load_checksums <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -198,9 +189,7 @@ inv_load_checksums <- function(inventory, path) {
 #'
 #' @return (data.frame) The modified Inventory.
 #'
-#' @export
-#'
-#' @examples
+
 inv_load_dois <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
@@ -233,9 +222,7 @@ inv_load_dois <- function(inventory, path) {
 #'
 #' @return (data.frame) An inventory.
 #'
-#' @export
-#'
-#' @examples
+
 inv_load_identifiers <- function(inventory, paths) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
@@ -272,7 +259,7 @@ inv_load_identifiers <- function(inventory, paths) {
 #'
 #' @return An inventory (data.frame)
 #'
-#' @export
+
 inv_add_extra_columns <- function(inventory) {
   stopifnot(is(inventory, "data.frame"), "file" %in% names(inventory))
 
@@ -366,9 +353,7 @@ inv_add_extra_columns <- function(inventory) {
 #' @param inventory (data.frame) An Inventory.
 #'
 #' @return inventory (data.frame) An Inventory.
-#' @export
-#'
-#' @examples
+
 inv_add_parent_package_column <- function(inventory) {
   stopifnot(all(c("file", "package", "is_metadata", "depth") %in% names(inventory)))
 
@@ -438,10 +423,7 @@ inv_add_parent_package_column <- function(inventory) {
 #' @param inventory (data.frame) The old Inventory.
 #' @param new_state (data.frame) The new Inventory.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 inv_update <- function(inventory, new_state) {
   stopifnot(is.data.frame(inventory),
             is.data.frame(new_state),

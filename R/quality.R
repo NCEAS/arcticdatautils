@@ -9,7 +9,7 @@
 #' @examples
 #' # Check an EML document you are authoring
 #' library(EML)
-#' mdq_run(new("eml))
+#' mdq_run(new("eml"))
 #'
 #' # Check an EML document that is saved to disk
 #' mdq_run(system.file("examples", "example-eml-2.1.1.xml", package = "EML"))

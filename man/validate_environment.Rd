@@ -7,7 +7,7 @@
 validate_environment(env)
 }
 \arguments{
-\item{env}{}
+\item{env}{(character) An environment}
 }
 \description{
 Validate an environment.
