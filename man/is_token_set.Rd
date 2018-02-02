@@ -10,7 +10,7 @@ is_token_set(node)
 \item{node}{(MNode|CNode) The CN or MN you want to find a token for.}
 }
 \value{
-(boolean)
+(logical)
 }
 \description{
 Helpers for the DataONE R package.

@@ -17,3 +17,6 @@ eml_individual_name(given_names = NULL, sur_name)
 \description{
 Create an EML individualName section
 }
+\examples{
+eml_individual_name("some", "user")
+}

@@ -41,7 +41,10 @@ access policies are not affected.}
 
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.}
 
-\item{parent_data_pids}{}
+\item{parent_data_pids}{(character) Optional. Data pids of a parent package to be updated.}
+}
+\value{
+pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 }
 \description{
 This function can be used for a variety of tasks:

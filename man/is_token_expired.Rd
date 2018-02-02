@@ -7,7 +7,7 @@
 is_token_expired(node)
 }
 \value{
-(boolean)
+(logical)
 }
 \description{
 Determine whether the set token is expired.
