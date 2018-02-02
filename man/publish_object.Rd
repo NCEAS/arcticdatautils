@@ -20,6 +20,9 @@ publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
 
 \item{clone_pid}{(character) PID of objet to clone System Metadata from}
 }
+\value{
+pid (character). The PID of the published object.
+}
 \description{
 High-level functions for managing content.
 Publish an object on a member node
@@ -30,4 +33,12 @@ use it, otherwise generate a UUID.  If clone_id is provided, then retrieve the
 system metadata for that identifier and use it to provide rightsHolder, accessPolicy,
 and replicationPolicy metadata. Note that this function only uploads the object to
 the Member Node, and does not add it to a data package, which can be done separately.
+}
+\examples{
+\dontrun{
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+my_path <- "/home/Documents/myfile.csv"
+pid <- publish_object(mn, path = my_path, format_id = "text/csv", public = FALSE)
+}
 }

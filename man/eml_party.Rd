@@ -40,3 +40,7 @@ fine.
 \details{
 The \code{userId} argument assumes an ORCID so be sure to adjust for that.
 }
+\examples{
+eml_party("creator", "Test", "User")
+eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+}

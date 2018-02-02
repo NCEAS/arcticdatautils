@@ -6,6 +6,16 @@
 \usage{
 is_token_expired(node)
 }
+\value{
+(logical)
+}
 \description{
 Determine whether the set token is expired.
+}
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+is_token_expired(mn)
+}
 }

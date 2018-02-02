@@ -34,9 +34,9 @@ env_get <- function() {
 #' @param skip_mn (logical) Optional. Skip contacting the MNode and filling in the $mn element of the environment.
 #'
 #' @return (list) A list of name-value pairs.
-#' @export
 #'
-#' @examples
+#'
+#'
 env_load <- function(name=NULL, path=NULL, skip_mn=FALSE) {
   # Determine the environment to load
   if (is.null(name)) {
