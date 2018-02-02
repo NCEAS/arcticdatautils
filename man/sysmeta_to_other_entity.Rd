@@ -2,27 +2,16 @@
 % Please edit documentation in R/eml.R
 \name{sysmeta_to_other_entity}
 \alias{sysmeta_to_other_entity}
-\alias{sysmeta_to_other_entity}
-\title{This function is deprecated. See \link{pid_to_other_eml_entity}.}
+\title{This function is deprecated. See \link{sysmeta_to_eml_other_entity}.}
 \usage{
-sysmeta_to_other_entity(sysmeta)
-
 sysmeta_to_other_entity(sysmeta)
 }
 \arguments{
 \item{sysmeta}{(SystemMetadata)}
-
-\item{mn}{(MNode)}
-
-\item{pids}{(character)}
 }
 \value{
 
-
-
 }
 \description{
-This function is deprecated. See \link{pid_to_other_eml_entity}.
-
 This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
 }
