@@ -78,6 +78,8 @@ dataone_format_mappings <- list("avi" = "ideo/avi",
 #' @export
 #'
 #' @examples
+#'formatid <- guess_format_id("temperature_data.csv")
+#'
 guess_format_id <- function(filenames) {
   extensions <- tolower(tools::file_ext(filenames))
   filetypes <- vector(mode = "character", length = length(extensions))
@@ -101,9 +103,7 @@ guess_format_id <- function(filenames) {
 #' @param path (character) Full or relative path to the file in question.
 #'
 #' @return (character) The DataONE format ID.
-#' @export
-#'
-#' @examples
+
 get_netcdf_format_id <- function(path) {
   stopifnot(is.character(path),
             nchar(path) > 0,
@@ -146,9 +146,7 @@ get_netcdf_format_id <- function(path) {
 #' @param n (numeric) Optional. The number of files to show.
 #'
 #' @return Nothing.
-#' @export
-#'
-#' @examples
+
 show_random_dataset <- function(inventory, theme=NULL, n=10) {
   stopifnot(is.data.frame(inventory),
             all(c("file", "folder", "filename", "theme") %in% names(inventory)))
@@ -203,9 +201,7 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
 #' @param message (character) Your log message.
 #'
 #' @return Nothing.
-#' @export
-#'
-#' @examples
+
 log_message <- function(message=NULL) {
   if (is.null(message) || !is.character(message) || nchar(message) < 1) {
     invisible(return(FALSE))
@@ -244,6 +240,14 @@ log_message <- function(message=NULL) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#'
+#' object_exists(mn, pids)
+#' }
 object_exists <- function(node, pids) {
   stopifnot(class(node) %in% c("MNode", "CNode"),
             is.character(pids))
@@ -279,6 +283,10 @@ object_exists <- function(node, pids) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#'iso_path <- "~/Docuements/ISO_metadata.xml"
+#'eml_path <- convert_iso_to_eml(iso_path)
+#'}
 convert_iso_to_eml <- function(path, style=NA) {
   # Load the XSLT if needed
   if (is.na(style)) {
@@ -304,7 +312,7 @@ convert_iso_to_eml <- function(path, style=NA) {
 #'
 #' @return path (character) Path to the converted EML file.
 #' @import XML
-#' @export
+
 substitute_eml_party <- function(path) {
   # Read in the EML document
   doc = XML::xmlParse(path)
@@ -341,7 +349,7 @@ substitute_eml_party <- function(path) {
 #' @return the modified XML node
 #'
 #' @import XML
-#' @export
+
 change_eml_name <- function(party) {
   # Check if there is an individualName element exists
   if (length(XML::getNodeSet(party, "./individualName")) == 0) {
@@ -415,10 +423,7 @@ change_eml_name <- function(party) {
 #' @param path (character) Path to the XML file to edit.
 #' @param replacement (character) The new value.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 replace_package_id <- function(path, replacement) {
   stopifnot(file.exists(path))
   stopifnot(is.character(replacement),
@@ -440,10 +445,7 @@ replace_package_id <- function(path, replacement) {
 #' @param path (character) Path to the XML file to edit.
 #' @param string (character) The new value.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 add_string_to_title <- function(path, string) {
   stopifnot(file.exists(path))
   stopifnot(is.character(string),
@@ -476,9 +478,7 @@ add_string_to_title <- function(path, string) {
 #' @param identifiers (character) Set of identifiers to add.
 #'
 #' @return (character) Path to the modified document.
-#' @export
-#'
-#' @examples
+
 add_additional_identifiers <- function(path, identifiers) {
   stopifnot(is.character(path),
             nchar(path) > 0,
@@ -510,9 +510,7 @@ add_additional_identifiers <- function(path, identifiers) {
 #' @param path_parts (character)
 #'
 #' @return (character)The joined path string.
-#' @export
-#'
-#' @examples
+
 path_join <- function(path_parts=c("")) {
   result <- paste0(path_parts, collapse = "")
 
@@ -539,9 +537,7 @@ path_join <- function(path_parts=c("")) {
 #' @param format_id (character)
 #'
 #' @return (logical)
-#' @export
-#'
-#' @examples
+
 is_format_id <- function(node, pids, format_id) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(all(is.character(pids)),
@@ -564,9 +560,7 @@ is_format_id <- function(node, pids, format_id) {
 #' @param pids (character) Vector of PIDs
 #'
 #' @return (logical) Whether or not the object(s) are resource maps
-#' @export
-#'
-#' @examples
+
 is_resource_map <- function(node, pids) {
   is_format_id(node, pids, "http://www.openarchives.org/ore/terms")
 }
@@ -581,6 +575,14 @@ is_resource_map <- function(node, pids) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+#'
+#' is_obsolete(mn, pid)
+#'}
 is_obsolete <- function(node, pids) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pids))
@@ -600,9 +602,8 @@ is_obsolete <- function(node, pids) {
 #' Returns the subject of the set dataone_test_token
 #'
 #' @return (character) The token subject.
-#' @export
 #'
-#' @examples
+#'
 get_token_subject <- function() {
   info <- dataone::getTokenInfo(dataone::AuthenticationManager())
 
@@ -631,9 +632,7 @@ get_token_subject <- function() {
 #' @param dataone_response ("XMLInternalDocument" "XMLAbstractDocument")
 #'
 #' @return (character) The PID.
-#' @export
-#'
-#' @examples
+
 get_identifier <- function(dataone_response) {
   stopifnot("XMLInternalDocument" %in% class(dataone_response))
   XML::xmlValue(XML::getNodeSet(dataone_response, "//d1:identifier/text()", namespaces = c("d1"="http://ns.dataone.org/service/types/v1"))[[1]])
@@ -646,6 +645,7 @@ get_identifier <- function(dataone_response) {
 #' @export
 #'
 #' @examples
+#' id <- new_uuid()
 new_uuid <- function() {
   paste0("urn:uuid:", uuid::UUIDgenerate())
 }
@@ -657,9 +657,6 @@ new_uuid <- function() {
 #' version.
 #'
 #' @return (character) The current package version.
-#' @export
-#'
-#' @examples
 get_current_version <- function() {
   desc_file <- file.path(system.file("DESCRIPTION", package = "arcticdatautils"))
   desc_lines <- readLines(desc_file)
@@ -670,9 +667,6 @@ get_current_version <- function() {
 #' Use the GitHub API to find the latest release for the package.
 #'
 #' @return (character) The latest release.
-#' @export
-#'
-#' @examples
 get_latest_release <- function() {
   req <- httr::GET("https://api.github.com/repos/NCEAS/arcticdatautils/releases")
   content <- httr::content(req)
@@ -687,10 +681,7 @@ get_latest_release <- function() {
 #' Warns if the currently-installed version of the package is not the same
 #' version as the latest release on GitHub.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 warn_current_version <- function() {
   current <- get_current_version()
   latest <- get_latest_release()
@@ -710,6 +701,14 @@ warn_current_version <- function() {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' #Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+#'
+#' ids <- get_all_versions(mn, pid)
+#' }
 get_all_versions <- function(node, pid) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
@@ -768,6 +767,14 @@ get_all_versions <- function(node, pid) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' #Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "resource_map_urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+#'
+#' ids <- get_package(mn, pid)
+#' }
 get_package <- function(node, pid, file_names=FALSE, rows=1000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
@@ -811,9 +818,7 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
 #' @param rows (numeric) The number of rows to return in the query. This is only
 #' useful to set if you are warned about the result set being truncated.
 #'
-#' @return
-#'
-#' @examples
+
 get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
@@ -889,9 +894,7 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
 #'   more than enough.
 #'
 #' @return (character) The resource map(s) that contain `pid`.
-#' @export
-#'
-#' @examples
+
 find_newest_resource_map <- function(node, pid, rows = 1000) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
@@ -986,9 +989,7 @@ find_newest_object <- function(node, identifiers, rows=1000) {
 #' @param pids (character) PIDs to check the obsoletion state of.
 #'
 #' @return (character) PIDs that are not obsoleted by another PID.
-#' @export
-#'
-#' @examples
+
 filter_obsolete_pids <- function(node, pids) {
   pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(node, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
@@ -1026,6 +1027,13 @@ filter_obsolete_pids <- function(node, pids) {
 #'
 #' // Get a custom set of fields
 #' view_profile(mn, me, "origin")
+#'
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' package_df <- view_profile(mn, "http://orcid.org/0000-0003-4703-1974", fields = c("title"))
+#'
 #' }
 view_profile <- function(mn, subject, fields=c("identifier", "title")) {
   stopifnot(is(mn, "MNode"))
