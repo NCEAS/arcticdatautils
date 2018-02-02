@@ -16,9 +16,6 @@ get_package_direct(node, pid, file_names = FALSE, rows = 1000)
 \item{rows}{(numeric) The number of rows to return in the query. This is only
 useful to set if you are warned about the result set being truncated.}
 }
-\value{
-
-}
 \description{
 Get a structured list of PIDs for the objects in a package.
 }
