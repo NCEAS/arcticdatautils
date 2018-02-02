@@ -29,19 +29,6 @@ pid_to_eml_other_entity <- function(mn, pids) {
   sysmeta_to_eml_other_entity(sysmeta)
 }
 
-#' This function is deprecated. See \link{pid_to_other_eml_entity}.
-#'
-#' @param mn (MNode)
-#' @param pids (character)
-#'
-#' @return
-#'
-sysmeta_to_other_entity <- function(mn, pids) {
-  .Deprecated("pid_to_other_eml_entity",
-              package = "arcticdtautils",
-              old = "pid_to_other_entity")
-}
-
 #' Create EML physical objects for the given set of PIDs
 #'
 #' Note this is a wrapper around sysmeta_to_eml_physical which handles the task of
