@@ -6,7 +6,7 @@
 #'
 #' @param node (MNode|CNode) The CN or MN you want to find a token for.
 #'
-#' @return (boolean)
+#' @return (logical)
 #' @export
 #'
 #' @examples
@@ -61,7 +61,7 @@ get_token <- function(node) {
 
 #' Determine whether the set token is expired.
 #'
-#' @return (boolean)
+#' @return (logical)
 #' @export
 #'
 #' @examples
