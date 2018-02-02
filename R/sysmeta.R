@@ -11,9 +11,7 @@
 #' @param sysmeta (SystemMetadata) The SystemMetadata to add rules to.
 #'
 #' @return The modified SystemMetadata object
-#' @export
-#'
-#' @examples
+
 add_access_rules <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {
     stop(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
@@ -41,7 +39,7 @@ add_access_rules <- function(sysmeta) {
 #'
 #' @examples
 #' library(datapack)
-#' sm <- new("SystemMetadata)
+#' sm <- new("SystemMetadata")
 #' sm <- addAccessRule(sm, "public", "read")
 #' sm@accessPolicy
 #' sm <- remove_public_access(sm)
@@ -61,10 +59,6 @@ remove_public_access <- function(sysmeta) {
 #'
 #' @param sysmeta
 #'
-#' @return
-#' @export
-#'
-#' @examples
 add_admin_group_access <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {
     message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
@@ -90,9 +84,6 @@ add_admin_group_access <- function(sysmeta) {
 #' @param to (character) The DN string to put in place of `from`.
 #'
 #' @return The modified System Metadata (SystemMetadata)
-#' @export
-#'
-#' @examples
 replace_subject <- function(sysmeta,
                             from="cn=arctic-data-admins,dc=dataone,dc=org",
                             to="CN=arctic-data-admins,DC=dataone,DC=org") {
@@ -122,9 +113,6 @@ replace_subject <- function(sysmeta,
 #' @param sysmeta (SystemMetadata) The System Metadata object to clear the replication policy of.
 #'
 #' @return (SystemMetadata) The modified System Metadata object.
-#' @export
-#'
-#' @examples
 clear_replication_policy <- function(sysmeta) {
   if (!(is(sysmeta, "SystemMetadata"))) {
     stop("First argument was not of class SystemMetadata.")
