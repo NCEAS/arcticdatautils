@@ -19,6 +19,5 @@ Get the base URL of the Member Node.
 \dontrun{
 cn <- CNode('STAGING2')
 mn <- getMNode(cn,"urn:node:mnTestKNB")
-url <- get_mn_base_url(mn)
 }
 }

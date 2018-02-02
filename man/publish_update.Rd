@@ -64,3 +64,17 @@ should be updated as well, using the parent_medata_pid, parent_data_pids, and
 parent_child_pids as members of the updated package. In all cases, the objects
 are made publicly readable.
 }
+\examples{
+\dontrun{
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+
+meta_path <- "/home/Documents/myMetadata.xml"
+
+publish_update(mn, meta_pid, rm_pid, data_pids, meta_path, public = TRUE)
+}
+}
