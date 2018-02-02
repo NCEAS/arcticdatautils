@@ -7,8 +7,16 @@
 #'
 #' @param mn (MNode) The Member Node.
 #' @param data_pids (character) Optional. PIDs for data objects the metadata documents.
-#'
+#' @return pid (character) PID of published metadata document.
 #' @export
+#' @examples
+#'\dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+#' pid <- create_dummy_metadata(mn)
+#' }
 create_dummy_metadata <- function(mn, data_pids=NULL) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
@@ -49,10 +57,17 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 #'
 #' @param mn (MNode) The Member Node.
 #'
-#' @return
+#' @return pid (character) The pid of the dummy object.
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' pid <- create_dummy_object(mn)
+#'}
 create_dummy_object <- function(mn) {
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
@@ -88,12 +103,19 @@ create_dummy_object <- function(mn) {
 #' Create a test package.
 #'
 #' @param mn (MNode) The Member Node.
-#' @param size (numeric) The number of files in the package.
+#' @param size (numeric) The number of files in the package, including the metadata file.
 #'
-#' @return
+#' @return pids (character) A named character vector of the data pids in the package.
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' #Create dummy package with 5 data objects and 1 metadata object
+#' pids <- create_dummy_package(mn, 6)
+#' }
 create_dummy_package <- function(mn, size = 2) {
   me <- get_token_subject()
 
@@ -147,10 +169,19 @@ create_dummy_package <- function(mn, size = 2) {
 #' @param mn (MNode) The Member Node.
 #' @param children (character) Child package (resource maps) PIDs.
 #'
-#' @return
+#' @return pid (character) Named character vector of PIDs including parent package and child package pids.
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' # Set environment
+# cn <- CNode("STAGING2")
+# mn <- getMNode(cn,"urn:node:mnTestKNB")
+#
+# child_pid <- "urn:uuid:39a59f99-118b-4c81-9747-4b6c43308e00"
+#
+# create_dummy_parent_package(mn, child_pid)
+#'}
 create_dummy_parent_package <- function(mn, children) {
   me <- get_token_subject()
   meta_pid <- create_dummy_metadata(mn)
