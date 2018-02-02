@@ -21,6 +21,8 @@ generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
 \item{other_statements}{(data.frame) Extra statements to add to the Resource Map.}
 
 \item{resolve_base}{(character) Optional. The resolve service base URL.}
+
+\item{resource_map_pid}{(character) PID of resource map.}
 }
 \value{
 Absolute path to the Resource Map on disk (character)
