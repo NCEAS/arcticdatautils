@@ -19,3 +19,12 @@ set_file_name(mn, pid, name)
 \description{
 Set the file name on an object
 }
+\examples{
+\dontrun{
+cn <- CNode("STAGING2")
+mn <- getMNode(cn, "urn:node:mnTestKNB")
+
+pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+set_file_name(mn, pid, "myfile.csv")
+}
+}

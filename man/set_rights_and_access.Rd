@@ -27,9 +27,9 @@ needed.
 }
 \examples{
 \dontrun{
-cn <- CNode('STAGING2')
+cn <- CNode("STAGING2")
 mn <- getMNode(cn,"urn:node:mnTestKNB")
-pids <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
-set_rights_and_access(mn, pids, subjects = 'http://orcid.org/0000-000X-XXXX-XXXX', permissions = c('read', 'write', 'changePermission'))
+pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+set_rights_and_access(mn, pids, "http://orcid.org/0000-000X-XXXX-XXXX", permissions = c("read", "write", "changePermission"))
 }
 }
