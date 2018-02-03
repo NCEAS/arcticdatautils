@@ -31,30 +31,6 @@ add_access_rules <- function(sysmeta) {
 }
 
 
-#' Remove all public read access rules from a System Metadata document
-#'
-#' @param sysmeta (SystemMetadata) The System Metadata document. to change.
-#'
-#' @return (SystemMetadata) The potentially modified System Metadata document.
-#'
-#' @examples
-#' library(datapack)
-#' sm <- new("SystemMetadata")
-#' sm <- addAccessRule(sm, "public", "read")
-#' sm@accessPolicy
-#' sm <- remove_public_access(sm)
-#' sm@accessPolicy
-remove_public_access <- function(sysmeta) {
-  if (!inherits(sysmeta, "SystemMetadata")) {
-    stop(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
-  }
-
-  sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)),]
-
-  sysmeta
-}
-
-
 #' Adds access to the given System Metadata for the arctic-data-admins group
 #'
 #' @param sysmeta
