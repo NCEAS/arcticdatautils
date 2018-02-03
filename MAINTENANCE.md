@@ -1,5 +1,7 @@
 # Maintenance
 
+TODO: Add reasons for these things!
+
 This document should serve as a guide for new maintainers of this package.
 It's a work in progress so expect it to change and, hopefully, get better and more complete over time.
 
@@ -40,5 +42,8 @@ Since this package isn't on CRAN, we can release it as much as we like and we're
 - You're done, now go tell people to upgrade!
 
 ## Pull Requests
+
+- Code style
+- Commit style
 
 TODO
