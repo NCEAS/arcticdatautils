@@ -6,10 +6,15 @@
 #'
 #' @param node (MNode|CNode) The CN or MN you want to find a token for.
 #'
-#' @return (boolean)
+#' @return (logical)
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#'cn <- CNode('STAGING2')
+#'mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'is_token_set(mn)
+#'}
 is_token_set <- function(node) {
   token <- tryCatch(get_token(node),
                     error = function(e) FALSE)
@@ -30,6 +35,11 @@ is_token_set <- function(node) {
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#'cn <- CNode('STAGING2')
+#'mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'get_token(mn)
+#'}
 get_token <- function(node) {
   if (!(class(node) %in% c("MNode", "CNode"))) {
     stop(paste0("Node must be an MNode or CNode. You passed in a '", class(node), "'."))
@@ -51,10 +61,15 @@ get_token <- function(node) {
 
 #' Determine whether the set token is expired.
 #'
-#' @return
+#' @return (logical)
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#'cn <- CNode('STAGING2')
+#'mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'is_token_expired(mn)
+#'}
 is_token_expired <- function(node) {
   token_name <- ifelse(node@env == "prod", "dataone_token", "dataone_test_token")
 
@@ -91,14 +106,19 @@ is_token_expired <- function(node) {
 #'
 #' @param mn
 #'
-#' @return
+#' @return (character) The URL
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#' cn <- CNode('STAGING2')
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+# 'url <- get_mn_base_url(mn)
+#'}
 get_mn_base_url <- function(mn) {
   # Determine MN URL. Accept either an MNode or a character string
   if (is(mn, "MNode")) {
-    mn_base_url <- mn$base_url
+    mn_base_url <- mn@base_url
   }
 
   mn_base_url <- mn
@@ -110,8 +130,16 @@ get_mn_base_url <- function(mn) {
 #' @param node (MNode|CNode) The Node to query.
 #' @param ids (character) The PID or SID to check.
 #' @param action (character) One of read, write, or changePermission.
-#'
+#' @return (boolean)
 #' @export
+#'
+#' @examples
+#'\dontrun{
+#' cn <- CNode('STAGING2')
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' is_authorized(mn, pids, "write")
+#'}
 is_authorized <- function(node, ids, action) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(ids))

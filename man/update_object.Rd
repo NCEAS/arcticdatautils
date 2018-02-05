@@ -27,3 +27,12 @@ This is a convenience wrapper around `dataone::updateObject` which copies in
 fields from the old object's System Metadata such as the rightsHolder and
 accessPolicy and updates only what needs to be changed.
 }
+\examples{
+\dontrun{
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+my_path <- "/home/Documents/myfile.csv"
+new_pid <- update_object(mn, pid, my_path, format_id = "text/csv")
+}
+}

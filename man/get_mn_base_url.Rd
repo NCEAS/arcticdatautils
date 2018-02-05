@@ -9,6 +9,15 @@ get_mn_base_url(mn)
 \arguments{
 \item{mn}{}
 }
+\value{
+(character) The URL
+}
 \description{
 Get the base URL of the Member Node.
+}
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+}
 }
