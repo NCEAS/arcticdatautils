@@ -84,19 +84,6 @@ pid_to_eml_datatable <- function(mn, pid, attributes, factors=NULL, name=NULL, d
   dataTable
 }
 
-#' This function is deprecated. See \link{pid_to_other_eml_entity}.
-#'
-#' @param mn (MNode)
-#' @param pids (character)
-#'
-#' @return
-#' @export
-sysmeta_to_other_entity <- function(mn, pids) {
-  .Deprecated("pid_to_other_eml_entity",
-              package = "arcticdtautils",
-              old = "pid_to_other_entity")
-}
-
 #' Create EML physical objects for the given set of PIDs
 #'
 #' Note this is a wrapper around sysmeta_to_eml_physical which handles the task of
@@ -162,19 +149,6 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
   if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
 
   lapply(sysmeta, work)
-}
-
-
-#' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
-#'
-#' @param sysmeta (SystemMetadata)
-#'
-#' @return
-#'
-sysmeta_to_other_entity <- function(sysmeta) {
-  .Deprecated("sysmeta_to_eml_other_entity",
-              package = "arcticdtautils",
-              old = "sysmeta_to_other_entity")
 }
 
 #' Create an EML physical object from System Metadata
