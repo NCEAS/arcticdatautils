@@ -134,9 +134,9 @@ test_that("a data table can be added from a pid", {
   doc <- EML::read_eml(eml_path)
   
   factors <- c("factor 1", "factor 2")
-  doc@dataset@dataTable <- pid_to_eml_datatable(mn, pid, 
-                                                create_dummy_attributes_dataframe(10, factors),
-                                                create_dummy_enumeratedDomain_dataframe(factors))
+  dummy_attributes <- create_dummy_attributes_dataframe(10, factors)
+  dummy_enumeratedDomain <- create_dummy_enumeratedDomain_dataframe(factors)
+  doc@dataset@dataTable <- as(list(pid_to_eml_datatable(mn, pid, dummy_attributes, dummy_enumeratedDomain)), "ListOfdataTable")
 
   testthat::expect_length(doc@dataset@dataTable, 1)
   
