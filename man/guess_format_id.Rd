@@ -15,3 +15,7 @@ guess_format_id(filenames)
 \description{
 Guess format from filename for a vector of filenames.
 }
+\examples{
+formatid <- guess_format_id("temperature_data.csv")
+
+}

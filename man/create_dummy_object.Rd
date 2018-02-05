@@ -9,6 +9,18 @@ create_dummy_object(mn)
 \arguments{
 \item{mn}{(MNode) The Member Node.}
 }
+\value{
+pid (character) The pid of the dummy object.
+}
 \description{
 Create a test object.
+}
+\examples{
+\dontrun{
+# Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+pid <- create_dummy_object(mn)
+}
 }

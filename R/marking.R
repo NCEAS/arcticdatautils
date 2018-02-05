@@ -34,9 +34,7 @@
 #' @param inventory (data.frame) An Inventory.
 #'
 #' @return (data.frame) An Inventory.
-#' @export
-#'
-#' @examples
+
 theme_packages <- function(inventory, nfiles_cutoff=100) {
   stopifnot(is.data.frame(inventory),
             "package_nfiles" %in% names(inventory))

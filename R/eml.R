@@ -721,8 +721,7 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #' @export
 #'
 #' @examples
-#' NCEASadd <- eml_address("735 State St #300", "Santa Barbara," "CA", "93101")
-
+#' NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")
 eml_address <- function(delivery_points, city, administrative_area, postal_code) {
   stopifnot(is.character(delivery_points),
             is.character(city),

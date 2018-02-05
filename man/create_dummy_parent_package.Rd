@@ -11,6 +11,14 @@ create_dummy_parent_package(mn, children)
 
 \item{children}{(character) Child package (resource maps) PIDs.}
 }
+\value{
+pid (character) Named character vector of PIDs including parent package and child package pids.
+}
 \description{
 Create a test parent package.
+}
+\examples{
+\dontrun{
+# Set environment
+}
 }
