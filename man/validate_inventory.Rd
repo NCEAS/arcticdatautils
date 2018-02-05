@@ -7,7 +7,7 @@
 validate_inventory(inventory)
 }
 \arguments{
-\item{inventory}{}
+\item{inventory}{(data.frame) An Inventory.}
 }
 \description{
 Validate an Inventory.

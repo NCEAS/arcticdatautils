@@ -11,7 +11,18 @@ create_dummy_metadata(mn, data_pids = NULL)
 
 \item{data_pids}{(character) Optional. PIDs for data objects the metadata documents.}
 }
+\value{
+pid (character) PID of published metadata document.
+}
 \description{
 Various helper functions for things like testing the package.
 Create a test metadata object.
+}
+\examples{
+\dontrun{
+# Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+pid <- create_dummy_metadata(mn)
+}
 }

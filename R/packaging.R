@@ -11,9 +11,7 @@
 #' @param file (character) The fully-qualified relative path to the file. See examples.
 #' @param env (list) Optional. Specify an environment.
 #'
-#' @export
-#'
-#' @examples
+
 insert_file <- function(inventory, file, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(file), nchar(file) > 0, file %in% inventory$file)
@@ -90,9 +88,7 @@ insert_file <- function(inventory, file, env=NULL) {
 #'
 #' @return A list containing PIDs and whether objects were inserted. (list)
 #'
-#' @export
-#'
-#' @examples
+
 insert_package <- function(inventory, package, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(package), nchar(package) > 0, package %in% inventory$package)
@@ -308,12 +304,11 @@ insert_package <- function(inventory, package, env=NULL) {
 #' @param data_pids (character) PID(s) of the data Objects.
 #' @param child_pids (character) Optional. PID(s) of child Resource Maps.
 #' @param other_statements (data.frame) Extra statements to add to the Resource Map.
-#' @param resource_map_pid
+#' @param resource_map_pid (character) PID of resource map.
 #' @param resolve_base (character) Optional. The resolve service base URL.
 #'
 #' @return Absolute path to the Resource Map on disk (character)
 #'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -491,10 +486,7 @@ generate_resource_map <- function(metadata_pid,
 #'
 #' @param metadata_pid
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 generate_resource_map_pid <- function(metadata_pid) {
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
@@ -513,9 +505,7 @@ generate_resource_map_pid <- function(metadata_pid) {
 #' @param scheme (character) The identifier scheme to use.
 #'
 #' @return The identifier (character)
-#' @export
-#'
-#' @examples
+
 get_or_create_pid <- function(file, mn, scheme="UUID") {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
@@ -569,9 +559,7 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
 #' @param rights_holder (character) The rights holder DN string for the object.
 #'
 #' @return The sysmeta object (dataone::SystemMetadata)
-#' @export
-#'
-#' @examples
+
 create_sysmeta <- function(file, base_path, submitter, rights_holder) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1)
@@ -639,10 +627,7 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 #' @param base_path (character)
 #' @param mn (MNode)
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 create_object <- function(file, sysmeta, base_path, mn) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
@@ -709,12 +694,9 @@ create_object <- function(file, sysmeta, base_path, mn) {
 
 #' Validate an Inventory.
 #'
-#' @param inventory
+#' @param inventory (data.frame) An Inventory.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 validate_inventory <- function(inventory) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0,
@@ -731,12 +713,9 @@ validate_inventory <- function(inventory) {
 
 #' Validate an environment.
 #'
-#' @param env
+#' @param env (character) An environment
 #'
-#' @return
-#' @export
-#'
-#' @examples
+
 validate_environment <- function(env) {
   env_default_components <- c("base_path",
                               "alternate_path",
@@ -757,13 +736,9 @@ validate_environment <- function(env) {
 
 #' Calculate a set of child PIDs for a given package.
 #'
-#' @param inventory
-#' @param package
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @param inventory (data.frame) An Inventory.
+#' @param package (character) The package identifier.
+
 determine_child_pids <- function(inventory, package) {
   stopifnot(all(c("package", "parent_package", "is_metadata") %in% names(inventory)))
 
@@ -805,13 +780,11 @@ determine_child_pids <- function(inventory, package) {
 #' exist on the Member Node before doing their work and will call createObject()
 #' instead of updateObject() if the object didn't already exist.
 #'
-#' @param inventory (data.frame)
-#' @param package (character)
+#' @param inventory (data.frame) An inventory.
+#' @param package (character) The package identifier.
 #'
 #' @return TRUE or FALSE depending on sucess (logical)
-#' @export
-#'
-#' @examples
+
 update_package <- function(inventory,
                            package,
                            env = NULL) {
@@ -1038,6 +1011,17 @@ update_package <- function(inventory,
 #' @export
 #'
 #' @examples
+#'\dontrun{
+#'# Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#'
+#' rm_pid <- "resource_map_urn:uuid:6b2e5753-4a94-4e6f-971c-36420a446ecb"
+#'
+#' # Write resource map to file
+#' writeBin(getObject(mn, rm_pid), "~/Documents/resource_map.rdf")
+#' df <- parse_resource_map("~/Documents/resource_map.rdf")
+#' }
 parse_resource_map <- function(path) {
   stopifnot(file.exists(path))
 
@@ -1059,9 +1043,7 @@ parse_resource_map <- function(path) {
 #' @param statements (data.frame) A set of Statements to be filtered
 #'
 #' @return (data.frame) The filtered Statements
-#' @export
-#'
-#' @examples
+
 filter_packaging_statements <- function(statements) {
   stopifnot(is.data.frame(statements))
   if (nrow(statements) == 0) return(statements)

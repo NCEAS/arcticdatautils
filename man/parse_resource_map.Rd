@@ -15,3 +15,16 @@ parse_resource_map(path)
 \description{
 Parse a Resource Map into a data.frame
 }
+\examples{
+\dontrun{
+# Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+rm_pid <- "resource_map_urn:uuid:6b2e5753-4a94-4e6f-971c-36420a446ecb"
+
+# Write resource map to file
+writeBin(getObject(mn, rm_pid), "~/Documents/resource_map.rdf")
+df <- parse_resource_map("~/Documents/resource_map.rdf")
+}
+}

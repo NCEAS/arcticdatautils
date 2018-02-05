@@ -41,5 +41,12 @@ profile(mn, me)
 
 // Get a custom set of fields
 view_profile(mn, me, "origin")
+
+# Set environment
+cn <- CNode("STAGING2")
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+package_df <- view_profile(mn, "http://orcid.org/0000-0003-4703-1974", fields = c("title"))
+
 }
 }
