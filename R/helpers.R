@@ -259,9 +259,10 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors=NULL) {
 #'
 #' @examples
 create_dummy_enumeratedDomain_dataframe <- function(factors) {
-  df <- data.frame(attributeName = rep(factors, 4),
-                   code = rep(seq(1:4), 4),
-                   definition = rep(factors, 4))
+  names <- rep(factors, 4)
+  df <- data.frame(attributeName = names,
+                   code = paste0(names, 1:length(names)),
+                   definition = names)
   
   df
 }

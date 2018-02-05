@@ -30,14 +30,14 @@ pid_to_eml_other_entity <- function(mn, pids) {
 }
 
 #' Create an EML dataTable object for a given PID. 
-#' This function generates an attributeList object and physical and constructs a dataTable.
+#' This function generates an attributeList and physical and constructs a dataTable.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PID of the object to create the sub-tree for.
+#' @param pid (character) The PID of the object to create the dataTable for.
 #' @param attributes (data.frame) Data frame of attributes.
-#' @param enumeratedValues (data.frame) Data frame of enumerated attribute values.
+#' @param factors (data.frame) Data frame of enumerated attribute values (factors).
 #' @param name (character) Optional field to specify entityName, otherwise will be extracted from system metadata.
-#' @param description (character) Optional field to specify entityDescription.
+#' @param description (character) Optional field to specify entityDescription, otherwise will match name.
 #' 
 #' @return (dataTable) The dataTable object
 #' @export
@@ -45,17 +45,15 @@ pid_to_eml_other_entity <- function(mn, pids) {
 #' @examples
 #' \dontrun{
 #' # Generate a dataTable for a given pid
-#' pid <- "urn:uuid:xxxx"
-#' attributes <- data.frame(attributeName = ..., attributeDefinition = ..., ...)
-#' factors <- data.frame(attributeName = ..., code = ..., definition = ...)
+#' attributes <- create_dummy_attributes_dataframe(10)
 #' name <- "1234.csv"
 #' description <- "A description of this entity."
-#' dataTable <- pid_to_eml_datatable(mn, pid, attributes, factors, name, description)
+#' dataTable <- pid_to_eml_datatable(mn, pid, attributes, name=name, description=description)
 #' }
 pid_to_eml_datatable <- function(mn, pid, attributes, factors=NULL, name=NULL, description=NULL) {
   stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
   stopifnot(is.data.frame(attributes))
   
   if (is.null(factors)) {
@@ -66,7 +64,11 @@ pid_to_eml_datatable <- function(mn, pid, attributes, factors=NULL, name=NULL, d
   }
   
   if (is.null(name)) {
-    name <- getSystemMetadata(pid)@fileName
+    name <- getSystemMetadata(mn, pid)@fileName
+  }
+  
+  if (is.null(description)) {
+    description <- name
   }
   
   stopifnot(eml_validate_attributes(attributes))

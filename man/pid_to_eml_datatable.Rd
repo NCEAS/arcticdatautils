@@ -3,7 +3,7 @@
 \name{pid_to_eml_datatable}
 \alias{pid_to_eml_datatable}
 \title{Create an EML dataTable object for a given PID. 
-This function generates an attributeList object and physical and constructs a dataTable.}
+This function generates an attributeList and physical and constructs a dataTable.}
 \usage{
 pid_to_eml_datatable(mn, pid, attributes, factors = NULL, name = NULL,
   description = NULL)
@@ -11,31 +11,29 @@ pid_to_eml_datatable(mn, pid, attributes, factors = NULL, name = NULL,
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
+\item{pid}{(character) The PID of the object to create the dataTable for.}
+
 \item{attributes}{(data.frame) Data frame of attributes.}
+
+\item{factors}{(data.frame) Data frame of enumerated attribute values (factors).}
 
 \item{name}{(character) Optional field to specify entityName, otherwise will be extracted from system metadata.}
 
-\item{description}{(character) Optional field to specify entityDescription.}
-
-\item{pids}{(character) The PID of the object to create the sub-tree for.}
-
-\item{enumeratedValues}{(data.frame) Data frame of enumerated attribute values.}
+\item{description}{(character) Optional field to specify entityDescription, otherwise will match name.}
 }
 \value{
 (dataTable) The dataTable object
 }
 \description{
 Create an EML dataTable object for a given PID. 
-This function generates an attributeList object and physical and constructs a dataTable.
+This function generates an attributeList and physical and constructs a dataTable.
 }
 \examples{
 \dontrun{
 # Generate a dataTable for a given pid
-pid <- "urn:uuid:xxxx"
-attributes <- data.frame(attributeName = ..., attributeDefinition = ..., ...)
-factors <- data.frame(attributeName = ..., code = ..., definition = ...)
+attributes <- create_dummy_attributes_dataframe(10)
 name <- "1234.csv"
 description <- "A description of this entity."
-dataTable <- pid_to_eml_datatable(mn, pid, attributes, factors, name, description)
+dataTable <- pid_to_eml_datatable(mn, pid, attributes, name=name, description=description)
 }
 }
