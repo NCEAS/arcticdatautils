@@ -9,9 +9,22 @@ update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
   public = FALSE, check_first = TRUE)
 }
 \arguments{
+\item{mn}{(MNode) The Member Node}
+
+\item{resource_map_pid}{(character) The PID of the resource map to be updated.}
+
+\item{metadata_pid}{(character) The PID of the metadata object to go in the
+package.}
+
+\item{data_pids}{(character) The PID(s) of the data objects to go in the
+package.}
+
+\item{child_pids}{child_pids (character) The resource map PIDs of the packages to be
+nested under the package.}
+
 \item{other_statements}{(data.frame) Extra statements to add to the Resource Map.}
 
-\item{identifier}{}
+\item{identifier}{(character) Manually specify the identifier for the new metadata object.}
 
 \item{public}{Whether or not to make the new resource map public read
 (logical)}
@@ -19,6 +32,9 @@ update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as
 aruments exist on the MN before continuing. This speeds up the function,
 especially when `data_pids` has many elements.}
+}
+\value{
+pid (character) Updated resource map PID.
 }
 \description{
 This function first generates a new resource map RDF/XML document locally and
@@ -43,4 +59,17 @@ you could use this function.
 Note: This function currently replaces the rightsHolder on the Resource Map
 temporarily to allow updating but sets it back to the rightsHolder that was
 in place before the update.
+}
+\examples{
+\dontrun{
+cn <- CNode('STAGING2')
+mn <- getMNode(cn,"urn:node:mnTestKNB")
+
+rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
+data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+
+
+rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
+}
 }

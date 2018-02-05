@@ -16,6 +16,11 @@ sysmeta_to_other_entity(sysmeta)
 
 \item{pids}{(character)}
 }
+\value{
+
+
+
+}
 \description{
 This function is deprecated. See \link{pid_to_other_eml_entity}.
 
