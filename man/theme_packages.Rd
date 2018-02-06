@@ -9,6 +9,8 @@ theme_packages(inventory, nfiles_cutoff = 100)
 }
 \arguments{
 \item{inventory}{(data.frame) An Inventory.}
+
+\item{nfiles_cutoff}{(integer) Number of cutoff files}
 }
 \value{
 (data.frame) An Inventory.

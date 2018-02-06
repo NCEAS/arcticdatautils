@@ -9,9 +9,9 @@ find_newest_object(node, identifiers, rows = 1000)
 \arguments{
 \item{node}{(MNode | CNode) The node to query}
 
-\item{rows}{(numeric) Optional. Specify the size of the query result set.}
+\item{identifiers}{(character) One or more identifiers}
 
-\item{identiifers}{(character) One or more identifiers}
+\item{rows}{(numeric) Optional. Specify the size of the query result set.}
 }
 \value{
 (character) The PID of the newest object. In the case of a tie (very

@@ -11,7 +11,7 @@ inv_load_identifiers(inventory, paths)
 \arguments{
 \item{inventory}{(data.frame) An inventory.}
 
-\item{path}{(character) Path(s) to files containing identifiers.}
+\item{paths}{(character) Path(s) to files containing identifiers.}
 }
 \value{
 (data.frame) An inventory.

@@ -1,7 +1,10 @@
 #' interactive.R
 #' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
 #'
+#'
 #' Functions for interactive viewing of the Inventory and other objects.
+#'
+#' @param inventory (character) An inventory
 
 view_packages <- function(inventory) {
   stopifnot(is.data.frame(inventory),

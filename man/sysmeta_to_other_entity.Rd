@@ -7,10 +7,7 @@
 sysmeta_to_other_entity(sysmeta)
 }
 \arguments{
-\item{sysmeta}{(SystemMetadata)}
-}
-\value{
-
+\item{sysmeta}{(SystemMetadata) A SystemMetadata object}
 }
 \description{
 This function is deprecated. See \link{sysmeta_to_eml_other_entity}.

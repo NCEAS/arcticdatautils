@@ -83,7 +83,6 @@ insert_file <- function(inventory, file, env=NULL) {
 #'
 #' @param inventory (data.frame) An Inventory.
 #' @param package (character) The package identifier.
-#' @param child_pids (character) Resource Map PIDs for child Data Packages.
 #' @param env (list) Environment variables.
 #'
 #' @return A list containing PIDs and whether objects were inserted. (list)
@@ -484,7 +483,7 @@ generate_resource_map <- function(metadata_pid,
 
 #' Generate a PID for a new resource map by appending "resource_map_" to it.
 #'
-#' @param metadata_pid
+#' @param metadata_pid (character) A metadata pid
 #'
 
 generate_resource_map_pid <- function(metadata_pid) {
@@ -782,6 +781,7 @@ determine_child_pids <- function(inventory, package) {
 #'
 #' @param inventory (data.frame) An inventory.
 #' @param package (character) The package identifier.
+#' @param env (character) Environment
 #'
 #' @return TRUE or FALSE depending on sucess (logical)
 

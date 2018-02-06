@@ -10,6 +10,8 @@ update_package(inventory, package, env = NULL)
 \item{inventory}{(data.frame) An inventory.}
 
 \item{package}{(character) The package identifier.}
+
+\item{env}{(character) Environment}
 }
 \value{
 TRUE or FALSE depending on sucess (logical)
