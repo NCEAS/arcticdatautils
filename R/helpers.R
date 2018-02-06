@@ -252,7 +252,7 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors=NULL) {
 
 #' Create dummy enumeratedDomain data frame
 #'
-#' @param factors (character) Optional vector of factor names to include.
+#' @param factors (character) Vector of factor names to include.
 #'
 #' @return
 #' @export
