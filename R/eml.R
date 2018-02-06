@@ -151,6 +151,19 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
   lapply(sysmeta, work)
 }
 
+
+#' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
+#'
+#' @param sysmeta (SystemMetadata)
+#'
+#' @return
+#'
+sysmeta_to_other_entity <- function(sysmeta) {
+  .Deprecated("sysmeta_to_eml_other_entity",
+              package = "arcticdtautils",
+              old = "sysmeta_to_other_entity")
+}
+
 #' Create an EML physical object from System Metadata
 #'
 #' This function creates a pre-canned EML physical object from what's in the
