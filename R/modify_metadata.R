@@ -184,9 +184,7 @@ fix_bad_enum <- function(path) {
 #'   <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
 #' </gmd:topicCategory>
 #'
-#' @param path
-#'
-#' @return
+#' @param path (character) Path
 #'
 
 fix_bad_topic <- function(path) {

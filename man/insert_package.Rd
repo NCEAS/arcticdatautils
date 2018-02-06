@@ -12,8 +12,6 @@ insert_package(inventory, package, env = NULL)
 \item{package}{(character) The package identifier.}
 
 \item{env}{(list) Environment variables.}
-
-\item{child_pids}{(character) Resource Map PIDs for child Data Packages.}
 }
 \value{
 A list containing PIDs and whether objects were inserted. (list)

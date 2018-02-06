@@ -244,7 +244,8 @@ log_message <- function(message=NULL) {
 #' # Set environment
 #' cn <- CNode("STAGING2")
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
-#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #' object_exists(mn, pids)
 #' }
@@ -941,7 +942,7 @@ find_newest_resource_map <- function(node, pid, rows = 1000) {
 #' Find the newest (by dateUploaded) object within a given set of objects.
 #'
 #' @param node (MNode | CNode) The node to query
-#' @param identiifers (character) One or more identifiers
+#' @param identifers (character) One or more identifiers
 #' @param rows (numeric) Optional. Specify the size of the query result set.
 #'
 #' @return (character) The PID of the newest object. In the case of a tie (very
