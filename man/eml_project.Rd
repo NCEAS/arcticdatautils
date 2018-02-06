@@ -34,8 +34,8 @@ fully fleshed out. Need to pass these objects in directly if you want to use
 them.
 }
 \examples{
-eml_project("Some title",
-            c(eml_personnel("Bryce", "Mecum", role = "Test")),
-            c("Abstract paragraph 1", "Abstract paragraph 2"),
-            "#1 Best Scientist Award")
+proj <- eml_project("Some title",
+           c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+           c("Abstract paragraph 1", "Abstract paragraph 2"),
+           "Funding Agency: Award Number 12345")
 }

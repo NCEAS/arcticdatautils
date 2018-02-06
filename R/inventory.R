@@ -217,7 +217,7 @@ inv_load_dois <- function(inventory, path) {
 #' removes the column 'identifier' from inventory before doing a
 #' left join.
 #'
-#' @param path (character) Path(s) to files containing identifiers.
+#' @param paths (character) Path(s) to files containing identifiers.
 #' @param inventory (data.frame) An inventory.
 #'
 #' @return (data.frame) An inventory.

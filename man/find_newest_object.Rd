@@ -11,7 +11,7 @@ find_newest_object(node, identifiers, rows = 1000)
 
 \item{rows}{(numeric) Optional. Specify the size of the query result set.}
 
-\item{identiifers}{(character) One or more identifiers}
+\item{identifers}{(character) One or more identifiers}
 }
 \value{
 (character) The PID of the newest object. In the case of a tie (very

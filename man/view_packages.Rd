@@ -7,6 +7,9 @@ Author: Bryce Mecum <mecum@nceas.ucsb.edu>}
 \usage{
 view_packages(inventory)
 }
+\arguments{
+\item{inventory}{(character) An inventory}
+}
 \description{
 Functions for interactive viewing of the Inventory and other objects.
 }

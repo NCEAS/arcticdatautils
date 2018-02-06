@@ -99,9 +99,7 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
 
 #' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
 #'
-#' @param sysmeta (SystemMetadata)
-#'
-#' @return
+#' @param sysmeta (SystemMetadata) A SystemMetadata object
 #'
 sysmeta_to_other_entity <- function(sysmeta) {
   .Deprecated("sysmeta_to_eml_other_entity",
@@ -566,10 +564,10 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' eml_project("Some title",
-#'             c(eml_personnel("Bryce", "Mecum", role = "Test")),
-#'             c("Abstract paragraph 1", "Abstract paragraph 2"),
-#'             "#1 Best Scientist Award")
+#' proj <- eml_project("Some title",
+#'            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+#'            c("Abstract paragraph 1", "Abstract paragraph 2"),
+#'            "Funding Agency: Award Number 12345")
 eml_project <- function(title,
                         personnelList,
                         abstract = NULL,
