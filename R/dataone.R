@@ -137,7 +137,8 @@ get_mn_base_url <- function(mn) {
 #'\dontrun{
 #' cn <- CNode('STAGING2')
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
-#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #' is_authorized(mn, pids, "write")
 #'}
 is_authorized <- function(node, ids, action) {
