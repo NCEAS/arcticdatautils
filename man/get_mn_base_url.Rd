@@ -7,7 +7,7 @@
 get_mn_base_url(mn)
 }
 \arguments{
-\item{mn}{}
+\item{mn}{(character) A mn instance}
 }
 \value{
 (character) The URL

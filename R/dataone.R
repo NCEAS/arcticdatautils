@@ -60,7 +60,7 @@ get_token <- function(node) {
 
 
 #' Determine whether the set token is expired.
-#'
+#' @param node (character) A member node instance
 #' @return (logical)
 #' @export
 #'
@@ -104,7 +104,7 @@ is_token_expired <- function(node) {
 
 #' Get the base URL of the Member Node.
 #'
-#' @param mn
+#' @param mn (character) A mn instance
 #'
 #' @return (character) The URL
 #' @export

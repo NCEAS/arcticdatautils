@@ -234,7 +234,7 @@ log_message <- function(message=NULL) {
 #' provided member node.
 #'
 #' @param node (MNode|CNode) The Node to query.
-#' @param pid (character) PID to check the existence of.
+#' @param pids (character) PID to check the existence of.
 #'
 #' @return (logical) Whether the object exists.
 #' @export
@@ -942,7 +942,7 @@ find_newest_resource_map <- function(node, pid, rows = 1000) {
 #' Find the newest (by dateUploaded) object within a given set of objects.
 #'
 #' @param node (MNode | CNode) The node to query
-#' @param identifers (character) One or more identifiers
+#' @param identifiers (character) One or more identifiers
 #' @param rows (numeric) Optional. Specify the size of the query result set.
 #'
 #' @return (character) The PID of the newest object. In the case of a tie (very

@@ -19,6 +19,8 @@ publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
 \item{sid}{(character) Optional. The SID to use with the new object.}
 
 \item{clone_pid}{(character) PID of objet to clone System Metadata from}
+
+\item{public}{(logical) TRUE/FALSE Whether object should be given public read access.}
 }
 \value{
 pid (character). The PID of the published object.

@@ -7,7 +7,7 @@
 fix_bad_enum(path)
 }
 \arguments{
-\item{path}{}
+\item{path}{(character) a path}
 }
 \description{
 This is the case where the ISO schema says what's inside a

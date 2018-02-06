@@ -7,7 +7,7 @@
 add_admin_group_access(sysmeta)
 }
 \arguments{
-\item{sysmeta}{}
+\item{sysmeta}{(sysmeta) System Metadata object}
 }
 \description{
 Adds access to the given System Metadata for the arctic-data-admins group

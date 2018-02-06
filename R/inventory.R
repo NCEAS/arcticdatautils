@@ -99,7 +99,7 @@ inv_load_files <- function(inventory, path, filter=TRUE) {
 #' 'size_bytes' from inventory before doing a left join.
 #'
 #' @param path (character) Path to a file containing sizes.
-#' @param (data.frame) inventory A \code{data.frame}.
+#' @param inventory (data.frame) inventory A \code{data.frame}.
 #'
 #' @return (data.frame) An inventory
 #'

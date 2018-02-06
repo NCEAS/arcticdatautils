@@ -483,7 +483,7 @@ generate_resource_map <- function(metadata_pid,
 
 #' Generate a PID for a new resource map by appending "resource_map_" to it.
 #'
-#' @param metadata_pid
+#' @param metadata_pid (character) A metadata pid
 #'
 
 generate_resource_map_pid <- function(metadata_pid) {
