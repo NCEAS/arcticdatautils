@@ -7,7 +7,7 @@
 generate_resource_map_pid(metadata_pid)
 }
 \arguments{
-\item{metadata_pid}{}
+\item{metadata_pid}{(character) A metadata pid}
 }
 \description{
 Generate a PID for a new resource map by appending "resource_map_" to it.

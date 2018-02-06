@@ -17,6 +17,7 @@
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
 #' @param clone_pid (character) PID of objet to clone System Metadata from
+#' @param public (logical) TRUE/FALSE Whether object should be given public read access.
 #'
 #' @import dataone
 #' @import datapack
@@ -243,7 +244,6 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
-#' @param parent_data_pids (character) Optional. Data pids of a parent package to be updated.
 #' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 #'
 #' @import dataone
@@ -258,7 +258,8 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #'
 #' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 #' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #' meta_path <- "/home/Documents/myMetadata.xml"
 #'
@@ -562,7 +563,8 @@ publish_update <- function(mn,
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
 #'
 #' meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
-#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
+#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1',
+#' 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
 #'
 #'
 #' create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
@@ -654,7 +656,8 @@ create_resource_map <- function(mn,
 #'
 #' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 #' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #'
 #' rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
