@@ -8,9 +8,9 @@
 inv_load_sizes(inventory, path)
 }
 \arguments{
-\item{path}{(character) Path to a file containing sizes.}
+\item{inventory}{(data.frame) inventory A \code{data.frame}.}
 
-\item{(data.frame)}{inventory A \code{data.frame}.}
+\item{path}{(character) Path to a file containing sizes.}
 }
 \value{
 (data.frame) An inventory

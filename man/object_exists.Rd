@@ -9,7 +9,7 @@ object_exists(node, pids)
 \arguments{
 \item{node}{(MNode|CNode) The Node to query.}
 
-\item{pid}{(character) PID to check the existence of.}
+\item{pids}{(character) PID to check the existence of.}
 }
 \value{
 (logical) Whether the object exists.

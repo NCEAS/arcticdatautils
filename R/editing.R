@@ -17,6 +17,7 @@
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
 #' @param clone_pid (character) PID of objet to clone System Metadata from
+#' @param public (logical) TRUE/FALSE Whether object should be given public read access.
 #'
 #' @import dataone
 #' @import datapack
@@ -243,7 +244,6 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
-#' @param parent_data_pids (character) Optional. Data pids of a parent package to be updated.
 #' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 #'
 #' @import dataone

@@ -32,6 +32,7 @@
 #'
 #'
 #' @param inventory (data.frame) An Inventory.
+#' @param nfiles_cutoff (integer) Number of cutoff files
 #'
 #' @return (data.frame) An Inventory.
 
