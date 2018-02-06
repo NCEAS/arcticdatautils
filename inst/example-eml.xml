@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packageId="urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c" system="knb" scope="system" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 ~/development/eml/eml.xsd">
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml_1.1" packageId="urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c" system="knb" scope="system" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 ~/development/eml/eml.xsd">
   <dataset>
     <alternateIdentifier>some-alternate-identifier-string</alternateIdentifier>
     <title>arcticdata R package test</title>
@@ -69,20 +68,20 @@
         <para>NSF Award XXXXXX</para>
       </funding>
     </project>
-    <otherEntity id="urn:uuid:200afcb5-8e26-4315-a875-48bbf0703cb5" scope="document">
-      <entityName>file2f9a550fb9b5b</entityName>
+    <otherEntity id="5179254207aed0f39ded1add3d9bab3ea0e10b084c2c194ccf0a033b8f5e7789" scope="document">
+      <entityName>NA</entityName>
       <physical scope="document">
-        <objectName>file2f9a550fb9b5b</objectName>
-        <size unit="bytes">52</size>
-        <authentication method="SHA1">da257f8aeced0fb2b9755b704e53ea5aaf9983ae</authentication>
+        <objectName>NA</objectName>
+        <size>27</size>
+        <authentication method="SHA256">5179254207aed0f39ded1add3d9bab3ea0e10b084c2c194ccf0a033b8f5e7789</authentication>
         <dataFormat>
           <externallyDefinedFormat>
-            <formatName>text/plain</formatName>
+            <formatName>application/octet-stream</formatName>
           </externallyDefinedFormat>
         </dataFormat>
         <distribution scope="document">
           <online>
-            <url function="download">https://cn.dataone.org/cn/v2/resolve/urn:uuid:200afcb5-8e26-4315-a875-48bbf0703cb5</url>
+            <url function="download">ecogrid://knb/urn:uuid:89bec5d0-26db-48ac-ae54-e1b4c999c456</url>
           </online>
         </distribution>
       </physical>
