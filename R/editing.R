@@ -562,7 +562,8 @@ publish_update <- function(mn,
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
 #'
 #' meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
-#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
+#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1',
+#' 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
 #'
 #'
 #' create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
@@ -654,7 +655,8 @@ create_resource_map <- function(mn,
 #'
 #' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 #' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #'
 #' rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
