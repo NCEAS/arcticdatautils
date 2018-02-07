@@ -149,7 +149,6 @@ test_that("we can publish an update to an object", {
     upd <- update_object(mn, old, tmp)
   })
 
-  file.remove(tmp)
   sm <- dataone::getSystemMetadata(mn, upd)
 
   expect_equal(sm@fileName, basename(tmp))
