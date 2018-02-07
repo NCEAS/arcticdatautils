@@ -454,7 +454,7 @@ publish_update <- function(mn,
       set_public_read(mn, data_pid)
     }
   } else {
-    metadata_updated_sysmeta <- remove_public_access(metadata_updated_sysmeta)
+    metadata_updated_sysmeta <- datapack::removeAccessRule(metadata_updated_sysmeta, "public", "read")
   }
 
   set_rights_holder(mn, metadata_pid, me)
@@ -729,7 +729,7 @@ update_resource_map <- function(mn,
   if (public) {
     new_rm_sysmeta <- datapack::addAccessRule(new_rm_sysmeta, "public", "read")
   } else {
-    new_rm_sysmeta <- remove_public_access(new_rm_sysmeta)
+    new_rm_sysmeta <- datapack::removeAccessRule(new_rm_sysmeta, "public", "read")
   }
 
   # Update it
