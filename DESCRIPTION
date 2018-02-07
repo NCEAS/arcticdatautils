@@ -9,7 +9,7 @@ Authors@R: c(
   person("Emily", "O'Dean", email="eodean10@gmail.com", role = "ctb")
   )
 Description: A set of utilites for working with the Arctic Data Center 
-  (https://arcticdata.io)
+  (https://arcticdata.io).
 Depends:
     R (>= 3.2.3)
 Imports:
