@@ -149,7 +149,6 @@ test_that("we can publish an update to an object", {
     upd <- update_object(mn, old, tmp)
   })
 
-  file.remove(tmp)
   sm <- dataone::getSystemMetadata(mn, upd)
 
   expect_equal(sm@fileName, basename(tmp))
@@ -236,4 +235,26 @@ test_that("publish_update removes the deprecated eml@access element", {
 
   new_eml <- EML::read_eml(updated_eml_path)
   expect_equal(0, length(new_eml@access@allow))
+})
+
+test_that("publishing an object with a valid format ID succeeds", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  tmp_path <- tempfile()
+  writeLines(LETTERS, tmp_path)
+
+  expect_is(publish_object(mn, tmp_path, "text/plain"), "character")
+})
+
+test_that("publishing an object with an invalid format ID fails", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  tmp_path <- tempfile()
+  writeLines(LETTERS, tmp_path)
+
+  expect_error(publish_object(mn, tmp_path, "asdf/asdf"))
 })

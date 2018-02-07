@@ -106,8 +106,8 @@ test_that("an other entity can be added from a pid", {
   writeLines(LETTERS, data_path)
   pid <- publish_object(mn, data_path, "text/plain")
 
-  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
-
+  eml_path <- tempfile()
+  file.copy(file.path(system.file(package = "arcticdatautils"), "example-eml.xml"), eml_path)
   doc <- EML::read_eml(eml_path)
   doc@dataset@otherEntity <- new("ListOfotherEntity", list())
 
@@ -115,8 +115,6 @@ test_that("an other entity can be added from a pid", {
 
   doc <- EML::read_eml(eml_path)
   testthat::expect_length(doc@dataset@otherEntity, 1)
-
-  unlink(data_path)
 })
 
 

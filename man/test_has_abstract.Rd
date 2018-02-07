@@ -7,6 +7,9 @@ Author: Bryce Mecum <mecum@nceas.ucsb.edu>}
 \usage{
 test_has_abstract(path)
 }
+\arguments{
+\item{path}{(character) a path}
+}
 \description{
 Functions related to fixing invalid ISO metadata.
 }

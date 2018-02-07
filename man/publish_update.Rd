@@ -40,8 +40,6 @@ This applies to the new metadata PID and its resource map and data object.
 access policies are not affected.}
 
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.}
-
-\item{parent_data_pids}{(character) Optional. Data pids of a parent package to be updated.}
 }
 \value{
 pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
@@ -74,7 +72,8 @@ mn <- getMNode(cn,"urn:node:mnTestKNB")
 
 rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+"urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 
 meta_path <- "/home/Documents/myMetadata.xml"
 

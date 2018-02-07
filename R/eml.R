@@ -154,9 +154,7 @@ sysmeta_to_eml_other_entity <- function(sysmeta) {
 
 #' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
 #'
-#' @param sysmeta (SystemMetadata)
-#'
-#' @return
+#' @param sysmeta (SystemMetadata) A SystemMetadata object
 #'
 sysmeta_to_other_entity <- function(sysmeta) {
   .Deprecated("sysmeta_to_eml_other_entity",
@@ -328,7 +326,8 @@ get_doc_id <- function(sysmeta) {
 #' @examples
 #' \dontrun{
 #' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- add_methods_step(eml, "Field Sampling", "Samples were collected using a niskin water sampler.")
+#' eml <- add_methods_step(eml, "Field Sampling", "Samples were
+#' collected using a niskin water sampler.")
 #' }
 add_methods_step <- function(doc, title, description) {
   stopifnot(is(doc, "eml"))
@@ -551,12 +550,12 @@ eml_associated_party <- function(...) {
 #' See \code{\link{eml_party}} for details.
 #'
 #' @param ... Arguments passed on to eml_party
-#'
+#' @param role (character) Personnel role, eg "principalInvestigator"
 #' @return (personnel) The new personnel
 #' @export
 #'
 #' @examples
-#' eml_personnel("test", "user", email = "test@user.com", role = "Principal Investigator")
+#' eml_personnel("test", "user", email = "test@user.com", role = "principalInvestigator")
 eml_personnel <- function(role = NULL, ...) {
   if(is.null(role)) {
     stop(call. = FALSE,
@@ -620,10 +619,10 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' eml_project("Some title",
-#'             c(eml_personnel("Bryce", "Mecum", role = "Test")),
-#'             c("Abstract paragraph 1", "Abstract paragraph 2"),
-#'             "#1 Best Scientist Award")
+#' proj <- eml_project("Some title",
+#'            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+#'            c("Abstract paragraph 1", "Abstract paragraph 2"),
+#'            "Funding Agency: Award Number 12345")
 eml_project <- function(title,
                         personnelList,
                         abstract = NULL,

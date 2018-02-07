@@ -17,6 +17,7 @@
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
 #' @param clone_pid (character) PID of objet to clone System Metadata from
+#' @param public (logical) TRUE/FALSE Whether object should be given public read access.
 #'
 #' @import dataone
 #' @import datapack
@@ -52,11 +53,7 @@ publish_object <- function(mn,
     warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
   }
 
-  # Check if format ID is valid
-  if (!is.null(D1_FORMATS) && !(format_id %in% D1_FORMATS)) {
-    stop(call. = FALSE,
-         paste0("The provided format_id of '", format_id, "' is not a valid format ID. Check what you entered against the list of format IDs on https://cn.dataone.org/cn/v2/formats. Note that this list is cached when arcticdatautils is loaded so if you haven't restarted your R session in a while you may have an outdated copy and restarting your session may fix this."))
-  }
+  check_format(format_id)
 
   # Set up some variables for use later on
   ########################################
@@ -154,11 +151,7 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
     warning(paste0("No format_id was specified so a guess was made based upon the file extension: ", format_id, "."))
   }
 
-  # Check if format ID is valid
-  if (!is.null(D1_FORMATS) && !(format_id %in% D1_FORMATS)) {
-    stop(call. = FALSE,
-         paste0("The provided format_id of '", format_id, "' is not a valid format ID. Check what you entered against the list of format IDs on https://cn.dataone.org/cn/v2/formats. Note that this list is cached when arcticdatautils is loaded so if you haven't restarted your R session in a while you may have an outdated copy and restarting your session may fix this."))
-  }
+  check_format(format_id)
 
   message(paste0("Updating object ", pid, " with the file at ", path, "."))
 
@@ -243,7 +236,6 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
-#' @param parent_data_pids (character) Optional. Data pids of a parent package to be updated.
 #' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
 #'
 #' @import dataone
@@ -258,7 +250,8 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #'
 #' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 #' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #' meta_path <- "/home/Documents/myMetadata.xml"
 #'
@@ -461,7 +454,7 @@ publish_update <- function(mn,
       set_public_read(mn, data_pid)
     }
   } else {
-    metadata_updated_sysmeta <- remove_public_access(metadata_updated_sysmeta)
+    metadata_updated_sysmeta <- datapack::removeAccessRule(metadata_updated_sysmeta, "public", "read")
   }
 
   set_rights_holder(mn, metadata_pid, me)
@@ -562,7 +555,8 @@ publish_update <- function(mn,
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
 #'
 #' meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
-#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1', 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
+#' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1',
+#' 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
 #'
 #'
 #' create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
@@ -654,7 +648,8 @@ create_resource_map <- function(mn,
 #'
 #' rm_pid <- "resource_map_urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
 #' meta_pid <- "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe"
-#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
 #'
 #' rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
@@ -734,7 +729,7 @@ update_resource_map <- function(mn,
   if (public) {
     new_rm_sysmeta <- datapack::addAccessRule(new_rm_sysmeta, "public", "read")
   } else {
-    new_rm_sysmeta <- remove_public_access(new_rm_sysmeta)
+    new_rm_sysmeta <- datapack::removeAccessRule(new_rm_sysmeta, "public", "read")
   }
 
   # Update it

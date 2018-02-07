@@ -62,10 +62,10 @@ create_from_folder <- function(mn, path, data_pids=NULL) {
   stopifnot(EML::eml_validate(eml_path))
 
   eml_package <- publish_update(mn,
-                                metadata_old_pid = iso_pid,
-                                resmap_old_pid = iso_resmap_pid,
-                                data_old_pids = data_pids,
-                                metadata_file_path = eml_path)
+                                metadata_pid = iso_pid,
+                                resource_map_pid = iso_resmap_pid,
+                                data_pids = data_pids,
+                                metadata_path = eml_path)
 
   list(iso_pid = iso_pid,
        iso_resource_map_pid = iso_resmap_pid,
