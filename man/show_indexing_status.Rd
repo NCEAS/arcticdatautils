@@ -21,7 +21,6 @@ Show the indexing status of a set of PIDs
 \dontrun{
 # Create a package then check its indexing status
 library(dataone)
-library(arcticdatautils)
 mn <- MNode(...)
 pkg <- create_dummy_package(mn)
 show_indexing_status(mn, pkg)
