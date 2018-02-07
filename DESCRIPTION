@@ -1,5 +1,5 @@
 Package: arcticdatautils
-Title: Arctic Data Utilities
+Title: Utilities for the Arctic Data Center
 Version: 0.6.3.9000
 Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
@@ -8,8 +8,8 @@ Authors@R: c(
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
   person("Emily", "O'Dean", email="eodean10@gmail.com", role = "ctb")
   )
-Description: This package provides a set of utility methods for uploading
-  and  editing data on the Arctic Data Catalog.
+Description: A set of utilites for working with the Arctic Data Center 
+  (https://arcticdata.io)
 Depends:
     R (>= 3.2.3)
 Imports:
