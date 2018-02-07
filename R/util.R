@@ -1085,7 +1085,6 @@ view_profile <- function(mn, subject, fields=c("identifier", "title")) {
 #' \dontrun{
 #' # Create a package then check its indexing status
 #' library(dataone)
-#' library(arcticdatautils)
 #' mn <- MNode(...)
 #' pkg <- create_dummy_package(mn)
 #' show_indexing_status(mn, pkg)
