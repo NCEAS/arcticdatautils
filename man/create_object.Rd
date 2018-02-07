@@ -4,16 +4,17 @@
 \alias{create_object}
 \title{Create an object from a row of the inventory.}
 \usage{
-create_object(file, sysmeta, base_path, mn)
+create_object(file, sysmeta, base_path, env)
 }
 \arguments{
 \item{file}{(data.frame)A row from the inventory.}
 
 \item{sysmeta}{(SystemMetadata) The file's sysmeta.}
 
-\item{base_path}{(character)}
+\item{base_path}{(character) Base path, to be appended to the \code{file}
+column to find the file to upload.}
 
-\item{mn}{(MNode)}
+\item{env}{(list) An environment.}
 }
 \description{
 Create an object from a row of the inventory.

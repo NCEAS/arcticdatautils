@@ -3,3 +3,4 @@
 ^etc$
 ^docs$
 ^\.travis\.yml$
+MAINTENANCE.md

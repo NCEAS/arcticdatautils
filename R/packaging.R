@@ -623,11 +623,12 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 #'
 #' @param file (data.frame)A row from the inventory.
 #' @param sysmeta (SystemMetadata) The file's sysmeta.
-#' @param base_path (character)
-#' @param mn (MNode)
+#' @param base_path (character) Base path, to be appended to the \code{file}
+#' column to find the file to upload.
+#' @param env (list) An environment.
 #'
 
-create_object <- function(file, sysmeta, base_path, mn) {
+create_object <- function(file, sysmeta, base_path, env) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
             "pid" %in% names(file),
