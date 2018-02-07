@@ -83,7 +83,6 @@ insert_file <- function(inventory, file, env=NULL) {
 #'
 #' @param inventory (data.frame) An Inventory.
 #' @param package (character) The package identifier.
-#' @param child_pids (character) Resource Map PIDs for child Data Packages.
 #' @param env (list) Environment variables.
 #'
 #' @return A list containing PIDs and whether objects were inserted. (list)
@@ -484,7 +483,7 @@ generate_resource_map <- function(metadata_pid,
 
 #' Generate a PID for a new resource map by appending "resource_map_" to it.
 #'
-#' @param metadata_pid
+#' @param metadata_pid (character) A metadata pid
 #'
 
 generate_resource_map_pid <- function(metadata_pid) {
@@ -624,11 +623,12 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 #'
 #' @param file (data.frame)A row from the inventory.
 #' @param sysmeta (SystemMetadata) The file's sysmeta.
-#' @param base_path (character)
-#' @param mn (MNode)
+#' @param base_path (character) Base path, to be appended to the \code{file}
+#' column to find the file to upload.
+#' @param env (list) An environment.
 #'
 
-create_object <- function(file, sysmeta, base_path, mn) {
+create_object <- function(file, sysmeta, base_path, env) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
             "pid" %in% names(file),
@@ -782,6 +782,7 @@ determine_child_pids <- function(inventory, package) {
 #'
 #' @param inventory (data.frame) An inventory.
 #' @param package (character) The package identifier.
+#' @param env (character) Environment
 #'
 #' @return TRUE or FALSE depending on sucess (logical)
 

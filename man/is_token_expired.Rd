@@ -6,6 +6,9 @@
 \usage{
 is_token_expired(node)
 }
+\arguments{
+\item{node}{(character) A member node instance}
+}
 \value{
 (logical)
 }

@@ -9,7 +9,7 @@ object_exists(node, pids)
 \arguments{
 \item{node}{(MNode|CNode) The Node to query.}
 
-\item{pid}{(character) PID to check the existence of.}
+\item{pids}{(character) PID to check the existence of.}
 }
 \value{
 (logical) Whether the object exists.
@@ -23,7 +23,8 @@ provided member node.
 # Set environment
 cn <- CNode("STAGING2")
 mn <- getMNode(cn,"urn:node:mnTestKNB")
-pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1", "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+"urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 
 object_exists(mn, pids)
 }

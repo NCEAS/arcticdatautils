@@ -22,6 +22,7 @@ Adds a step to the methods document
 \examples{
 \dontrun{
 eml <- read_eml("~/Documents/metadata.xml")
-eml <- add_methods_step(eml, "Field Sampling", "Samples were collected using a niskin water sampler.")
+eml <- add_methods_step(eml, "Field Sampling", "Samples were
+collected using a niskin water sampler.")
 }
 }

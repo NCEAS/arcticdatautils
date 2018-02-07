@@ -33,7 +33,7 @@ add_access_rules <- function(sysmeta) {
 
 #' Adds access to the given System Metadata for the arctic-data-admins group
 #'
-#' @param sysmeta
+#' @param sysmeta (sysmeta) System Metadata object
 #'
 add_admin_group_access <- function(sysmeta) {
   if (!inherits(sysmeta, "SystemMetadata")) {

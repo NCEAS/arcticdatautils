@@ -21,7 +21,7 @@
 #  sapply(bad_enums, fix_bad_enums)
 
 
-
+#' @param path (character) a path
 test_has_abstract <- function(path) {
   stopifnot(file.exists(path))
 
@@ -143,7 +143,7 @@ test_has_bad_enum <- function(path) {
 #'
 #' 'oceans' != '     oceans     '
 #'
-#' @param path
+#' @param path (character) a path
 #'
 
 fix_bad_enum <- function(path) {
@@ -184,9 +184,7 @@ fix_bad_enum <- function(path) {
 #'   <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
 #' </gmd:topicCategory>
 #'
-#' @param path
-#'
-#' @return
+#' @param path (character) Path
 #'
 
 fix_bad_topic <- function(path) {

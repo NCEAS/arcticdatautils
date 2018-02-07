@@ -8,10 +8,7 @@ inside a single topicCategory element.}
 fix_bad_topic(path)
 }
 \arguments{
-\item{path}{}
-}
-\value{
-
+\item{path}{(character) Path}
 }
 \description{
 Example:
