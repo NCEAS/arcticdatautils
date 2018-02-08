@@ -1,6 +1,6 @@
 context("dataone")
 
-node <- env_load()$node
+node <- env_load()$mn
 
 test_that("permissions can be checked", {
   if (!is_token_set(node)) {
