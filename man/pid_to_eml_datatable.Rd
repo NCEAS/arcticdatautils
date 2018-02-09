@@ -2,8 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_datatable}
 \alias{pid_to_eml_datatable}
-\title{Create an EML code\code{dataTable} object for a given PID. 
-This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.}
+\title{Create an EML code\code{dataTable} object for a given PID.}
 \usage{
 pid_to_eml_datatable(mn, pid, attributes = NULL, factors = NULL,
   name = NULL, description = NULL, validateAttributes = TRUE)
@@ -27,7 +26,6 @@ pid_to_eml_datatable(mn, pid, attributes = NULL, factors = NULL,
 (dataTable) The \code{dataTable} object
 }
 \description{
-Create an EML code\code{dataTable} object for a given PID. 
 This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
 }
 \examples{
