@@ -269,7 +269,7 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) 
 create_dummy_enumeratedDomain_dataframe <- function(factors) {
   names <- rep(factors, 4)
   enumeratedDomains <- data.frame(attributeName = names,
-                                  code = paste0(names, 1:length(names)),
+                                  code = paste0(names, seq_along(names)),
                                   definition = names)
   
   enumeratedDomains
