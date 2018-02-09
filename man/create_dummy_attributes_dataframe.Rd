@@ -12,8 +12,14 @@ create_dummy_attributes_dataframe(numberAttributes, factors = NULL)
 \item{factors}{(character) Optional vector of factor names to include.}
 }
 \value{
-dataframe
+(data.frame) Data frame of attributes
 }
 \description{
 Create dummy attributes data frame
+}
+\examples{
+\dontrun{
+# Create dummy attribute dataframe with 6 attributes and 1 factor
+attributes <- create_dummy_attributes_dataframe(6, c("Factor1", "Factor2"))
+}
 }

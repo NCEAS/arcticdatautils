@@ -7,8 +7,17 @@
 create_dummy_enumeratedDomain_dataframe(factors)
 }
 \arguments{
-\item{factors}{(character) Optional vector of factor names to include.}
+\item{factors}{(character) Vector of factor names to include.}
+}
+\value{
+(data.frame) Data frame of factors
 }
 \description{
 Create dummy enumeratedDomain data frame
+}
+\examples{
+\dontrun{
+# Create dummy dataframe of 2 factors/enumerated domains 
+attributes <- create_dummy_enumeratedDomain_dataframe(c("Factor1", "Factor2"))
+}
 }

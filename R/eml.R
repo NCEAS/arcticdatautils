@@ -29,17 +29,19 @@ pid_to_eml_other_entity <- function(mn, pids) {
   sysmeta_to_eml_other_entity(sysmeta)
 }
 
-#' Create an EML dataTable object for a given PID. 
-#' This function generates an attributeList and physical and constructs a dataTable.
+
+#' Create an EML code\code{dataTable} object for a given PID. 
+#' This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pid (character) The PID of the object to create the dataTable for.
-#' @param attributes (data.frame) Data frame of attributes.
-#' @param factors (data.frame) Data frame of enumerated attribute values (factors).
-#' @param name (character) Optional field to specify entityName, otherwise will be extracted from system metadata.
-#' @param description (character) Optional field to specify entityDescription, otherwise will match name.
+#' @param pid (character) The PID of the object to create the \code{dataTable} for.
+#' @param attributes (data.frame) Optional data frame of attributes. Follows the convention in \link[EML]{set_attributes}.
+#' @param factors (data.frame) Optional data frame of enumerated attribute values (factors). Follows the convention in \link[EML]{set_attributes}.
+#' @param name (character) Optional field to specify \code{entityName}, otherwise will be extracted from system metadata.
+#' @param description (character) Optional field to specify \code{entityDescription}, otherwise will match name.
+#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.
 #' 
-#' @return (dataTable) The dataTable object
+#' @return (dataTable) The \code{dataTable} object
 #' @export
 #'
 #' @examples
@@ -50,39 +52,54 @@ pid_to_eml_other_entity <- function(mn, pids) {
 #' description <- "A description of this entity."
 #' dataTable <- pid_to_eml_datatable(mn, pid, attributes, name=name, description=description)
 #' }
-pid_to_eml_datatable <- function(mn, pid, attributes, factors=NULL, name=NULL, description=NULL) {
+pid_to_eml_datatable <- function(mn,
+                                 pid,
+                                 attributes = NULL,
+                                 factors = NULL,
+                                 name = NULL,
+                                 description = NULL,
+                                 validateAttributes = TRUE) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
-  stopifnot(is.data.frame(attributes))
   
-  if (is.null(factors)) {
-    attributes <- set_attributes(attributes)
-  } else {
-    stopifnot(is.data.frame(factors))
-    attributes <- set_attributes(attributes, factors)
+  dataTable <- new("dataTable", physical = pid_to_eml_physical(mn, pid))
+
+  if(!is.null(attributes)) {
+    stopifnot(is.data.frame(attributes))
+    
+    if (is.null(factors)) {
+      attributes <- set_attributes(attributes)
+    } else {
+      stopifnot(is.data.frame(factors))
+      attributes <- set_attributes(attributes, factors)
+    }
+    
+    if (validateAttributes == TRUE) {
+      stopifnot(eml_validate_attributes(attributes))
+    }
+    
+    dataTable@attributeList <- attributes
   }
   
   if (is.null(name)) {
     name <- getSystemMetadata(mn, pid)@fileName
+    
+    if (is.null(name)) {
+      stop(call. = FALSE, 
+           "'Name' must either be specified in the function call or must exist in the system metadata.")
+    }
   }
   
-  if (is.null(description)) {
-    description <- name
+  dataTable@entityName <- name
+  
+  if (!is.null(description)) {
+    dataTable@entityDescription <- description
   }
-  
-  stopifnot(eml_validate_attributes(attributes))
-  
-  physicalObj <- pid_to_eml_physical(mn, pid)
-  
-  dataTable <- new("dataTable",
-                   entityName = name,
-                   entityDescription = description,
-                   physical = physicalObj,
-                   attributeList = attributes)
-  
+
   dataTable
 }
+
 
 #' Create EML physical objects for the given set of PIDs
 #'
