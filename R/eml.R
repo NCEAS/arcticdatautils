@@ -41,7 +41,7 @@ pid_to_eml_other_entity <- function(mn, pids) {
 #' @param name (character) Optional field to specify \code{entityName}, otherwise will be extracted from system metadata.
 #' @param description (character) Optional field to specify \code{entityDescription}, otherwise will match name.
 #' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.
-#' 
+#'
 #' @return (dataTable) The \code{dataTable} object
 #' @export
 #'
@@ -63,37 +63,37 @@ pid_to_eml_datatable <- function(mn,
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
-  
+
   dataTable <- new("dataTable", physical = pid_to_eml_physical(mn, pid))
 
   if(!is.null(attributes)) {
     stopifnot(is.data.frame(attributes))
-    
+
     if (is.null(factors)) {
       attributes <- set_attributes(attributes)
     } else {
       stopifnot(is.data.frame(factors))
       attributes <- set_attributes(attributes, factors)
     }
-    
+
     if (validateAttributes == TRUE) {
       stopifnot(eml_validate_attributes(attributes))
     }
-    
+
     dataTable@attributeList <- attributes
   }
-  
+
   if (is.null(name)) {
     name <- getSystemMetadata(mn, pid)@fileName
-    
+
     if (is.na(name)) {
-      stop(call. = FALSE, 
+      stop(call. = FALSE,
            "'Name' must either be specified in the function call or must exist in the system metadata.")
     }
   }
-  
+
   dataTable@entityName <- name
-  
+
   if (!is.null(description)) {
     dataTable@entityDescription <- description
   }
