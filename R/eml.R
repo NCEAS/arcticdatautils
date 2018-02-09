@@ -85,7 +85,7 @@ pid_to_eml_datatable <- function(mn,
   if (is.null(name)) {
     name <- getSystemMetadata(mn, pid)@fileName
     
-    if (is.null(name)) {
+    if (is.na(name)) {
       stop(call. = FALSE, 
            "'Name' must either be specified in the function call or must exist in the system metadata.")
     }
