@@ -2,31 +2,33 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_datatable}
 \alias{pid_to_eml_datatable}
-\title{Create an EML dataTable object for a given PID. 
-This function generates an attributeList and physical and constructs a dataTable.}
+\title{Create an EML code\code{dataTable} object for a given PID. 
+This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.}
 \usage{
-pid_to_eml_datatable(mn, pid, attributes, factors = NULL, name = NULL,
-  description = NULL)
+pid_to_eml_datatable(mn, pid, attributes = NULL, factors = NULL,
+  name = NULL, description = NULL, validateAttributes = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
-\item{pid}{(character) The PID of the object to create the dataTable for.}
+\item{pid}{(character) The PID of the object to create the \code{dataTable} for.}
 
-\item{attributes}{(data.frame) Data frame of attributes.}
+\item{attributes}{(data.frame) Optional data frame of attributes. Follows the convention in \link[EML]{set_attributes}.}
 
-\item{factors}{(data.frame) Data frame of enumerated attribute values (factors).}
+\item{factors}{(data.frame) Optional data frame of enumerated attribute values (factors). Follows the convention in \link[EML]{set_attributes}.}
 
-\item{name}{(character) Optional field to specify entityName, otherwise will be extracted from system metadata.}
+\item{name}{(character) Optional field to specify \code{entityName}, otherwise will be extracted from system metadata.}
 
-\item{description}{(character) Optional field to specify entityDescription, otherwise will match name.}
+\item{description}{(character) Optional field to specify \code{entityDescription}, otherwise will match name.}
+
+\item{validateAttributes}{(logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.}
 }
 \value{
-(dataTable) The dataTable object
+(dataTable) The \code{dataTable} object
 }
 \description{
-Create an EML dataTable object for a given PID. 
-This function generates an attributeList and physical and constructs a dataTable.
+Create an EML code\code{dataTable} object for a given PID. 
+This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
 }
 \examples{
 \dontrun{
