@@ -116,3 +116,30 @@ test_that("an other entity can be added from a pid", {
   doc <- EML::read_eml(eml_path)
   testthat::expect_length(doc@dataset@otherEntity, 1)
 })
+
+
+test_that("a data table can be added from a pid", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+  
+  data_path <- tempfile()
+  writeLines(LETTERS, data_path)
+  pid <- publish_object(mn, data_path, "text/csv")
+  
+  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
+  
+  doc <- EML::read_eml(eml_path)
+  
+  factors <- c("factor 1", "factor 2")
+  dummy_attributes <- create_dummy_attributes_dataframe(10, factors)
+  dummy_enumeratedDomain <- create_dummy_enumeratedDomain_dataframe(factors)
+  doc@dataset@dataTable <- as(list(pid_to_eml_datatable(mn, pid, dummy_attributes, dummy_enumeratedDomain)), "ListOfdataTable")
+
+  testthat::expect_length(doc@dataset@dataTable, 1)
+  
+  unlink(data_path)
+})
+
+
+
