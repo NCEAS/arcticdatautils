@@ -215,3 +215,62 @@ create_dummy_parent_package <- function(mn, children) {
   list(parent = create_response,
        children = children)
 }
+
+
+#' Create dummy attributes data frame
+#'
+#' @param numberAttributes (integer) Number of attributes to be created in the table
+#' @param factors (character) Optional vector of factor names to include.
+#'
+#' @return (data.frame) Data frame of attributes
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create dummy attribute dataframe with 6 attributes and 1 factor
+#' attributes <- create_dummy_attributes_dataframe(6, c("Factor1", "Factor2"))
+#' }
+create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) {
+  names <- vapply(seq_len(numberAttributes), function(x) { paste0("Attribute ", x)}, "")
+  
+  if(!is.null(factors)) {
+    domains <- c(rep("textDomain", numberAttributes - length(factors)),
+                 rep("enumeratedDomain", length(factors)))
+    names[seq((numberAttributes - length(factors) + 1), numberAttributes)] <- factors
+  }
+  
+  attributes <- data.frame(attributeName = names,
+                           attributeDefinition = names,
+                           measurementScale = rep("nominal", numberAttributes),
+                           domain = domains,
+                           formatString = rep(NA, numberAttributes),
+                           definition = names,
+                           unit = rep(NA, numberAttributes),
+                           numberType = rep(NA, numberAttributes),
+                           missingValueCode = rep(NA, numberAttributes),
+                           missingValueCodeExplanation = rep(NA, numberAttributes),
+                           stringsAsFactors = FALSE)
+  
+  attributes
+}
+
+#' Create dummy enumeratedDomain data frame
+#'
+#' @param factors (character) Vector of factor names to include.
+#'
+#' @return (data.frame) Data frame of factors 
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Create dummy dataframe of 2 factors/enumerated domains 
+#' attributes <- create_dummy_enumeratedDomain_dataframe(c("Factor1", "Factor2"))
+#' }
+create_dummy_enumeratedDomain_dataframe <- function(factors) {
+  names <- rep(factors, 4)
+  enumeratedDomains <- data.frame(attributeName = names,
+                                  code = paste0(names, seq_along(names)),
+                                  definition = names)
+  
+  enumeratedDomains
+}
