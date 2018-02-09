@@ -30,7 +30,8 @@ pid_to_eml_other_entity <- function(mn, pids) {
 }
 
 
-#' Create an EML code\code{dataTable} object for a given PID. 
+#' Create an EML code\code{dataTable} object for a given PID.
+#'
 #' This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
