@@ -258,3 +258,33 @@ test_that("publishing an object with an invalid format ID fails", {
 
   expect_error(publish_object(mn, tmp_path, "asdf/asdf"))
 })
+
+test_that("publish_update removes the target package from 'parent_parent_pids' argument", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  parent <- create_dummy_package(mn)
+  child <- create_dummy_package(mn)
+
+  # Nest packages
+  parent["resource_map"] <- update_resource_map(mn,
+                                                parent$resource_map,
+                                                parent$metadata,
+                                                parent$data,
+                                                child$resource_map,
+                                                check_first = F)
+
+  # Updating parent incorrectly should still run (with parent resource_map listed in 'parent_parent_pids')
+  child <- publish_update(mn,
+                           child$metadata,
+                           child$resource_map,
+                           child$data,
+                           parent_resmap_pid = parent$resource_map,
+                           parent_metadata_pid = parent$metadata,
+                           parent_data_pids = parent$data,
+                           parent_child_pids = child$resource_map, check_first = F)
+  parent <- get_package(mn, child$parent_resource_map)
+
+  expect_equal(child$resource_map, parent$child_packages)
+})
