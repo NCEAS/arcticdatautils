@@ -259,7 +259,7 @@ test_that("publishing an object with an invalid format ID fails", {
   expect_error(publish_object(mn, tmp_path, "asdf/asdf"))
 })
 
-test_that("publish_update removes the target package from 'parent_parent_pids' argument", {
+test_that("publish_update removes 'resource_map_pid' from 'parent_child_pids' argument", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
