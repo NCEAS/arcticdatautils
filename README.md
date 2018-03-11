@@ -35,6 +35,11 @@ remotes::install_github("nceas/arcticdatautils")
   - Run the tests and make sure they all pass
     > `devtools::test()`
 
+## Support
+
+- Please submit bugs or other comments as [Issues](https://github.com/NCEAS/arcticdatautils/issues)
+- Maintainers of the package are @jeanetteclark and @jagoldstein
+
 ## Testing
 
 Note: The test suite contains a set of tests that call out to a remote server and whether or not these tests are run depends on whether `is_token_set()` returns true which just checks whether the `dataone_test_token` option is set.
