@@ -3,9 +3,9 @@ Title: Utilities for the Arctic Data Center
 Version: 0.6.3.9000
 Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
-  person("Jeanette", "Clark", email = "jclark@nceas.ucsb.edu", role = c("cre", "ctb")),
-  person("Jesse", "Goldstein", email = "jgoldstein@nceas.ucsb.edu", role = c("cre", "ctb")),
   person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb"),
+  person("Jesse", "Goldstein", email = "jgoldstein@nceas.ucsb.edu", role = "ctb"),
+  person("Jeanette", "Clark", email = "jclark@nceas.ucsb.edu", role = "ctb"),
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
   person("Emily", "O'Dean", email="eodean10@gmail.com", role = "ctb")
   )
