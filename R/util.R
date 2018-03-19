@@ -759,7 +759,7 @@ get_all_versions <- function(node, pid) {
 #' a resource map PID or a metadata PID as its `pid` argument.
 #'
 #' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
-#' @param pid (character) The the metadata PID of the package.
+#' @param pid (character) The the resource map PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
 #' useful to set if you are warned about the result set being truncated.
