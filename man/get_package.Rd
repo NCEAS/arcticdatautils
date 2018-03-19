@@ -9,7 +9,7 @@ get_package(node, pid, file_names = FALSE, rows = 1000)
 \arguments{
 \item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
 
-\item{pid}{(character) The the metadata PID of the package.}
+\item{pid}{(character) The the resource map PID of the package.}
 
 \item{file_names}{(logical) Whether to return file names for all objects.}
 
