@@ -226,10 +226,10 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' @param data_pids (character)  PID(s) of data objects that will go in the updated package.
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
 #' @param use_doi (logical) Generate and use a DOI as the identifier for the updated metadata object.
-#' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
-#' @param parent_metadata_pid (character)  Optional. Identifier for the metadata document of the parent package.
-#' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package.
-#' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
+#' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated. Not optional if a parent package exists.
+#' @param parent_metadata_pid (character)  Optional. Identifier for the metadata document of the parent package. Not optional if a parent package exists.
+#' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package. Not optional if the parent package contains data objects.
+#' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.  \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
 #' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
 #' @param public (logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
