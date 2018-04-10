@@ -623,7 +623,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' fully fleshed out. Need to pass these objects in directly if you want to use
 #' them.
 #'
-#' @param title (character) Title of the project (Required).
+#' @param title (character) Title of the project (Required). May have multiple titles.
 #' @param personnelList (list of personnel) Personnel involved with the project.
 #' @param abstract (character) Project abstract. Can pass as a character vector
 #' for separate paragraphs.
@@ -637,7 +637,7 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' proj <- eml_project("Some title",
+#' proj <- eml_project(c("Some title", "A second title if needed"),
 #'            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
 #'            c("Abstract paragraph 1", "Abstract paragraph 2"),
 #'            "Funding Agency: Award Number 12345")
@@ -650,15 +650,17 @@ eml_project <- function(title,
                         relatedProject = NULL) {
 
   stopifnot(is.character(title),
-            nchar(title) > 0)
+            length(title) > 0,
+            all(nchar(title)) > 0)
   stopifnot(length(personnelList) > 0)
 
   # Project
   project <- new("project")
 
   # Title
-  project@title <- c(as(title, "title"))
-
+  titles <- lapply(title, function(x) { as(x, "title") })
+  project@title <- as(titles, "ListOftitle")
+  
   # Personnel
   if(!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
     stop(call. = FALSE,
