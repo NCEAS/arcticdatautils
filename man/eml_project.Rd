@@ -9,7 +9,7 @@ eml_project(title, personnelList, abstract = NULL, funding = NULL,
   relatedProject = NULL)
 }
 \arguments{
-\item{title}{(character) Title of the project (Required).}
+\item{title}{(character) Title of the project (Required). May have multiple titles.}
 
 \item{personnelList}{(list of personnel) Personnel involved with the project.}
 
@@ -34,7 +34,7 @@ fully fleshed out. Need to pass these objects in directly if you want to use
 them.
 }
 \examples{
-proj <- eml_project("Some title",
+proj <- eml_project(c("Some title", "A second title if needed"),
            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
            c("Abstract paragraph 1", "Abstract paragraph 2"),
            "Funding Agency: Award Number 12345")
