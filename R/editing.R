@@ -545,6 +545,7 @@ publish_update <- function(mn,
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as
 #'   aruments exist on the MN before continuing. This speeds up the function,
 #'   especially when `data_pids` has many elements.
+#' @param ... Additional arguments that can be passed into \code{\link{publish_object}}
 #'
 #' @return (character) The created resource map's PID
 #' @export
@@ -563,9 +564,10 @@ publish_update <- function(mn,
 #'}
 create_resource_map <- function(mn,
                                 metadata_pid,
-                                data_pids=NULL,
-                                child_pids=NULL,
-                                check_first=TRUE) {
+                                data_pids = NULL,
+                                child_pids = NULL,
+                                check_first = TRUE,
+                                ...) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
@@ -591,7 +593,8 @@ create_resource_map <- function(mn,
   actual <- publish_object(mn,
                            path,
                            pid,
-                           format_id = "http://www.openarchives.org/ore/terms")
+                           format_id = "http://www.openarchives.org/ore/terms",
+                           ...)
 
   stopifnot(pid == actual)
 
