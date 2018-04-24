@@ -27,13 +27,13 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{use_doi}{(logical) Generate and use a DOI as the identifier for the updated metadata object.}
 
-\item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated.}
+\item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated. Not optional if a parent package exists.}
 
-\item{parent_metadata_pid}{(character)  Optional. Identifier for the metadata document of the parent package.}
+\item{parent_metadata_pid}{(character)  Optional. Identifier for the metadata document of the parent package. Not optional if a parent package exists.}
 
-\item{parent_data_pids}{(character)  Optional. Identifier for the data objects of the parent package.}
+\item{parent_data_pids}{(character)  Optional. Identifier for the data objects of the parent package. Not optional if the parent package contains data objects.}
 
-\item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.}
+\item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.  \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.}
 
 \item{public}{(logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
 This applies to the new metadata PID and its resource map and data object.
