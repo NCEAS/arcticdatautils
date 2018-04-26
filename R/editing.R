@@ -33,11 +33,11 @@
 #'}
 publish_object <- function(mn,
                            path,
-                           format_id=NULL,
-                           pid=NULL,
-                           sid=NULL,
-                           clone_pid=NULL,
-                           public=TRUE) {
+                           format_id = NULL,
+                           pid = NULL,
+                           sid = NULL,
+                           clone_pid = NULL,
+                           public = TRUE) {
 
   stopifnot(is(mn, "MNode"))
   stopifnot(file.exists(path))
@@ -102,7 +102,9 @@ publish_object <- function(mn,
   }
 
   sysmeta <- add_admin_group_access(sysmeta)
-  sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+  if(public == TRUE){
+    sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
+  }
   sysmeta@fileName <- basename(path)
 
   dataone::createObject(mn,
