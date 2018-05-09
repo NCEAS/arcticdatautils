@@ -6,7 +6,6 @@ r:
   - release
   - devel
 sudo: false
-cache: packages
 addons:
   apt:
     packages:
