@@ -7,7 +7,6 @@ r:
   - devel
 r_packages: ncdf4
 sudo: false
-cache: packages
 addons:
   apt:
     update: true
