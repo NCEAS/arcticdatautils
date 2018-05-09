@@ -6,8 +6,10 @@ r:
   - release
   - devel
 sudo: false
+cache: packages
 addons:
   apt:
+    update: true
     packages:
       - librdf0-dev
       - libnetcdf-dev
