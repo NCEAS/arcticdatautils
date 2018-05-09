@@ -233,7 +233,7 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package. Not optional if the parent package contains data objects.
 #' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.  \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
-#' @param metadata_path (character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.
+#' @param metadata_path (character or eml) Optional. An eml class object or a path to a metadata file to update with. If this is not set, the existing metadata document will be used.
 #' @param public (logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
 #' This applies to the new metadata PID and its resource map and data object.
 #' access policies are not affected.
@@ -367,6 +367,15 @@ publish_update <- function(mn,
     # Get the metadata doc
     message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
+
+  } if(class(metadata_path) == "eml") {
+    # If an eml object is provided, use it directly after validating
+    if(!eml_validate(metadata_path)){
+      stop("The EML object is not valid.")
+    }
+
+    eml <- metadata_path
+
   } else {
     # Alternatively, read an edited metadata file from disk if provided
     if (!file.exists(metadata_path)) {
