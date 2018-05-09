@@ -368,13 +368,13 @@ publish_update <- function(mn,
     message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
 
-  } if(class(metadata_path) == "eml") {
-    # If an eml object is provided, use it directly after validating
-    if(!eml_validate(metadata_path)){
-      stop("The EML object is not valid.")
-    }
+  } else if(class(metadata_path) == "eml") {
+      # If an eml object is provided, use it directly after validating
+      if(!eml_validate(metadata_path)){
+        stop("The EML object is not valid.")
+      }
 
-    eml <- metadata_path
+      eml <- metadata_path
 
   } else {
     # Alternatively, read an edited metadata file from disk if provided
