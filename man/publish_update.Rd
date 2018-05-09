@@ -21,7 +21,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{child_pids}{(character) Optional. Child packages resource map PIDs.}
 
-\item{metadata_path}{(character) Optional. Path to a metadata file to update with. If this is not set, the existing metadata document will be used.}
+\item{metadata_path}{(character or eml) Optional. An eml class object or a path to a metadata file to update with. If this is not set, the existing metadata document will be used.}
 
 \item{identifier}{(character) Manually specify the identifier for the new metadata object.}
 
