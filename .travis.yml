@@ -13,3 +13,4 @@ addons:
     packages:
       - librdf0-dev
       - libnetcdf-dev
+      - netcdf-bin
