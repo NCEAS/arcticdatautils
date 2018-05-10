@@ -11,5 +11,3 @@ addons:
   apt:
     packages:
       - librdf0-dev
-      - libnetcdf-dev
-      - r-cran-ncdf4

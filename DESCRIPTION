@@ -21,12 +21,10 @@ Imports:
     EML,
     httr,
     methods,
-    ncdf4,
     stringr,
     stringi,
     tools,
     uuid,
-    yaml,
     xml2,
     XML
 License: MIT + file LICENSE
@@ -35,7 +33,9 @@ Suggests:
     testthat,
     humaniformat,
     knitr,
+    ncdf4,
     rmarkdown,
+    yaml,
     xslt
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
