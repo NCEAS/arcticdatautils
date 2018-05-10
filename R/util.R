@@ -109,6 +109,12 @@ get_netcdf_format_id <- function(path) {
             nchar(path) > 0,
             file.exists(path))
 
+  if (!requireNamespace("ncdf4")) {
+    stop(call. = FALSE, 
+         "The package 'ncdf4' must be installed to run this function. ",
+         "Please install it and try again.")
+  }
+
   # Try to open the file, capturing errors
   cdf_file <- try({
     ncdf4::nc_open(path)

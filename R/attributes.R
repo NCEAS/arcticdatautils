@@ -12,6 +12,12 @@
 get_ncdf4_attributes <- function(nc) {
   stopifnot(is(nc, "ncdf4") || file.exists(nc))
 
+  if (!requireNamespace("ncdf4")) {
+    stop(call. = FALSE, 
+         "The package 'ncdf4' must be installed to run this function. ",
+         "Please install it and try again.")
+  }
+  
   # Read the file in if `nc` is a character vector
   if (is.character(nc)) {
     nc <- ncdf4::nc_open(nc)

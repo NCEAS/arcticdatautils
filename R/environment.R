@@ -38,6 +38,12 @@ env_get <- function() {
 #'
 #'
 env_load <- function(name=NULL, path=NULL, skip_mn=FALSE) {
+  if (!requireNamespace("yaml")) {
+    stop(call. = FALSE, 
+         "The package 'yaml' must be installed to run this function. ",
+         "Please install it and try again.")
+  }
+
   # Determine the environment to load
   if (is.null(name)) {
     name <- env_get()
