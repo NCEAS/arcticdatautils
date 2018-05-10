@@ -6,6 +6,8 @@ r:
   - release
   - devel
 sudo: false
+env:
+  - _R_CHECK_FORCE_SUGGESTS_=0
 cache: packages
 addons:
   apt:
