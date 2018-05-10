@@ -15,7 +15,6 @@ Depends:
     R (>= 3.2.3)
 Imports:
     digest,
-    dplyr,
     dataone,
     datapack,
     EML,
@@ -30,6 +29,7 @@ Imports:
 License: MIT + file LICENSE
 LazyData: true
 Suggests:
+    dplyr,
     testthat,
     humaniformat,
     knitr,
