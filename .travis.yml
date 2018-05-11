@@ -5,11 +5,13 @@ r:
   - oldrel
   - release
   - devel
+r_packages: ncdf4
 sudo: false
 cache: packages
 addons:
   apt:
+    update: true
     packages:
       - librdf0-dev
       - libnetcdf-dev
-      - r-cran-ncdf4
+      - netcdf-bin

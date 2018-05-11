@@ -15,27 +15,27 @@ Depends:
     R (>= 3.2.3)
 Imports:
     digest,
-    dplyr,
     dataone,
     datapack,
     EML,
     httr,
     methods,
-    ncdf4,
     stringr,
     stringi,
     tools,
     uuid,
-    yaml,
     xml2,
     XML
 License: MIT + file LICENSE
 LazyData: true
 Suggests:
+    dplyr,
     testthat,
     humaniformat,
     knitr,
+    ncdf4,
     rmarkdown,
+    yaml,
     xslt
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
