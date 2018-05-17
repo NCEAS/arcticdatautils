@@ -3,6 +3,146 @@
 #' Helpers for creating EML.
 
 
+#' Create EML dataTable or otherEntity objects for a set of PIDs
+#'
+#' Note this is a useful alternative to pid_to_eml_datatable and
+#' pid_to_eml_other_entity because it can create multiple of objects at once.
+#'
+#' @param mn (MNode) Member Node where the PID is associated with an object.
+#' @param pids (character) The PIDs of the objects to create the entities for. Either a vector or list of names of the objects. Note that \code{pids[i]} or \code{pids[[i]]} must be a character vector of length one.
+#' @param entityType (character) What kind of objects to create from the input. Either "dataTable" or "otherEntity".
+#' @param names (character) Either a vector or list of names of the objects. Note that \code{names[i]} or \code{names[[i]]} must be \code{NA} or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.
+#' @param descriptions (character) Either a vector or list of names of the objects. Note that \code{descriptions[i]} or \code{descriptions[[i]]} must be \code{NA} if no entityDescription is needed for a particular pid or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.
+#' @param attributes (list) Required if entityType is set to "dataTable". \code{NULL} if entityType is set to "otherEntity" and no attribute tables are needed. A list of attribute tables. Note that \code{attributes[[i]]} must be a dataframe or possibly \code{NA} in the case where \code{entityType} is set to "otherEntity" and must correspond to \code{pids[i]} or \code{pids[[i]]}.
+#' @param factors (list) A list of enumerated domain tables. \code{NULL} if no enumerated domains exist. Note that \code{factors[[i]]} must be a dataframe or \code{NA} in the case where enumerated domains are not present in the data. Must correspond to \code{pids[i]} or \code{pids[[i]]}.
+#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.
+#'
+#' @return (list) The otherEntity or dataTable object(s)
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' #Generate EML otherEntities for four pids
+#' TEST_pid_to_eml_entity(mn,
+#'                        entityType = 'otherEntity',
+#'                        pids = c('pid1', 'pid2', 'pid3', 'pid4'),
+#'                        names = c('name1', 'name2', 'name3', 'name4'),
+#'                        descriptions = c('description1', 'description2',
+#'                        'description3', 'description4'),
+#'                        attributes = list(atTbl1, atTbl2, atTbl3, atTbl4),
+#'                        factors = rep(factors1, factors2, NA, NA)))
+#' }
+pid_to_eml_entity <- function(mn,
+                              pids,
+                              entityType,
+                              names,
+                              descriptions = NULL,
+                              attributes = NULL,
+                              factors = NULL,
+                              validateAttributes = TRUE) {
+
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(pids),
+            all(nchar(pids)) > 0)
+
+  if ( (length(pids) != length(attributes)) & (!is.null(attributes)) ){
+    stop(call. = FALSE,
+         "'attributes' must be NULL or have same length as pids")
+  }
+  if ( (length(pids) != length(factors)) & (!is.null(factors)) ){
+    stop(call. = FALSE,
+         "'factors' must be NULL or have same length as pids")
+  }
+  if ( (length(pids) != length(names)) & (!is.null(names)) ){
+    stop(call. = FALSE,
+         "'names' must be NULL or have same length as pids")
+  }
+  if ( (length(pids) != length(descriptions)) & (!is.null(descriptions)) ){
+    stop(call. = FALSE,
+         "'descriptions' must be NULL or have same length as pids")
+  }
+
+
+  work <- function(i, some_list){
+
+    mn <- some_list$mn
+    entity_type <- some_list$entity_type
+    pid <- some_list$pid[[i]]
+    name <- some_list$name[[i]]
+
+    description = some_list$description[[i]]
+
+
+    attribute_table <- l$attribute_table[[i]]
+    factors_table <- l$factors_table[[i]]
+
+    entity <- new(Class = entity_type)
+    entity@scope <- new("xml_attribute", "document")
+    entity@physical@.Data[[1]] <- pid_to_eml_physical(mn, pid)[[1]]
+    if (entityType == "otherEntity"){
+      entity@entityType <- "other"
+    }
+
+    if (is.na(name)) {
+      stop(call. = FALSE,
+           paste("'Name' of entity ", i," must be specified in the function call", sep = ''))
+    }
+
+    entity@entityName <- name
+
+    if (!is.na(description)) {
+      entity@entityDescription <- description
+    }
+
+    if(class(attribute_table) == "data.frame") {
+      stopifnot(is.data.frame(attribute_table))
+
+      if (class(factors_table) != "data.frame") {
+        attribute_list <- set_attributes(attribute_table)
+      }
+      else {
+        stopifnot(is.data.frame(factors_table))
+        attribute_list <- set_attributes(attribute_table, factors_table)
+      }
+
+      if (validateAttributes == TRUE) {
+        stopifnot(eml_validate_attributes(attribute_list))
+      }
+
+      entity@attributeList <- attribute_list
+    }
+
+    else {
+      if (entity_type == "dataTable"){
+        stop(call. = FALSE,
+             "An attribute table must be provided when creating a dataTable")
+      }
+    }
+
+    entity
+  }
+
+  l <- list(mn = mn,
+            entity_type = entityType,
+            pid = as.list(pids),
+            name = as.list(names),
+            description = ifelse(rep(is.null(descriptions),length(pids)),
+                                 rep(list(NA),
+                                     length(pids)),
+                                 as.list(descriptions)),
+            attribute_table = ifelse(rep(is.null(attributes),length(pids)),
+                                     rep(list(NA),
+                                         length(pids)),
+                                     attributes),
+            factors_table = ifelse(rep(is.null(factors),length(pids)),
+                                   rep(list(NA),
+                                       length(pids)),
+                                   factors))
+
+  lapply(seq_along(as.list(pids)), work, some_list = l)
+}
+
+
 #' Create EML otherEntity objects for a set of PIDs
 #'
 #' Note this is a wrapper around sysmeta_to_other_entity which handles the task of
@@ -660,7 +800,7 @@ eml_project <- function(title,
   # Title
   titles <- lapply(title, function(x) { as(x, "title") })
   project@title <- as(titles, "ListOftitle")
-  
+
   # Personnel
   if(!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
     stop(call. = FALSE,

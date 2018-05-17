@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_other_entity}
 \alias{pid_to_eml_other_entity}
-\title{eml.R}
+\title{Create EML otherEntity objects for a set of PIDs}
 \usage{
 pid_to_eml_other_entity(mn, pids)
 }
@@ -15,10 +15,6 @@ pid_to_eml_other_entity(mn, pids)
 (list of otherEntity) The otherEntity object(s)
 }
 \description{
-Helpers for creating EML.
-Create EML otherEntity objects for a set of PIDs
-}
-\details{
 Note this is a wrapper around sysmeta_to_other_entity which handles the task of
 creating the EML otherEntity.
 }
