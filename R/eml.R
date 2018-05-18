@@ -62,17 +62,13 @@ pid_to_eml_entity <- function(mn,
          "'descriptions' must be NULL or have same length as pids")
   }
 
-
   work <- function(i, some_list){
 
     mn <- some_list$mn
     entity_type <- some_list$entity_type
     pid <- some_list$pid[[i]]
     name <- some_list$name[[i]]
-
     description = some_list$description[[i]]
-
-
     attribute_table <- l$attribute_table[[i]]
     factors_table <- l$factors_table[[i]]
 
