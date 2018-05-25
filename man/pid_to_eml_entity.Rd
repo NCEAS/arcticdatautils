@@ -4,47 +4,33 @@
 \alias{pid_to_eml_entity}
 \title{eml.R}
 \usage{
-pid_to_eml_entity(mn, pids, entityType, names, descriptions = NULL,
-  attributes = NULL, factors = NULL, validateAttributes = TRUE)
+pid_to_eml_entity(mn, pid, entityType = "otherEntity", ...)
 }
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
-\item{pids}{(character) The PIDs of the objects to create the entities for. Either a vector or list of names of the objects. Note that \code{pids[i]} or \code{pids[[i]]} must be a character vector of length one.}
+\item{pid}{(character) The PID of the object to create the sub-tree for.}
 
-\item{entityType}{(character) What kind of objects to create from the input. Either "dataTable" or "otherEntity".}
+\item{entityType}{(character) What kind of objects to create from the input. Either "dataTable",
+"spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity".}
 
-\item{names}{(character) Either a vector or list of names of the objects. Note that \code{names[i]} or \code{names[[i]]} must be \code{NA} or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.}
-
-\item{descriptions}{(character) Either a vector or list of names of the objects. Note that \code{descriptions[i]} or \code{descriptions[[i]]} must be \code{NA} if no entityDescription is needed for a particular pid or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.}
-
-\item{attributes}{(list) Required if entityType is set to "dataTable". \code{NULL} if entityType is set to "otherEntity" and no attribute tables are needed. A list of attribute tables. Note that \code{attributes[[i]]} must be a dataframe or possibly \code{NA} in the case where \code{entityType} is set to "otherEntity" and must correspond to \code{pids[i]} or \code{pids[[i]]}.}
-
-\item{factors}{(list) A list of enumerated domain tables. \code{NULL} if no enumerated domains exist. Note that \code{factors[[i]]} must be a dataframe or \code{NA} in the case where enumerated domains are not present in the data. Must correspond to \code{pids[i]} or \code{pids[[i]]}.}
-
-\item{validateAttributes}{(logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.}
+\item{...}{(optional) Additional arguments to be passed to \code{new(entityType, ...)}. See example}
 }
 \value{
-(list) The otherEntity or dataTable object(s)
+(list) The entity object
 }
 \description{
 Helpers for creating EML.
-Create EML dataTable or otherEntity objects for a set of PIDs
-}
-\details{
-Note this is a useful alternative to pid_to_eml_datatable and
-pid_to_eml_other_entity because it can create multiple of objects at once.
+Create EML entity from a DataONE pid
 }
 \examples{
 \dontrun{
-#Generate EML otherEntities for four pids
-TEST_pid_to_eml_entity(mn,
-                       entityType = 'otherEntity',
-                       pids = c('pid1', 'pid2', 'pid3', 'pid4'),
-                       names = c('name1', 'name2', 'name3', 'name4'),
-                       descriptions = c('description1', 'description2',
-                       'description3', 'description4'),
-                       attributes = list(atTbl1, atTbl2, atTbl3, atTbl4),
-                       factors = rep(factors1, factors2, NA, NA)))
+#Generate EML otherEntity
+pid_to_eml_entity(mn,
+                  pid,
+                  entityType = "otherEntity",
+                  entityName = "Entity Name",
+                  entityDescription = "Description about entity")
+
 }
 }

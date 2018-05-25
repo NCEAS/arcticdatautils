@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_datatable}
 \alias{pid_to_eml_datatable}
-\title{Create an EML code\code{dataTable} object for a given PID.}
+\title{This function is deprecated. See \link{pid_to_eml_entity}.}
 \usage{
 pid_to_eml_datatable(mn, pid, attributes = NULL, factors = NULL,
   name = NULL, description = NULL, validateAttributes = TRUE)
@@ -20,20 +20,8 @@ pid_to_eml_datatable(mn, pid, attributes = NULL, factors = NULL,
 
 \item{description}{(character) Optional field to specify \code{entityDescription}, otherwise will match name.}
 
-\item{validateAttributes}{(logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.}
-}
-\value{
-(dataTable) The \code{dataTable} object
+\item{validateAttributes}{(logical) If set to FALSE or if attributes are not passed into the function, attribute validatio}
 }
 \description{
-This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
-}
-\examples{
-\dontrun{
-# Generate a dataTable for a given pid
-attributes <- create_dummy_attributes_dataframe(10)
-name <- "1234.csv"
-description <- "A description of this entity."
-dataTable <- pid_to_eml_datatable(mn, pid, attributes, name=name, description=description)
-}
+This function is deprecated. See \link{pid_to_eml_entity}.
 }

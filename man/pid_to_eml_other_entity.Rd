@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_other_entity}
 \alias{pid_to_eml_other_entity}
-\title{Create EML otherEntity objects for a set of PIDs}
+\title{This function is deprecated. See \link{pid_to_eml_entity}.}
 \usage{
 pid_to_eml_other_entity(mn, pids)
 }
@@ -11,17 +11,6 @@ pid_to_eml_other_entity(mn, pids)
 
 \item{pids}{(character) The PID of the object to create the sub-tree for.}
 }
-\value{
-(list of otherEntity) The otherEntity object(s)
-}
 \description{
-Note this is a wrapper around sysmeta_to_other_entity which handles the task of
-creating the EML otherEntity.
-}
-\examples{
-\dontrun{
-# Generate EML otherEntity objects for all the data in a package
-pkg <- get_package(mn, pid)
-pid_to_other_entity(mn, pkg$data)
-}
+This function is deprecated. See \link{pid_to_eml_entity}.
 }

@@ -3,172 +3,88 @@
 #' Helpers for creating EML.
 
 
-#' Create EML dataTable or otherEntity objects for a set of PIDs
-#'
-#' Note this is a useful alternative to pid_to_eml_datatable and
-#' pid_to_eml_other_entity because it can create multiple of objects at once.
+#' Create EML entity from a DataONE pid
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PIDs of the objects to create the entities for. Either a vector or list of names of the objects. Note that \code{pids[i]} or \code{pids[[i]]} must be a character vector of length one.
-#' @param entityType (character) What kind of objects to create from the input. Either "dataTable" or "otherEntity".
-#' @param names (character) Either a vector or list of names of the objects. Note that \code{names[i]} or \code{names[[i]]} must be \code{NA} or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.
-#' @param descriptions (character) Either a vector or list of names of the objects. Note that \code{descriptions[i]} or \code{descriptions[[i]]} must be \code{NA} if no entityDescription is needed for a particular pid or a character vector of length one and must correspond to \code{pids[i]} or \code{pids[[i]]}.
-#' @param attributes (list) Required if entityType is set to "dataTable". \code{NULL} if entityType is set to "otherEntity" and no attribute tables are needed. A list of attribute tables. Note that \code{attributes[[i]]} must be a dataframe or possibly \code{NA} in the case where \code{entityType} is set to "otherEntity" and must correspond to \code{pids[i]} or \code{pids[[i]]}.
-#' @param factors (list) A list of enumerated domain tables. \code{NULL} if no enumerated domains exist. Note that \code{factors[[i]]} must be a dataframe or \code{NA} in the case where enumerated domains are not present in the data. Must correspond to \code{pids[i]} or \code{pids[[i]]}.
-#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.
+#' @param pid (character) The PID of the object to create the sub-tree for.
+#' @param entityType (character) What kind of objects to create from the input. Either "dataTable",
+#' "spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity".
+#' @param ... (optional) Additional arguments to be passed to \code{new(entityType, ...)}. See example
 #'
-#' @return (list) The otherEntity or dataTable object(s)
+#' @return (list) The entity object
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' #Generate EML otherEntities for four pids
-#' TEST_pid_to_eml_entity(mn,
-#'                        entityType = 'otherEntity',
-#'                        pids = c('pid1', 'pid2', 'pid3', 'pid4'),
-#'                        names = c('name1', 'name2', 'name3', 'name4'),
-#'                        descriptions = c('description1', 'description2',
-#'                        'description3', 'description4'),
-#'                        attributes = list(atTbl1, atTbl2, atTbl3, atTbl4),
-#'                        factors = rep(factors1, factors2, NA, NA)))
+#' #Generate EML otherEntity
+#' pid_to_eml_entity(mn,
+#'                   pid,
+#'                   entityType = "otherEntity",
+#'                   entityName = "Entity Name",
+#'                   entityDescription = "Description about entity")
+#'
 #' }
 pid_to_eml_entity <- function(mn,
-                              pids,
-                              entityType,
-                              names,
-                              descriptions = NULL,
-                              attributes = NULL,
-                              factors = NULL,
-                              validateAttributes = TRUE) {
+                              pid,
+                              entityType = "otherEntity",
+                              ...) {
 
   stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
+  stopifnot(is.character(pid),
+            nchar(pid) > 0)
 
-  if ( (length(pids) != length(attributes)) & (!is.null(attributes)) ){
-    stop(call. = FALSE,
-         "'attributes' must be NULL or have same length as pids")
-  }
-  if ( (length(pids) != length(factors)) & (!is.null(factors)) ){
-    stop(call. = FALSE,
-         "'factors' must be NULL or have same length as pids")
-  }
-  if ( (length(pids) != length(names)) & (!is.null(names)) ){
-    stop(call. = FALSE,
-         "'names' must be NULL or have same length as pids")
-  }
-  if ( (length(pids) != length(descriptions)) & (!is.null(descriptions)) ){
-    stop(call. = FALSE,
-         "'descriptions' must be NULL or have same length as pids")
+  stopifnot(entityType %in% c("dataTable",
+                              "spatialRaster",
+                              "spatialVector",
+                              "storedProcedure",
+                              "view",
+                              "otherEntity"))
+
+  systmeta <- getSystemMetadata(mn, pid)
+  physical <- sysmeta_to_eml_physical(systmeta)
+
+  # Create entity
+  entity <- new(entityType,
+                physical = pid_to_eml_physical(mn, pid),
+                ...)
+
+  # Set entity slots
+  if (length(slot(entity, "id")) == 0) {
+    entity@id <- new("xml_attribute", systmeta@identifier)
   }
 
-  work <- function(i, some_list){
-
-    mn <- some_list$mn
-    entity_type <- some_list$entity_type
-    pid <- some_list$pid[[i]]
-    name <- some_list$name[[i]]
-    description = some_list$description[[i]]
-    attribute_table <- l$attribute_table[[i]]
-    factors_table <- l$factors_table[[i]]
-
-    entity <- new(Class = entity_type)
+  if (length(slot(entity, "scope")) == 0) {
     entity@scope <- new("xml_attribute", "document")
-    entity@physical@.Data[[1]] <- pid_to_eml_physical(mn, pid)[[1]]
-    if (entityType == "otherEntity"){
-      entity@entityType <- "other"
-    }
-
-    if (is.na(name)) {
-      stop(call. = FALSE,
-           paste("'Name' of entity ", i," must be specified in the function call", sep = ''))
-    }
-
-    entity@entityName <- name
-
-    if (!is.na(description)) {
-      entity@entityDescription <- description
-    }
-
-    if(class(attribute_table) == "data.frame") {
-      stopifnot(is.data.frame(attribute_table))
-
-      if (class(factors_table) != "data.frame") {
-        attribute_list <- set_attributes(attribute_table)
-      }
-      else {
-        stopifnot(is.data.frame(factors_table))
-        attribute_list <- set_attributes(attribute_table, factors_table)
-      }
-
-      if (validateAttributes == TRUE) {
-        stopifnot(eml_validate_attributes(attribute_list))
-      }
-
-      entity@attributeList <- attribute_list
-    }
-
-    else {
-      if (entity_type == "dataTable"){
-        stop(call. = FALSE,
-             "An attribute table must be provided when creating a dataTable")
-      }
-    }
-
-    entity
   }
 
-  l <- list(mn = mn,
-            entity_type = entityType,
-            pid = as.list(pids),
-            name = as.list(names),
-            description = ifelse(rep(is.null(descriptions),length(pids)),
-                                 rep(list(NA),
-                                     length(pids)),
-                                 as.list(descriptions)),
-            attribute_table = ifelse(rep(is.null(attributes),length(pids)),
-                                     rep(list(NA),
-                                         length(pids)),
-                                     attributes),
-            factors_table = ifelse(rep(is.null(factors),length(pids)),
-                                   rep(list(NA),
-                                       length(pids)),
-                                   factors))
+  if (length(slot(entity, "entityName")) == 0) {
 
-  lapply(seq_along(as.list(pids)), work, some_list = l)
+    if (!is.na(systmeta@fileName)) {
+      entity@entityName <- new("entityName", systmeta@fileName)
+    }
+  }
+
+  if (entityType == "otherEntity" && length(slot(entity, "entityType")) == 0) {
+    entity@entityType <- "Other"
+  }
+
+  return(entity)
 }
 
 
-#' Create EML otherEntity objects for a set of PIDs
-#'
-#' Note this is a wrapper around sysmeta_to_other_entity which handles the task of
-#' creating the EML otherEntity.
+#' This function is deprecated. See \link{pid_to_eml_entity}.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pids (character) The PID of the object to create the sub-tree for.
 #'
-#' @return (list of otherEntity) The otherEntity object(s)
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Generate EML otherEntity objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' pid_to_other_entity(mn, pkg$data)
-#' }
 pid_to_eml_other_entity <- function(mn, pids) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
-
-  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
-  sysmeta_to_eml_other_entity(sysmeta)
+  .Deprecated(new = "pid_to_eml_entity",
+              package = "arcticdtautils",
+              old = "pid_to_eml_other_entity")
 }
 
 
-#' Create an EML code\code{dataTable} object for a given PID.
-#'
-#' This function generates an \code{attributeList} and \code{physical} and constructs a \code{dataTable}.
+#' This function is deprecated. See \link{pid_to_eml_entity}.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the \code{dataTable} for.
@@ -176,19 +92,8 @@ pid_to_eml_other_entity <- function(mn, pids) {
 #' @param factors (data.frame) Optional data frame of enumerated attribute values (factors). Follows the convention in \link[EML]{set_attributes}.
 #' @param name (character) Optional field to specify \code{entityName}, otherwise will be extracted from system metadata.
 #' @param description (character) Optional field to specify \code{entityDescription}, otherwise will match name.
-#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validation test will not run.
+#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validatio
 #'
-#' @return (dataTable) The \code{dataTable} object
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Generate a dataTable for a given pid
-#' attributes <- create_dummy_attributes_dataframe(10)
-#' name <- "1234.csv"
-#' description <- "A description of this entity."
-#' dataTable <- pid_to_eml_datatable(mn, pid, attributes, name=name, description=description)
-#' }
 pid_to_eml_datatable <- function(mn,
                                  pid,
                                  attributes = NULL,
@@ -196,45 +101,9 @@ pid_to_eml_datatable <- function(mn,
                                  name = NULL,
                                  description = NULL,
                                  validateAttributes = TRUE) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pid),
-            nchar(pid) > 0)
-
-  dataTable <- new("dataTable", physical = pid_to_eml_physical(mn, pid))
-
-  if(!is.null(attributes)) {
-    stopifnot(is.data.frame(attributes))
-
-    if (is.null(factors)) {
-      attributes <- set_attributes(attributes)
-    } else {
-      stopifnot(is.data.frame(factors))
-      attributes <- set_attributes(attributes, factors)
-    }
-
-    if (validateAttributes == TRUE) {
-      stopifnot(eml_validate_attributes(attributes))
-    }
-
-    dataTable@attributeList <- attributes
-  }
-
-  if (is.null(name)) {
-    name <- getSystemMetadata(mn, pid)@fileName
-
-    if (is.na(name)) {
-      stop(call. = FALSE,
-           "'Name' must either be specified in the function call or must exist in the system metadata.")
-    }
-  }
-
-  dataTable@entityName <- name
-
-  if (!is.null(description)) {
-    dataTable@entityDescription <- description
-  }
-
-  dataTable
+  .Deprecated(new = "pid_to_eml_entity",
+              package = "arcticdtautils",
+              old = "pid_to_eml_other_entity")
 }
 
 
@@ -264,45 +133,14 @@ pid_to_eml_physical <- function(mn, pids) {
   sysmeta_to_eml_physical(sysmeta)
 }
 
-#' Create an EML otherEntity for the given object from the System Metadata
+#' This function is deprecated. See \link{pid_to_eml_entity}.
 #'
 #' @param sysmeta (SystemMetadata) One or more System Metadata objects
 #'
-#' @return (list of otherEntity) The otherEntity object(s)
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Generate EML otherEntity objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' sm <- lapply(pkg$data, function(pid) { getSystemMetadata(mn, pid) })
-#' sysmeta_to_other_entity(sm)
-#'}
 sysmeta_to_eml_other_entity <- function(sysmeta) {
-  work <- function(x) {
-    other_entity <- new("otherEntity")
-    other_entity@id <- new("xml_attribute", x@identifier)
-    other_entity@scope <- new("xml_attribute", "document")
-
-    if (is.na(x@fileName)) {
-      other_entity@entityName <- new("entityName", "NA")
-    }
-    else {
-      other_entity@entityName <- new("entityName", x@fileName)
-    }
-
-    other_entity@entityType <- "Other"
-
-    phys <- sysmeta_to_eml_physical(x)
-    other_entity@physical <- new("ListOfphysical", phys)
-
-    other_entity
-  }
-
-
-  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
-
-  lapply(sysmeta, work)
+  .Deprecated(new = "pid_to_eml_entity",
+              package = "arcticdtautils",
+              old = "sysmeta_to_other_entity")
 }
 
 
@@ -372,56 +210,16 @@ sysmeta_to_eml_physical <- function(sysmeta) {
   lapply(sysmeta, work)
 }
 
-#' Creates and sets EML otherEntity elements to an existing EML document,
-#' replacing any existing otherEntities
-#'
-#' This function is slow because it needs get the System Metadata for each
-#' element of `pids` in order to get the fileName, checksum, etc.
+#' This function is deprecated. See \link{pid_to_eml_entity}.
 #'
 #' @param mn (MNode) The Member Node the objects exist on.
 #' @param path (character) The location on disk of the EML file.
 #' @param pids (character) One or more PIDs for the objects.
 #'
-#' @return (character) The path to the updated EML file.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' mn <- MNode(...) # Set up a connection to an MN
-#' eml_path <- "/path/to/your/eml.xml"
-#' set_other_entities(mn, eml_path, "a_data_pid")
-#' }
 set_other_entities <- function(mn, path, pids) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(file.exists(path))
-  stopifnot(all(is.character(pids)),
-            all(nchar(pids) > 0))
-
-  if (length(pids) == 0) {
-    message("Skipped adding EML otherEntity elements because no pids were specified.")
-    return(path)
-  }
-
-  # Get the metadata document from the MN and load it as an EML document
-  doc <- EML::read_eml(path)
-  stopifnot(is(doc, "eml"))
-
-  message("Setting EML otherEntity elements. This can take a while if there are lots of PIDs...")
-
-  # Generate otherEntity elements
-  other_entities <- pid_to_eml_other_entity(mn, pids)
-
-  # Concatenate the existing and new otherEntity elements and put back in the
-  # EML
-  if (length(other_entities) > 0) {
-    doc@dataset@otherEntity <- new("ListOfotherEntity", other_entities)
-  }
-
-  # Write the modified document back to disk and stop
-  EML::write_eml(doc, path)
-  stopifnot(EML::eml_validate(path) == TRUE)
-
-  path
+  .Deprecated(new = "pid_to_eml_entity",
+              package = "arcticdtautils",
+              old = "set_other_entities")
 }
 
 #' Get the Metacat docid for the given identifier
@@ -739,10 +537,10 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
     stopifnot(all(sapply(given_names, is.character)))
     stopifnot(all(lengths(given_names) > 0))
 
-      givens <- lapply(given_names, function(given_name) {
-        x <- new("givenName")
-        x@.Data <- given_name
-        x
+    givens <- lapply(given_names, function(given_name) {
+      x <- new("givenName")
+      x@.Data <- given_name
+      x
     })
 
     indiv_name@givenName <- new("ListOfgivenName", givens)
