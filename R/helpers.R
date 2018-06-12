@@ -18,6 +18,12 @@
 #' pid <- create_dummy_metadata(mn)
 #' }
 create_dummy_metadata <- function(mn, data_pids=NULL) {
+
+  # Make sure the node is not a production node
+  if (mn@env == "prod") {
+    stop('Can not create dummy metadata on production node.')
+    }
+
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
 
@@ -69,6 +75,12 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 #' pid <- create_dummy_object(mn)
 #'}
 create_dummy_object <- function(mn) {
+
+  # Make sure the node is not a production node
+  if (mn@env == "prod") {
+    stop('Can not create dummy object on production node.')
+  }
+
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
   tmp <- tempfile()
@@ -117,6 +129,12 @@ create_dummy_object <- function(mn) {
 #' pids <- create_dummy_package(mn, 6)
 #' }
 create_dummy_package <- function(mn, size = 2) {
+
+  # Make sure the node is not a production node
+  if (mn@env == "prod") {
+    stop('Can not create dummy package on production node.')
+  }
+
   me <- get_token_subject()
 
   # Data objects
@@ -183,6 +201,12 @@ create_dummy_package <- function(mn, size = 2) {
 # create_dummy_parent_package(mn, child_pid)
 #'}
 create_dummy_parent_package <- function(mn, children) {
+
+  # Make sure the node is not a production node
+  if (mn@env == "prod") {
+    stop('Can not create dummy parent package on production node.')
+  }
+
   me <- get_token_subject()
   meta_pid <- create_dummy_metadata(mn)
 
@@ -232,13 +256,13 @@ create_dummy_parent_package <- function(mn, children) {
 #' }
 create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) {
   names <- vapply(seq_len(numberAttributes), function(x) { paste0("Attribute ", x)}, "")
-  
+
   if(!is.null(factors)) {
     domains <- c(rep("textDomain", numberAttributes - length(factors)),
                  rep("enumeratedDomain", length(factors)))
     names[seq((numberAttributes - length(factors) + 1), numberAttributes)] <- factors
   }
-  
+
   attributes <- data.frame(attributeName = names,
                            attributeDefinition = names,
                            measurementScale = rep("nominal", numberAttributes),
@@ -250,7 +274,7 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) 
                            missingValueCode = rep(NA, numberAttributes),
                            missingValueCodeExplanation = rep(NA, numberAttributes),
                            stringsAsFactors = FALSE)
-  
+
   attributes
 }
 
@@ -258,12 +282,12 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) 
 #'
 #' @param factors (character) Vector of factor names to include.
 #'
-#' @return (data.frame) Data frame of factors 
+#' @return (data.frame) Data frame of factors
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Create dummy dataframe of 2 factors/enumerated domains 
+#' # Create dummy dataframe of 2 factors/enumerated domains
 #' attributes <- create_dummy_enumeratedDomain_dataframe(c("Factor1", "Factor2"))
 #' }
 create_dummy_enumeratedDomain_dataframe <- function(factors) {
@@ -271,6 +295,6 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
   enumeratedDomains <- data.frame(attributeName = names,
                                   code = paste0(names, seq_along(names)),
                                   definition = names)
-  
+
   enumeratedDomains
 }
