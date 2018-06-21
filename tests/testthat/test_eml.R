@@ -97,47 +97,52 @@ test_that("a project can be created with multiple personnel, an abstract can be 
   expect_equal(xml2::xml_text(project@funding@para[[2]]@.Data[[1]]), "I won a second award, wow")
 })
 
-test_that("an other entity can be added from a pid", {
+test_that("a dataTable and otherEntity can be added from a pid", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
-  data_path <- tempfile()
-  writeLines(LETTERS, data_path)
-  pid <- publish_object(mn, data_path, "text/plain")
-
-  eml_path <- tempfile()
-  file.copy(file.path(system.file(package = "arcticdatautils"), "example-eml.xml"), eml_path)
-  doc <- EML::read_eml(eml_path)
-  doc@dataset@otherEntity <- new("ListOfotherEntity", list())
-
-  set_other_entities(mn, eml_path, pid)
-
-  doc <- EML::read_eml(eml_path)
-  testthat::expect_length(doc@dataset@otherEntity, 1)
-})
-
-
-test_that("a data table can be added from a pid", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-  
   data_path <- tempfile()
   writeLines(LETTERS, data_path)
   pid <- publish_object(mn, data_path, "text/csv")
-  
-  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
-  
-  doc <- EML::read_eml(eml_path)
-  
-  factors <- c("factor 1", "factor 2")
-  dummy_attributes <- create_dummy_attributes_dataframe(10, factors)
-  dummy_enumeratedDomain <- create_dummy_enumeratedDomain_dataframe(factors)
-  doc@dataset@dataTable <- as(list(pid_to_eml_datatable(mn, pid, dummy_attributes, dummy_enumeratedDomain)), "ListOfdataTable")
 
-  testthat::expect_length(doc@dataset@dataTable, 1)
-  
+  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
+
+  doc <- EML::read_eml(eml_path)
+
+  dummy_factors <- c("factor 1", "factor 2")
+  dummy_attributes <- create_dummy_attributes_dataframe(10, dummy_factors)
+  dummy_enumeratedDomain <- create_dummy_enumeratedDomain_dataframe(dummy_factors)
+
+  dummy_attributeList <- EML::set_attributes(dummy_attributes, factors = dummy_enumeratedDomain)
+  dummy_entityName <- "Test_Name"
+  dummy_entityDescription <- "Test_Description"
+
+  # Create an otherEntity
+  OE <- pid_to_eml_entity(mn, pid,
+                    entityName = dummy_entityName,
+                    entityDescription = dummy_entityDescription,
+                    attributeList = dummy_attributeList)
+  expect_s4_class(OE, "otherEntity")
+  expect_true(slot(OE, "entityName") == dummy_entityName)
+  expect_true(slot(OE, "entityDescription") == dummy_entityDescription)
+
+  # Create a dataTable
+  DT <- pid_to_eml_entity(mn, pid,
+                          entityType = "dataTable",
+                          entityName = dummy_entityName,
+                          entityDescription = dummy_entityDescription,
+                          attributeList = dummy_attributeList)
+  expect_s4_class(DT, "dataTable")
+  expect_true(slot(DT, "entityName") == dummy_entityName)
+  expect_true(slot(DT, "entityDescription") == dummy_entityDescription)
+
+  doc@dataset@otherEntity[[1]] <- OE
+  expect_true(EML::eml_validate(doc))
+
+  doc@dataset@dataTable[[1]] <- DT
+  expect_true(EML::eml_validate(doc))
+
   unlink(data_path)
 })
 
