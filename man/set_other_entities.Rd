@@ -2,8 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{set_other_entities}
 \alias{set_other_entities}
-\title{Creates and sets EML otherEntity elements to an existing EML document,
-replacing any existing otherEntities}
+\title{This function is deprecated. See \link{pid_to_eml_entity}.}
 \usage{
 set_other_entities(mn, path, pids)
 }
@@ -14,17 +13,6 @@ set_other_entities(mn, path, pids)
 
 \item{pids}{(character) One or more PIDs for the objects.}
 }
-\value{
-(character) The path to the updated EML file.
-}
 \description{
-This function is slow because it needs get the System Metadata for each
-element of `pids` in order to get the fileName, checksum, etc.
-}
-\examples{
-\dontrun{
-mn <- MNode(...) # Set up a connection to an MN
-eml_path <- "/path/to/your/eml.xml"
-set_other_entities(mn, eml_path, "a_data_pid")
-}
+This function is deprecated. See \link{pid_to_eml_entity}.
 }
