@@ -979,3 +979,31 @@ eml_add_entities <- function(doc,
   doc
 }
 
+
+#' Convert otherEntities to dataTables
+#'
+#' Convert an EML 'otherEntity' object to a 'dataTable' object
+#'
+#' @param eml (S4) An EML S4 object
+#' @param otherEntity (S4 / character) Either an EML otherEntity object or the index
+#' of an otherEntity within a ListOfotherEntity
+#'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @export
+eml_otherEntity_to_dataTable <- function(eml, otherEntity) {
+  # argument checks
+
+  # convert otherEntity to dataTable
+  dt <- capture.output(otherEntity) %>%
+    str_trim() %>%
+    str_replace_all("otherEntity", "dataTable") %>%
+    paste(sep = "", collapse = "") %>%
+    read_eml()
+
+  # Add dt to bottom of dt list
+
+  # delete otherEntity and update the lsit
+
+  # return eml
+}
