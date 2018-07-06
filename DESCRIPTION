@@ -37,5 +37,6 @@ Suggests:
     rmarkdown,
     yaml,
     xslt
+Remotes: NCEAS/datamgmt
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

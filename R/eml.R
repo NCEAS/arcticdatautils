@@ -982,8 +982,8 @@ eml_add_entities <- function(doc,
 
 #' Convert otherEntities to dataTables
 #'
-#' Convert an EML 'otherEntity' object to a 'dataTable' object.  It converts the
-#' otherEntity as currently constructed - it does not add a physical or add attributes.
+#' Convert an EML 'otherEntity' object to a 'dataTable' object.  This will convert an
+#' otherEntity objectas currently constructed - it does not add a physical or add attributes.
 #' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param eml (S4) An EML S4 object
@@ -991,7 +991,7 @@ eml_add_entities <- function(doc,
 #' of an otherEntity within a ListOfotherEntity.  Integer input is recommended.
 #' @param validate_eml (logical) Optional.  Specify whether or not to validate the eml after
 #' completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
-#' \code{FALSE} reduces execution time by ~50%.
+#' \code{FALSE} reduces execution time by ~ 50 percent.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1028,11 +1028,11 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
   }
 
   ## convert otherEntity to dataTable
-  dt <- capture.output(otherEntity) %>%
-    str_trim() %>%
-    str_replace_all("otherEntity", "dataTable") %>%
+  dt <- utils::capture.output(otherEntity) %>%
+    stringr::str_trim() %>%
+    stringr::str_replace_all("otherEntity", "dataTable") %>%
     paste(sep = "", collapse = "") %>%
-    read_eml()
+    EML::read_eml()
 
   ## Add dt to bottom of dt list
   type <- "dataTable"
