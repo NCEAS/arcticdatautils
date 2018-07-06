@@ -1010,7 +1010,7 @@ eml_add_entities <- function(doc,
 #' }
 eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) {
   ## Argument checks
-  stopifnot(isS4(eml))
+  stopifnot(methods::is(eml, "eml"))
   stopifnot(any(is.integer(otherEntity), methods::is(otherEntity, "otherEntity")))
   stopifnot(is.logical(validate_eml))
 
@@ -1019,9 +1019,9 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
     index <- otherEntity
     otherEntity <- eml@dataset@otherEntity[[index]]
   } else {
-    index <- datamgmt::which_in_eml(eml@dataset@otherEntity,
-                                    "entityName",
-                                    otherEntity@entityName)
+    index <- which_in_eml(eml@dataset@otherEntity,
+                          "entityName",
+                          otherEntity@entityName)
     if (length(index) > 1) {
       stop("Duplicate 'entityName' found in 'eml@dataset@otherEntity', please use a numeric index (1, 2, etc.) to specify which 'otherEntity' you would like to convert.")
     }
