@@ -982,28 +982,53 @@ eml_add_entities <- function(doc,
 
 #' Convert otherEntities to dataTables
 #'
-#' Convert an EML 'otherEntity' object to a 'dataTable' object
+#' Convert an EML 'otherEntity' object to a 'dataTable' object.  It converts the
+#' otherEntity as currently constructed - it does not add a physical or add attributes.
+#' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param eml (S4) An EML S4 object
 #' @param otherEntity (S4 / character) Either an EML otherEntity object or the index
 #' of an otherEntity within a ListOfotherEntity
+#' @param validate_eml (logical) Optional.  Specify whether or not to validate the eml after
+#' completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
+#' \code{FALSE} reduces execution time by ~50%.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
 #' @export
-eml_otherEntity_to_dataTable <- function(eml, otherEntity) {
-  # argument checks
+eml_otherEntity_to_dataTable <- function(eml, otherEntity, eml_validate = TRUE) {
+  ## Argument checks
+  stopifnot(isS4(eml))
+  stopifnot(any(is.numeric(otherEntity), methods::is(otherEntity, "otherEntity")))
 
-  # convert otherEntity to dataTable
+  ## Handle different inputs for 'otherEntity'
+  if (is.numeric(otherEntity)) {
+    index <- otherEntity
+    otherEntity <- eml@dataset@otherEntity[[index]]
+  } else {
+    index <- datamgmt::which_in_eml(eml@dataset@otherEntity,
+                                    "entityName",
+                                    otherEntity@entityName)
+  }
+
+  ## convert otherEntity to dataTable
   dt <- capture.output(otherEntity) %>%
     str_trim() %>%
     str_replace_all("otherEntity", "dataTable") %>%
     paste(sep = "", collapse = "") %>%
     read_eml()
 
-  # Add dt to bottom of dt list
+  ## Add dt to bottom of dt list
+  type <- "dataTable"
+  slot(eml@dataset, type) <- new(paste0("ListOf", type), c(slot(eml@dataset, type),
+                                                           new(paste0("ListOf", type), list(dt))))
 
-  # delete otherEntity and update the lsit
+  ## delete otherEntity from list
+  eml@dataset@otherEntity[[index]] <- NULL
 
-  # return eml
+  ## return eml
+  if (validate_eml == TRUE) {
+    eml_validate(eml)
+  }
+  return(eml)
 }
