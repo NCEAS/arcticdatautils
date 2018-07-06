@@ -14,11 +14,12 @@ Description: A set of utilites for working with the Arctic Data Center
 Depends:
     R (>= 3.2.3)
 Imports:
-    digest,
     dataone,
     datapack,
+    digest,
     EML,
     httr,
+    magrittr,
     methods,
     stringr,
     stringi,
