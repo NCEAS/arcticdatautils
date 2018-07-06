@@ -979,3 +979,146 @@ eml_add_entities <- function(doc,
   doc
 }
 
+
+#' Convert otherEntities to dataTables
+#'
+#' Convert an EML 'otherEntity' object to a 'dataTable' object.  This will convert an
+#' otherEntity objectas currently constructed - it does not add a physical or add attributes.
+#' However, if these are already in their respective slots, they will be retained.
+#'
+#' @param eml (S4) An EML S4 object
+#' @param otherEntity (S4 / integer) Either an EML otherEntity object or the index
+#' of an otherEntity within a ListOfotherEntity.  Integer input is recommended.
+#' @param validate_eml (logical) Optional.  Specify whether or not to validate the eml after
+#' completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
+#' \code{FALSE} reduces execution time by ~ 50 percent.
+#'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+#'
+#' # The following two calls are equivalent:
+#' eml <- eml_otherEntity_to_dataTable(eml, eml@@dataset@@otherEntity[[1]])
+#' eml <- eml_otherEntity_to_dataTable(eml, 1)
+#'
+#' # Integer input is recommended:
+#' eml <- eml_otherEntity_to_dataTable(eml, 1)
+#' }
+eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) {
+  ## Argument checks
+  stopifnot(methods::is(eml, "eml"))
+  stopifnot(any(is.integer(otherEntity), methods::is(otherEntity, "otherEntity")))
+  stopifnot(is.logical(validate_eml))
+
+  ## Handle different inputs for 'otherEntity'
+  if (is.numeric(otherEntity)) {
+    index <- otherEntity
+    otherEntity <- eml@dataset@otherEntity[[index]]
+  } else {
+    index <- which_in_eml(eml@dataset@otherEntity,
+                          "entityName",
+                          otherEntity@entityName)
+    if (length(index) > 1) {
+      stop("Duplicate 'entityName' found in 'eml@dataset@otherEntity', please use a numeric index (1, 2, etc.) to specify which 'otherEntity' you would like to convert.")
+    }
+  }
+
+  ## convert otherEntity to dataTable
+  dt <- utils::capture.output(otherEntity) %>%
+    stringr::str_trim() %>%
+    stringr::str_replace_all("otherEntity", "dataTable") %>%
+    paste(sep = "", collapse = "") %>%
+    EML::read_eml()
+
+  ## Add dt to bottom of dt list
+  type <- "dataTable"
+  slot(eml@dataset, type) <- new(paste0("ListOf", type), c(slot(eml@dataset, type),
+                                                           new(paste0("ListOf", type), list(dt))))
+
+  ## delete otherEntity from list
+  eml@dataset@otherEntity[[index]] <- NULL
+
+  ## return eml
+  if (validate_eml == TRUE) {
+    eml_validate(eml)
+  }
+  return(eml)
+}
+
+
+#' Search through EMLs
+#'
+#' This function returns indices within an EML list that contain an instance where \code{test == TRUE}. See examples for more information.
+#'
+#' @import EML
+#' @param eml_list (S4/List) an EML list object
+#' @param element (character) element to evaluate
+#' @param test (function/character) A function to evaluate (see examples). If test is a character, will evaluate if \code{element == test} (see example 1).
+#'
+#' @keywords eml
+#'
+#' @author Mitchell Maier mitchell.maier@@gmail.com
+#'
+#' @examples
+#' \dontrun{
+#' # Question: Which creators have a surName "Smith"?
+#' n <- which_in_eml(eml@@dataset@@creator, "surName", "Smith")
+#' # Answer: eml@@dataset@@creator[n]
+#'
+#' # Question: Which dataTables have an entityName that begins with "2016"
+#' n <- which_in_eml(eml@@dataset@@dataTable, "entityName", function(x) {grepl("^2016", x)})
+#' # Answer: eml@@dataset@@dataTable[n]
+#'
+#' # Question: Which attributes in dataTable[[1]] have a numberType "natural"?
+#' n <- which_in_eml(eml@@dataset@@dataTable[[1]]@@attributeList@@attribute, "numberType", "natural")
+#' # Answer: eml@@dataset@@dataTable[[1]]@@attributeList@@attribute[n]
+#'
+#' #' # Question: Which dataTables have at least one attribute with a numberType "natural"?
+#' n <- which_in_eml(eml@@dataset@@dataTable, "numberType", function(x) {"natural" %in% x})
+#' # Answer: eml@@dataset@@dataTable[n]
+#' }
+#' @export
+#'
+which_in_eml <- function(eml_list, element, test) {
+
+  stopifnot(isS4(eml_list))
+  stopifnot(methods::is(eml_list,"list"))
+  stopifnot(is.character(element))
+
+  if (is.character(test)) {
+    value = test
+    test = function(x) {x == value}
+
+  } else {
+    stopifnot(is.function(test))
+  }
+
+  # Find location
+  location <- unlist(lapply(seq_along(eml_list), function(i) {
+    elements_test <- unlist(EML::eml_get(eml_list[[i]], element))
+
+    if (is.null(elements_test)) {
+      out <- NULL
+
+    } else {
+      result <- test(elements_test)
+
+      if (length(result) > 1) {
+        stop("Test must only return one value.")
+
+      } else if (result == TRUE) {
+        out <- i
+
+      } else {
+        out <- NULL
+      }
+    }
+    return(out)
+  }))
+
+  return(location)
+}
