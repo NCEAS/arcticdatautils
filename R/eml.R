@@ -987,8 +987,8 @@ eml_add_entities <- function(doc,
 #' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param eml (S4) An EML S4 object
-#' @param otherEntity (S4 / character) Either an EML otherEntity object or the index
-#' of an otherEntity within a ListOfotherEntity
+#' @param otherEntity (S4 / integer) Either an EML otherEntity object or the index
+#' of an otherEntity within a ListOfotherEntity.  Integer input is recommended.
 #' @param validate_eml (logical) Optional.  Specify whether or not to validate the eml after
 #' completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
 #' \code{FALSE} reduces execution time by ~50%.
@@ -996,10 +996,22 @@ eml_add_entities <- function(doc,
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+#'
+#' # The following two calls are equivalent:
+#' eml <- eml_otherEntity_to_dataTable(eml, eml@@dataset@@otherEntity[[1]])
+#' eml <- eml_otherEntity_to_dataTable(eml, 1)
+#'
+#' # Integer input is recommended:
+#' eml <- eml_otherEntity_to_dataTable(eml, 1)
+#' }
 eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) {
   ## Argument checks
   stopifnot(isS4(eml))
-  stopifnot(any(is.numeric(otherEntity), methods::is(otherEntity, "otherEntity")))
+  stopifnot(any(is.integer(otherEntity), methods::is(otherEntity, "otherEntity")))
   stopifnot(is.logical(validate_eml))
 
   ## Handle different inputs for 'otherEntity'
