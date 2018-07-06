@@ -146,5 +146,41 @@ test_that("a dataTable and otherEntity can be added from a pid", {
   unlink(data_path)
 })
 
+test_that("eml_otherEntity_to_dataTable fails gracefully", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
 
+  eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 
+  # incorrect inputs
+  expect_error(eml_otherEntity_to_dataTable("dummy input"))
+  expect_error(eml_otherEntity_to_dataTable(eml, "1"))
+
+  # subscripts out of bounds
+  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[2]]))
+  expect_error(eml_otherEntity_to_dataTable(eml, 2))
+
+  # Duplicate entityNames found
+  eml@dataset@otherEntity[[2]] <- eml@dataset@otherEntity[[1]]
+  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]]))
+
+})
+
+test_that("eml_otherEntity_to_dataTable fails gracefully", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+  otherEntity <- eml@dataset@otherEntity[[1]]
+
+  eml <- eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]])
+
+  # test that otherEntity was removed
+  expect_length(eml@dataset@otherEntity, 0)
+
+  # test that dataTable was added
+  expect_equal(otherEntity@entityName, eml@dataset@dataTable[[1]]@entityName)
+  expect_equivalent(otherEntity@physical, eml@dataset@dataTable[[1]]@physical)
+})
