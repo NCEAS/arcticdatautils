@@ -17,7 +17,7 @@ Create dummy enumeratedDomain data frame
 }
 \examples{
 \dontrun{
-# Create dummy dataframe of 2 factors/enumerated domains 
+# Create dummy dataframe of 2 factors/enumerated domains
 attributes <- create_dummy_enumeratedDomain_dataframe(c("Factor1", "Factor2"))
 }
 }
