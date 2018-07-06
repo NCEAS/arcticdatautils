@@ -1011,7 +1011,7 @@ eml_add_entities <- function(doc,
 eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) {
   ## Argument checks
   stopifnot(methods::is(eml, "eml"))
-  stopifnot(any(is.integer(otherEntity), methods::is(otherEntity, "otherEntity")))
+  stopifnot(any(is.numeric(otherEntity), methods::is(otherEntity, "otherEntity")))
   stopifnot(is.logical(validate_eml))
 
   ## Handle different inputs for 'otherEntity'
