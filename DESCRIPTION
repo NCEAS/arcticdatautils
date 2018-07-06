@@ -14,7 +14,6 @@ Description: A set of utilites for working with the Arctic Data Center
 Depends:
     R (>= 3.2.3)
 Imports:
-    datamgmt,
     dataone,
     datapack,
     digest,
@@ -39,6 +38,5 @@ Suggests:
     rmarkdown,
     yaml,
     xslt
-Remotes: NCEAS/datamgmt
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
