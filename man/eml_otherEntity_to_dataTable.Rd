@@ -14,11 +14,11 @@ of an otherEntity within a ListOfotherEntity.  Integer input is recommended.}
 
 \item{validate_eml}{(logical) Optional.  Specify whether or not to validate the eml after
 completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
-\code{FALSE} reduces execution time by ~50%.}
+\code{FALSE} reduces execution time by ~ 50 percent.}
 }
 \description{
-Convert an EML 'otherEntity' object to a 'dataTable' object.  It converts the
-otherEntity as currently constructed - it does not add a physical or add attributes.
+Convert an EML 'otherEntity' object to a 'dataTable' object.  This will convert an
+otherEntity objectas currently constructed - it does not add a physical or add attributes.
 However, if these are already in their respective slots, they will be retained.
 }
 \examples{
