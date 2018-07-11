@@ -311,16 +311,6 @@ publish_update <- function(mn,
     stopifnot(all(is.character(parent_child_pids)))
   }
 
-  # Check that resource_map_pid, and metadata_pid are the current versions
-  meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
-  if (!is.na(meta_obsoletedBy)) {
-    stop("metadata_pid is already obsoleted by: ", meta_obsoletedBy)
-  }
-  rm_obsoletedBy <- dataone::getSystemMetadata(mn, resource_map_pid)@obsoletedBy
-  if (!is.na(rm_obsoletedBy)) {
-    stop("resource_map_pid is already obsoleted by: ", rm_obsoletedBy)
-  }
-
   # Check to see if the obsoleted package is in the list of parent_child_pids
   # If it is notify the user and remove it from the list
   if (resource_map_pid %in% parent_child_pids) {
@@ -364,6 +354,16 @@ publish_update <- function(mn,
       stopifnot(object_exists(mn, parent_data_pids))
     if (!is.null(parent_child_pids))
       stopifnot(object_exists(mn, parent_child_pids))
+  }
+
+  # Check that resource_map_pid, and metadata_pid are the current versions
+  meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
+  if (!is.na(meta_obsoletedBy)) {
+    stop("metadata_pid is already obsoleted by: ", meta_obsoletedBy)
+  }
+  rm_obsoletedBy <- dataone::getSystemMetadata(mn, resource_map_pid)@obsoletedBy
+  if (!is.na(rm_obsoletedBy)) {
+    stop("resource_map_pid is already obsoleted by: ", rm_obsoletedBy)
   }
 
   # Prepare the response object
