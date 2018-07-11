@@ -312,15 +312,13 @@ publish_update <- function(mn,
   }
 
   # Check that resource_map_pid, and metadata_pid are the current versions
-  meta_versions <- get_all_versions(mn, metadata_pid)
-  current_meta_version <- tail(metadata_versions, 1)
-  if (metadata_pid != current_meta_version) {
-    stop("metadata_pid is already obsoleted by: ", current_meta_version)
+  meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
+  if (!is.na(meta_obsoletedBy)) {
+    stop("metadata_pid is already obsoleted by: ", meta_obsoletedBy)
   }
-  rm_versions <- get_all_versions(mn, resource_map_pid)
-  current_rm_version <- tail(rm_versions, 1)
-  if (resource_map_pid != current_rm_version) {
-    stop("resource_map_pid is already obsoleted by: ", current_rm_version)
+  rm_obsoletedBy <- dataone::getSystemMetadata(mn, resource_map_pid)@obsoletedBy
+  if (!is.na(rm_obsoletedBy)) {
+    stop("resource_map_pid is already obsoleted by: ", rm_obsoletedBy)
   }
 
   # Check to see if the obsoleted package is in the list of parent_child_pids
