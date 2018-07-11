@@ -311,6 +311,18 @@ publish_update <- function(mn,
     stopifnot(all(is.character(parent_child_pids)))
   }
 
+  # Check that resource_map_pid, and metadata_pid are the current versions
+  meta_versions <- get_all_versions(mn, metadata_pid)
+  current_meta_version <- tail(metadata_versions, 1)
+  if (metadata_pid != current_meta_version) {
+    stop("metadata_pid is already obsoleted by: ", current_meta_version)
+  }
+  rm_versions <- get_all_versions(mn, resource_map_pid)
+  current_rm_version <- tail(rm_versions, 1)
+  if (resource_map_pid != current_rm_version) {
+    stop("resource_map_pid is already obsoleted by: ", current_rm_version)
+  }
+
   # Check to see if the obsoleted package is in the list of parent_child_pids
   # If it is notify the user and remove it from the list
   if (resource_map_pid %in% parent_child_pids) {
