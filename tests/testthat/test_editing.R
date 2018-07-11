@@ -288,3 +288,15 @@ test_that("publish_update removes 'resource_map_pid' from 'parent_child_pids' ar
 
   expect_equal(child$resource_map, parent$child_packages)
 })
+
+test_that("publish_update errors if the non-current resource map or metadata pid is provided", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  pkg1 <- create_dummy_package(mn)
+  pkg2 <- publish_update(mn, pkg1$metadata, pkg1$resource_map, pkg1$data)
+
+  expect_error(publish_update(mn, pkg1$metadata, pkg2$resource_map, pkg2$data))
+  expect_error(publish_update(mn, pkg2$metadata, pkg1$resource_map, pkg2$data))
+})
