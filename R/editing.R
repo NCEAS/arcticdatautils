@@ -354,16 +354,17 @@ publish_update <- function(mn,
       stopifnot(object_exists(mn, parent_data_pids))
     if (!is.null(parent_child_pids))
       stopifnot(object_exists(mn, parent_child_pids))
+    # Check for obsoleted metadata_pid
+    meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
+    if (!is.na(meta_obsoletedBy)) {
+      stop("The value passed in for the argument 'metadata_pid' of '", metadata_pid, "' is already obsoleted by a newer version with PID '", meta_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each Object series.")
+    }
   }
 
-  # Check that resource_map_pid, and metadata_pid are the current versions
-  meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
-  if (!is.na(meta_obsoletedBy)) {
-    stop("metadata_pid is already obsoleted by: ", meta_obsoletedBy)
-  }
+  # Check for obsoleted resource_map_pid. The resource map and metadata can desassociate without this check.
   rm_obsoletedBy <- dataone::getSystemMetadata(mn, resource_map_pid)@obsoletedBy
   if (!is.na(rm_obsoletedBy)) {
-    stop("resource_map_pid is already obsoleted by: ", rm_obsoletedBy)
+    stop("The value passed in for the argument 'resource_map_pid' of '", resource_map_pid, "' is already obsoleted by a newer version with PID '", rm_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each Object series.")
   }
 
   # Prepare the response object
