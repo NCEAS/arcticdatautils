@@ -4,7 +4,8 @@
 \alias{update_object}
 \title{Update an object with a new file.}
 \usage{
-update_object(mn, pid, path, format_id = NULL, new_pid = NULL, sid = NULL)
+update_object(mn, pid, path, format_id = NULL, new_pid = NULL,
+  sid = NULL)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
