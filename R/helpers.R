@@ -14,7 +14,6 @@
 #' # Set environment
 #' cn <- CNode("STAGING2")
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
-
 #' pid <- create_dummy_metadata(mn)
 #' }
 create_dummy_metadata <- function(mn, data_pids=NULL) {
@@ -58,6 +57,7 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 
   pid
 }
+
 
 #' Create a test object.
 #'
@@ -111,6 +111,7 @@ create_dummy_object <- function(mn) {
 
   create_response
 }
+
 
 #' Create a test package.
 #'
@@ -181,6 +182,7 @@ create_dummy_package <- function(mn, size = 2) {
        resource_map = resource_map_pid,
        data = data_pids)
 }
+
 
 #' Create a test parent package.
 #'
@@ -278,6 +280,7 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) 
   attributes
 }
 
+
 #' Create dummy enumeratedDomain data frame
 #'
 #' @param factors (character) Vector of factor names to include.
@@ -297,4 +300,51 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
                                   definition = names)
 
   enumeratedDomains
+}
+
+
+#' Get system metadata for all objects in a data package
+#'
+#' This is a wrapper function around `dataone::getSystemMetadata` that retrieves
+#' the system metadata for all objects in a data package and returns them as a list.
+#' It is useful for inspecting system metadata and identifying changes where needed.
+#'
+#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on
+#' @param pid (character) The resource map PID of the package
+#'
+#' @return (list) A structured list of system metadata
+#'
+#' @examples
+#'\dontrun{
+#' # Set environment
+#' cn_staging <- CNode("STAGING2")
+#' knb_test <- getMNode(cn_staging, "urn:node:mnTestKNB")
+#' rm_pid <- "resource_map_urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+#'
+#' all <- get_all_sysmeta(knb_test, rm_pid)
+#'
+#' # View in RStudio data viewer to inspect
+#' View(all)
+#'
+#' # Print specific elements to console
+#' all[["Metadata"]]@rightsHolder
+#'
+#' # Create separate object
+#' sysmeta_md <- all[["Metadata"]]
+#' }
+get_all_sysmeta <- function(node, pid) {
+  stopifnot(class(node) %in% c("MNode", "CNode"))
+  stopifnot(is.character(pid), nchar(pid) > 0)
+  stopifnot(is_resource_map(node, pid))
+
+  pkg <- get_package(node, pid, file_names = TRUE)
+
+  all <- lapply(pkg$data, function(x) {dataone::getSystemMetadata(node, x)})
+  all[[length(all) + 1]] <- dataone::getSystemMetadata(node, pkg$metadata)
+  all[[length(all) + 1]] <- dataone::getSystemMetadata(node, pkg$resource_map)
+
+  names(all)[length(all) - 1] <- "Metadata"
+  names(all)[length(all)] <- "Resource_map"
+
+  return(all)
 }

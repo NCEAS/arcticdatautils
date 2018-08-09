@@ -6,8 +6,8 @@
 This is a convenience wrapper around the constructor of the `ResourceMap`
 class from `DataPackage`.}
 \usage{
-generate_resource_map(metadata_pid, data_pids = NULL, child_pids = NULL,
-  other_statements = NULL,
+generate_resource_map(metadata_pid, data_pids = NULL,
+  child_pids = NULL, other_statements = NULL,
   resolve_base = "https://cn.dataone.org/cn/v2/resolve",
   resource_map_pid = NULL)
 }

@@ -6,9 +6,9 @@
 \usage{
 publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
   child_pids = NULL, metadata_path = NULL, identifier = NULL,
-  use_doi = FALSE, parent_resmap_pid = NULL, parent_metadata_pid = NULL,
-  parent_data_pids = NULL, parent_child_pids = NULL, public = TRUE,
-  check_first = TRUE)
+  use_doi = FALSE, parent_resmap_pid = NULL,
+  parent_metadata_pid = NULL, parent_data_pids = NULL,
+  parent_child_pids = NULL, public = TRUE, check_first = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
