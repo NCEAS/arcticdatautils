@@ -4,20 +4,23 @@
 \alias{get_all_sysmeta}
 \title{Get system metadata for all objects in a data package}
 \usage{
-get_all_sysmeta(node, pid)
+get_all_sysmeta(node, rm_pid, nmax = 1000, child_packages = FALSE)
 }
 \arguments{
-\item{node}{(MNode/CNode) The Coordinating/Member Node to run the query on}
+\item{node}{(MNode/CNode) The Coordinating/Member Node to run the query on.}
 
-\item{pid}{(character) The resource map PID of the package}
+\item{rm_pid}{(character) The resource map PID of the package.}
+
+\item{nmax}{(numeric) Default 1000. The maximum number of object system metadata to return. The default is sufficient to get system metadata for all objects in most packages.}
+
+\item{child_packages}{(logical) Default FALSE. If parent package, whether or not to include objects of child packages.}
 }
 \value{
-(list) A structured list of system metadata
+(list) A structured list of system metadata.
 }
 \description{
-This is a wrapper function around `dataone::getSystemMetadata` that retrieves
-the system metadata for all objects in a data package and returns them as a list.
-It is useful for inspecting system metadata and identifying changes where needed.
+This function retrieves the system metadata for all objects in a data package and returns them as a list.
+It is useful for inspecting system metadata for an entire data package and identifying changes where needed.
 }
 \examples{
 \dontrun{
@@ -32,9 +35,10 @@ all <- get_all_sysmeta(knb_test, rm_pid)
 View(all)
 
 # Print specific elements to console
-all[["Metadata"]]@rightsHolder
+all[[1]]@rightsHolder
 
 # Create separate object
-sysmeta_md <- all[["Metadata"]]
+sysmeta_md <- all[[2]]
 }
 }
+\keyword{internal}
