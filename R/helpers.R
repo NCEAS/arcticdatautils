@@ -21,7 +21,7 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
   # Make sure the node is not a production node
   if (mn@env == "prod") {
     stop('Can not create dummy metadata on production node.')
-    }
+  }
 
   pid <- paste0("urn:uuid:", uuid::UUIDgenerate())
   me <- get_token_subject()
@@ -305,14 +305,17 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 
 #' Get system metadata for all objects in a data package
 #'
-#' This is a wrapper function around `dataone::getSystemMetadata` that retrieves
-#' the system metadata for all objects in a data package and returns them as a list.
-#' It is useful for inspecting system metadata and identifying changes where needed.
+#' This function retrieves the system metadata for all objects in a data package and returns them as a list.
+#' It is useful for inspecting system metadata for an entire data package and identifying changes where needed.
 #'
-#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on
-#' @param pid (character) The resource map PID of the package
+#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on.
+#' @param rm_pid (character) The resource map PID of the package.
+#' @param nmax (numeric) Default 1000. The maximum number of object system metadata to return. The default is sufficient to get system metadata for all objects in most packages.
+#' @param child_packages (logical) Default FALSE. If parent package, whether or not to include objects of child packages.
 #'
-#' @return (list) A structured list of system metadata
+#' @return (list) A structured list of system metadata.
+#'
+#' @keywords internal
 #'
 #' @examples
 #'\dontrun{
@@ -327,24 +330,114 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 #' View(all)
 #'
 #' # Print specific elements to console
-#' all[["Metadata"]]@rightsHolder
+#' all[[1]]@rightsHolder
 #'
 #' # Create separate object
-#' sysmeta_md <- all[["Metadata"]]
+#' sysmeta_md <- all[[2]]
 #' }
-get_all_sysmeta <- function(node, pid) {
+get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
-  stopifnot(is.character(pid), nchar(pid) > 0)
-  stopifnot(is_resource_map(node, pid))
+  stopifnot(is.character(rm_pid), nchar(rm_pid) > 0, length(rm_pid) == 1)
+  stopifnot(is.numeric(nmax), length(nmax) == 1 , nmax >= 0)
+  stopifnot(is.logical(child_packages), length(child_packages) == 1)
+  stopifnot(is_resource_map(node, rm_pid))
 
-  pkg <- get_package(node, pid, file_names = TRUE)
+  query_params <- paste("identifier:", rm_pid, "+OR+resourceMap:", rm_pid, "", sep = "\"")
+  response <- dataone::query(node, list(q = query_params, rows = as.character(nmax)))
 
-  all <- lapply(pkg$data, function(x) {dataone::getSystemMetadata(node, x)})
-  all[[length(all) + 1]] <- dataone::getSystemMetadata(node, pkg$metadata)
-  all[[length(all) + 1]] <- dataone::getSystemMetadata(node, pkg$resource_map)
+  if (length(response) == 0) {
+    stop(paste0("No results were found when searching for a package with resource map '", rm_pid,
+                "'.\nThis could be caused by not having appropriate access to read the resource map."))
+  }
 
-  names(all)[length(all) - 1] <- "Metadata"
-  names(all)[length(all)] <- "Resource_map"
+  if (length(response) == nmax) {
+    warning("Query returned the maximum number of objects. It is possible there are more to retrieve. \nSpecify a larger number of objects with the 'nmax' argument.")
+  }
+
+  # Check if child package
+  if (response[[1]]$formatType == "RESOURCE" && !is.null(response[[1]]$resourceMap)) {
+    message("The data package with this resource map is a child package.")
+  }
+  # Check if parent package
+  if (any(unlist(lapply(response[2:length(response)], function(x) ifelse(x$formatType == "RESOURCE", TRUE, FALSE))))) {
+    message("The data package with this resource map is a parent package.")
+    if (child_packages == TRUE) {
+      children <- Filter(function(x) x$formatType == "RESOURCE", response[2:length(response)])
+      children2 <- vector("list", length(children))
+      for (i in seq_along(children)) {
+        child_rm_pid <- children[[i]]$identifier
+        query_params2 <- paste("identifier:", child_rm_pid, "+OR+resourceMap:", child_rm_pid, "", sep = "\"")
+        children2[[i]] <- dataone::query(node, list(q = query_params2, rows = as.character(nmax)))
+      }
+    }
+  }
+
+  # Translate fields from Solr query to formal class SystemMetadata
+  translate <- function(x) {
+    sysmeta <- methods::new("SystemMetadata")
+
+    sysmeta@serialVersion <- sysmeta@serialVersion
+    sysmeta@identifier <- if (is.null(x$identifier)) {sysmeta@identifier} else {x$identifier}
+    sysmeta@formatId <- if (is.null(x$formatId)) {sysmeta@formatId} else {x$formatId}
+    sysmeta@size <- if (is.null(x$size)) {sysmeta@size} else {x$size}
+    sysmeta@checksum <- if (is.null(x$checksum)) {sysmeta@checksum} else {x$checksum}
+    sysmeta@checksumAlgorithm <- if (is.null(x$checksumAlgorithm)) {sysmeta@checksumAlgorithm} else {x$checksumAlgorithm}
+    sysmeta@submitter <- if (is.null(x$submitter)) {sysmeta@submitter} else {x$submitter}
+    sysmeta@rightsHolder <- if (is.null(x$rightsHolder)) {sysmeta@rightsHolder} else {x$rightsHolder}
+
+    read <- if (is.null(x$readPermission)) {} else {data.frame(subject = unlist(x$readPermission),
+                                                               permission = "read")}
+    write <- if (is.null(x$writePermission)) {} else {data.frame(subject = unlist(x$writePermission),
+                                                                 permission = "write")}
+    change <- if (is.null(x$changePermission)) {} else {data.frame(subject = unlist(x$changePermission),
+                                                                   permission = "changePermission")}
+    sysmeta@accessPolicy <- rbind(read, write, change)
+
+    sysmeta@replicationAllowed <- if (is.null(x$replicationAllowed)) {sysmeta@replicationAllowed} else {x$replicationAllowed}
+    sysmeta@numberReplicas <- if (is.null(x$numberReplicas)) {sysmeta@numberReplicas} else {x$numberReplicas}
+    sysmeta@preferredNodes <- if (is.null(x$preferredReplicationMN)) {sysmeta@preferredNodes} else {x$preferredReplicationMN}
+    sysmeta@blockedNodes <- if (is.null(x$blockedReplicationMN)) {sysmeta@blockedNodes} else {x$blockedReplicationMN}
+    sysmeta@obsoletes <- if (is.null(x$obsoletes)) {sysmeta@obsoletes} else {x$obsoletes}
+    sysmeta@obsoletedBy <- if (is.null(x$obsoletedBy)) {sysmeta@obsoletedBy} else {x$obsoletedBy}
+    sysmeta@archived <- sysmeta@archived
+    sysmeta@dateUploaded <- if (is.null(x$dateUploaded)) {sysmeta@dateUploaded} else {as.character(x$dateUploaded)}
+    sysmeta@dateSysMetadataModified <- if (is.null(x$dateModified)) {sysmeta@dateSysMetadataModified} else {as.character(x$dateModified)}
+    sysmeta@originMemberNode <- if (is.null(x$datasource)) {sysmeta@originMemberNode} else {x$datasource}
+    sysmeta@authoritativeMemberNode <- if (is.null(x$authoritativeMN)) {sysmeta@authoritativeMemberNode} else {x$authoritativeMN}
+    sysmeta@seriesId <- if (is.null(x$seriesId)) {sysmeta@seriesId} else {x$seriesId}
+    sysmeta@mediaType <- if (is.null(x$mediaType)) {sysmeta@mediaType} else {x$mediaType}
+    sysmeta@fileName <- if (is.null(x$fileName)) {sysmeta@fileName} else {x$fileName}
+    sysmeta@mediaTypeProperty <- if (is.null(x$mediaTypeProperty)) {sysmeta@mediaTypeProperty} else {x$mediaTypeProperty}
+
+    return(sysmeta)
+  }
+
+  if (child_packages == FALSE) {
+    all <- lapply(response, translate)
+    names(all) <- unlist(lapply(all, function(x) {x@fileName}))
+    for (i in seq_along(all)) {
+      if (is.na(names(all)[i])) {names(all)[i] <- paste0("missing_fileName", i)}
+    }
+  } else {
+    other <- Filter(function(x) x$formatType != "RESOURCE", response[2:length(response)])
+    response2 <- c(list(response[[1]]), other)
+    parent <- lapply(response2, translate)
+    names(parent) <- unlist(lapply(parent, function(x) {x@fileName}))
+    for (i in seq_along(parent)) {
+      if (is.na(names(parent)[i])) {names(parent)[i] <- paste0("missing_fileName", i)}
+    }
+
+    child <- lapply(children2, function(x) {lapply(x, translate)})
+    for (i in seq_along(child)) {
+      names(child[[i]]) <- unlist(lapply(child[[i]], function(x) {x@fileName}))
+      for (j in seq_along(child[[i]])) {
+        if (is.na(names(child[[i]])[j])) {names(child[[i]])[j] <- paste0("missing_fileName", j)}
+      }
+    }
+    names(child) <- paste0("child", seq_along(child))
+
+    all <- c(parent, child)
+  }
 
   return(all)
 }
