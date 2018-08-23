@@ -380,7 +380,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
 
 #' Check whether an object has public read access
 #'
-#' Check whether objects with given pids have public read access.
+#' Check whether DataOne objects have public read access set in their System Metadata.
 #' No token needs to be set to use this function.
 #'
 #' @param mn (MNode) The Member Node to send the query to.
@@ -422,7 +422,7 @@ is_public_read <- function(mn, pids, use.names=TRUE){
 
     if(response$status_code != "200") {
       error_desc <- dataone:::getErrorDescription(response)
-      if(grepl("READ not allowed", error_desc)){
+      if(grepl("READ not allowed", error_desc, ignore.case = TRUE)){
         return(FALSE)
       } else {
         stop(error_desc)

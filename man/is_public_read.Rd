@@ -19,7 +19,7 @@ those names will be used for the result.}
 A vector of class logical.
 }
 \description{
-Check whether objects with given pids have public read access.
+Check whether DataOne objects have public read access set in their System Metadata.
 No token needs to be set to use this function.
 }
 \examples{
