@@ -36,7 +36,7 @@ set_rights_holder <- function(mn, pids, subject) {
 
   if (!all(is.character(subject),
            nchar(subject) > 0)){
-    stop("Argument 'pids' must be character class with non-zero number of characters.")
+    stop("Argument 'subject' must be character class with non-zero number of characters.")
   }
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
@@ -118,7 +118,7 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
 
   if (!all(is.character(subjects),
            all(nchar(subjects)) > 0)){
-    stop("Argument 'pids' must be character class with non-zero number of characters.")
+    stop("Argument 'subjects' must be character class with non-zero number of characters.")
   }
 
   if (any(grepl("^https:\\/\\/orcid\\.org", subjects))) {
@@ -297,7 +297,7 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
 
   if (!all(is.character(subject),
            nchar(subject) > 0)){
-    stop("Argument 'pids' must be character class with non-zero number of characters.")
+    stop("Argument 'subject' must be character class with non-zero number of characters.")
   }
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
@@ -375,4 +375,63 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
   }
 
   results
+}
+
+
+#' Check whether an object has public read access
+#'
+#' Check whether objects with given pids have public read access.
+#' No token needs to be set to use this function.
+#'
+#' @param mn (MNode) The Member Node to send the query to.
+#' @param pids (character) The PID(s) to check for public read access.
+#' @param use.names (logical) Optional. If set to `TRUE` (the deafult), pids will
+#' be used as names for the result, unless pids has names already, in which case,
+#' those names will be used for the result.
+#'
+#' @return A vector of class logical.
+#' @export
+#'
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#'     "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' is_public_read(mn, pids)
+#'}
+is_public_read <- function(mn, pids, use.names=TRUE){
+
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))){
+    stop("Argument 'pid' must be character class with non-zero number of characters.")
+  }
+
+  if(!is.logical(use.names)){
+    stop(paste0("Argument 'use.names' must be logical class, but was a ", class(use.names), " instead."))
+  }
+
+  vapply(pids, USE.NAMES = use.names, FUN.VALUE = logical(1), FUN=function(pid){
+
+    url       <-  paste(mn@endpoint, "meta", URLencode(pid, reserved=T), sep="/")
+    response  <-  dataone:::auth_get(url, node=mn)
+
+    if(response$status_code != "200") {
+      error_desc <- dataone:::getErrorDescription(response)
+      if(grepl("READ not allowed", error_desc)){
+        return(FALSE)
+      } else {
+        stop(error_desc)
+      }
+    }
+
+    sysmeta <-  datapack:::SystemMetadata(XML::xmlRoot(suppressMessages(XML::xmlParse((httr::content(response, as="text"))))))
+    return(datapack::hasAccessRule(sysmeta, "public", "read"))
+
+  })
+
 }
