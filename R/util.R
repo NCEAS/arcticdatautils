@@ -37,17 +37,25 @@ extract_local_identifier <- function(type, file) {
 }
 
 
-dataone_format_mappings <- list("avi" = "ideo/avi",
+dataone_format_mappings <- list("avi" = "video/avi",
                                 "bmp" = "image/bmp",
                                 "bz2" = "application/x-bzip2",
                                 "csv" = "text/csv",
+                                "doc" = "application/msword",
+                                "docx" = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                 "fasta" = "application/x-fasta",
                                 "gif" = "image/gif",
                                 "gz" = "application/x-gzip",
                                 "html" = "text/html",
+                                "ipynb" = "application/json",
+                                "jp2" = "image/jp2",
                                 "jpg" = "image/jpeg",
                                 "jpeg" = "image/jpeg",
                                 "kml" = "application/vnd.google-earth.kml/xml",
+                                "kmz" = "application/vnd.google-earth.kmz",
+                                "md" = "text/markdown",
+                                "mov" = "video/quicktime",
+                                "mp3" = "audio/mpeg",
                                 "mp4" = "video/mp4",
                                 "mpg" = "video/mpeg",
                                 "mpeg" = "video/mpeg",
@@ -56,13 +64,23 @@ dataone_format_mappings <- list("avi" = "ideo/avi",
                                 "pdf" = "application/pdf",
                                 "png" = "image/png",
                                 "ppt" = "application/vnd.ms-powerpoint",
+                                "pptx" = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                                 "py" = "application/x-python",
+                                "qt" = "video/quicktime",
+                                "r" = "application/R",
+                                "rar" = "application/x-rar-compressed",
                                 "rdf" = "application/rdf/xml",
+                                "rmd" = "text/x-rmarkdown",
+                                "sas" = "application/SAS",
+                                "svg" = "image/svg/xml",
                                 "tar" = "application/x-tar",
                                 "tif" = "image/tiff",
                                 "tiff" = "image/tiff",
                                 "ttl" = "text/turtle",
+                                "tsv" = "text/tsv",
                                 "txt" = "text/plain",
+                                "wav" = "audio/x-wav",
+                                "wma" = "audio/x-ms-wma",
                                 "wmv" = "video/x-ms-wmv",
                                 "xls" = "application/vnd.ms-excel",
                                 "xlsx" = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -103,14 +121,13 @@ guess_format_id <- function(filenames) {
 #' @param path (character) Full or relative path to the file in question.
 #'
 #' @return (character) The DataONE format ID.
-
 get_netcdf_format_id <- function(path) {
   stopifnot(is.character(path),
             nchar(path) > 0,
             file.exists(path))
 
   if (!requireNamespace("ncdf4")) {
-    stop(call. = FALSE, 
+    stop(call. = FALSE,
          "The package 'ncdf4' must be installed to run this function. ",
          "Please install it and try again.")
   }
