@@ -810,7 +810,7 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
     resource_map_pids <- pid
   } else {
     warning(call. = FALSE,
-            paste0("The PID '", pid, "' is not for a Resource Map Object so the most likely candidate was found. This is usally fine! Specify a Resource Map PID instead to stop getting this warning."))
+            paste0("The PID '", pid, "' is not for a Resource Map Object so the most likely candidate was found. This is usually fine! Specify a Resource Map PID instead to stop getting this warning."))
     resource_map_pids <- find_newest_resource_map(node, pid)
   }
 

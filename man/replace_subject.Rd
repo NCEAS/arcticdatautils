@@ -4,7 +4,8 @@
 \alias{replace_subject}
 \title{Replace subjects in the accessPolicy section of a System Metadata entries.}
 \usage{
-replace_subject(sysmeta, from = "cn=arctic-data-admins,dc=dataone,dc=org",
+replace_subject(sysmeta,
+  from = "cn=arctic-data-admins,dc=dataone,dc=org",
   to = "CN=arctic-data-admins,DC=dataone,DC=org")
 }
 \arguments{
