@@ -1,21 +1,24 @@
-#' access.R
-#'
-#' High-level utility functions for getting and setting access rules for DataONE
-#' objects.
+# access.R
+#
+# High-level utility functions for getting and setting access rules for DataONE objects.
 
 
-#' Set the rightsHolder field for a given PID.
+#' Set the rights holder for an object
 #'
-#' Update the rights holder to the provided subject for the object identified in
-#' the provided system metadata document on the given Member Node.
+#' Set the rights holder to the given subject for the given objects on the
+#' given Member Node. This function checks if the rights holder is already set
+#' and only updates the System Metadata when a change is needed.
 #'
-#' @param mn (MNode) The MNode instance to be changed.
-#' @param pids (character) The identifiers for the object to be changed.
-#' @param subject (character) The identifier of the new rightsHolder, often an ORCID or DN.
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to set the rights holder for.
+#' @param subject (character) The identifier of the new rights holder, typially an ORCID or DN.
 #'
 #' @import dataone
 #' @import datapack
+#'
+#' @return (logical) Whether an update was needed.
 #' @export
+#'
 #' @examples
 #'\dontrun{
 #' cn <- CNode("STAGING2")
@@ -30,17 +33,17 @@ set_rights_holder <- function(mn, pids, subject) {
   }
 
   if (!all(is.character(pids),
-           all(nchar(pids) > 0))){
+           all(nchar(pids) > 0))) {
     stop("Argument 'pids' must be character class with non-zero number of characters.")
   }
 
   if (!all(is.character(subject),
-           nchar(subject) > 0)){
+           nchar(subject) > 0)) {
     stop("Argument 'subject' must be character class with non-zero number of characters.")
   }
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
-    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+    stop("Argument 'subject' cannot contain 'https:', use 'http:' instead.")
   }
 
 
@@ -50,7 +53,20 @@ set_rights_holder <- function(mn, pids, subject) {
     pid <- pids[i]
 
     # Get System Metadata
-    sysmeta <- dataone::getSystemMetadata(mn, pid)
+    sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, pid)
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      message(e)
+      e
+    })
+
+    if (!inherits(sysmeta, "SystemMetadata")) {
+      stop("Failed to get System Metadata.")
+    }
 
     # Change rightsHolder (if needed)
     if (sysmeta@rightsHolder == subject) {
@@ -84,17 +100,19 @@ set_rights_holder <- function(mn, pids, subject) {
 }
 
 
-#' Set the access policy for a set of objects.
+#' Set the access policy for an object
 #'
-#' For each permission, this function checks if the permission is already set
-#' and moves on. System Metadata are only updated when a change was needed.
+#' Set the access policy for the given subjects for the given objects on the given Member Node.
+#' For each type of permission, this function checks if the permission is already set
+#' and only updates the System Metadata when a change is needed.
 #'
 #' @param mn (MNode) The Member Node.
-#' @param pids (character) The object(s) to set the permissions on.
-#' @param subjects (character) The subject(s) to set permissions for.
-#' @param permissions (character) Optional. Vector of permissions.
+#' @param pids (character) The PIDs of the objects to set permissions for.
+#' @param subjects (character) The identifiers of the subjects to set permissions for, typially an ORCID or DN.
+#' @param permissions (character) Optional. The permissions to set. Defaults to
+#' read, write, and changePermission.
 #'
-#' @return (logical) Named
+#' @return (logical) Whether an update was needed.
 #' @export
 #'
 #' @examples
@@ -106,18 +124,18 @@ set_rights_holder <- function(mn, pids, subject) {
 #' set_access(mn, pids, subjects = "http://orcid.org/0000-000X-XXXX-XXXX",
 #'    permissions = c("read", "write", "changePermission"))
 #'}
-set_access <- function(mn, pids, subjects, permissions=c("read", "write", "changePermission")) {
+set_access <- function(mn, pids, subjects, permissions = c("read", "write", "changePermission")) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
   }
 
   if (!all(is.character(pids),
-           all(nchar(pids) > 0))){
+           all(nchar(pids) > 0))) {
     stop("Argument 'pids' must be character class with non-zero number of characters.")
   }
 
   if (!all(is.character(subjects),
-           all(nchar(subjects)) > 0)){
+           all(nchar(subjects)) > 0)) {
     stop("Argument 'subjects' must be character class with non-zero number of characters.")
   }
 
@@ -135,7 +153,20 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
   for (pid in pids) {
     changed <- FALSE
 
-    sysmeta <- dataone::getSystemMetadata(mn, pid)
+    sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, pid)
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      message(e)
+      e
+    })
+
+    if (!inherits(sysmeta, "SystemMetadata")) {
+      stop("Failed to get System Metadata.")
+    }
 
     for (subject in subjects) {
       for (permission in permissions) {
@@ -163,11 +194,14 @@ set_access <- function(mn, pids, subjects, permissions=c("read", "write", "chang
 }
 
 
-#' Set public access on a set of objects.
+#' Set public read access for an object
 #'
-#' @param mn (MNode)
-#' @param pids (character) A vector of PIDs to set public access on
+#' Set public read access for an object.
 #'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to set public read access for.
+#'
+#' @return (logical) Whether an update was needed.
 #' @export
 #'
 #' @examples
@@ -182,10 +216,13 @@ set_public_read <- function(mn, pids) {
   set_access(mn, pids, "public", "read")
 }
 
-#' Remove public access on a set of objects.
+
+#' Remove public read access for an object
 #'
-#' @param mn (MNode)
-#' @param pids (character) A vector of PIDs to set public access on
+#' Remove public read access for an object.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to remove public read access for.
 #'
 #' @export
 #'
@@ -203,7 +240,7 @@ remove_public_read <- function(mn, pids) {
   }
 
   if (!all(is.character(pids),
-           all(nchar(pids) > 0))){
+           all(nchar(pids) > 0))) {
     stop("Argument 'pids' must be character class with non-zero number of characters.")
   }
 
@@ -211,18 +248,20 @@ remove_public_read <- function(mn, pids) {
   # Store the results of each attempted update
   results <- c()
 
-  # Remove public access for each PID
+  # Remove public read access for each PID
   for (pid in pids) {
     sysmeta <- tryCatch({
       dataone::getSystemMetadata(mn, pid)
-    },
-    error = function(e) {
-      message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
       message(e)
       e
     })
 
-    if (inherits(sysmeta, "error")) {
+    if (!inherits(sysmeta, "SystemMetadata")) {
       stop("Failed to get System Metadata.")
     }
 
@@ -237,7 +276,7 @@ remove_public_read <- function(mn, pids) {
     changed <- TRUE
 
     message(paste0("Removing public read access on ", pid, "."))
-    sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)),]
+    sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)), ]
 
     # Update the sysmeta
     update_response <- tryCatch({
@@ -261,19 +300,19 @@ remove_public_read <- function(mn, pids) {
 }
 
 
-#' Set the given subject as the rightsHolder and subject with write and
-#' changePermission access for the given PID.
+#' Set rights holder with access policy for an object
 #'
-#' This function only updates the existing System Metadata if a change is
-#' needed.
+#' Set the given subject as the rights holder and with given permissions
+#' for the given objects. This function only updates the existing
+#' System Metadata when a change is needed.
 #'
-#' @param mn (MNode) The Member Node to send the query.
-#' @param pids (character) The PID(s) to set the access rule for.
-#' @param subject (character)The subject of the rule(s).
-#' @param permissions (character) The permissions for the rule. Defaults to
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to set the rights holder and access policy for.
+#' @param subject (character) The identifier of the new rights holder, typially an ORCID or DN.
+#' @param permissions (character) Optional. The permissions to set. Defaults to
 #' read, write, and changePermission.
 #'
-#' @return Whether an update was needed.
+#' @return (logical) Whether an update was needed.
 #' @export
 #'
 #' @examples
@@ -285,18 +324,18 @@ remove_public_read <- function(mn, pids) {
 #' set_rights_and_access(mn, pids, "http://orcid.org/0000-000X-XXXX-XXXX",
 #'     permissions = c("read", "write", "changePermission"))
 #'}
-set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "write", "changePermission")) {
+set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "write", "changePermission")) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
   }
 
   if (!all(is.character(pids),
-           all(nchar(pids) > 0))){
+           all(nchar(pids) > 0))) {
     stop("Argument 'pids' must be character class with non-zero number of characters.")
   }
 
   if (!all(is.character(subject),
-           nchar(subject) > 0)){
+           nchar(subject) > 0)) {
     stop("Argument 'subject' must be character class with non-zero number of characters.")
   }
 
@@ -315,18 +354,20 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
   for (pid in pids) {
     sysmeta <- tryCatch({
       dataone::getSystemMetadata(mn, pid)
-    },
-    error = function(e) {
-      message(paste0("Failed to get system metadata for PID '", pid, "' on MN '", mn@endpoint, "'.\n"))
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
       message(e)
       e
     })
 
-    if (inherits(sysmeta, "error")) {
+    if (!inherits(sysmeta, "SystemMetadata")) {
       stop("Failed to get System Metadata.")
     }
 
-    # Track whether we have changed the record to avoid an uncessary update call
+    # Track whether we have changed the record to avoid an unnecessary update call
     changed <- FALSE
 
     # Set rights holder if needed
@@ -380,16 +421,18 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
 
 #' Check whether an object has public read access
 #'
-#' Check whether DataOne objects have public read access set in their System Metadata.
+#' Check whether objects have public read access.
 #' No token needs to be set to use this function.
 #'
-#' @param mn (MNode) The Member Node to send the query to.
-#' @param pids (character) The PID(s) to check for public read access.
-#' @param use.names (logical) Optional. If set to `TRUE` (the deafult), pids will
-#' be used as names for the result, unless pids has names already, in which case,
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to check for public read access.
+#' @param use.names (logical) Optional. If `TRUE` (the default), PIDs will
+#' be used as names for the result unless PIDs have names already, in which case
 #' those names will be used for the result.
 #'
-#' @return A vector of class logical.
+#' @importFrom httr content
+#'
+#' @return (logical) Whether an object has public read access.
 #' @export
 #'
 #' @examples
@@ -400,38 +443,35 @@ set_rights_and_access <- function(mn, pids, subject, permissions=c("read", "writ
 #'     "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #' is_public_read(mn, pids)
 #'}
-is_public_read <- function(mn, pids, use.names=TRUE){
-
+is_public_read <- function(mn, pids, use.names = TRUE) {
   if (!is(mn, "MNode")) {
     stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
   }
 
   if (!all(is.character(pids),
-           all(nchar(pids) > 0))){
-    stop("Argument 'pid' must be character class with non-zero number of characters.")
+           all(nchar(pids) > 0))) {
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
   }
 
-  if(!is.logical(use.names)){
+  if (!is.logical(use.names)) {
     stop(paste0("Argument 'use.names' must be logical class, but was a ", class(use.names), " instead."))
   }
 
-  vapply(pids, USE.NAMES = use.names, FUN.VALUE = logical(1), FUN=function(pid){
+  vapply(pids, USE.NAMES = use.names, FUN.VALUE = logical(1), FUN = function(pid) {
 
-    url       <-  paste(mn@endpoint, "meta", URLencode(pid, reserved=T), sep="/")
-    response  <-  dataone:::auth_get(url, node=mn)
+    url       <-  paste(mn@endpoint, "meta", utils::URLencode(pid, reserved = TRUE), sep = "/")
+    response  <-  dataone:::auth_get(url, node = mn)
 
-    if(response$status_code != "200") {
+    if (response$status_code != "200") {
       error_desc <- dataone:::getErrorDescription(response)
-      if(grepl("READ not allowed", error_desc, ignore.case = TRUE)){
+      if (grepl("READ not allowed", error_desc, ignore.case = TRUE)) {
         return(FALSE)
       } else {
         stop(error_desc)
       }
     }
 
-    sysmeta <-  datapack:::SystemMetadata(XML::xmlRoot(suppressMessages(XML::xmlParse((httr::content(response, as="text"))))))
+    sysmeta <- datapack:::SystemMetadata(XML::xmlRoot(suppressMessages(XML::xmlParse((httr::content(response, as = "text"))))))
     return(datapack::hasAccessRule(sysmeta, "public", "read"))
-
   })
-
 }
