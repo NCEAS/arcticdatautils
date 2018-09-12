@@ -66,6 +66,18 @@ test_that("get_package works the same when given a metadata pid as it does when 
   expect_equal(a, b)
 })
 
+test_that("access functions stop if system metadata is not found", {
+  expect_error(set_rights_holder(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
+
+  expect_error(set_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
+
+  expect_error(set_public_read(mn, "test"))
+
+  expect_error(remove_public_read(mn, "test"))
+
+  expect_error(set_rights_and_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
+})
+
 test_that("is_public_read returns true for public packages and false for private packages", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
