@@ -29,6 +29,7 @@ Imports:
     xml2,
     XML
 License: MIT + file LICENSE
+Encoding: UTF-8
 LazyData: true
 Suggests:
     dplyr,
