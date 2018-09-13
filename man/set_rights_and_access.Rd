@@ -2,28 +2,28 @@
 % Please edit documentation in R/access.R
 \name{set_rights_and_access}
 \alias{set_rights_and_access}
-\title{Set the given subject as the rightsHolder and subject with write and
-changePermission access for the given PID.}
+\title{Set rights holder with access policy for an object}
 \usage{
 set_rights_and_access(mn, pids, subject, permissions = c("read", "write",
   "changePermission"))
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to send the query.}
+\item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) The PID(s) to set the access rule for.}
+\item{pids}{(character) The PIDs of the objects to set the rights holder and access policy for.}
 
-\item{subject}{(character)The subject of the rule(s).}
+\item{subject}{(character) The identifier of the new rights holder, typially an ORCID or DN.}
 
-\item{permissions}{(character) The permissions for the rule. Defaults to
+\item{permissions}{(character) Optional. The permissions to set. Defaults to
 read, write, and changePermission.}
 }
 \value{
-Whether an update was needed.
+(logical) Whether an update was needed.
 }
 \description{
-This function only updates the existing System Metadata if a change is
-needed.
+Set the given subject as the rights holder and with given permissions
+for the given objects. This function only updates the existing
+System Metadata when a change is needed.
 }
 \examples{
 \dontrun{

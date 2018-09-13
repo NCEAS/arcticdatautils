@@ -7,19 +7,19 @@
 is_public_read(mn, pids, use.names = TRUE)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to send the query to.}
+\item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) The PID(s) to check for public read access.}
+\item{pids}{(character) The PIDs of the objects to check for public read access.}
 
-\item{use.names}{(logical) Optional. If set to `TRUE` (the deafult), pids will
-be used as names for the result, unless pids has names already, in which case,
+\item{use.names}{(logical) Optional. If `TRUE` (the default), PIDs will
+be used as names for the result unless PIDs have names already, in which case
 those names will be used for the result.}
 }
 \value{
-A vector of class logical.
+(logical) Whether an object has public read access.
 }
 \description{
-Check whether DataOne objects have public read access set in their System Metadata.
+Check whether objects have public read access.
 No token needs to be set to use this function.
 }
 \examples{
