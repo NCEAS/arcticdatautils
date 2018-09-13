@@ -835,7 +835,7 @@ update_physical <- function(eml, mn, data_pid, new_data_pid) {
 
   all_url <- unlist(EML::eml_get(eml, "url"))
   if (sum(stringr::str_detect(all_url, data_pid)) == 0) {
-    stop("The data PID does not match any physical sections, so the EML will not be updated.")
+    stop("The obsoleted data PID does not match any physical sections, so the EML will not be updated.")
   }
 
   dataTable_url <- unlist(EML::eml_get(eml@dataset@dataTable, "url"))
@@ -897,6 +897,8 @@ update_physical <- function(eml, mn, data_pid, new_data_pid) {
 #' @import dataone
 #' @import EML
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' cnTest <- dataone::CNode("STAGING")
@@ -908,8 +910,6 @@ update_physical <- function(eml, mn, data_pid, new_data_pid) {
 #' update_package_object(mnTest, pkg$data[1], "new_file.csv", pkg$resource_map, format_id = "text/csv")
 #' file.remove("new_file.csv")
 #' }
-#'
-#' @export
 update_package_object <- function(mn,
                                   data_pid,
                                   new_data_path,
@@ -940,12 +940,12 @@ update_package_object <- function(mn,
                                       data_pid = data_pid,
                                       new_data_pid = new_data_pid),
                       error = function(e) {
-                        print("The data PID does not match any physical sections, so the EML will not be updated.")
+                        message("The obsoleted data PID does not match any physical sections, so the EML will not be updated.",
+                                "\nCheck if the correct resource map PID was given.")
                         return(eml)
                       })
 
-  eml_path <- "science-metadata.xml"
-  file.create(eml_path)
+  eml_path <- tempfile(fileext = ".xml")
   EML::write_eml(eml_new, eml_path)
 
   pkg_new <- publish_update(mn,
