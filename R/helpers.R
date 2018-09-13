@@ -298,3 +298,113 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 
   enumeratedDomains
 }
+
+
+#' Create dummy package with fuller metadata
+#'
+#' Creates a fuller package than \code{\link{create_dummy_package}}
+#' but is otherwise based on the same concept. This dummy
+#' package includes multiple data objects, responsible parties,
+#' geographic locations, method steps, etc.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param title (character) Optional. Title of package. Defaults to "A Dummy Package".
+#'
+#' @import EML
+#' @import dataone
+#'
+#' @export
+create_dummy_package_full <- function(mn, title = "A Dummy Package") {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(title), nchar(title) > 0)
+  if (mn@env == "prod") {
+    stop("Cannot create dummy package on production node.")
+  }
+
+  # Create objects
+  file.create(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"))
+  # TODO: add actual data to dummy files
+
+  pid_csv1 <- publish_object(mn,
+                             path = "dummy1.csv",
+                             format_id = "text/csv")
+
+  pid_csv2 <- publish_object(mn,
+                             path = "dummy2.csv",
+                             format_id = "text/csv")
+
+  pid_jpg1 <- publish_object(mn,
+                             path = "dummy1.jpg",
+                             format_id = "image/jpeg")
+
+  pid_R1 <- publish_object(mn,
+                           path = "dummy1.R",
+                           format_id = "application/R")
+
+  data_pids <- c(pid_csv1, pid_csv2, pid_jpg1, pid_R1)
+
+  # Import EML
+  eml_path_original <- file.path(system.file(package = "arcticdatautils"), "example-eml-full.xml")
+  eml <- EML::read_eml(eml_path_original)
+
+  # Add objects to EML
+  eml@dataset@title[[1]]@.Data <- title
+
+  attr <- data.frame(
+    attributeName = c("Date", "Location", "Salinity", "Temperature"),
+    attributeDefinition = c("Date sample was taken on", "Location code representing location where sample was taken", "Salinity of sample in PSU", "Temperature of sample"),
+    measurementScale = c("dateTime", "nominal","ratio", "interval"),
+    domain = c("dateTimeDomain", "enumeratedDomain","numericDomain", "numericDomain"),
+    formatString = c("MM-DD-YYYY", NA, NA, NA),
+    definition = c(NA,NA, NA, NA),
+    unit = c(NA, NA, "dimensionless", "celsius"),
+    numberType = c(NA, NA, "real", "real"),
+    missingValueCode = c(NA, NA, NA, NA),
+    missingValueCodeExplanation = c(NA, NA, NA, NA),
+    stringsAsFactors = FALSE)
+
+  location <- c(CASC = "Cascade Lake", CHIK = "Chikumunik Lake", HEAR = "Heart Lake", NISH = "Nishlik Lake")
+  fact <- data.frame(attributeName = "Location", code = names(location), definition = unname(location))
+
+  attributeList <- EML::set_attributes(attributes = attr, factors = fact)
+
+  dT1 <- pid_to_eml_entity(mn,
+                           pid = pid_csv1,
+                           entityType = "dataTable")
+  dT1@attributeList <- attributeList
+
+  dT2 <- pid_to_eml_entity(mn,
+                           pid = pid_csv2,
+                           entityType = "dataTable")
+  dT2@attributeList <- attributeList
+
+  eml@dataset@dataTable <- c(dT1, dT2)
+
+  oE1 <- pid_to_eml_entity(mn,
+                           pid = pid_jpg1,
+                           entityType = "otherEntity")
+
+  oE2 <- pid_to_eml_entity(mn,
+                           pid = pid_R1,
+                           entityType = "otherEntity")
+
+  eml@dataset@otherEntity <- c(oE1, oE2)
+
+  eml_path <- tempfile(fileext = ".xml")
+  EML::write_eml(eml, eml_path)
+
+  pid_eml <- publish_object(mn,
+                            path = eml_path,
+                            format_id = "eml://ecoinformatics.org/eml-2.1.1")
+
+  # Create resource map
+  resource_map_pid <- create_resource_map(mn,
+                                          metadata_pid = pid_eml,
+                                          data_pids = data_pids)
+
+  file.remove(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"), eml_path)
+
+  return(list(resource_map = resource_map_pid,
+              metadata = pid_eml,
+              data = data_pids))
+}

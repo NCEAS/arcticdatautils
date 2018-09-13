@@ -813,3 +813,154 @@ set_file_name <- function(mn, pid, name) {
   sysmeta@fileName <- name
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
+
+
+#' Update physical of an updated data object
+#'
+#' This function updates the EML with the new physical
+#' of a data object once it has been updated.
+#' This is a helper function for \code{\link{update_package_object}}.
+#'
+#' @param eml (eml) An EML class object.
+#' @param mn (MNode) The Member Node of the data package.
+#' @param data_pid (character) The identifier of the data object to be updated.
+#' @param new_data_pid (character) The new identifier of the updated data object.
+#'
+#' @importFrom stringr str_detect
+update_physical <- function(eml, mn, data_pid, new_data_pid) {
+  stopifnot(is(eml, "eml"))
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(data_pid), nchar(data_pid) > 0)
+  stopifnot(is.character(new_data_pid), nchar(new_data_pid) > 0)
+
+  all_url <- unlist(EML::eml_get(eml, "url"))
+  if (sum(stringr::str_detect(all_url, data_pid)) == 0) {
+    stop("The obsoleted data PID does not match any physical sections, so the EML will not be updated.")
+  }
+
+  dataTable_url <- unlist(EML::eml_get(eml@dataset@dataTable, "url"))
+
+  if (any(stringr::str_detect(dataTable_url, data_pid))) {
+    position <- which(stringr::str_detect(dataTable_url, data_pid))
+    new_phys <- pid_to_eml_physical(mn, new_data_pid)
+    eml@dataset@dataTable[[position]]@physical@.Data <- new_phys
+  }
+
+  otherEntity_url <- unlist(EML::eml_get(eml@dataset@otherEntity, "url"))
+
+  if (any(stringr::str_detect(otherEntity_url, data_pid))) {
+    position <- which(stringr::str_detect(otherEntity_url, data_pid))
+    new_phys <- pid_to_eml_physical(mn, new_data_pid)
+    eml@dataset@otherEntity[[position]]@physical@.Data <- new_phys
+  }
+
+  spatialVector_url <- unlist(EML::eml_get(eml@dataset@spatialVector, "url"))
+
+  if (any(stringr::str_detect(spatialVector_url, data_pid))) {
+    position <- which(stringr::str_detect(spatialVector_url, data_pid))
+    new_phys <- pid_to_eml_physical(mn, new_data_pid)
+    eml@dataset@spatialVector[[position]]@physical@.Data <- new_phys
+  }
+
+  invisible(eml)
+}
+
+
+#' Update a data object and associated resource map and metadata
+#'
+#' This function updates a data object and then automatically
+#' updates the package resource map with the new data PID. If an object
+#' already has a \code{dataTable}, \code{otherEntity}, or \code{spatialVector}
+#' with a working physical section, the EML will be updated with the new physical.
+#' It is a convenience wrapper around \code{\link{update_object}}
+#' and \code{\link{publish_update}}.
+#'
+#' @param mn (MNode) The Member Node of the data package.
+#' @param data_pid (character) PID for data object to update.
+#' @param new_data_path (character) Path to new data object.
+#' @param resource_map_pid (character) PID for resource map to update.
+#' @param format_id (character) Optional. The format ID to set for the object.
+#' When not set, \code{\link{guess_format_id}} will be used
+#' to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
+#' @param public (logical) Optional. Make the update public. If FALSE,
+#' will set the metadata and resource map to private (but not the data objects).
+#' This applies to the new metadata PID and its resource map and data object.
+#' Access policies are not affected.
+#' @param use_doi (logical) Optional. If TRUE, a new DOI will be minted.
+#' @param ... Other arguments to pass into \code{\link{publish_update}}.
+#'
+#' @return PIDs (character) Named character vector of PIDs in the data package, including PIDs
+#' for the metadata, resource map, and data objects.
+#'
+#' @keywords update_object publish_update
+#'
+#' @import dataone
+#' @import EML
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cnTest <- dataone::CNode("STAGING")
+#' mnTest <- dataone::getMNode(cnTest,"urn:node:mnTestARCTIC")
+#'
+#' pkg <- create_dummy_package_full(mnTest, title = "My package")
+#'
+#' file.create("new_file.csv")
+#' update_package_object(mnTest, pkg$data[1], "new_file.csv", pkg$resource_map, format_id = "text/csv")
+#' file.remove("new_file.csv")
+#' }
+update_package_object <- function(mn,
+                                  data_pid,
+                                  new_data_path,
+                                  resource_map_pid,
+                                  format_id = NULL,
+                                  public = TRUE,
+                                  use_doi = FALSE,
+                                  ...) {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(data_pid), nchar(data_pid) > 0)
+  stopifnot(is.character(new_data_path), nchar(new_data_path) > 0, file.exists(new_data_path))
+  stopifnot(is.character(resource_map_pid), nchar(resource_map_pid) > 0)
+  stopifnot(is.logical(public))
+
+  pkg <- get_package(mn, resource_map_pid)
+  eml <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
+
+  new_data_pid <- update_object(mn,
+                                pid = data_pid,
+                                path = new_data_path,
+                                format_id = format_id)
+
+  other_data_pids <- pkg$data[which(pkg$data != data_pid)] # wrapped in which for better NA handling
+  new_data_pids <- c(other_data_pids, new_data_pid)
+
+  eml_new <- tryCatch(update_physical(eml = eml,
+                                      mn = mn,
+                                      data_pid = data_pid,
+                                      new_data_pid = new_data_pid),
+                      error = function(e) {
+                        message("The obsoleted data PID does not match any physical sections, so the EML will not be updated.",
+                                "\nCheck if the correct resource map PID was given.")
+                        return(eml)
+                      })
+
+  eml_path <- tempfile(fileext = ".xml")
+  EML::write_eml(eml_new, eml_path)
+
+  pkg_new <- publish_update(mn,
+                            metadata_pid = pkg$metadata,
+                            resource_map_pid = pkg$resource_map,
+                            metadata_path = eml_path,
+                            data_pids = new_data_pids,
+                            child_pids = pkg$child_packages,
+                            public = public,
+                            use_doi = use_doi,
+                            ...)
+
+  file.remove(eml_path)
+
+  cat("\nThe new data pid is:", new_data_pid)
+
+  return(pkg_new)
+}
