@@ -41,7 +41,6 @@ pid_to_eml_entity <- function(mn,
                               "otherEntity"))
 
   systmeta <- getSystemMetadata(mn, pid)
-  physical <- sysmeta_to_eml_physical(systmeta)
 
   # Create entity
   entity <- new(entityType,
@@ -128,6 +127,7 @@ pid_to_eml_physical <- function(mn, pids) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
+  names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
   sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
   sysmeta_to_eml_physical(sysmeta)
@@ -994,6 +994,8 @@ eml_add_entities <- function(doc,
 #' \code{FALSE} reduces execution time by ~ 50 percent.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @importFrom magrittr '%>%'
 #'
 #' @export
 #'
