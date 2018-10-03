@@ -1150,8 +1150,16 @@ which_in_eml <- function(eml_list, element, test) {
 #' eml@@dataset@@contact[[1]])
 #'
 #' # This is also useful when we want to set references to a subset of 'dataTable' or 'otherEntity' objects
-#'
-#'
+#' # Add a few more objects to illustrate the use
+#' eml@@dataset@@dataTable[[3]] <- eml@@dataset@@dataTable[[1]]
+#' eml@@dataset@@dataTable[[4]] <- eml@@dataset@@dataTable[[1]]
+#' # Add references to the second and third elements
+#' for (i in 2:3) {
+#'     eml@@dataset@@dataTable[[i]] <- eml_set_reference(eml@@dataset@@dataTable[[1]],
+#'                                                       eml@@dataset@@dataTable[[1]])
+#' }
+#' # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
+#' eml@@dataset@@dataTable
 #' }
 eml_set_reference <- function(element_to_reference, element_to_replace) {
   if (length(element_to_reference@id) == 0) {
