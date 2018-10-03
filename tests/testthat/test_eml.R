@@ -265,3 +265,38 @@ test_that("which_in_eml Returns correct locations", {
   expect_error(which_in_eml(eml@dataset@dataTable, "attributeName", "length_3"))
   expect_equal(c(1,3), which_in_eml(eml@dataset@dataTable[[1]]@attributeList@attribute, "attributeName", function(x) {grepl("^length", x)}))
 })
+
+test_that('eml_set_reference sets a reference', {
+  eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
+  doc <- EML::read_eml(eml_path)
+
+  expect_error(eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]]))
+
+  # Add id to use references
+  doc@dataset@creator[[1]]@id <- new('xml_attribute', 'creator_id')
+  doc@dataset@contact[[1]] <- eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]])
+
+  expect_equal(doc@dataset@creator[[1]]@id[1], doc@dataset@contact[[1]]@references[1])
+})
+
+test_that('eml_set_shared_attributes creates shared attribute references', {
+  eml_path <- file.path(system.file(package = 'arcticdatautils'), 'example-eml.xml')
+  doc <- EML::read_eml(eml_path)
+
+  attributes <- data.frame(attributeName = 'length_1', attributeDefinition = 'def1',
+                           formatString = NA, measurementScale = 'ratio', domain = 'numericDomain',
+                           definition = NA, unit = 'meter', numberType = 'real',
+                           stringsAsFactors = FALSE)
+  attributeList <- EML::set_attributes(attributes)
+
+  dataTable_1 <- new('dataTable',
+                     entityName = '2016_data.csv',
+                     entityDescription = '2016 data',
+                     attributeList = attributeList)
+  dataTable_2 <- dataTable_1
+  doc@dataset@dataTable <- c(dataTable_1, dataTable_2)
+
+  doc <- eml_set_shared_attributes(doc)
+
+  expect_equal(doc@dataset@dataTable[[1]]@id[1], doc@dataset@dataTable[[2]]@references[1])
+})
