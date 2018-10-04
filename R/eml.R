@@ -1165,7 +1165,7 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
   if (length(element_to_reference@id) == 0) {
     stop('No id detected at element_to_reference@id. Please add an id in order to use references.')
   }
-  id <- element_to_reference@id
+  id <- element_to_reference@id[1]
   class <- class(element_to_replace)[1]
   element_to_replace <- new(class, reference = id)
   return(element_to_replace)
