@@ -52,7 +52,6 @@ file.create("new_file.csv")
 update_package_object(mnTest, pkg$data[1], "new_file.csv", pkg$resource_map, format_id = "text/csv")
 file.remove("new_file.csv")
 }
-
 }
 \keyword{publish_update}
 \keyword{update_object}
