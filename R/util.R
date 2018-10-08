@@ -785,7 +785,7 @@ get_all_versions <- function(node, pid) {
 #' @param pid (character) The the resource map PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated.
+#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
 #' @return (list) A structured list of the members of the package.
 #' @export
@@ -799,7 +799,7 @@ get_all_versions <- function(node, pid) {
 #'
 #' ids <- get_package(mn, pid)
 #' }
-get_package <- function(node, pid, file_names=FALSE, rows=1000) {
+get_package <- function(node, pid, file_names=FALSE, rows=5000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -840,10 +840,10 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
 #' @param pid (character) The the metadata PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated.
+#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
 
-get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
+get_package_direct <- function(node, pid, file_names=FALSE, rows = 5000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
