@@ -277,6 +277,7 @@ test_that('eml_set_reference sets a reference', {
   doc@dataset@contact[[1]] <- eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]])
 
   expect_equal(doc@dataset@creator[[1]]@id[1], doc@dataset@contact[[1]]@references[1])
+  expect_true(EML::eml_validate(doc))
 })
 
 test_that('eml_set_shared_attributes creates shared attribute references', {
@@ -299,4 +300,15 @@ test_that('eml_set_shared_attributes creates shared attribute references', {
   doc <- eml_set_shared_attributes(doc)
 
   expect_equal(doc@dataset@dataTable[[1]]@id[1], doc@dataset@dataTable[[2]]@references[1])
+  expect_true(EML::eml_validate(doc))
+})
+
+test_that('eml_party creates multiple giveName, organizationName, and positionName fields', {
+  creator <- eml_party('creator', c('John', 'and Jack'), 'Smith', c('NCEAS', 'UCSB'),
+                       c('Programmers', 'brothers'))
+
+  expect_is(creator, "creator")
+  expect_equal(unlist(EML::eml_get(creator, 'givenName')), c('John', 'and Jack'))
+  expect_equal(unlist(EML::eml_get(creator, 'organizationName')), c('NCEAS', 'UCSB'))
+  expect_equal(unlist(EML::eml_get(creator, 'positionName')), c('Programmers', 'brothers'))
 })

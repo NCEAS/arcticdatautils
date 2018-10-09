@@ -26,14 +26,15 @@ eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 eml@dataset@contact[[1]] <- eml_set_reference(eml@dataset@creator[[1]],
 eml@dataset@contact[[1]])
 
-# This is also useful when we want to set references to a subset of 'dataTable' or 'otherEntity' objects
-# Add a few more objects to illustrate the use
+# This is also useful when we want to set references to a subset of 'dataTable'
+  or 'otherEntity' objects
+# Add a few more objects first to illustrate the use:
 eml@dataset@dataTable[[3]] <- eml@dataset@dataTable[[1]]
 eml@dataset@dataTable[[4]] <- eml@dataset@dataTable[[1]]
-# Add references to the second and third elements
+# Add references to the second and third elements only (not the 4th):
 for (i in 2:3) {
-    eml@dataset@dataTable[[i]] <- eml_set_reference(eml@dataset@dataTable[[1]],
-                                                      eml@dataset@dataTable[[1]])
+    eml@dataset@dataTable[[i]]@attributeList <- eml_set_reference(eml@dataset@dataTable[[1]]@attributeList,
+                                                      eml@dataset@dataTable[[i]]@attributeList)
 }
 # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
 eml@dataset@dataTable
