@@ -345,6 +345,8 @@ clear_methods <- function(doc) {
 #' @examples
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'           c("Data Scientist", "Programmer"))
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
                       sur_name=NULL,
@@ -369,12 +371,12 @@ eml_party <- function(type="associatedParty",
 
   # Organization Name
   if (!is.null(organization)) {
-    party@organizationName <- c(new("organizationName", .Data = organization))
+    party@organizationName <- new('ListOforganizationName', lapply(organization, function(x) {new('organizationName', .Data = x)}))
   }
 
   # Position
   if (!is.null(position)) {
-    party@positionName <- c(new("positionName", .Data = position))
+    party@positionName <- new('ListOfpositionName', lapply(position, function(x) {new('positionName', .Data = x)}))
   }
 
   # Email
@@ -446,7 +448,10 @@ eml_party <- function(type="associatedParty",
 #' @export
 #'
 #' @examples
-#' eml_creator("test", "user", email = "test@user.com")
+#' eml_creator("test", "user", email = "test@@user.com")
+#' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'             c("Data Scientist", "Programmer"))
 eml_creator <- function(...) {
   eml_party("creator", ...)
 }
@@ -461,7 +466,10 @@ eml_creator <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_contact("test", "user", email = "test@user.com")
+#' eml_contact("test", "user", email = "test@@user.com")
+#' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'             c("Data Scientist", "Programmer"))
 eml_contact <- function(...) {
   eml_party("contact", ...)
 }
@@ -477,7 +485,7 @@ eml_contact <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_metadata_provider("test", "user", email = "test@user.com")
+#' eml_metadata_provider("test", "user", email = "test@@user.com")
 eml_metadata_provider <- function(...) {
   eml_party("metadataProvider", ...)
 }
@@ -492,7 +500,7 @@ eml_metadata_provider <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_associated_party("test", "user", email = "test@user.com", role = "Principal Investigator")
+#' eml_associated_party("test", "user", email = "test@@user.com", role = "Principal Investigator")
 eml_associated_party <- function(...) {
   eml_party("associatedParty", ...)
 }
@@ -507,7 +515,7 @@ eml_associated_party <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_personnel("test", "user", email = "test@user.com", role = "principalInvestigator")
+#' eml_personnel("test", "user", email = "test@@user.com", role = "principalInvestigator")
 eml_personnel <- function(role = NULL, ...) {
   if(is.null(role)) {
     stop(call. = FALSE,
@@ -1149,14 +1157,15 @@ which_in_eml <- function(eml_list, element, test) {
 #' eml@@dataset@@contact[[1]] <- eml_set_reference(eml@@dataset@@creator[[1]],
 #' eml@@dataset@@contact[[1]])
 #'
-#' # This is also useful when we want to set references to a subset of 'dataTable' or 'otherEntity' objects
-#' # Add a few more objects to illustrate the use
+#' # This is also useful when we want to set references to a subset of 'dataTable'
+#'   or 'otherEntity' objects
+#' # Add a few more objects first to illustrate the use:
 #' eml@@dataset@@dataTable[[3]] <- eml@@dataset@@dataTable[[1]]
 #' eml@@dataset@@dataTable[[4]] <- eml@@dataset@@dataTable[[1]]
-#' # Add references to the second and third elements
+#' # Add references to the second and third elements only (not the 4th):
 #' for (i in 2:3) {
-#'     eml@@dataset@@dataTable[[i]] <- eml_set_reference(eml@@dataset@@dataTable[[1]],
-#'                                                       eml@@dataset@@dataTable[[1]])
+#'     eml@@dataset@@dataTable[[i]]@@attributeList <- eml_set_reference(eml@@dataset@@dataTable[[1]]@@attributeList,
+#'                                                       eml@@dataset@@dataTable[[i]]@@attributeList)
 #' }
 #' # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
 #' eml@@dataset@@dataTable
@@ -1213,10 +1222,10 @@ eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTab
   if (!is.null(attributeList)) {
     x[[1]]@attributeList <- attributeList
   }
-  x[[1]]@id <- new('xml_attribute', uuid::UUIDgenerate(TRUE))
+  x[[1]]@attributeList@id <- new('xml_attribute', uuid::UUIDgenerate(TRUE))
   # Apply references to all other elements
   for (i in 2:n) {
-    x[[i]] <- eml_set_reference(x[[1]], x[[i]])
+    x[[i]]@attributeList <- eml_set_reference(x[[1]]@attributeList, x[[i]]@attributeList)
   }
 
   slot(eml@dataset, type) <- x
