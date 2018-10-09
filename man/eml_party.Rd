@@ -42,6 +42,10 @@ fine.
 The \code{userId} argument assumes an ORCID so be sure to adjust for that.
 }
 \examples{
+\dontrun{
 eml_party("creator", "Test", "User")
 eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+          c("Data Scientist", "Programmer"))
+}
 }
