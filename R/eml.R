@@ -343,10 +343,12 @@ clear_methods <- function(doc) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
 #' eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
 #'           c("Data Scientist", "Programmer"))
+#'}
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
                       sur_name=NULL,
@@ -448,10 +450,12 @@ eml_party <- function(type="associatedParty",
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' eml_creator("test", "user", email = "test@@user.com")
 #' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
 #' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
 #'             c("Data Scientist", "Programmer"))
+#'}
 eml_creator <- function(...) {
   eml_party("creator", ...)
 }
@@ -466,10 +470,12 @@ eml_creator <- function(...) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' eml_contact("test", "user", email = "test@@user.com")
 #' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
 #' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
 #'             c("Data Scientist", "Programmer"))
+#'}
 eml_contact <- function(...) {
   eml_party("contact", ...)
 }
