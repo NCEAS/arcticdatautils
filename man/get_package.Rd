@@ -4,7 +4,7 @@
 \alias{get_package}
 \title{Get a structured list of PIDs for the objects in a package.}
 \usage{
-get_package(node, pid, file_names = FALSE, rows = 1000)
+get_package(node, pid, file_names = FALSE, rows = 5000)
 }
 \arguments{
 \item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
@@ -14,7 +14,7 @@ get_package(node, pid, file_names = FALSE, rows = 1000)
 \item{file_names}{(logical) Whether to return file names for all objects.}
 
 \item{rows}{(numeric) The number of rows to return in the query. This is only
-useful to set if you are warned about the result set being truncated.}
+useful to set if you are warned about the result set being truncated. Defaults to 5000.}
 }
 \value{
 (list) A structured list of the members of the package.

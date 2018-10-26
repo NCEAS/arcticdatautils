@@ -2,7 +2,7 @@
 % Please edit documentation in R/access.R
 \name{set_access}
 \alias{set_access}
-\title{Set the access policy for a set of objects.}
+\title{Set the access policy for an object}
 \usage{
 set_access(mn, pids, subjects, permissions = c("read", "write",
   "changePermission"))
@@ -10,18 +10,20 @@ set_access(mn, pids, subjects, permissions = c("read", "write",
 \arguments{
 \item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) The object(s) to set the permissions on.}
+\item{pids}{(character) The PIDs of the objects to set permissions for.}
 
-\item{subjects}{(character) The subject(s) to set permissions for.}
+\item{subjects}{(character) The identifiers of the subjects to set permissions for, typially an ORCID or DN.}
 
-\item{permissions}{(character) Optional. Vector of permissions.}
+\item{permissions}{(character) Optional. The permissions to set. Defaults to
+read, write, and changePermission.}
 }
 \value{
-(logical) Named
+(logical) Whether an update was needed.
 }
 \description{
-For each permission, this function checks if the permission is already set
-and moves on. System Metadata are only updated when a change was needed.
+Set the access policy for the given subjects for the given objects on the given Member Node.
+For each type of permission, this function checks if the permission is already set
+and only updates the System Metadata when a change is needed.
 }
 \examples{
 \dontrun{

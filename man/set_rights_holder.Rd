@@ -2,25 +2,24 @@
 % Please edit documentation in R/access.R
 \name{set_rights_holder}
 \alias{set_rights_holder}
-\title{access.R}
+\title{Set the rights holder for an object}
 \usage{
 set_rights_holder(mn, pids, subject)
 }
 \arguments{
-\item{mn}{(MNode) The MNode instance to be changed.}
+\item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) The identifiers for the object to be changed.}
+\item{pids}{(character) The PIDs of the objects to set the rights holder for.}
 
-\item{subject}{(character) The identifier of the new rightsHolder, often an ORCID or DN.}
+\item{subject}{(character) The identifier of the new rights holder, typially an ORCID or DN.}
+}
+\value{
+(logical) Whether an update was needed.
 }
 \description{
-High-level utility functions for getting and setting access rules for DataONE
-objects.
-Set the rightsHolder field for a given PID.
-}
-\details{
-Update the rights holder to the provided subject for the object identified in
-the provided system metadata document on the given Member Node.
+Set the rights holder to the given subject for the given objects on the
+given Member Node. This function checks if the rights holder is already set
+and only updates the System Metadata when a change is needed.
 }
 \examples{
 \dontrun{

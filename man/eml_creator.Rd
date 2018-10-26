@@ -16,5 +16,10 @@ eml_creator(...)
 See \code{\link{eml_party}} for details.
 }
 \examples{
+\dontrun{
 eml_creator("test", "user", email = "test@user.com")
+eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+            c("Data Scientist", "Programmer"))
+}
 }

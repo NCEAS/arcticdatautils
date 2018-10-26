@@ -2,17 +2,17 @@
 % Please edit documentation in R/access.R
 \name{remove_public_read}
 \alias{remove_public_read}
-\title{Remove public access on a set of objects.}
+\title{Remove public read access for an object}
 \usage{
 remove_public_read(mn, pids)
 }
 \arguments{
-\item{mn}{(MNode)}
+\item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) A vector of PIDs to set public access on}
+\item{pids}{(character) The PIDs of the objects to remove public read access for.}
 }
 \description{
-Remove public access on a set of objects.
+Remove public read access for an object.
 }
 \examples{
 \dontrun{
