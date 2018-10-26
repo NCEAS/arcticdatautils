@@ -37,17 +37,25 @@ extract_local_identifier <- function(type, file) {
 }
 
 
-dataone_format_mappings <- list("avi" = "ideo/avi",
+dataone_format_mappings <- list("avi" = "video/avi",
                                 "bmp" = "image/bmp",
                                 "bz2" = "application/x-bzip2",
                                 "csv" = "text/csv",
+                                "doc" = "application/msword",
+                                "docx" = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                 "fasta" = "application/x-fasta",
                                 "gif" = "image/gif",
                                 "gz" = "application/x-gzip",
                                 "html" = "text/html",
+                                "ipynb" = "application/json",
+                                "jp2" = "image/jp2",
                                 "jpg" = "image/jpeg",
                                 "jpeg" = "image/jpeg",
                                 "kml" = "application/vnd.google-earth.kml/xml",
+                                "kmz" = "application/vnd.google-earth.kmz",
+                                "md" = "text/markdown",
+                                "mov" = "video/quicktime",
+                                "mp3" = "audio/mpeg",
                                 "mp4" = "video/mp4",
                                 "mpg" = "video/mpeg",
                                 "mpeg" = "video/mpeg",
@@ -56,13 +64,23 @@ dataone_format_mappings <- list("avi" = "ideo/avi",
                                 "pdf" = "application/pdf",
                                 "png" = "image/png",
                                 "ppt" = "application/vnd.ms-powerpoint",
+                                "pptx" = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                                 "py" = "application/x-python",
+                                "qt" = "video/quicktime",
+                                "r" = "application/R",
+                                "rar" = "application/x-rar-compressed",
                                 "rdf" = "application/rdf/xml",
+                                "rmd" = "text/x-rmarkdown",
+                                "sas" = "application/SAS",
+                                "svg" = "image/svg/xml",
                                 "tar" = "application/x-tar",
                                 "tif" = "image/tiff",
                                 "tiff" = "image/tiff",
                                 "ttl" = "text/turtle",
+                                "tsv" = "text/tsv",
                                 "txt" = "text/plain",
+                                "wav" = "audio/x-wav",
+                                "wma" = "audio/x-ms-wma",
                                 "wmv" = "video/x-ms-wmv",
                                 "xls" = "application/vnd.ms-excel",
                                 "xlsx" = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -103,14 +121,13 @@ guess_format_id <- function(filenames) {
 #' @param path (character) Full or relative path to the file in question.
 #'
 #' @return (character) The DataONE format ID.
-
 get_netcdf_format_id <- function(path) {
   stopifnot(is.character(path),
             nchar(path) > 0,
             file.exists(path))
 
   if (!requireNamespace("ncdf4")) {
-    stop(call. = FALSE, 
+    stop(call. = FALSE,
          "The package 'ncdf4' must be installed to run this function. ",
          "Please install it and try again.")
   }
@@ -768,7 +785,7 @@ get_all_versions <- function(node, pid) {
 #' @param pid (character) The the resource map PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated.
+#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
 #' @return (list) A structured list of the members of the package.
 #' @export
@@ -782,7 +799,7 @@ get_all_versions <- function(node, pid) {
 #'
 #' ids <- get_package(mn, pid)
 #' }
-get_package <- function(node, pid, file_names=FALSE, rows=1000) {
+get_package <- function(node, pid, file_names=FALSE, rows=5000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -793,7 +810,7 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
     resource_map_pids <- pid
   } else {
     warning(call. = FALSE,
-            paste0("The PID '", pid, "' is not for a Resource Map Object so the most likely candidate was found. This is usally fine! Specify a Resource Map PID instead to stop getting this warning."))
+            paste0("The PID '", pid, "' is not for a Resource Map Object so the most likely candidate was found. This is usually fine! Specify a Resource Map PID instead to stop getting this warning."))
     resource_map_pids <- find_newest_resource_map(node, pid)
   }
 
@@ -823,10 +840,10 @@ get_package <- function(node, pid, file_names=FALSE, rows=1000) {
 #' @param pid (character) The the metadata PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated.
+#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
 
-get_package_direct <- function(node, pid, file_names=FALSE, rows = 1000) {
+get_package_direct <- function(node, pid, file_names=FALSE, rows = 5000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)

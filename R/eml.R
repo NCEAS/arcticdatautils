@@ -41,7 +41,6 @@ pid_to_eml_entity <- function(mn,
                               "otherEntity"))
 
   systmeta <- getSystemMetadata(mn, pid)
-  physical <- sysmeta_to_eml_physical(systmeta)
 
   # Create entity
   entity <- new(entityType,
@@ -128,6 +127,7 @@ pid_to_eml_physical <- function(mn, pids) {
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pids),
             all(nchar(pids)) > 0)
+  names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
   sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
   sysmeta_to_eml_physical(sysmeta)
@@ -343,8 +343,12 @@ clear_methods <- function(doc) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'           c("Data Scientist", "Programmer"))
+#'}
 eml_party <- function(type="associatedParty",
                       given_names=NULL,
                       sur_name=NULL,
@@ -369,12 +373,12 @@ eml_party <- function(type="associatedParty",
 
   # Organization Name
   if (!is.null(organization)) {
-    party@organizationName <- c(new("organizationName", .Data = organization))
+    party@organizationName <- new('ListOforganizationName', lapply(organization, function(x) {new('organizationName', .Data = x)}))
   }
 
   # Position
   if (!is.null(position)) {
-    party@positionName <- c(new("positionName", .Data = position))
+    party@positionName <- new('ListOfpositionName', lapply(position, function(x) {new('positionName', .Data = x)}))
   }
 
   # Email
@@ -446,7 +450,12 @@ eml_party <- function(type="associatedParty",
 #' @export
 #'
 #' @examples
-#' eml_creator("test", "user", email = "test@user.com")
+#' \dontrun{
+#' eml_creator("test", "user", email = "test@@user.com")
+#' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'             c("Data Scientist", "Programmer"))
+#'}
 eml_creator <- function(...) {
   eml_party("creator", ...)
 }
@@ -461,7 +470,12 @@ eml_creator <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_contact("test", "user", email = "test@user.com")
+#' \dontrun{
+#' eml_contact("test", "user", email = "test@@user.com")
+#' eml_creator("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_creator("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
+#'             c("Data Scientist", "Programmer"))
+#'}
 eml_contact <- function(...) {
   eml_party("contact", ...)
 }
@@ -477,7 +491,7 @@ eml_contact <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_metadata_provider("test", "user", email = "test@user.com")
+#' eml_metadata_provider("test", "user", email = "test@@user.com")
 eml_metadata_provider <- function(...) {
   eml_party("metadataProvider", ...)
 }
@@ -492,7 +506,7 @@ eml_metadata_provider <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_associated_party("test", "user", email = "test@user.com", role = "Principal Investigator")
+#' eml_associated_party("test", "user", email = "test@@user.com", role = "Principal Investigator")
 eml_associated_party <- function(...) {
   eml_party("associatedParty", ...)
 }
@@ -507,7 +521,7 @@ eml_associated_party <- function(...) {
 #' @export
 #'
 #' @examples
-#' eml_personnel("test", "user", email = "test@user.com", role = "principalInvestigator")
+#' eml_personnel("test", "user", email = "test@@user.com", role = "principalInvestigator")
 eml_personnel <- function(role = NULL, ...) {
   if(is.null(role)) {
     stop(call. = FALSE,
@@ -995,6 +1009,8 @@ eml_add_entities <- function(doc,
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
+#' @importFrom magrittr '%>%'
+#'
 #' @export
 #'
 #' @examples
@@ -1121,4 +1137,103 @@ which_in_eml <- function(eml_list, element, test) {
   }))
 
   return(location)
+}
+
+
+#' Set a reference to an EML object
+#'
+#' This function creates a new object with the same class as \code{element_to_replace}
+#' using a reference to \code{element_to_reference}
+#'
+#' @param element_to_reference (S4) An EML object to reference
+#' @param element_to_replace (S4) An EML object to replace with a reference
+#'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#'
+#' # Set the first contact as a reference to the first creator
+#' eml@@dataset@@contact[[1]] <- eml_set_reference(eml@@dataset@@creator[[1]],
+#' eml@@dataset@@contact[[1]])
+#'
+#' # This is also useful when we want to set references to a subset of 'dataTable'
+#'   or 'otherEntity' objects
+#' # Add a few more objects first to illustrate the use:
+#' eml@@dataset@@dataTable[[3]] <- eml@@dataset@@dataTable[[1]]
+#' eml@@dataset@@dataTable[[4]] <- eml@@dataset@@dataTable[[1]]
+#' # Add references to the second and third elements only (not the 4th):
+#' for (i in 2:3) {
+#'     eml@@dataset@@dataTable[[i]]@@attributeList <- eml_set_reference(eml@@dataset@@dataTable[[1]]@@attributeList,
+#'                                                       eml@@dataset@@dataTable[[i]]@@attributeList)
+#' }
+#' # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
+#' eml@@dataset@@dataTable
+#' }
+eml_set_reference <- function(element_to_reference, element_to_replace) {
+  if (length(element_to_reference@id) == 0) {
+    stop('No id detected at element_to_reference@id. Please add an id in order to use references.')
+  }
+  id <- element_to_reference@id[1]
+  class <- class(element_to_replace)[1]
+  element_to_replace <- new(class, reference = id)
+  return(element_to_replace)
+}
+
+
+#' Set shared attribute references
+#'
+#' This function sets shared attributes using the attributes of the first \code{type}
+#' selected and creates references for all remaining objects of equivalent \code{type}.
+#'
+#' @param eml (S4) An EML S4 object
+#' @param attributeList (S4) Optional. An EML attributeList object. If not provided then it will default to the attributeList of the first \code{type} element
+#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList objects with references. Defaults to 'dataTable'
+#'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#' atts <- EML::set_attributes(EML::get_attributes(eml@@dataset@@dataTable[[1]]@@attributeList)$attributes)
+#'
+#' eml <- eml_set_shared_attributes(eml, atts, type = 'dataTable')
+#'
+#' }
+eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTable') {
+  stopifnot(methods::is(eml, 'eml'))
+  if(!is.null(attributeList)) {
+    stopifnot(methods::is(attributeList, 'attributeList'))
+  }
+  stopifnot(type %in% c('dataTable', 'otherEntity'))
+
+  x <- slot(eml@dataset, type)
+  n <- length(x)
+  if (n <= 1) {
+    stop('1 or fewer entities') # add message
+  }
+
+  # If a new attributeList is provided set it
+  if (!is.null(attributeList)) {
+    x[[1]]@attributeList <- attributeList
+  }
+  x[[1]]@attributeList@id <- new('xml_attribute', uuid::UUIDgenerate(TRUE))
+  # Apply references to all other elements
+  for (i in 2:n) {
+    x[[i]]@attributeList <- eml_set_reference(x[[1]]@attributeList, x[[i]]@attributeList)
+  }
+
+  slot(eml@dataset, type) <- x
+  return(eml)
 }

@@ -303,30 +303,144 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 }
 
 
-#' Get system metadata for all objects in a data package
+#' Create dummy package with fuller metadata
 #'
-#' This function retrieves the system metadata for all objects in a data package and returns them as a list.
+#' Creates a fuller package than \code{\link{create_dummy_package}}
+#' but is otherwise based on the same concept. This dummy
+#' package includes multiple data objects, responsible parties,
+#' geographic locations, method steps, etc.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param title (character) Optional. Title of package. Defaults to "A Dummy Package".
+#'
+#' @import EML
+#' @import dataone
+#'
+#' @export
+create_dummy_package_full <- function(mn, title = "A Dummy Package") {
+  stopifnot(is(mn, "MNode"))
+  stopifnot(is.character(title), nchar(title) > 0)
+  if (mn@env == "prod") {
+    stop("Cannot create dummy package on production node.")
+  }
+
+  # Create objects
+  file.create(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"))
+  # TODO: add actual data to dummy files
+
+  pid_csv1 <- publish_object(mn,
+                             path = "dummy1.csv",
+                             format_id = "text/csv")
+
+  pid_csv2 <- publish_object(mn,
+                             path = "dummy2.csv",
+                             format_id = "text/csv")
+
+  pid_jpg1 <- publish_object(mn,
+                             path = "dummy1.jpg",
+                             format_id = "image/jpeg")
+
+  pid_R1 <- publish_object(mn,
+                           path = "dummy1.R",
+                           format_id = "application/R")
+
+  data_pids <- c(pid_csv1, pid_csv2, pid_jpg1, pid_R1)
+
+  # Import EML
+  eml_path_original <- file.path(system.file(package = "arcticdatautils"), "example-eml-full.xml")
+  eml <- EML::read_eml(eml_path_original)
+
+  # Add objects to EML
+  eml@dataset@title[[1]]@.Data <- title
+
+  attr <- data.frame(
+    attributeName = c("Date", "Location", "Salinity", "Temperature"),
+    attributeDefinition = c("Date sample was taken on", "Location code representing location where sample was taken", "Salinity of sample in PSU", "Temperature of sample"),
+    measurementScale = c("dateTime", "nominal","ratio", "interval"),
+    domain = c("dateTimeDomain", "enumeratedDomain","numericDomain", "numericDomain"),
+    formatString = c("MM-DD-YYYY", NA, NA, NA),
+    definition = c(NA,NA, NA, NA),
+    unit = c(NA, NA, "dimensionless", "celsius"),
+    numberType = c(NA, NA, "real", "real"),
+    missingValueCode = c(NA, NA, NA, NA),
+    missingValueCodeExplanation = c(NA, NA, NA, NA),
+    stringsAsFactors = FALSE)
+
+  location <- c(CASC = "Cascade Lake", CHIK = "Chikumunik Lake", HEAR = "Heart Lake", NISH = "Nishlik Lake")
+  fact <- data.frame(attributeName = "Location", code = names(location), definition = unname(location))
+
+  attributeList <- EML::set_attributes(attributes = attr, factors = fact)
+
+  dT1 <- pid_to_eml_entity(mn,
+                           pid = pid_csv1,
+                           entityType = "dataTable")
+  dT1@attributeList <- attributeList
+
+  dT2 <- pid_to_eml_entity(mn,
+                           pid = pid_csv2,
+                           entityType = "dataTable")
+  dT2@attributeList <- attributeList
+
+  eml@dataset@dataTable <- c(dT1, dT2)
+
+  oE1 <- pid_to_eml_entity(mn,
+                           pid = pid_jpg1,
+                           entityType = "otherEntity")
+
+  oE2 <- pid_to_eml_entity(mn,
+                           pid = pid_R1,
+                           entityType = "otherEntity")
+
+  eml@dataset@otherEntity <- c(oE1, oE2)
+
+  eml_path <- tempfile(fileext = ".xml")
+  EML::write_eml(eml, eml_path)
+
+  pid_eml <- publish_object(mn,
+                            path = eml_path,
+                            format_id = "eml://ecoinformatics.org/eml-2.1.1")
+
+  # Create resource map
+  resource_map_pid <- create_resource_map(mn,
+                                          metadata_pid = pid_eml,
+                                          data_pids = data_pids)
+
+  file.remove(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"), eml_path)
+
+  return(list(resource_map = resource_map_pid,
+              metadata = pid_eml,
+              data = data_pids))
+}
+
+
+#' Get system metadata for all elements of a data package
+#'
+#' This function retrieves the system metadata for all elements of a data package and returns them as a list.
 #' It is useful for inspecting system metadata for an entire data package and identifying changes where needed.
 #'
-#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on.
-#' @param rm_pid (character) The resource map PID of the package.
-#' @param nmax (numeric) Default 1000. The maximum number of object system metadata to return. The default is sufficient to get system metadata for all objects in most packages.
-#' @param child_packages (logical) Default FALSE. If parent package, whether or not to include objects of child packages.
+#' @param mn (MNode) The Member Node to query.
+#' @param resource_map_pid (character) The PID for a resource map.
+#' @param nmax (numeric) The maximum number of system metadata objects to return.
+#' @param child_packages (logical) If parent package, whether or not to include child packages.
 #'
-#' @return (list) A structured list of system metadata.
+#' @return (list) A list of system metadata objects.
 #'
-#' @keywords internal
+#' @import dataone
+#' @importFrom methods is
+#' @importFrom methods new
+#'
+#' @export
 #'
 #' @examples
 #'\dontrun{
-#' # Set environment
-#' cn_staging <- CNode("STAGING2")
-#' knb_test <- getMNode(cn_staging, "urn:node:mnTestKNB")
-#' rm_pid <- "resource_map_urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+#' cn_staging <- CNode("STAGING")
+#' adc_test <- getMNode(cn_staging, "urn:node:mnTestARCTIC")
 #'
-#' all <- get_all_sysmeta(knb_test, rm_pid)
+#' rm_pid <- "resource_map_urn:uuid:..."
 #'
-#' # View in RStudio data viewer to inspect
+#' all <- get_all_sysmeta(adc_test, rm_pid)
+#'
+#' # View in viewer to inspect
 #' View(all)
 #'
 #' # Print specific elements to console
@@ -335,23 +449,24 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 #' # Create separate object
 #' sysmeta_md <- all[[2]]
 #' }
-get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
-  stopifnot(class(node) %in% c("MNode", "CNode"))
-  stopifnot(is.character(rm_pid), nchar(rm_pid) > 0, length(rm_pid) == 1)
+get_all_sysmeta <- function(mn, resource_map_pid, nmax = 1000, child_packages = FALSE) {
+  stopifnot(methods::is(mn, "MNode"))
+  stopifnot(is.character(resource_map_pid), nchar(resource_map_pid) > 0, length(resource_map_pid) == 1)
+  stopifnot(is_resource_map(mn, resource_map_pid))
   stopifnot(is.numeric(nmax), length(nmax) == 1 , nmax >= 0)
   stopifnot(is.logical(child_packages), length(child_packages) == 1)
-  stopifnot(is_resource_map(node, rm_pid))
 
-  query_params <- paste("identifier:", rm_pid, "+OR+resourceMap:", rm_pid, "", sep = "\"")
-  response <- dataone::query(node, list(q = query_params, rows = as.character(nmax)))
+  query_params <- paste("identifier:", resource_map_pid, "+OR+resourceMap:", resource_map_pid, "", sep = "\"")
+  response <- dataone::query(mn, list(q = query_params, rows = as.character(nmax)))
 
   if (length(response) == 0) {
-    stop(paste0("No results were found when searching for a package with resource map '", rm_pid,
+    stop(paste0("No results were found when searching for a package with resource map '", resource_map_pid,
                 "'.\nThis could be caused by not having appropriate access to read the resource map."))
   }
 
   if (length(response) == nmax) {
-    warning("Query returned the maximum number of objects. It is possible there are more to retrieve. \nSpecify a larger number of objects with the 'nmax' argument.")
+    warning(paste("Query returned the maximum number of objects. It is possible there are more to retrieve.",
+                  "\nSpecify a larger number of objects with the 'nmax' argument."))
   }
 
   # Check if child package
@@ -365,9 +480,9 @@ get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
       children <- Filter(function(x) x$formatType == "RESOURCE", response[2:length(response)])
       children2 <- vector("list", length(children))
       for (i in seq_along(children)) {
-        child_rm_pid <- children[[i]]$identifier
-        query_params2 <- paste("identifier:", child_rm_pid, "+OR+resourceMap:", child_rm_pid, "", sep = "\"")
-        children2[[i]] <- dataone::query(node, list(q = query_params2, rows = as.character(nmax)))
+        child_resource_map_pid <- children[[i]]$identifier
+        query_params2 <- paste("identifier:", child_resource_map_pid, "+OR+resourceMap:", child_resource_map_pid, "", sep = "\"")
+        children2[[i]] <- dataone::query(mn, list(q = query_params2, rows = as.character(nmax)))
       }
     }
   }
@@ -384,7 +499,6 @@ get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
     sysmeta@checksumAlgorithm <- if (is.null(x$checksumAlgorithm)) {sysmeta@checksumAlgorithm} else {x$checksumAlgorithm}
     sysmeta@submitter <- if (is.null(x$submitter)) {sysmeta@submitter} else {x$submitter}
     sysmeta@rightsHolder <- if (is.null(x$rightsHolder)) {sysmeta@rightsHolder} else {x$rightsHolder}
-
     read <- if (is.null(x$readPermission)) {} else {data.frame(subject = unlist(x$readPermission),
                                                                permission = "read")}
     write <- if (is.null(x$writePermission)) {} else {data.frame(subject = unlist(x$writePermission),
@@ -392,7 +506,6 @@ get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
     change <- if (is.null(x$changePermission)) {} else {data.frame(subject = unlist(x$changePermission),
                                                                    permission = "changePermission")}
     sysmeta@accessPolicy <- rbind(read, write, change)
-
     sysmeta@replicationAllowed <- if (is.null(x$replicationAllowed)) {sysmeta@replicationAllowed} else {x$replicationAllowed}
     sysmeta@numberReplicas <- if (is.null(x$numberReplicas)) {sysmeta@numberReplicas} else {x$numberReplicas}
     sysmeta@preferredNodes <- if (is.null(x$preferredReplicationMN)) {sysmeta@preferredNodes} else {x$preferredReplicationMN}
@@ -412,13 +525,7 @@ get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
     return(sysmeta)
   }
 
-  if (child_packages == FALSE) {
-    all <- lapply(response, translate)
-    names(all) <- unlist(lapply(all, function(x) {x@fileName}))
-    for (i in seq_along(all)) {
-      if (is.na(names(all)[i])) {names(all)[i] <- paste0("missing_fileName", i)}
-    }
-  } else {
+  if (child_packages) {
     other <- Filter(function(x) x$formatType != "RESOURCE", response[2:length(response)])
     response2 <- c(list(response[[1]]), other)
     parent <- lapply(response2, translate)
@@ -437,6 +544,12 @@ get_all_sysmeta <- function(node, rm_pid, nmax = 1000, child_packages = FALSE) {
     names(child) <- paste0("child", seq_along(child))
 
     all <- c(parent, child)
+  } else {
+    all <- lapply(response, translate)
+    names(all) <- unlist(lapply(all, function(x) {x@fileName}))
+    for (i in seq_along(all)) {
+      if (is.na(names(all)[i])) {names(all)[i] <- paste0("missing_fileName", i)}
+    }
   }
 
   return(all)

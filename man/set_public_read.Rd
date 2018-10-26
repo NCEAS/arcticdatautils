@@ -2,17 +2,20 @@
 % Please edit documentation in R/access.R
 \name{set_public_read}
 \alias{set_public_read}
-\title{Set public access on a set of objects.}
+\title{Set public read access for an object}
 \usage{
 set_public_read(mn, pids)
 }
 \arguments{
-\item{mn}{(MNode)}
+\item{mn}{(MNode) The Member Node.}
 
-\item{pids}{(character) A vector of PIDs to set public access on}
+\item{pids}{(character) The PIDs of the objects to set public read access for.}
+}
+\value{
+(logical) Whether an update was needed.
 }
 \description{
-Set public access on a set of objects.
+Set public read access for an object.
 }
 \examples{
 \dontrun{

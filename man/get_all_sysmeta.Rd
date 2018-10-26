@@ -2,36 +2,37 @@
 % Please edit documentation in R/helpers.R
 \name{get_all_sysmeta}
 \alias{get_all_sysmeta}
-\title{Get system metadata for all objects in a data package}
+\title{Get system metadata for all elements of a data package}
 \usage{
-get_all_sysmeta(node, rm_pid, nmax = 1000, child_packages = FALSE)
+get_all_sysmeta(mn, resource_map_pid, nmax = 1000,
+  child_packages = FALSE)
 }
 \arguments{
-\item{node}{(MNode/CNode) The Coordinating/Member Node to run the query on.}
+\item{mn}{(MNode) The Member Node to query.}
 
-\item{rm_pid}{(character) The resource map PID of the package.}
+\item{resource_map_pid}{(character) The PID for a resource map.}
 
-\item{nmax}{(numeric) Default 1000. The maximum number of object system metadata to return. The default is sufficient to get system metadata for all objects in most packages.}
+\item{nmax}{(numeric) The maximum number of system metadata objects to return.}
 
-\item{child_packages}{(logical) Default FALSE. If parent package, whether or not to include objects of child packages.}
+\item{child_packages}{(logical) If parent package, whether or not to include child packages.}
 }
 \value{
-(list) A structured list of system metadata.
+(list) A list of system metadata objects.
 }
 \description{
-This function retrieves the system metadata for all objects in a data package and returns them as a list.
+This function retrieves the system metadata for all elements of a data package and returns them as a list.
 It is useful for inspecting system metadata for an entire data package and identifying changes where needed.
 }
 \examples{
 \dontrun{
-# Set environment
-cn_staging <- CNode("STAGING2")
-knb_test <- getMNode(cn_staging, "urn:node:mnTestKNB")
-rm_pid <- "resource_map_urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
+cn_staging <- CNode("STAGING")
+adc_test <- getMNode(cn_staging, "urn:node:mnTestARCTIC")
 
-all <- get_all_sysmeta(knb_test, rm_pid)
+rm_pid <- "resource_map_urn:uuid:..."
 
-# View in RStudio data viewer to inspect
+all <- get_all_sysmeta(adc_test, rm_pid)
+
+# View in viewer to inspect
 View(all)
 
 # Print specific elements to console
@@ -41,4 +42,3 @@ all[[1]]@rightsHolder
 sysmeta_md <- all[[2]]
 }
 }
-\keyword{internal}
