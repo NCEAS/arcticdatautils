@@ -554,3 +554,91 @@ get_all_sysmeta <- function(mn, resource_map_pid, nmax = 1000, child_packages = 
 
   return(all)
 }
+
+#' Retrieve a name from an orcid ID URL
+#'
+#' Retrieve first and last name from an orcid ID URL by scraping the page.
+#'
+#' @param orcid_url (character) A valid orcid ID URL address
+#'
+#' @return character
+#'
+#' @examples
+#' \dontrun{
+#' pi_name <- get_orcid_name('https://orcid.org/0000-0002-2561-5840')
+#' }
+get_orcid_name <- function(orcid_url) {
+  req <- httr::GET(orcid_url)
+  if(req$status_code != 200) {
+    stop('Failed to read in ', orcid_url)
+  }
+
+  name <- httr::content(req, "text") %>%
+    stringr::str_extract("<title>.*<") %>%
+    stringr::str_split(" ") %>%
+    unlist() %>%
+    stringr::str_remove("<title>")
+
+  return(paste(name[1], name[2]))
+}
+
+#' List recent submissions to a DataOne Member Node
+#'
+#' List recent submissions to a DataOne Member Node from all submitters not present
+#' in the administrator whitelist: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
+#'
+#' @param mn (MNode) A DataOne Member Node
+#' @param from (character) the date at which the query begins in 'YYYY/MM/DD' format
+#' @param to (character) the date at which the query ends in 'YYYY/MM/DD' format
+#' @param formatType (character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
+#'
+#' @export
+#'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
+#' @examples
+#' \dontrun{
+#' library(lubridate)
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#' # Return all submitted objects in the past month for the 'adc' node:
+#' View(list_submissions(adc, Sys.Date() %m+% months(-1), Sys.Date(), '*'))
+#' }
+list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType = '*') {
+  if (!is_token_set(mn)) {
+    stop('No token set')
+  }
+  stopifnot(methods::is(mn, 'MNode'))
+  if (!(is.Date(as.Date(from, '%Y/%M/%D')))){
+    stop('"from" argument must be in YYYY/MM/DD format')
+  }
+  if (!(is.Date(as.Date(to, '%Y/%M/%D')))){
+    stop('"to" argument must be in YYYY/MM/DD format')
+  }
+  if (!(formatType %in% c('RESOURCE', 'METADATA', 'DATA', '*'))) {
+    stop('formatType must be one of: RESOURCE, METADATA, DATA, or *')
+  }
+
+  q = sprintf('dateUploaded:["%sT00:00:00Z" TO "%sT00:00:00Z"] AND formatType:%s', from, to, formatType)
+  results <- dataone::query(mn, list(q = q,
+                                      fl = "identifier AND submitter AND dateUploaded AND formatType AND fileName",
+                                      rows = 10000),
+                            as = "data.frame")
+
+  whitelist <- httr::GET("https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org")
+  if(whitelist$status_code != 200) {
+    warning('Failed to read in the whitelist: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org of orcid Ids. Results will include admin submissions / edits.')
+  }
+  whitelist <- httr::content(whitelist, "text")
+
+  # Remove rows from admin whitelist members
+  results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
+
+  # Get orcid names
+  results$submitter_name <- purrr::map(results$submitter, get_orcid_name)
+
+  # Arrange by dateUploaded
+  results <- dplyr::arrange(results, dateUploaded)
+
+  return(results)
+}
