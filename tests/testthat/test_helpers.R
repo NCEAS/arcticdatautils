@@ -50,3 +50,14 @@ test_that("all system metadata is retrieved", {
 
   expect_message(get_all_sysmeta(adc_test, "resource_map_urn:uuid:924f81f6-2e68-4eb8-925f-53f5b66318ec"))
 })
+
+test_that('list_submissions returns correct output', {
+  cn <- dataone::CNode('PROD')
+  adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+  if (!is_token_set(adc)) {
+    skip("No token set. Skipping test.")
+  }
+
+  out <- list_submissions(adc, '2018-10-01', '2018-10-03')
+  expect_equal(out$submitter_name[1], 'Baptiste Vandecrux')
+})
