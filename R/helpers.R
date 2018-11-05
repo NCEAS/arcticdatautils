@@ -591,9 +591,7 @@ get_orcid_name <- function(orcid_url) {
 #' @param from (character) the date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}
 #' @param to (character) the date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}
 #' @param formatType (character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
-#' @param whitelist (character) A list of admin orcid Identifiers.  Can be a URL or a
-#' character vector of length 1.
-#' Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
+#' @param whitelist (character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
 #'
 #' @export
 #'
@@ -633,14 +631,11 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
     stop('formatType must be one of: RESOURCE, METADATA, DATA, or *')
   }
 
-  # Check if whitelist is a URL - if true then GET and return text content
-  if(RCurl::url.exists(whitelist)) {
-    req <- httr::GET(whitelist)
-    if(req$status_code != 200) {
-      warning('Failed to read in', whitelist, '. Results will include admin submissions / edits.')
-    }
-    whitelist <- httr::content(req, "text")
+  req <- httr::GET(whitelist)
+  if(req$status_code != 200) {
+    warning('Failed to read in', whitelist, '. Results will include admin submissions / edits.')
   }
+  whitelist <- httr::content(req, "text")
 
   # Construct query and return results
   q = sprintf('dateUploaded:["%sT00:00:00Z" TO "%sT00:00:00Z"] AND formatType:%s', from, to, formatType)
@@ -653,10 +648,10 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
   results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
 
   # Return full names based on orcid Id
-  results$submitter_name <- purrr::map(results$submitter, get_orcid_name)
+  results$submitter_name <- purrr::map(results$submitter, get_orcid_name) %>% unlist()
 
   # Arrange by dateUploaded
-  results <- dplyr::arrange(results, dateUploaded)
+  #results <- dplyr::arrange(results, dateUploaded)
 
   return(results)
 }
