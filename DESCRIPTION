@@ -33,12 +33,15 @@ Encoding: UTF-8
 LazyData: true
 Suggests:
     dplyr,
-    testthat,
     humaniformat,
     knitr,
+    lubridate,
     ncdf4,
+    RCurl,
+    purrr,
     rmarkdown,
-    yaml,
-    xslt
+    testthat,
+    xslt,
+    yaml
 RoxygenNote: 6.1.0
 VignetteBuilder: knitr
