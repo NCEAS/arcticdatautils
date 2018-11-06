@@ -651,7 +651,7 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
   results$submitter_name <- purrr::map(results$submitter, get_orcid_name) %>% unlist()
 
   # Arrange by dateUploaded
-  #results <- dplyr::arrange(results, dateUploaded)
+  results <- dplyr::arrange(results, dateUploaded)
 
   return(results)
 }
