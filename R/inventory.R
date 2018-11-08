@@ -1,23 +1,21 @@
-#' inventory.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
-#'
-#' Functions relating to keeping up an inventory of files that exist on the KNB
-#' and may or may not be copied to another computer and untarred.
-#'
+# Functions relating to keeping up an inventory of files that exist on the KNB
+# and may or may not be copied to another computer and untarred
 
 
-#' Create an empty inventory data.frame. This doesn't need to be a function
-#' but I'm making it one in case the initialization routine becomes more
-#' complicated.
+#' Create an empty inventory data.frame
 #'
-#' @return An empty data frame
-
+#' @return (data.frame) An empty data.frame.
+#'
+#' @noRd
 inv_init <- function() {
   inventory <- data.frame(stringsAsFactors = FALSE)
 
   inventory
 }
 
+
+#' Load files into the inventory from a text file
+#'
 #' Load files into the inventory from a text file.
 #'
 #' Files should be the output of the command:
@@ -25,11 +23,12 @@ inv_init <- function() {
 #'   you@server:/path/to/acadis$ find . -type f
 #'
 #' @param path (character) Path to a file containing a file listing.
-#' @param inventory (character) A \code{data.frame}.
-#' @param filter (logical) Filter out versioned datasets. Default is TRUE.
+#' @param inventory (character) A data.frame.
+#' @param filter (logical) Whether or not to filter out versioned datasets.
 #'
-#' @return An inventory (data.frame)
-
+#' @return (data.frame) An inventory.
+#'
+#' @noRd
 inv_load_files <- function(inventory, path, filter=TRUE) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -55,7 +54,7 @@ inv_load_files <- function(inventory, path, filter=TRUE) {
   # Filter out versioned datasets
   if (filter) {
     size_before <- nrow(files)
-    files <- files[grep("v_\\d\\.\\d", files$file, invert = TRUE), "file", drop=FALSE]
+    files <- files[grep("v_\\d\\.\\d", files$file, invert = TRUE), "file", drop = FALSE]
 
     size_diff <- size_before - nrow(files)
     if (size_diff > 0) { cat("Removed", size_diff, "file(s) that were part of versioned datasets.\n") }
@@ -95,15 +94,17 @@ inv_load_files <- function(inventory, path, filter=TRUE) {
   inventory
 }
 
-#' Load file sizes into an inventory from a text file. Removes the column
-#' 'size_bytes' from inventory before doing a left join.
+
+#' Load file sizes into an inventory from a text file
+#'
+#' Removes the column 'size_bytes' from inventory before doing a left join.
 #'
 #' @param path (character) Path to a file containing sizes.
-#' @param inventory (data.frame) inventory A \code{data.frame}.
+#' @param inventory (data.frame) A data.frame.
 #'
-#' @return (data.frame) An inventory
+#' @return (data.frame) An inventory.
 #'
-
+#' @noRd
 inv_load_sizes <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -134,16 +135,18 @@ inv_load_sizes <- function(inventory, path) {
   inventory
 }
 
-#' Load checksums into the inventory file from a text file. This function
-#' removes the column 'checksum_sha256' from inventory before doing a
+
+#' Load checksums into the inventory file from a text file
+#'
+#' This function removes the column 'checksum_sha256' from inventory before doing a
 #' left join.
 #'
 #' @param path (character) Path to a file containing sizes.
 #' @param inventory (data.frame) An inventory.
 #'
-#' @return An inventory (data.frame)
+#' @return (data.frame) An inventory.
 #'
-
+#' @noRd
 inv_load_checksums <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot("inventory" %in% ls(),
@@ -182,14 +185,16 @@ inv_load_checksums <- function(inventory, path) {
 }
 
 
-#' Load DOIs from a text file into the Inventory.
+#' Load DOIs from a text file into the inventory
 #'
-#' @param path Location of a text file with DOIs and file paths. (character)
+#' Load DOIs from a text file into the inventory.
+#'
+#' @param path (character) Location of a text file with DOIs and file paths.
 #' @param inventory (data.frame) An inventory.
 #'
-#' @return (data.frame) The modified Inventory.
+#' @return (data.frame) The modified inventory.
 #'
-
+#' @noRd
 inv_load_dois <- function(inventory, path) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
@@ -213,8 +218,10 @@ inv_load_dois <- function(inventory, path) {
   inventory
 }
 
-#' Load identifiers into the inventory file(s) from a text file. This function
-#' removes the column 'identifier' from inventory before doing a
+
+#' Load identifiers into the inventory file(s) from a text file
+#'
+#' This function removes the column 'identifier' from inventory before doing a
 #' left join.
 #'
 #' @param paths (character) Path(s) to files containing identifiers.
@@ -222,7 +229,7 @@ inv_load_dois <- function(inventory, path) {
 #'
 #' @return (data.frame) An inventory.
 #'
-
+#' @noRd
 inv_load_identifiers <- function(inventory, paths) {
   stopifnot(file.exists(path))
   stopifnot(is.data.frame(inventory),
@@ -252,14 +259,17 @@ inv_load_identifiers <- function(inventory, paths) {
   inventory
 }
 
-#' Adds a set of extra columsn to the inventory that are useful for working
+
+#' Add a set of extra columns to the inventory
+#'
+#' Add a set of extra columns to the inventory that are useful for working
 #' with them.
 #'
 #' @param inventory (data.frame) An inventory.
 #'
-#' @return An inventory (data.frame)
+#' @return (data.frame) An inventory.
 #'
-
+#' @noRd
 inv_add_extra_columns <- function(inventory) {
   stopifnot(is(inventory, "data.frame"), "file" %in% names(inventory))
 
@@ -345,15 +355,13 @@ inv_add_extra_columns <- function(inventory) {
 }
 
 
-
-
-
-#' Add a column for parent packages.
+#' Add a column for parent packages
 #'
-#' @param inventory (data.frame) An Inventory.
+#' @param inventory (data.frame) An inventory.
 #'
-#' @return inventory (data.frame) An Inventory.
-
+#' @return (data.frame) An inventory.
+#'
+#' @noRd
 inv_add_parent_package_column <- function(inventory) {
   stopifnot(all(c("file", "package", "is_metadata", "depth") %in% names(inventory)))
 
@@ -417,13 +425,12 @@ inv_add_parent_package_column <- function(inventory) {
 }
 
 
-
-#' Update an Inventory with a new Inventory.
+#' Update an inventory with a new inventory
 #'
-#' @param inventory (data.frame) The old Inventory.
-#' @param new_state (data.frame) The new Inventory.
+#' @param inventory (data.frame) The old inventory.
+#' @param new_state (data.frame) The new inventory.
 #'
-
+#' @noRd
 inv_update <- function(inventory, new_state) {
   stopifnot(is.data.frame(inventory),
             is.data.frame(new_state),
@@ -451,5 +458,3 @@ inv_update <- function(inventory, new_state) {
 
   inventory
 }
-
-

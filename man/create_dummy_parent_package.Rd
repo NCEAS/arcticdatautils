@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_parent_package}
 \alias{create_dummy_parent_package}
-\title{Create a test parent package.}
+\title{Create a test parent package}
 \usage{
 create_dummy_parent_package(mn, children)
 }
@@ -12,10 +12,10 @@ create_dummy_parent_package(mn, children)
 \item{children}{(character) Child package (resource maps) PIDs.}
 }
 \value{
-pid (character) Named character vector of PIDs including parent package and child package pids.
+pid (character) A named character vector of PIDs, including parent package and child package PIDs.
 }
 \description{
-Create a test parent package.
+Create a test parent data package.
 }
 \examples{
 \dontrun{

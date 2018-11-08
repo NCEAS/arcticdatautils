@@ -1,8 +1,14 @@
+# Functions for editing metadata attributes
+
+
 #' Get a data.frame of attributes from a NetCDF object
 #'
-#' @param nc (ncdf4 or character) Either a ncdf4 object or a file path
+#' Get a data.frame of attributes from a NetCDF object.
 #'
-#' @return (data.frame) A data.frame of the attributes
+#' @param nc (ncdf4/character) Either a ncdf4 object or a file path.
+#'
+#' @return (data.frame) A data.frame of the attributes.
+#'
 #' @export
 #'
 #' @examples
@@ -13,11 +19,11 @@ get_ncdf4_attributes <- function(nc) {
   stopifnot(is(nc, "ncdf4") || file.exists(nc))
 
   if (!requireNamespace("ncdf4")) {
-    stop(call. = FALSE, 
+    stop(call. = FALSE,
          "The package 'ncdf4' must be installed to run this function. ",
          "Please install it and try again.")
   }
-  
+
   # Read the file in if `nc` is a character vector
   if (is.character(nc)) {
     nc <- ncdf4::nc_open(nc)
@@ -26,7 +32,7 @@ get_ncdf4_attributes <- function(nc) {
 
 
   unitlist <- c()
-  for (i in 1:length(dims)){
+  for (i in 1:length(dims)) {
     unitlist[i] <- dims[[i]]$units
   }
   inds <- which(unitlist != '')
@@ -35,7 +41,7 @@ get_ncdf4_attributes <- function(nc) {
 
   attributes <- c(names(nc$var), attributes(dims)$names)
 
-  result <- data.frame(attributeName=NA)
+  result <- data.frame(attributeName = NA)
 
   for (i in seq_along(attributes)) {
     result[i,"attributeName"] <- attributes[i]
@@ -49,4 +55,3 @@ get_ncdf4_attributes <- function(nc) {
 
   result
 }
-

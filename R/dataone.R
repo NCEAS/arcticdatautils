@@ -1,12 +1,14 @@
-#' dataone.R
-#'
-#' Helpers for the DataONE R package.
+# Helper functions for the dataone package
 
+
+#' Test whether a token is set
+#'
 #' Test whether a token is set.
 #'
-#' @param node (MNode|CNode) The CN or MN you want to find a token for.
+#' @param node (MNode/CNode) The Member/Coordinating Node to query.
 #'
 #' @return (logical)
+#'
 #' @export
 #'
 #' @examples
@@ -27,11 +29,14 @@ is_token_set <- function(node) {
 }
 
 
-#' Gets the currently set authentication token.
+#' Get the currently set authentication token
 #'
-#' @param node (MNode|CNode) The CN or MN you want to find a token for.
+#' Get the currently set authentication token.
+#'
+#' @param node (MNode/CNode) The Member/Coordinating Node to query.
 #'
 #' @return (character) The token.
+#'
 #' @export
 #'
 #' @examples
@@ -59,17 +64,22 @@ get_token <- function(node) {
 }
 
 
+#' Determine whether token is expired
+#'
 #' Determine whether the set token is expired.
-#' @param node (character) A member node instance
+#'
+#' @param node (character) The Member Node.
+#'
 #' @return (logical)
+#'
 #' @export
 #'
 #' @examples
-#'\dontrun{
-#'cn <- CNode('STAGING2')
-#'mn <- getMNode(cn,"urn:node:mnTestKNB")
-#'is_token_expired(mn)
-#'}
+#' \dontrun{
+#' cn <- CNode('STAGING2')
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' is_token_expired(mn)
+#' }
 is_token_expired <- function(node) {
   token_name <- ifelse(node@env == "prod", "dataone_token", "dataone_test_token")
 
@@ -102,11 +112,14 @@ is_token_expired <- function(node) {
 }
 
 
-#' Get the base URL of the Member Node.
+#' Get base URL of a Member Node
 #'
-#' @param mn (character) A mn instance
+#' Get the base URL of a Member Node.
 #'
-#' @return (character) The URL
+#' @param mn (character) The Member Node.
+#'
+#' @return (character) The URL.
+#'
 #' @export
 #'
 #' @examples
@@ -125,12 +138,16 @@ get_mn_base_url <- function(mn) {
 }
 
 
+#' Check if user has authorization to perform an action on an object
+#'
 #' Check if the user has authorization to perform an action on an object.
 #'
-#' @param node (MNode|CNode) The Node to query.
+#' @param node (MNode/CNode) The Member/Coordinating Node to query.
 #' @param ids (character) The PID or SID to check.
 #' @param action (character) One of read, write, or changePermission.
-#' @return (boolean)
+#'
+#' @return (logical)
+#'
 #' @export
 #'
 #' @examples

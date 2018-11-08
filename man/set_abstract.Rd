@@ -2,23 +2,23 @@
 % Please edit documentation in R/eml.R
 \name{set_abstract}
 \alias{set_abstract}
-\title{Set the abstract on an EML document}
+\title{Set the abstract for an EML document}
 \usage{
 set_abstract(doc, text)
 }
 \arguments{
-\item{doc}{(eml) An EML document}
+\item{doc}{(eml) An EML document.}
 
 \item{text}{(character) The abstract text. If \code{text} is length one, an
-abstract without \code{<para>} or \code{section} elements will be created.
+abstract without \code{<para>} or \code{<section>} elements will be created.
 If \code{text} is greater than one in length, \code{para} elementes will be
 used for each element.}
 }
 \value{
-(eml) The modified EML document
+(eml) The modified EML document.
 }
 \description{
-Set the abstract on an EML document
+Set the abstract for an EML document.
 }
 \examples{
 # Create a new EML document

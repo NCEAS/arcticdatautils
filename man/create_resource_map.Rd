@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{create_resource_map}
 \alias{create_resource_map}
-\title{Create a resource map Object on a Member Node.}
+\title{Create a resource map object on a Member Node}
 \usage{
 create_resource_map(mn, metadata_pid, data_pids = NULL,
   child_pids = NULL, check_first = TRUE, ...)
@@ -10,32 +10,29 @@ create_resource_map(mn, metadata_pid, data_pids = NULL,
 \arguments{
 \item{mn}{(MNode) The Member Node}
 
-\item{metadata_pid}{(character) The PID of the metadata object to go in the
-package.}
+\item{metadata_pid}{(character) The PID of the metadata object to go in the package.}
 
-\item{data_pids}{(character) The PID(s) of the data objects to go in the
-package.}
+\item{data_pids}{(character) The PID(s) of the data objects to go in the package.}
 
 \item{child_pids}{(character) The resource map PIDs of the packages to be
 nested under the package.}
 
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as
-aruments exist on the MN before continuing. This speeds up the function,
-especially when `data_pids` has many elements.}
+arguments exist on the MN before continuing. This speeds up the function,
+especially when \code{data_pids} has many elements.}
 
-\item{...}{Additional arguments that can be passed into \code{\link{publish_object}}}
+\item{...}{Additional arguments that can be passed into \code{\link[=publish_object]{publish_object()}}.}
 }
 \value{
-(character) The created resource map's PID
+(character) The PID of the created resource map.
 }
 \description{
 This function first generates a new resource map RDF/XML document locally and
-then uses the dataone::createObject function to create the Object on the
+then uses the \code{\link[dataone:createObject]{dataone::createObject()}} function to create the object on the
 specified MN.
 }
 \details{
-If you only want to generate resource map RDF/XML, see
-\code{\link{generate_resource_map}}
+If you only want to generate resource map RDF/XML, see \code{\link[=generate_resource_map]{generate_resource_map()}}.
 }
 \examples{
 \dontrun{
@@ -45,7 +42,6 @@ mn <- getMNode(cn,"urn:node:mnTestKNB")
 meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
 dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1',
 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
-
 
 create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
 }

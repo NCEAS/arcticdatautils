@@ -2,18 +2,18 @@
 % Please edit documentation in R/dataone.R
 \name{get_token}
 \alias{get_token}
-\title{Gets the currently set authentication token.}
+\title{Get the currently set authentication token}
 \usage{
 get_token(node)
 }
 \arguments{
-\item{node}{(MNode|CNode) The CN or MN you want to find a token for.}
+\item{node}{(MNode/CNode) The Member/Coordinating Node to query.}
 }
 \value{
 (character) The token.
 }
 \description{
-Gets the currently set authentication token.
+Get the currently set authentication token.
 }
 \examples{
 \dontrun{

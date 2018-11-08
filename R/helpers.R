@@ -1,14 +1,17 @@
-#' helpers.R
+# Various helper functions for things like testing a package
+
+
+#' Create a test metadata object
 #'
-#' Various helper functions for things like testing the package.
-
-
-#' Create a test metadata object.
+#' Create a test EML metadata object.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param data_pids (character) Optional. PIDs for data objects the metadata documents.
-#' @return pid (character) PID of published metadata document.
+#'
+#' @return (character) PID of published metadata document.
+#'
 #' @export
+#'
 #' @examples
 #'\dontrun{
 #' # Set environment
@@ -59,11 +62,14 @@ create_dummy_metadata <- function(mn, data_pids=NULL) {
 }
 
 
-#' Create a test object.
+#' Create a test object
+#'
+#' Create a test data object.
 #'
 #' @param mn (MNode) The Member Node.
 #'
-#' @return pid (character) The pid of the dummy object.
+#' @return (character) The PID of the dummy object.
+#'
 #' @export
 #'
 #' @examples
@@ -113,12 +119,15 @@ create_dummy_object <- function(mn) {
 }
 
 
-#' Create a test package.
+#' Create a test package
+#'
+#' Create a test data package.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param size (numeric) The number of files in the package, including the metadata file.
 #'
-#' @return pids (character) A named character vector of the data pids in the package.
+#' @return (character) A named character vector of the data PIDs in the package.
+#'
 #' @export
 #'
 #' @examples
@@ -184,12 +193,15 @@ create_dummy_package <- function(mn, size = 2) {
 }
 
 
-#' Create a test parent package.
+#' Create a test parent package
+#'
+#' Create a test parent data package.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param children (character) Child package (resource maps) PIDs.
 #'
-#' @return pid (character) Named character vector of PIDs including parent package and child package pids.
+#' @return pid (character) A named character vector of PIDs, including parent package and child package PIDs.
+#'
 #' @export
 #'
 #' @examples
@@ -243,12 +255,15 @@ create_dummy_parent_package <- function(mn, children) {
 }
 
 
-#' Create dummy attributes data frame
+#' Create test attributes data.frame
 #'
-#' @param numberAttributes (integer) Number of attributes to be created in the table
+#' Create a test data.frame of attributes.
+#'
+#' @param numberAttributes (integer) Number of attributes to be created in the table.
 #' @param factors (character) Optional vector of factor names to include.
 #'
-#' @return (data.frame) Data frame of attributes
+#' @return (data.frame) A data.frame of attributes.
+#'
 #' @export
 #'
 #' @examples
@@ -281,11 +296,14 @@ create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) 
 }
 
 
-#' Create dummy enumeratedDomain data frame
+#' Create test enumeratedDomain data.frame
+#'
+#' Create a test data.frame of enumeratedDomains.
 #'
 #' @param factors (character) Vector of factor names to include.
 #'
-#' @return (data.frame) Data frame of factors
+#' @return (data.frame) A data.frame of factors.
+#'
 #' @export
 #'
 #' @examples
@@ -305,13 +323,15 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 
 #' Create dummy package with fuller metadata
 #'
-#' Creates a fuller package than \code{\link{create_dummy_package}}
+#' Creates a fuller package than [create_dummy_package()]
 #' but is otherwise based on the same concept. This dummy
 #' package includes multiple data objects, responsible parties,
 #' geographic locations, method steps, etc.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param title (character) Optional. Title of package. Defaults to "A Dummy Package".
+#'
+#' @return (list) A list of package PIDs, inluding for the resource map, metadata, and data objects.
 #'
 #' @import EML
 #' @import dataone
@@ -413,146 +433,110 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 }
 
 
-#' Get system metadata for all elements of a data package
+#' Retrieve a name from an ORCID URL
 #'
-#' This function retrieves the system metadata for all elements of a data package and returns them as a list.
-#' It is useful for inspecting system metadata for an entire data package and identifying changes where needed.
+#' Retrieve first and last name from an ORCID URL by scraping the page.
 #'
-#' @param mn (MNode) The Member Node to query.
-#' @param resource_map_pid (character) The PID for a resource map.
-#' @param nmax (numeric) The maximum number of system metadata objects to return.
-#' @param child_packages (logical) If parent package, whether or not to include child packages.
+#' @param orcid_url (character) A valid ORCID URL address.
 #'
-#' @return (list) A list of system metadata objects.
+#' @return (character) First and last name.
 #'
-#' @import dataone
-#' @importFrom methods is
-#' @importFrom methods new
+#' @noRd
+#'
+#' @examples
+#' \dontrun{
+#' pi_name <- get_orcid_name('https://orcid.org/0000-0002-2561-5840')
+#' }
+get_orcid_name <- function(orcid_url) {
+  req <- httr::GET(orcid_url)
+  if (req$status_code != 200) {
+    stop('Failed to read in ', orcid_url)
+  }
+
+  name <- httr::content(req, "text") %>%
+    stringr::str_extract("<title>.*<") %>%
+    stringr::str_split(" ") %>%
+    unlist() %>%
+    stringr::str_remove("<title>")
+
+  return(paste(name[1], name[2]))
+}
+
+
+#' List recent submissions to a DataONE Member Node
+#'
+#' List recent submissions to a DataONE Member Node from all submitters not present
+#' in the administrator whitelist: <https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org>
+#'
+#' @param mn (MNode) A DataONE Member Node.
+#' @param from (character) The date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}.
+#' @param to (character) The date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}.
+#' @param formatType (character) The format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
+#' @param whitelist (character) An xml list of admin orcid Identifiers.
+#'   Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org.
+#'
+#' @return (data.frame)
 #'
 #' @export
 #'
+#' @author Dominic Mullen dmullen17@@gmail.com
+#'
 #' @examples
-#'\dontrun{
-#' cn_staging <- CNode("STAGING")
-#' adc_test <- getMNode(cn_staging, "urn:node:mnTestARCTIC")
+#' \dontrun{
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #'
-#' rm_pid <- "resource_map_urn:uuid:..."
+#' # Return all submitted objects in the past month for the 'adc' node:
+#' View(list_submissions(adc, Sys.Date() %m+% months(-1), Sys.Date(), '*'))
 #'
-#' all <- get_all_sysmeta(adc_test, rm_pid)
-#'
-#' # View in viewer to inspect
-#' View(all)
-#'
-#' # Print specific elements to console
-#' all[[1]]@rightsHolder
-#'
-#' # Create separate object
-#' sysmeta_md <- all[[2]]
+#' # Return all submitted objects except for one user
+#' View(list_submissions(adc, Sys.Date() %m+% months(-1), Sys.Date(), '*'),
+#'                       whitelist = 'http://orcid.org/0000-0002-2561-5840')
 #' }
-get_all_sysmeta <- function(mn, resource_map_pid, nmax = 1000, child_packages = FALSE) {
-  stopifnot(methods::is(mn, "MNode"))
-  stopifnot(is.character(resource_map_pid), nchar(resource_map_pid) > 0, length(resource_map_pid) == 1)
-  stopifnot(is_resource_map(mn, resource_map_pid))
-  stopifnot(is.numeric(nmax), length(nmax) == 1 , nmax >= 0)
-  stopifnot(is.logical(child_packages), length(child_packages) == 1)
-
-  query_params <- paste("identifier:", resource_map_pid, "+OR+resourceMap:", resource_map_pid, "", sep = "\"")
-  response <- dataone::query(mn, list(q = query_params, rows = as.character(nmax)))
-
-  if (length(response) == 0) {
-    stop(paste0("No results were found when searching for a package with resource map '", resource_map_pid,
-                "'.\nThis could be caused by not having appropriate access to read the resource map."))
+list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType = '*',
+                             whitelist = 'https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org') {
+  if (!requireNamespace('lubridate', 'purrr', 'RCurl')) {
+    stop(call. = FALSE,
+         'The packages "lubridate", "purrr", and "RCurl" must be installed to run this function. ',
+         'Please install them and try again.')
+  }
+  stopifnot(methods::is(mn, 'MNode'))
+  if (!is_token_set(mn)) {
+    stop('No token set')
+  }
+  if (!(lubridate::is.Date(as.Date(from, '%Y/%M/%D')))) {
+    stop('"from" argument must be in YYYY/MM/DD format')
+  }
+  if (!(lubridate::is.Date(as.Date(to, '%Y/%M/%D')))) {
+    stop('"to" argument must be in YYYY/MM/DD format')
+  }
+  if (!(formatType %in% c('RESOURCE', 'METADATA', 'DATA', '*'))) {
+    stop('formatType must be one of: RESOURCE, METADATA, DATA, or *')
   }
 
-  if (length(response) == nmax) {
-    warning(paste("Query returned the maximum number of objects. It is possible there are more to retrieve.",
-                  "\nSpecify a larger number of objects with the 'nmax' argument."))
+  req <- httr::GET(whitelist)
+  if (req$status_code != 200) {
+    warning('Failed to read in', whitelist, '. Results will include admin submissions / edits.')
   }
+  whitelist <- httr::content(req, "text")
 
-  # Check if child package
-  if (response[[1]]$formatType == "RESOURCE" && !is.null(response[[1]]$resourceMap)) {
-    message("The data package with this resource map is a child package.")
-  }
-  # Check if parent package
-  if (any(unlist(lapply(response[2:length(response)], function(x) ifelse(x$formatType == "RESOURCE", TRUE, FALSE))))) {
-    message("The data package with this resource map is a parent package.")
-    if (child_packages == TRUE) {
-      children <- Filter(function(x) x$formatType == "RESOURCE", response[2:length(response)])
-      children2 <- vector("list", length(children))
-      for (i in seq_along(children)) {
-        child_resource_map_pid <- children[[i]]$identifier
-        query_params2 <- paste("identifier:", child_resource_map_pid, "+OR+resourceMap:", child_resource_map_pid, "", sep = "\"")
-        children2[[i]] <- dataone::query(mn, list(q = query_params2, rows = as.character(nmax)))
-      }
-    }
-  }
+  # Construct query and return results
+  q = sprintf('dateUploaded:["%sT00:00:00Z" TO "%sT00:00:00Z"] AND formatType:%s', from, to, formatType)
+  results <- dataone::query(mn, list(q = q,
+                                     fl = "identifier AND submitter AND dateUploaded AND formatType AND fileName",
+                                     rows = 10000),
+                            as = "data.frame")
 
-  # Translate fields from Solr query to formal class SystemMetadata
-  translate <- function(x) {
-    sysmeta <- methods::new("SystemMetadata")
+  # Filter out rows where the submitter is in the whitelist
+  results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
 
-    sysmeta@serialVersion <- sysmeta@serialVersion
-    sysmeta@identifier <- if (is.null(x$identifier)) {sysmeta@identifier} else {x$identifier}
-    sysmeta@formatId <- if (is.null(x$formatId)) {sysmeta@formatId} else {x$formatId}
-    sysmeta@size <- if (is.null(x$size)) {sysmeta@size} else {x$size}
-    sysmeta@checksum <- if (is.null(x$checksum)) {sysmeta@checksum} else {x$checksum}
-    sysmeta@checksumAlgorithm <- if (is.null(x$checksumAlgorithm)) {sysmeta@checksumAlgorithm} else {x$checksumAlgorithm}
-    sysmeta@submitter <- if (is.null(x$submitter)) {sysmeta@submitter} else {x$submitter}
-    sysmeta@rightsHolder <- if (is.null(x$rightsHolder)) {sysmeta@rightsHolder} else {x$rightsHolder}
-    read <- if (is.null(x$readPermission)) {} else {data.frame(subject = unlist(x$readPermission),
-                                                               permission = "read")}
-    write <- if (is.null(x$writePermission)) {} else {data.frame(subject = unlist(x$writePermission),
-                                                                 permission = "write")}
-    change <- if (is.null(x$changePermission)) {} else {data.frame(subject = unlist(x$changePermission),
-                                                                   permission = "changePermission")}
-    sysmeta@accessPolicy <- rbind(read, write, change)
-    sysmeta@replicationAllowed <- if (is.null(x$replicationAllowed)) {sysmeta@replicationAllowed} else {x$replicationAllowed}
-    sysmeta@numberReplicas <- if (is.null(x$numberReplicas)) {sysmeta@numberReplicas} else {x$numberReplicas}
-    sysmeta@preferredNodes <- if (is.null(x$preferredReplicationMN)) {sysmeta@preferredNodes} else {x$preferredReplicationMN}
-    sysmeta@blockedNodes <- if (is.null(x$blockedReplicationMN)) {sysmeta@blockedNodes} else {x$blockedReplicationMN}
-    sysmeta@obsoletes <- if (is.null(x$obsoletes)) {sysmeta@obsoletes} else {x$obsoletes}
-    sysmeta@obsoletedBy <- if (is.null(x$obsoletedBy)) {sysmeta@obsoletedBy} else {x$obsoletedBy}
-    sysmeta@archived <- sysmeta@archived
-    sysmeta@dateUploaded <- if (is.null(x$dateUploaded)) {sysmeta@dateUploaded} else {as.character(x$dateUploaded)}
-    sysmeta@dateSysMetadataModified <- if (is.null(x$dateModified)) {sysmeta@dateSysMetadataModified} else {as.character(x$dateModified)}
-    sysmeta@originMemberNode <- if (is.null(x$datasource)) {sysmeta@originMemberNode} else {x$datasource}
-    sysmeta@authoritativeMemberNode <- if (is.null(x$authoritativeMN)) {sysmeta@authoritativeMemberNode} else {x$authoritativeMN}
-    sysmeta@seriesId <- if (is.null(x$seriesId)) {sysmeta@seriesId} else {x$seriesId}
-    sysmeta@mediaType <- if (is.null(x$mediaType)) {sysmeta@mediaType} else {x$mediaType}
-    sysmeta@fileName <- if (is.null(x$fileName)) {sysmeta@fileName} else {x$fileName}
-    sysmeta@mediaTypeProperty <- if (is.null(x$mediaTypeProperty)) {sysmeta@mediaTypeProperty} else {x$mediaTypeProperty}
+  # Return full names based on orcid Id
+  results$submitter_name <- purrr::map(results$submitter, get_orcid_name) %>% unlist()
 
-    return(sysmeta)
-  }
+  # Arrange by dateUploaded
+  results <- dplyr::arrange(results, dateUploaded)
 
-  if (child_packages) {
-    other <- Filter(function(x) x$formatType != "RESOURCE", response[2:length(response)])
-    response2 <- c(list(response[[1]]), other)
-    parent <- lapply(response2, translate)
-    names(parent) <- unlist(lapply(parent, function(x) {x@fileName}))
-    for (i in seq_along(parent)) {
-      if (is.na(names(parent)[i])) {names(parent)[i] <- paste0("missing_fileName", i)}
-    }
-
-    child <- lapply(children2, function(x) {lapply(x, translate)})
-    for (i in seq_along(child)) {
-      names(child[[i]]) <- unlist(lapply(child[[i]], function(x) {x@fileName}))
-      for (j in seq_along(child[[i]])) {
-        if (is.na(names(child[[i]])[j])) {names(child[[i]])[j] <- paste0("missing_fileName", j)}
-      }
-    }
-    names(child) <- paste0("child", seq_along(child))
-
-    all <- c(parent, child)
-  } else {
-    all <- lapply(response, translate)
-    names(all) <- unlist(lapply(all, function(x) {x@fileName}))
-    for (i in seq_along(all)) {
-      if (is.na(names(all)[i])) {names(all)[i] <- paste0("missing_fileName", i)}
-    }
-  }
-
-  return(all)
+  return(results)
 }
 
 #' Retrieve a name from an orcid ID URL

@@ -7,11 +7,17 @@ Authors@R: c(
   person("Jesse", "Goldstein", email = "jgoldstein@nceas.ucsb.edu", role = "ctb", comment = "Maintainer"),
   person("Jeanette", "Clark", email = "jclark@nceas.ucsb.edu", role = "ctb", comment = "Maintainer"),
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
-  person("Emily", "O'Dean", email="eodean10@gmail.com", role = "ctb"),
-  person("Robyn", "Thiessen-Bock", email = "robyn.thiessenbock@gmail.com", role = "ctb")
+  person("Emily", "O'Dean", email = "eodean10@gmail.com", role = "ctb"),
+  person("Robyn", "Thiessen-Bock", email = "robyn.thiessenbock@gmail.com", role = "ctb"),
+  person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb")
   )
-Description: A set of utilites for working with the Arctic Data Center 
+Description: A set of utilities for working with the Arctic Data Center 
   (https://arcticdata.io).
+License: Apache License (== 2.0)
+URL: https://nceas.github.io/arcticdatautils/
+BugReports: https://github.com/NCEAS/arcticdatautils/issues
+Encoding: UTF-8
+LazyData: true
 Depends:
     R (>= 3.2.3)
 Imports:
@@ -28,9 +34,6 @@ Imports:
     uuid,
     xml2,
     XML
-License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
 Suggests:
     dplyr,
     humaniformat,
@@ -44,4 +47,5 @@ Suggests:
     xslt,
     yaml
 RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

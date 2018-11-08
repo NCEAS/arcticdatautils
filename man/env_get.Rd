@@ -2,8 +2,7 @@
 % Please edit documentation in R/environment.R
 \name{env_get}
 \alias{env_get}
-\title{environment.R
-Author: Bryce Mecum <mecum@nceas.ucsb.edu>}
+\title{Get the current environment name}
 \usage{
 env_get()
 }
@@ -11,7 +10,5 @@ env_get()
 (character) The environment name.
 }
 \description{
-Functions related to loading configuriation based upon the environment
-the code is being run under.
 Get the current environment name.
 }

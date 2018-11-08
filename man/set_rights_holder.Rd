@@ -11,7 +11,7 @@ set_rights_holder(mn, pids, subject)
 
 \item{pids}{(character) The PIDs of the objects to set the rights holder for.}
 
-\item{subject}{(character) The identifier of the new rights holder, typially an ORCID or DN.}
+\item{subject}{(character) The identifier of the new rights holder, typically an ORCID or DN.}
 }
 \value{
 (logical) Whether an update was needed.

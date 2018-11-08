@@ -1,29 +1,31 @@
-#' editing.R
-#'
-#' High-level functions for managing content.
+# High-level functions for managing content
 
 
-#' Publish an object on a member node
+#' Publish an object on a Member Node
 #'
-#' Use sensible defaults to publish an object on a member node. If identifier is provided,
-#' use it, otherwise generate a UUID.  If clone_id is provided, then retrieve the
+#' Use sensible defaults to publish an object on a Member Node. If identifier is provided,
+#' use it, otherwise generate a UUID. If clone_id is provided, then retrieve the
 #' system metadata for that identifier and use it to provide rightsHolder, accessPolicy,
 #' and replicationPolicy metadata. Note that this function only uploads the object to
 #' the Member Node, and does not add it to a data package, which can be done separately.
 #'
 #' @param mn (MNode) The Member Node to publish the object to.
-#' @param path the path to the file to be published
-#' @param format_id (character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
+#' @param path (character) The path to the file to be published.
+#' @param format_id (character) Optional. The format ID to set for the object.
+#'   When not set, [guess_format_id()] will be used to guess the format ID.
+#'   Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
 #' @param pid (character) Optional. The PID to use with the object.
 #' @param sid (character) Optional. The SID to use with the new object.
-#' @param clone_pid (character) PID of objet to clone System Metadata from
-#' @param public (logical) TRUE/FALSE Whether object should be given public read access.
+#' @param clone_pid (character) PID of object to clone System Metadata from.
+#' @param public (logical) Whether object should be given public read access.
+#'
+#' @return pid (character) The PID of the published object.
 #'
 #' @import dataone
 #' @import datapack
-#' @return pid (character). The PID of the published object.
 #'
 #' @export
+#'
 #' @examples
 #'\dontrun{
 #' cn <- CNode("STAGING2")
@@ -102,7 +104,7 @@ publish_object <- function(mn,
   }
 
   sysmeta <- add_admin_group_access(sysmeta)
-  if(public == TRUE){
+  if (public == TRUE) {
     sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   }
   sysmeta@fileName <- basename(path)
@@ -113,20 +115,25 @@ publish_object <- function(mn,
                         sysmeta = sysmeta)
 }
 
-#' Update an object with a new file.
+
+#' Update an object with a new file
 #'
-#' This is a convenience wrapper around `dataone::updateObject` which copies in
+#' This is a convenience wrapper around [dataone::updateObject()] which copies in
 #' fields from the old object's System Metadata such as the rightsHolder and
 #' accessPolicy and updates only what needs to be changed.
 #'
 #' @param mn (MNode) The Member Node to update the object on.
 #' @param pid (character) The PID of the object to update.
 #' @param path (character) The full path to the file to update with.
-#' @param format_id (character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
-#' @param new_pid (character) Optional. Specify the PID for the new Object. Defaults to automatically generating a new, random UUID-style PID.
-#' @param sid (character) Optiona. Specify a Series ID (SID) to use for the new Object.
+#' @param format_id (character) Optional. The format ID to set for the object.
+#'   When not set, [guess_format_id()] will be used to guess the format ID.
+#'   Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
+#' @param new_pid (character) Optional. Specify the PID for the new object.
+#'   Defaults to automatically generating a new, random UUID-style PID.
+#' @param sid (character) Optional. Specify a Series ID (SID) to use for the new object.
 #'
 #' @return (character) The PID of the updated object.
+#'
 #' @export
 #'
 #' @examples
@@ -137,7 +144,7 @@ publish_object <- function(mn,
 #' my_path <- "/home/Documents/myfile.csv"
 #' new_pid <- update_object(mn, pid, my_path, format_id = "text/csv")
 #'}
-update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL) {
+update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid = NULL) {
   stopifnot(is(mn, "MNode"))
   stopifnot(object_exists(mn, pid))
   stopifnot(file.exists(path))
@@ -201,7 +208,9 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 }
 
 
-#' Publish an updated data package.
+#' Publish an updated data package
+#'
+#' Publish an update to a data package after updating data files or metadata.
 #'
 #' This function can be used for a variety of tasks:
 #'
@@ -214,11 +223,11 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' The metadata_pid and resource_map_pid provide the identifier of an EML metadata
 #' document and associated resource map, and the data_pids vector provides a list
 #' of PIDs of data objects in the package.  Update the metadata file and resource map
-#' by generating a new identifier (a DOI if use_doi is TRUE) and updating the Member
+#' by generating a new identifier (a DOI if `use_doi = TRUE`) and updating the Member
 #' Node with a public version of the object.  If metadata_file is not missing, it
 #' should be an edited version of the metadata to be used to update the original. If
 #' parent_resmap_pid is not missing, it indicates the PID of a parent package that
-#' should be updated as well, using the parent_medata_pid, parent_data_pids, and
+#' should be updated as well, using the parent_metadata_pid, parent_data_pids, and
 #' parent_child_pids as members of the updated package. In all cases, the objects
 #' are made publicly readable.
 #'
@@ -228,23 +237,31 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 #' @param data_pids (character)  PID(s) of data objects that will go in the updated package.
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
 #' @param use_doi (logical) Generate and use a DOI as the identifier for the updated metadata object.
-#' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated. Not optional if a parent package exists.
-#' @param parent_metadata_pid (character)  Optional. Identifier for the metadata document of the parent package. Not optional if a parent package exists.
-#' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package. Not optional if the parent package contains data objects.
-#' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.  \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.
+#' @param parent_resmap_pid  (character)  Optional. PID of a parent package to be updated.
+#'   Not optional if a parent package exists.
+#' @param parent_metadata_pid (character)  Optional. Identifier for the metadata document of the parent package.
+#'   Not optional if a parent package exists.
+#' @param parent_data_pids (character)  Optional. Identifier for the data objects of the parent package.
+#'   Not optional if the parent package contains data objects.
+#' @param parent_child_pids (character) Optional. Resource map identifier(s) of child packages in the parent package.
+#'   \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.
 #' @param child_pids (character) Optional. Child packages resource map PIDs.
-#' @param metadata_path (character or eml) Optional. An eml class object or a path to a metadata file to update with. If this is not set, the existing metadata document will be used.
-#' @param public (logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
-#' This applies to the new metadata PID and its resource map and data object.
-#' access policies are not affected.
-#' @param check_first (logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
-#' @return pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
+#' @param metadata_path (character or eml) Optional. An eml class object or a path to a metadata file to update with.
+#'   If this is not set, the existing metadata document will be used.
+#' @param public (logical) Optional. Make the update public. If `FALSE`, will set the metadata and resource map to private (but not the data objects).
+#'   This applies to the new metadata PID and its resource map and data object.
+#'   access policies are not affected.
+#' @param check_first (logical) Optional. Whether to check the PIDs passed in as arguments exist on the MN before continuing.
+#'   Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
+#'
+#' @return (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 #'
 #' @import dataone
 #' @import datapack
 #' @import EML
 #'
 #' @export
+#'
 #' @examples
 #'\dontrun{
 #' cn <- CNode("STAGING2")
@@ -262,17 +279,17 @@ update_object <- function(mn, pid, path, format_id=NULL, new_pid=NULL, sid=NULL)
 publish_update <- function(mn,
                            metadata_pid,
                            resource_map_pid,
-                           data_pids=NULL,
-                           child_pids=NULL,
-                           metadata_path=NULL,
-                           identifier=NULL,
-                           use_doi=FALSE,
-                           parent_resmap_pid=NULL,
-                           parent_metadata_pid=NULL,
-                           parent_data_pids=NULL,
-                           parent_child_pids=NULL,
-                           public=TRUE,
-                           check_first=TRUE) {
+                           data_pids = NULL,
+                           child_pids = NULL,
+                           metadata_path = NULL,
+                           identifier = NULL,
+                           use_doi = FALSE,
+                           parent_resmap_pid = NULL,
+                           parent_metadata_pid = NULL,
+                           parent_data_pids = NULL,
+                           parent_child_pids = NULL,
+                           public = TRUE,
+                           check_first = TRUE) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -357,14 +374,14 @@ publish_update <- function(mn,
     # Check for obsoleted metadata_pid
     meta_obsoletedBy <- dataone::getSystemMetadata(mn, metadata_pid)@obsoletedBy
     if (!is.na(meta_obsoletedBy)) {
-      stop("The value passed in for the argument 'metadata_pid' of '", metadata_pid, "' is already obsoleted by a newer version with PID '", meta_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each Object series.")
+      stop("The value passed in for the argument 'metadata_pid' of '", metadata_pid, "' is already obsoleted by a newer version with PID '", meta_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each object series.")
     }
   }
 
   # Check for obsoleted resource_map_pid. The resource map and metadata can desassociate without this check.
   rm_obsoletedBy <- dataone::getSystemMetadata(mn, resource_map_pid)@obsoletedBy
   if (!is.na(rm_obsoletedBy)) {
-    stop("The value passed in for the argument 'resource_map_pid' of '", resource_map_pid, "' is already obsoleted by a newer version with PID '", rm_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each Object series.")
+    stop("The value passed in for the argument 'resource_map_pid' of '", resource_map_pid, "' is already obsoleted by a newer version with PID '", rm_obsoletedBy, "'. All PID arguments to publish_update should be the latest versions of each object series.")
   }
 
   # Prepare the response object
@@ -379,9 +396,9 @@ publish_update <- function(mn,
     message("Getting metadata from the MN.")
     eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
 
-  } else if(class(metadata_path) == "eml") {
+  } else if (class(metadata_path) == "eml") {
       # If an eml object is provided, use it directly after validating
-      if(!eml_validate(metadata_path)){
+      if (!eml_validate(metadata_path)) {
         stop("The EML object is not valid.")
       }
 
@@ -548,28 +565,26 @@ publish_update <- function(mn,
 }
 
 
-#' Create a resource map Object on a Member Node.
+#' Create a resource map object on a Member Node
 #'
 #' This function first generates a new resource map RDF/XML document locally and
-#' then uses the dataone::createObject function to create the Object on the
+#' then uses the [dataone::createObject()] function to create the object on the
 #' specified MN.
 #'
-#' If you only want to generate resource map RDF/XML, see
-#' \code{\link{generate_resource_map}}
+#' If you only want to generate resource map RDF/XML, see [generate_resource_map()].
 #'
 #' @param mn (MNode) The Member Node
-#' @param metadata_pid (character) The PID of the metadata object to go in the
-#'   package.
-#' @param data_pids (character) The PID(s) of the data objects to go in the
-#'   package.
+#' @param metadata_pid (character) The PID of the metadata object to go in the package.
+#' @param data_pids (character) The PID(s) of the data objects to go in the package.
 #' @param child_pids (character) The resource map PIDs of the packages to be
 #'   nested under the package.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as
-#'   aruments exist on the MN before continuing. This speeds up the function,
+#'   arguments exist on the MN before continuing. This speeds up the function,
 #'   especially when `data_pids` has many elements.
-#' @param ... Additional arguments that can be passed into \code{\link{publish_object}}
+#' @param ... Additional arguments that can be passed into [publish_object()].
 #'
-#' @return (character) The created resource map's PID
+#' @return (character) The PID of the created resource map.
+#'
 #' @export
 #'
 #' @examples
@@ -580,7 +595,6 @@ publish_update <- function(mn,
 #' meta_pid <- 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe'
 #' dat_pid <- c('urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1',
 #' 'urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe')
-#'
 #'
 #' create_resource_map(mn, metadata_pid = meta_pid, data_pids = dat_pid)
 #'}
@@ -624,48 +638,46 @@ create_resource_map <- function(mn,
 }
 
 
-#' Update an existing resource map Object on a Member Node.
+#' Update an existing resource map object on a Member Node
 #'
 #' This function first generates a new resource map RDF/XML document locally and
-#' then uses the dataone::updateObject function to update an Object on the
+#' then uses the [dataone::updateObject()] function to update an object on the
 #' specified MN.
 #'
-#' If you only want to generate resource map RDF/XML, see
-#' \code{\link{generate_resource_map}}.
+#' If you only want to generate resource map RDF/XML, see [generate_resource_map()].
 #'
-#' This function also can be used to be used to add a new child packages to a
-#' parent package. For exmaple, if you have:
+#' This function also can be used to add a new child packages to a
+#' parent package. For example, if you have:
 #'
 #' Parent A B
 #'
-#' and want to add C as a sibling package to A and B, e.g.
+#' and want to add C as a sibling package to A and B, e.g.:
 #'
 #' Parent A B C
 #'
-#' you could use this function.
+#' then you could use this function.
 #'
-#' Note: This function currently replaces the rightsHolder on the Resource Map
+#' Note: This function currently replaces the rightsHolder on the resource map
 #' temporarily to allow updating but sets it back to the rightsHolder that was
 #' in place before the update.
 #'
-#' @param mn (MNode) The Member Node
-#' @param metadata_pid (character) The PID of the metadata object to go in the
-#'   package.
-#' @param data_pids (character) The PID(s) of the data objects to go in the
-#'   package.
-#' @param child_pids child_pids (character) The resource map PIDs of the packages to be
+#' @param mn (MNode) The Member Node.
+#' @param metadata_pid (character) The PID of the metadata object to go in the package.
+#' @param data_pids (character) The PID(s) of the data objects to go in the package.
+#' @param child_pids (character) The resource map PIDs of the packages to be
 #'   nested under the package.
-#' @param public Whether or not to make the new resource map public read
-#'   (logical)
+#' @param public (logical) Whether or not to make the new resource map public read.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as
-#'   aruments exist on the MN before continuing. This speeds up the function,
+#'   arguments exist on the MN before continuing. This speeds up the function,
 #'   especially when `data_pids` has many elements.
 #' @param resource_map_pid (character) The PID of the resource map to be updated.
-#' @param other_statements (data.frame) Extra statements to add to the Resource Map.
+#' @param other_statements (data.frame) Extra statements to add to the resource map.
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
-#' @return pid (character) Updated resource map PID.
+#'
+#' @return (character) The PID of the updated resource map.
 #'
 #' @export
+#'
 #' @examples
 #'\dontrun{
 #' cn <- CNode('STAGING2')
@@ -676,18 +688,17 @@ create_resource_map <- function(mn,
 #' data_pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
 #' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
 #'
-#'
 #' rm_new <- update_resource_map(mn, rm_pid, meta_pid, data_pids)
 #'}
 update_resource_map <- function(mn,
                                 resource_map_pid,
                                 metadata_pid,
-                                data_pids=NULL,
-                                child_pids=NULL,
-                                other_statements=NULL,
-                                identifier=NULL,
-                                public=FALSE,
-                                check_first=TRUE) {
+                                data_pids = NULL,
+                                child_pids = NULL,
+                                other_statements = NULL,
+                                identifier = NULL,
+                                public = FALSE,
+                                check_first = TRUE) {
 
   # Check arguments
   stopifnot(is(mn, "MNode"))
@@ -779,13 +790,16 @@ update_resource_map <- function(mn,
 }
 
 
-#' Set the file name on an object
+#' Set the file name for an object
+#'
+#' Set the file name for an object.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param pid (character) The PID of the object to set the file name on.
 #' @param name (character) The file name.
 #'
-#' @return (logical) Whether the update succeeded, FALSE means there was an error.
+#' @return (logical) Whether the update succeeded.
+#'
 #' @export
 #'
 #' @examples
@@ -819,7 +833,7 @@ set_file_name <- function(mn, pid, name) {
 #'
 #' This function updates the EML with the new physical
 #' of a data object once it has been updated.
-#' This is a helper function for \code{\link{update_package_object}}.
+#' This is a helper function for [update_package_object()].
 #'
 #' @param eml (eml) An EML class object.
 #' @param mn (MNode) The Member Node of the data package.
@@ -827,6 +841,8 @@ set_file_name <- function(mn, pid, name) {
 #' @param new_data_pid (character) The new identifier of the updated data object.
 #'
 #' @importFrom stringr str_detect
+#'
+#' @noRd
 update_physical <- function(eml, mn, data_pid, new_data_pid) {
   stopifnot(is(eml, "eml"))
   stopifnot(is(mn, "MNode"))
@@ -870,34 +886,33 @@ update_physical <- function(eml, mn, data_pid, new_data_pid) {
 #'
 #' This function updates a data object and then automatically
 #' updates the package resource map with the new data PID. If an object
-#' already has a \code{dataTable}, \code{otherEntity}, or \code{spatialVector}
+#' already has a `dataTable`, `otherEntity`, or `spatialVector`
 #' with a working physical section, the EML will be updated with the new physical.
-#' It is a convenience wrapper around \code{\link{update_object}}
-#' and \code{\link{publish_update}}.
+#' It is a convenience wrapper around [update_object()] and [publish_update()].
 #'
 #' @param mn (MNode) The Member Node of the data package.
 #' @param data_pid (character) PID for data object to update.
 #' @param new_data_path (character) Path to new data object.
 #' @param resource_map_pid (character) PID for resource map to update.
 #' @param format_id (character) Optional. The format ID to set for the object.
-#' When not set, \code{\link{guess_format_id}} will be used
-#' to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
-#' @param public (logical) Optional. Make the update public. If FALSE,
-#' will set the metadata and resource map to private (but not the data objects).
-#' This applies to the new metadata PID and its resource map and data object.
-#' Access policies are not affected.
-#' @param use_doi (logical) Optional. If TRUE, a new DOI will be minted.
-#' @param ... Other arguments to pass into \code{\link{publish_update}}.
+#'   When not set, [guess_format_id()] will be used
+#'   to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
+#' @param public (logical) Optional. Make the update public. If `FALSE`,
+#'   will set the metadata and resource map to private (but not the data objects).
+#'   This applies to the new metadata PID and its resource map and data object.
+#'   Access policies are not affected.
+#' @param use_doi (logical) Optional. If `TRUE`, a new DOI will be minted.
+#' @param ... Other arguments to pass into [publish_update()].
 #'
-#' @return PIDs (character) Named character vector of PIDs in the data package, including PIDs
+#' @return (character) Named character vector of PIDs in the data package, including PIDs
 #' for the metadata, resource map, and data objects.
-#'
-#' @keywords update_object publish_update
 #'
 #' @import dataone
 #' @import EML
 #'
 #' @export
+#'
+#' @seealso [update_object()] [publish_update()]
 #'
 #' @examples
 #' \dontrun{

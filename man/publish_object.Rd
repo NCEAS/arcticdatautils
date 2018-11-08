@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{publish_object}
 \alias{publish_object}
-\title{editing.R}
+\title{Publish an object on a Member Node}
 \usage{
 publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
   clone_pid = NULL, public = TRUE)
@@ -10,28 +10,26 @@ publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
 \arguments{
 \item{mn}{(MNode) The Member Node to publish the object to.}
 
-\item{path}{the path to the file to be published}
+\item{path}{(character) The path to the file to be published.}
 
-\item{format_id}{(character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
+\item{format_id}{(character) Optional. The format ID to set for the object.
+When not set, \code{\link[=guess_format_id]{guess_format_id()}} will be used to guess the format ID.
+Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 
 \item{pid}{(character) Optional. The PID to use with the object.}
 
 \item{sid}{(character) Optional. The SID to use with the new object.}
 
-\item{clone_pid}{(character) PID of objet to clone System Metadata from}
+\item{clone_pid}{(character) PID of object to clone System Metadata from.}
 
-\item{public}{(logical) TRUE/FALSE Whether object should be given public read access.}
+\item{public}{(logical) Whether object should be given public read access.}
 }
 \value{
-pid (character). The PID of the published object.
+pid (character) The PID of the published object.
 }
 \description{
-High-level functions for managing content.
-Publish an object on a member node
-}
-\details{
-Use sensible defaults to publish an object on a member node. If identifier is provided,
-use it, otherwise generate a UUID.  If clone_id is provided, then retrieve the
+Use sensible defaults to publish an object on a Member Node. If identifier is provided,
+use it, otherwise generate a UUID. If clone_id is provided, then retrieve the
 system metadata for that identifier and use it to provide rightsHolder, accessPolicy,
 and replicationPolicy metadata. Note that this function only uploads the object to
 the Member Node, and does not add it to a data package, which can be done separately.

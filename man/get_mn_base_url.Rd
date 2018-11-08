@@ -2,18 +2,18 @@
 % Please edit documentation in R/dataone.R
 \name{get_mn_base_url}
 \alias{get_mn_base_url}
-\title{Get the base URL of the Member Node.}
+\title{Get base URL of a Member Node}
 \usage{
 get_mn_base_url(mn)
 }
 \arguments{
-\item{mn}{(character) A mn instance}
+\item{mn}{(character) The Member Node.}
 }
 \value{
-(character) The URL
+(character) The URL.
 }
 \description{
-Get the base URL of the Member Node.
+Get the base URL of a Member Node.
 }
 \examples{
 \dontrun{

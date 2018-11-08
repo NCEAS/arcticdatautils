@@ -2,19 +2,19 @@
 % Please edit documentation in R/dataone.R
 \name{is_authorized}
 \alias{is_authorized}
-\title{Check if the user has authorization to perform an action on an object.}
+\title{Check if user has authorization to perform an action on an object}
 \usage{
 is_authorized(node, ids, action)
 }
 \arguments{
-\item{node}{(MNode|CNode) The Node to query.}
+\item{node}{(MNode/CNode) The Member/Coordinating Node to query.}
 
 \item{ids}{(character) The PID or SID to check.}
 
 \item{action}{(character) One of read, write, or changePermission.}
 }
 \value{
-(boolean)
+(logical)
 }
 \description{
 Check if the user has authorization to perform an action on an object.

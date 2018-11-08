@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_object}
 \alias{create_dummy_object}
-\title{Create a test object.}
+\title{Create a test object}
 \usage{
 create_dummy_object(mn)
 }
@@ -10,10 +10,10 @@ create_dummy_object(mn)
 \item{mn}{(MNode) The Member Node.}
 }
 \value{
-pid (character) The pid of the dummy object.
+(character) The PID of the dummy object.
 }
 \description{
-Create a test object.
+Create a test data object.
 }
 \examples{
 \dontrun{

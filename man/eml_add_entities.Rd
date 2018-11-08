@@ -2,26 +2,26 @@
 % Please edit documentation in R/eml.R
 \name{eml_add_entities}
 \alias{eml_add_entities}
-\title{Add new entity (otherEntity, dataTable, etc) elements to an EML document from a table.}
+\title{Add new entity elements to an EML document from a table}
 \usage{
 eml_add_entities(doc, entities,
   resolve_base = "https://cn.dataone.org/cn/v2/resolve/")
 }
 \arguments{
-\item{doc}{(eml) An EML document}
+\item{doc}{(eml) An EML document.}
 
 \item{entities}{(data.frame) A data.frame with columns type, path, pid, and
-format_id}
+format_id.}
 
 \item{resolve_base}{(character) Optional. Specify a DataONE CN resolve base
 URI which will be used for serializing download URLs into the EML. Most users
- should not override the default value.}
+should not override the default value.}
 }
 \value{
 (eml) The modified EML document.
 }
 \description{
-Add new entity (otherEntity, dataTable, etc) elements to an EML document from a table.
+Add new entity elements to an EML document from a table.
 }
 \examples{
 # Create entities from files on disk

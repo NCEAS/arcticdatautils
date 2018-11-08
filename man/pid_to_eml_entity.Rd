@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_entity}
 \alias{pid_to_eml_entity}
-\title{eml.R}
+\title{Create EML entity from a DataONE PID}
 \usage{
 pid_to_eml_entity(mn, pid, entityType = "otherEntity", ...)
 }
@@ -11,26 +11,24 @@ pid_to_eml_entity(mn, pid, entityType = "otherEntity", ...)
 
 \item{pid}{(character) The PID of the object to create the sub-tree for.}
 
-\item{entityType}{(character) What kind of objects to create from the input. Either "dataTable",
-"spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity".}
+\item{entityType}{(character) What kind of objects to create from the input. One of "dataTable",
+"spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".}
 
-\item{...}{(optional) Additional arguments to be passed to \code{new(entityType, ...)}. See example}
+\item{...}{(optional) Additional arguments to be passed to \code{new(entityType, ...)}.}
 }
 \value{
-(list) The entity object
+(list) The entity object.
 }
 \description{
-Helpers for creating EML.
-Create EML entity from a DataONE pid
+Create EML entity from a DataONE PID
 }
 \examples{
 \dontrun{
-#Generate EML otherEntity
+# Generate EML otherEntity
 pid_to_eml_entity(mn,
                   pid,
                   entityType = "otherEntity",
                   entityName = "Entity Name",
                   entityDescription = "Description about entity")
-
 }
 }

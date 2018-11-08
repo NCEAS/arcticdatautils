@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_package}
 \alias{create_dummy_package}
-\title{Create a test package.}
+\title{Create a test package}
 \usage{
 create_dummy_package(mn, size = 2)
 }
@@ -12,10 +12,10 @@ create_dummy_package(mn, size = 2)
 \item{size}{(numeric) The number of files in the package, including the metadata file.}
 }
 \value{
-pids (character) A named character vector of the data pids in the package.
+(character) A named character vector of the data PIDs in the package.
 }
 \description{
-Create a test package.
+Create a test data package.
 }
 \examples{
 \dontrun{

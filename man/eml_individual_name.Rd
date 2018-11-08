@@ -12,10 +12,10 @@ eml_individual_name(given_names = NULL, sur_name)
 \item{sur_name}{(character) A sur (last) name.}
 }
 \value{
-(individualName) The new individualName section
+(individualName) The new individualName section.
 }
 \description{
-Create an EML individualName section
+Create an EML individualName section.
 }
 \examples{
 eml_individual_name("some", "user")
