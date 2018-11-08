@@ -7,7 +7,7 @@ Authors@R: c(
   person("Jesse", "Goldstein", email = "jgoldstein@nceas.ucsb.edu", role = "ctb", comment = "Maintainer"),
   person("Jeanette", "Clark", email = "jclark@nceas.ucsb.edu", role = "ctb", comment = "Maintainer"),
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
-  person("Emily", "O'Dean", email="eodean10@gmail.com", role = "ctb"),
+  person("Emily", "O'Dean", email = "eodean10@gmail.com", role = "ctb"),
   person("Robyn", "Thiessen-Bock", email = "robyn.thiessenbock@gmail.com", role = "ctb"),
   person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb")
   )
@@ -36,13 +36,16 @@ Imports:
     XML
 Suggests:
     dplyr,
-    testthat,
     humaniformat,
     knitr,
+    lubridate,
     ncdf4,
+    RCurl,
+    purrr,
     rmarkdown,
-    yaml,
-    xslt
-Roxygen: list(markdown = TRUE)
+    testthat,
+    xslt,
+    yaml
 RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
