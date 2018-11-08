@@ -11,7 +11,7 @@ is_public_read(mn, pids, use.names = TRUE)
 
 \item{pids}{(character) The PIDs of the objects to check for public read access.}
 
-\item{use.names}{(logical) Optional. If `TRUE` (the default), PIDs will
+\item{use.names}{(logical) If \code{TRUE}, PIDs will
 be used as names for the result unless PIDs have names already, in which case
 those names will be used for the result.}
 }

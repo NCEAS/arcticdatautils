@@ -7,13 +7,13 @@
 eml_contact(...)
 }
 \arguments{
-\item{...}{Arguments passed on to eml_party}
+\item{...}{Arguments passed on to \code{\link[=eml_party]{eml_party()}}.}
 }
 \value{
-(contact) The new contact
+(contact) The new contact.
 }
 \description{
-See \code{\link{eml_party}} for details.
+See \code{\link[=eml_party]{eml_party()}} for details.
 }
 \examples{
 \dontrun{

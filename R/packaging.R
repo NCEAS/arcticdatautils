@@ -1,17 +1,13 @@
-#' package.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
+# Functions for inserting datasets as data packages
+
+
+#' Insert a file from a single row of the inventory
 #'
-#' Code related to inserting datasets as Data Packages.
-
-
-
-#' Insert a file from a single row of the Inventory.
-#'
-#' @param inventory (data.frame) An Inventory.
+#' @param inventory (data.frame) An inventory.
 #' @param file (character) The fully-qualified relative path to the file. See examples.
 #' @param env (list) Optional. Specify an environment.
 #'
-
+#' @noRd
 insert_file <- function(inventory, file, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(file), nchar(file) > 0, file %in% inventory$file)
@@ -79,15 +75,15 @@ insert_file <- function(inventory, file, env=NULL) {
 }
 
 
-#' Create a single package Data Package from files in the Inventory.
+#' Create a single data package from files in the inventory
 #'
-#' @param inventory (data.frame) An Inventory.
+#' @param inventory (data.frame) An inventory.
 #' @param package (character) The package identifier.
 #' @param env (list) Environment variables.
 #'
-#' @return A list containing PIDs and whether objects were inserted. (list)
+#' @return (list) A list containing PIDs and whether objects were inserted.
 #'
-
+#' @noRd
 insert_package <- function(inventory, package, env=NULL) {
   validate_inventory(inventory)
   stopifnot(is.character(package), nchar(package) > 0, package %in% inventory$package)
@@ -295,19 +291,22 @@ insert_package <- function(inventory, package, env=NULL) {
   return(files)
 }
 
-#' Create a resource map RDF/XML file and save is to a temporary path.
+
+#' Create a resource map RDF/XML file and save is to a temporary path
+#'
 #' This is a convenience wrapper around the constructor of the `ResourceMap`
 #' class from `DataPackage`.
 #'
-#' @param metadata_pid (character) PID of the metadata Object.
-#' @param data_pids (character) PID(s) of the data Objects.
-#' @param child_pids (character) Optional. PID(s) of child Resource Maps.
-#' @param other_statements (data.frame) Extra statements to add to the Resource Map.
-#' @param resource_map_pid (character) PID of resource map.
+#' @param metadata_pid (character) PID of the metadata object.
+#' @param data_pids (character) PID(s) of the data objects.
+#' @param child_pids (character) Optional. PID(s) of child resource maps.
+#' @param other_statements (data.frame) Extra statements to add to the resource map.
+#' @param resource_map_pid (character) The PID of a resource map.
 #' @param resolve_base (character) Optional. The resolve service base URL.
 #'
-#' @return Absolute path to the Resource Map on disk (character)
+#' @return (character) Absolute path to the resource map on disk.
 #'
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -317,11 +316,11 @@ insert_package <- function(inventory, package, env=NULL) {
 #'                                                     object="http://example.com/bar"))
 #' }
 generate_resource_map <- function(metadata_pid,
-                                  data_pids=NULL,
-                                  child_pids=NULL,
-                                  other_statements=NULL,
-                                  resolve_base="https://cn.dataone.org/cn/v2/resolve",
-                                  resource_map_pid=NULL) {
+                                  data_pids = NULL,
+                                  child_pids = NULL,
+                                  other_statements = NULL,
+                                  resolve_base = "https://cn.dataone.org/cn/v2/resolve",
+                                  resource_map_pid = NULL) {
   stopifnot(length(metadata_pid) == 1)
 
   # Generate a PID if needed
@@ -437,7 +436,7 @@ generate_resource_map <- function(metadata_pid,
     }
 
     if (length(setdiff(names(relationships), names(other_statements))) != 0) {
-      warning("The column names of the relationships and other_statements data frames do not match: ", paste(names(relationships), collapse =", "), " vs. ", paste(names(other_statements), collapse = ", "), ".")
+      warning("The column names of the relationships and other_statements data frames do not match: ", paste(names(relationships), collapse = ", "), " vs. ", paste(names(other_statements), collapse = ", "), ".")
     }
 
     message("Adding ", nrow(other_statements), " custom statement(s) to the Resource Map.")
@@ -481,11 +480,12 @@ generate_resource_map <- function(metadata_pid,
   outfilepath
 }
 
-#' Generate a PID for a new resource map by appending "resource_map_" to it.
-#'
-#' @param metadata_pid (character) A metadata pid
-#'
 
+#' Generate a PID for a new resource map by appending "resource_map_" to it
+#'
+#' @param metadata_pid (character) A metadata PID.
+#'
+#' @noRd
 generate_resource_map_pid <- function(metadata_pid) {
   stopifnot(is.character(metadata_pid),
             nchar(metadata_pid) > 0)
@@ -497,15 +497,17 @@ generate_resource_map_pid <- function(metadata_pid) {
   paste0("resource_map_", metadata_pid)
 }
 
-#' Get the already-minted PID from the inventory or mint a new one.
+
+#' Get the already-minted PID from the inventory or mint a new one
 #'
 #' @param file (data.frame) A single row from the inventory.
 #' @param mn (MNode) The Member Node that will mint the new PID, if needed.
 #' @param scheme (character) The identifier scheme to use.
 #'
-#' @return The identifier (character)
-
-get_or_create_pid <- function(file, mn, scheme="UUID") {
+#' @return (character) The PID.
+#'
+#' @noRd
+get_or_create_pid <- function(file, mn, scheme = "UUID") {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
             "pid" %in% names(file))
@@ -546,19 +548,21 @@ get_or_create_pid <- function(file, mn, scheme="UUID") {
   pid
 }
 
-#' Create a sysmeta object.
+
+#' Create a sysmeta object
 #'
 #' This is a wrapper function around the constructor for a
-#' dataone::SystemMetadata object.
+#' SystemMetadata object.
 #'
 #' @param file (data.frame) A single row from the inventory.
-#' @param base_path (character) The path prefix to use with the contents of `file[1,"filename]` that
-#' will be used to locate the file on disk.
+#' @param base_path (character) The path prefix to use with the contents of `file[1,"filename"]` that
+#'   will be used to locate the file on disk.
 #' @param submitter (character) The submitter DN string for the object.
 #' @param rights_holder (character) The rights holder DN string for the object.
 #'
-#' @return The sysmeta object (dataone::SystemMetadata)
-
+#' @return (SystemMetadata) The sysmeta object.
+#'
+#' @noRd
 create_sysmeta <- function(file, base_path, submitter, rights_holder) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1)
@@ -619,15 +623,15 @@ create_sysmeta <- function(file, base_path, submitter, rights_holder) {
 }
 
 
-#' Create an object from a row of the inventory.
+#' Create an object from a row of the inventory
 #'
-#' @param file (data.frame)A row from the inventory.
+#' @param file (data.frame) A row from the inventory.
 #' @param sysmeta (SystemMetadata) The file's sysmeta.
-#' @param base_path (character) Base path, to be appended to the \code{file}
-#' column to find the file to upload.
+#' @param base_path (character) Base path, to be appended to the 'file'
+#'   column to find the file to upload.
 #' @param env (list) An environment.
 #'
-
+#' @noRd
 create_object <- function(file, sysmeta, base_path, env) {
   stopifnot(is.data.frame(file),
             nrow(file) == 1,
@@ -692,11 +696,11 @@ create_object <- function(file, sysmeta, base_path, env) {
 }
 
 
-#' Validate an Inventory.
+#' Validate an inventory
 #'
-#' @param inventory (data.frame) An Inventory.
+#' @param inventory (data.frame) An inventory.
 #'
-
+#' @noRd
 validate_inventory <- function(inventory) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0,
@@ -711,11 +715,12 @@ validate_inventory <- function(inventory) {
                   "ready") %in% names(inventory)))
 }
 
-#' Validate an environment.
-#'
-#' @param env (character) An environment
-#'
 
+#' Validate an environment
+#'
+#' @param env (character) An environment.
+#'
+#' @noRd
 validate_environment <- function(env) {
   env_default_components <- c("base_path",
                               "alternate_path",
@@ -734,11 +739,12 @@ validate_environment <- function(env) {
 }
 
 
-#' Calculate a set of child PIDs for a given package.
+#' Calculate a set of child PIDs for the given package
 #'
-#' @param inventory (data.frame) An Inventory.
+#' @param inventory (data.frame) An inventory.
 #' @param package (character) The package identifier.
-
+#'
+#' @noRd
 determine_child_pids <- function(inventory, package) {
   stopifnot(all(c("package", "parent_package", "is_metadata") %in% names(inventory)))
 
@@ -757,8 +763,9 @@ determine_child_pids <- function(inventory, package) {
 }
 
 
-#' Update a package with modified metadata.
+#' Update a package with modified metadata
 #'
+#' @description
 #' The modified metadata should be set in the `env` variable. For example, if
 #' your original metadata is:
 #'
@@ -782,10 +789,11 @@ determine_child_pids <- function(inventory, package) {
 #'
 #' @param inventory (data.frame) An inventory.
 #' @param package (character) The package identifier.
-#' @param env (character) Environment
+#' @param env (character) Environment.
 #'
-#' @return TRUE or FALSE depending on sucess (logical)
-
+#' @return (logical)
+#'
+#' @noRd
 update_package <- function(inventory,
                            package,
                            env = NULL) {
@@ -1004,11 +1012,14 @@ update_package <- function(inventory,
 }
 
 
-#' Parse a Resource Map into a data.frame
+#' Parse a resource map into a data.frame
 #'
-#' @param path (character) Path to the resource map (an RDF/XML file)
+#' Parse a resource map into a data.frame.
 #'
-#' @return (data.frame) The statements in the Resource Map
+#' @param path (character) Path to the resource map (an RDF/XML file).
+#'
+#' @return (data.frame) The statements in the resource map.
+#'
 #' @export
 #'
 #' @examples
@@ -1034,17 +1045,18 @@ parse_resource_map <- function(path) {
 
 #' Filter statements related to packaging
 #'
-#' This is intended to be called after `datapack::getTriples` has been called
-#' on a ResourceMap.
+#' This is intended to be called after [datapack::getTriples()] has been called
+#' on a resource map.
 #'
 #' This function was written specifically for the case of updating a resource
 #' map while preserving any extra statements that have been added such as PROV
 #' statements. Statements are filtered according to these rules:
 #'
-#' @param statements (data.frame) A set of Statements to be filtered
+#' @param statements (data.frame) A set of statements to be filtered.
 #'
-#' @return (data.frame) The filtered Statements
-
+#' @return (data.frame) The filtered statements.
+#'
+#' @noRd
 filter_packaging_statements <- function(statements) {
   stopifnot(is.data.frame(statements))
   if (nrow(statements) == 0) return(statements)
@@ -1057,4 +1069,3 @@ filter_packaging_statements <- function(statements) {
 
   statements
 }
-

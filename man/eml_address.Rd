@@ -2,24 +2,24 @@
 % Please edit documentation in R/eml.R
 \name{eml_address}
 \alias{eml_address}
-\title{Create an EML address element.}
+\title{Create an EML address element}
 \usage{
 eml_address(delivery_points, city, administrative_area, postal_code)
 }
 \arguments{
 \item{delivery_points}{(character) One or more delivery points.}
 
-\item{city}{(character) City}
+\item{city}{(character) City.}
 
-\item{administrative_area}{(character) Administrative area}
+\item{administrative_area}{(character) Administrative area.}
 
-\item{postal_code}{(character) Postal code}
+\item{postal_code}{(character) Postal code.}
 }
 \value{
 (address) An EML address object.
 }
 \description{
-Create an EML address element.
+A simple way to create an EML address element.
 }
 \examples{
 NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")

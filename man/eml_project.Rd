@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_project}
 \alias{eml_project}
-\title{Create an eml-project section.}
+\title{Create an EML project section}
 \usage{
 eml_project(title, personnelList, abstract = NULL, funding = NULL,
   studyAreaDescription = NULL, designDescription = NULL,
@@ -29,6 +29,9 @@ contract numbers. Can pass as a character vector for separate paragraphs.}
 (project) The new project section.
 }
 \description{
+Create an EML project section.
+}
+\details{
 Note - studyAreaDescription, designDescription, and relatedProject are not
 fully fleshed out. Need to pass these objects in directly if you want to use
 them.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_metadata}
 \alias{create_dummy_metadata}
-\title{helpers.R}
+\title{Create a test metadata object}
 \usage{
 create_dummy_metadata(mn, data_pids = NULL)
 }
@@ -12,11 +12,10 @@ create_dummy_metadata(mn, data_pids = NULL)
 \item{data_pids}{(character) Optional. PIDs for data objects the metadata documents.}
 }
 \value{
-pid (character) PID of published metadata document.
+(character) PID of published metadata document.
 }
 \description{
-Various helper functions for things like testing the package.
-Create a test metadata object.
+Create a test EML metadata object.
 }
 \examples{
 \dontrun{

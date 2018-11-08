@@ -1,9 +1,9 @@
 # Maintenance
 
-TODO: Add reasons for these things!
+This document serves as a guide for new maintainers of and contributors to the arcticdatautils package.
 
-This document should serve as a guide for new maintainers of this package.
-It's a work in progress so expect it to change and, hopefully, get better and more complete over time.
+*Note: This is a work-in-progress, so expect it to change and improve over time.*
+
 
 ## Releases
 
@@ -72,9 +72,14 @@ remotes::install_github("nceas/arcticdatautils@*release")
 
 Note: `@*release` specifies that the latest release should be installed.
 
+
 ## Pull Requests
 
-- Code style
-- Commit style
-
-TODO
+- Follow the [tidyverse style conventions](http://style.tidyverse.org/), with the following specific style preferences: 
+    - use underscore for all variable names unless referring to an EML object (e.g., otherEntity, publicationDate, etc.)
+    - include argument checks in the form of `stopifnot()` statements for all functions
+- Before submitting a pull request, please update documentation, check package, and run tests:
+    - use `devtools::check()`
+    - fix any ERRORs and test failures to ensure the Travis CI build passes
+- Commit messages should follow these [guidelines](https://chris.beams.io/posts/git-commit/)
+- If fixing an issue, pull requests should reference that issue (e.g., "This update closes #93.")

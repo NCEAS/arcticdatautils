@@ -11,8 +11,11 @@ create_dummy_package_full(mn, title = "A Dummy Package")
 
 \item{title}{(character) Optional. Title of package. Defaults to "A Dummy Package".}
 }
+\value{
+(list) A list of package PIDs, inluding for the resource map, metadata, and data objects.
+}
 \description{
-Creates a fuller package than \code{\link{create_dummy_package}}
+Creates a fuller package than \code{\link[=create_dummy_package]{create_dummy_package()}}
 but is otherwise based on the same concept. This dummy
 package includes multiple data objects, responsible parties,
 geographic locations, method steps, etc.

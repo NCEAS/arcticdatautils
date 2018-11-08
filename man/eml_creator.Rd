@@ -7,13 +7,13 @@
 eml_creator(...)
 }
 \arguments{
-\item{...}{Arguments passed on to eml_party}
+\item{...}{Arguments passed on to \code{\link[=eml_party]{eml_party()}}.}
 }
 \value{
-(creator) The new creator
+(creator) The new creator.
 }
 \description{
-See \code{\link{eml_party}} for details.
+See \code{\link[=eml_party]{eml_party()}} for details.
 }
 \examples{
 \dontrun{

@@ -7,13 +7,13 @@
 get_ncdf4_attributes(nc)
 }
 \arguments{
-\item{nc}{(ncdf4 or character) Either a ncdf4 object or a file path}
+\item{nc}{(ncdf4/character) Either a ncdf4 object or a file path.}
 }
 \value{
-(data.frame) A data.frame of the attributes
+(data.frame) A data.frame of the attributes.
 }
 \description{
-Get a data.frame of attributes from a NetCDF object
+Get a data.frame of attributes from a NetCDF object.
 }
 \examples{
 \dontrun{

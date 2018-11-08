@@ -2,12 +2,12 @@
 % Please edit documentation in R/dataone.R
 \name{is_token_expired}
 \alias{is_token_expired}
-\title{Determine whether the set token is expired.}
+\title{Determine whether token is expired}
 \usage{
 is_token_expired(node)
 }
 \arguments{
-\item{node}{(character) A member node instance}
+\item{node}{(character) The Member Node.}
 }
 \value{
 (logical)
