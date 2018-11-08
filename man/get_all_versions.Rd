@@ -2,12 +2,12 @@
 % Please edit documentation in R/util.R
 \name{get_all_versions}
 \alias{get_all_versions}
-\title{Get the PIDs of all versions of an object.}
+\title{Get the PIDs of all versions of an object}
 \usage{
 get_all_versions(node, pid)
 }
 \arguments{
-\item{node}{(MNode|CNode) The node to query.}
+\item{node}{(MNode) The Member Node to query.}
 
 \item{pid}{(character) Any object in the chain.}
 }
@@ -19,7 +19,6 @@ Get the PIDs of all versions of an object.
 }
 \examples{
 \dontrun{
-#Set environment
 cn <- CNode("STAGING2")
 mn <- getMNode(cn,"urn:node:mnTestKNB")
 pid <- "urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"

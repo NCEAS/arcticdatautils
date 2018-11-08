@@ -7,15 +7,15 @@
 eml_personnel(role = NULL, ...)
 }
 \arguments{
-\item{role}{(character) Personnel role, eg "principalInvestigator"}
+\item{role}{(character) Personnel role, e.g. "principalInvestigator".}
 
-\item{...}{Arguments passed on to eml_party}
+\item{...}{Arguments passed on to \code{\link[=eml_party]{eml_party()}}.}
 }
 \value{
-(personnel) The new personnel
+(personnel) The new personnel.
 }
 \description{
-See \code{\link{eml_party}} for details.
+See \code{\link[=eml_party]{eml_party()}} for details.
 }
 \examples{
 eml_personnel("test", "user", email = "test@user.com", role = "principalInvestigator")

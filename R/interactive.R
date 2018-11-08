@@ -1,11 +1,11 @@
-#' interactive.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
-#'
-#'
-#' Functions for interactive viewing of the Inventory and other objects.
-#'
-#' @param inventory (character) An inventory
+# Functions for interactive viewing of the inventory and other objects
 
+
+#' View packages
+#'
+#' @param inventory (character) An inventory.
+#'
+#' @noRd
 view_packages <- function(inventory) {
   stopifnot(is.data.frame(inventory),
             nrow(inventory) > 0)
@@ -28,6 +28,7 @@ view_packages <- function(inventory) {
 }
 
 
+# Helper function for view_packages()
 wait_for_key <- function() {
   response <- readline(prompt = "Press [S]top or [C]ontinue")
   response <- tolower(response)
@@ -35,6 +36,7 @@ wait_for_key <- function() {
 }
 
 
+# Helper function for view_packages()
 show_package <- function(inventory, package) {
   cat(paste0("Package: ", package, "\n"))
 

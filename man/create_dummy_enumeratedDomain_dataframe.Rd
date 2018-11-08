@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_enumeratedDomain_dataframe}
 \alias{create_dummy_enumeratedDomain_dataframe}
-\title{Create dummy enumeratedDomain data frame}
+\title{Create test enumeratedDomain data.frame}
 \usage{
 create_dummy_enumeratedDomain_dataframe(factors)
 }
@@ -10,10 +10,10 @@ create_dummy_enumeratedDomain_dataframe(factors)
 \item{factors}{(character) Vector of factor names to include.}
 }
 \value{
-(data.frame) Data frame of factors
+(data.frame) A data.frame of factors.
 }
 \description{
-Create dummy enumeratedDomain data frame
+Create a test data.frame of enumeratedDomains.
 }
 \examples{
 \dontrun{

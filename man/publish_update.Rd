@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{publish_update}
 \alias{publish_update}
-\title{Publish an updated data package.}
+\title{Publish an updated data package}
 \usage{
 publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
   child_pids = NULL, metadata_path = NULL, identifier = NULL,
@@ -21,47 +21,55 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
 
 \item{child_pids}{(character) Optional. Child packages resource map PIDs.}
 
-\item{metadata_path}{(character or eml) Optional. An eml class object or a path to a metadata file to update with. If this is not set, the existing metadata document will be used.}
+\item{metadata_path}{(character or eml) Optional. An eml class object or a path to a metadata file to update with.
+If this is not set, the existing metadata document will be used.}
 
 \item{identifier}{(character) Manually specify the identifier for the new metadata object.}
 
 \item{use_doi}{(logical) Generate and use a DOI as the identifier for the updated metadata object.}
 
-\item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated. Not optional if a parent package exists.}
+\item{parent_resmap_pid}{(character)  Optional. PID of a parent package to be updated.
+Not optional if a parent package exists.}
 
-\item{parent_metadata_pid}{(character)  Optional. Identifier for the metadata document of the parent package. Not optional if a parent package exists.}
+\item{parent_metadata_pid}{(character)  Optional. Identifier for the metadata document of the parent package.
+Not optional if a parent package exists.}
 
-\item{parent_data_pids}{(character)  Optional. Identifier for the data objects of the parent package. Not optional if the parent package contains data objects.}
+\item{parent_data_pids}{(character)  Optional. Identifier for the data objects of the parent package.
+Not optional if the parent package contains data objects.}
 
-\item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.  \code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.}
+\item{parent_child_pids}{(character) Optional. Resource map identifier(s) of child packages in the parent package.
+\code{resource_map_pid} should not be included. Not optional if the parent package contains other child packages.}
 
-\item{public}{(logical) Optional. Make the update public. If FALSE, will set the metadata and resource map to private (but not the data objects).
+\item{public}{(logical) Optional. Make the update public. If \code{FALSE}, will set the metadata and resource map to private (but not the data objects).
 This applies to the new metadata PID and its resource map and data object.
 access policies are not affected.}
 
-\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as aruments exist on the MN before continuing. Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.}
+\item{check_first}{(logical) Optional. Whether to check the PIDs passed in as arguments exist on the MN before continuing.
+Checks that objects exist and are of the right format type. This speeds up the function, especially when \code{data_pids} has many elements.}
 }
 \value{
-pids (character) Named character vector of pids in the data package, including pids for the metadata, resource map, and data objects.
+(character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 }
 \description{
-This function can be used for a variety of tasks:
+Publish an update to a data package after updating data files or metadata.
 }
 \details{
+This function can be used for a variety of tasks:
+
 \itemize{
-  \item Publish an existing package with a DOI
-  \item Update a package with new data objects
-  \item Update a package with new metadata
+\item Publish an existing package with a DOI
+\item Update a package with new data objects
+\item Update a package with new metadata
 }
 
 The metadata_pid and resource_map_pid provide the identifier of an EML metadata
 document and associated resource map, and the data_pids vector provides a list
 of PIDs of data objects in the package.  Update the metadata file and resource map
-by generating a new identifier (a DOI if use_doi is TRUE) and updating the Member
+by generating a new identifier (a DOI if \code{use_doi = TRUE}) and updating the Member
 Node with a public version of the object.  If metadata_file is not missing, it
 should be an edited version of the metadata to be used to update the original. If
 parent_resmap_pid is not missing, it indicates the PID of a parent package that
-should be updated as well, using the parent_medata_pid, parent_data_pids, and
+should be updated as well, using the parent_metadata_pid, parent_data_pids, and
 parent_child_pids as members of the updated package. In all cases, the objects
 are made publicly readable.
 }

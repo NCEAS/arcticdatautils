@@ -17,20 +17,20 @@ update_package_object(mn, data_pid, new_data_path, resource_map_pid,
 \item{resource_map_pid}{(character) PID for resource map to update.}
 
 \item{format_id}{(character) Optional. The format ID to set for the object.
-When not set, \code{\link{guess_format_id}} will be used
+When not set, \code{\link[=guess_format_id]{guess_format_id()}} will be used
 to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 
-\item{public}{(logical) Optional. Make the update public. If FALSE,
+\item{public}{(logical) Optional. Make the update public. If \code{FALSE},
 will set the metadata and resource map to private (but not the data objects).
 This applies to the new metadata PID and its resource map and data object.
 Access policies are not affected.}
 
-\item{use_doi}{(logical) Optional. If TRUE, a new DOI will be minted.}
+\item{use_doi}{(logical) Optional. If \code{TRUE}, a new DOI will be minted.}
 
-\item{...}{Other arguments to pass into \code{\link{publish_update}}.}
+\item{...}{Other arguments to pass into \code{\link[=publish_update]{publish_update()}}.}
 }
 \value{
-PIDs (character) Named character vector of PIDs in the data package, including PIDs
+(character) Named character vector of PIDs in the data package, including PIDs
 for the metadata, resource map, and data objects.
 }
 \description{
@@ -38,8 +38,7 @@ This function updates a data object and then automatically
 updates the package resource map with the new data PID. If an object
 already has a \code{dataTable}, \code{otherEntity}, or \code{spatialVector}
 with a working physical section, the EML will be updated with the new physical.
-It is a convenience wrapper around \code{\link{update_object}}
-and \code{\link{publish_update}}.
+It is a convenience wrapper around \code{\link[=update_object]{update_object()}} and \code{\link[=publish_update]{publish_update()}}.
 }
 \examples{
 \dontrun{
@@ -53,5 +52,6 @@ update_package_object(mnTest, pkg$data[1], "new_file.csv", pkg$resource_map, for
 file.remove("new_file.csv")
 }
 }
-\keyword{publish_update}
-\keyword{update_object}
+\seealso{
+\code{\link[=update_object]{update_object()}} \code{\link[=publish_update]{publish_update()}}
+}

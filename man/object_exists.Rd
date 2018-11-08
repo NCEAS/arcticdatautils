@@ -2,21 +2,21 @@
 % Please edit documentation in R/util.R
 \name{object_exists}
 \alias{object_exists}
-\title{Check if an object exists on a Member Node.}
+\title{Check if an object exists on a Member Node}
 \usage{
 object_exists(node, pids)
 }
 \arguments{
-\item{node}{(MNode|CNode) The Node to query.}
+\item{node}{(MNode) The Member Node to query.}
 
-\item{pids}{(character) PID to check the existence of.}
+\item{pids}{(character) The PID(s) to check the existence of.}
 }
 \value{
 (logical) Whether the object exists.
 }
 \description{
 This is a simple check for the HTTP status of a /meta/{PID} call on the
-provided member node.
+provided Member Mode.
 }
 \examples{
 \dontrun{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{update_object}
 \alias{update_object}
-\title{Update an object with a new file.}
+\title{Update an object with a new file}
 \usage{
 update_object(mn, pid, path, format_id = NULL, new_pid = NULL,
   sid = NULL)
@@ -14,17 +14,20 @@ update_object(mn, pid, path, format_id = NULL, new_pid = NULL,
 
 \item{path}{(character) The full path to the file to update with.}
 
-\item{format_id}{(character) Optional. The format ID to set for the object. When not set, \code{\link{guess_format_id}} will be used to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
+\item{format_id}{(character) Optional. The format ID to set for the object.
+When not set, \code{\link[=guess_format_id]{guess_format_id()}} will be used to guess the format ID.
+Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.}
 
-\item{new_pid}{(character) Optional. Specify the PID for the new Object. Defaults to automatically generating a new, random UUID-style PID.}
+\item{new_pid}{(character) Optional. Specify the PID for the new object.
+Defaults to automatically generating a new, random UUID-style PID.}
 
-\item{sid}{(character) Optiona. Specify a Series ID (SID) to use for the new Object.}
+\item{sid}{(character) Optional. Specify a Series ID (SID) to use for the new object.}
 }
 \value{
 (character) The PID of the updated object.
 }
 \description{
-This is a convenience wrapper around `dataone::updateObject` which copies in
+This is a convenience wrapper around \code{\link[dataone:updateObject]{dataone::updateObject()}} which copies in
 fields from the old object's System Metadata such as the rightsHolder and
 accessPolicy and updates only what needs to be changed.
 }

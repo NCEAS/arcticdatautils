@@ -1,9 +1,7 @@
-#' inserting.R
-#'
-#' A set of utilities for inserting packages from files and folders on disk.
+# A set of utilities for inserting packages from files and folders on disk
 
 
-#' Create a package from a folder containing an ISO package (legacy)
+#' Create a package from a folder containing an ISO package
 #'
 #' This function  handles the process of inserting the original ISO package
 #' and updating it with an EML package.
@@ -12,9 +10,12 @@
 #'
 #' @param mn (MNode) The Member Node to create the packages on.
 #' @param path (character) The path to the folder containing the files.
-#' @param data_pids (character) Optional. Manually specify the PIDs of data. This is useful if data were inserted outside this function and you want to re-use those objects.
+#' @param data_pids (character) Optional. Manually specify the PIDs of data objects.
+#'   This is useful if data were inserted outside this function and you want to re-use those objects.
 #'
-#' @return (list) All of the PIDs created.
+#' @return (list) A list of the PIDs created.
+#'
+#' @noRd
 create_from_folder <- function(mn, path, data_pids=NULL) {
   # Validate args
   stopifnot(file.exists(path))

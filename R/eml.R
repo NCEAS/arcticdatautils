@@ -1,28 +1,26 @@
-#' eml.R
-#'
-#' Helpers for creating EML.
+# Helper functions for creating EML metadata
 
 
-#' Create EML entity from a DataONE pid
+#' Create EML entity from a DataONE PID
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
-#' @param entityType (character) What kind of objects to create from the input. Either "dataTable",
-#' "spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity".
-#' @param ... (optional) Additional arguments to be passed to \code{new(entityType, ...)}. See example
+#' @param entityType (character) What kind of objects to create from the input. One of "dataTable",
+#'   "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".
+#' @param ... (optional) Additional arguments to be passed to \code{new(entityType, ...)}.
 #'
-#' @return (list) The entity object
+#' @return (list) The entity object.
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' #Generate EML otherEntity
+#' # Generate EML otherEntity
 #' pid_to_eml_entity(mn,
 #'                   pid,
 #'                   entityType = "otherEntity",
 #'                   entityName = "Entity Name",
 #'                   entityDescription = "Description about entity")
-#'
 #' }
 pid_to_eml_entity <- function(mn,
                               pid,
@@ -71,50 +69,16 @@ pid_to_eml_entity <- function(mn,
 }
 
 
-#' This function is deprecated. See \link{pid_to_eml_entity}.
-#'
-#' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PID of the object to create the sub-tree for.
-#'
-pid_to_eml_other_entity <- function(mn, pids) {
-  .Deprecated(new = "pid_to_eml_entity",
-              package = "arcticdtautils",
-              old = "pid_to_eml_other_entity")
-}
-
-
-#' This function is deprecated. See \link{pid_to_eml_entity}.
-#'
-#' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pid (character) The PID of the object to create the \code{dataTable} for.
-#' @param attributes (data.frame) Optional data frame of attributes. Follows the convention in \link[EML]{set_attributes}.
-#' @param factors (data.frame) Optional data frame of enumerated attribute values (factors). Follows the convention in \link[EML]{set_attributes}.
-#' @param name (character) Optional field to specify \code{entityName}, otherwise will be extracted from system metadata.
-#' @param description (character) Optional field to specify \code{entityDescription}, otherwise will match name.
-#' @param validateAttributes (logical) If set to FALSE or if attributes are not passed into the function, attribute validatio
-#'
-pid_to_eml_datatable <- function(mn,
-                                 pid,
-                                 attributes = NULL,
-                                 factors = NULL,
-                                 name = NULL,
-                                 description = NULL,
-                                 validateAttributes = TRUE) {
-  .Deprecated(new = "pid_to_eml_entity",
-              package = "arcticdtautils",
-              old = "pid_to_eml_other_entity")
-}
-
-
 #' Create EML physical objects for the given set of PIDs
 #'
-#' Note this is a wrapper around sysmeta_to_eml_physical which handles the task of
-#' creating the EML physical
+#' This is a wrapper around [sysmeta_to_eml_physical()] which handles the task of
+#' creating the EML physical.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pids (character) The PID of the object to create the sub-tree for.
 #'
-#' @return (list of otherEntity) The otherEntity object(s)
+#' @return (list) A list of otherEntity object(s).
+#'
 #' @export
 #'
 #' @examples
@@ -133,36 +97,17 @@ pid_to_eml_physical <- function(mn, pids) {
   sysmeta_to_eml_physical(sysmeta)
 }
 
-#' This function is deprecated. See \link{pid_to_eml_entity}.
-#'
-#' @param sysmeta (SystemMetadata) One or more System Metadata objects
-#'
-sysmeta_to_eml_other_entity <- function(sysmeta) {
-  .Deprecated(new = "pid_to_eml_entity",
-              package = "arcticdtautils",
-              old = "sysmeta_to_other_entity")
-}
 
-
-#' This function is deprecated. See \link{sysmeta_to_eml_other_entity}.
-#'
-#' @param sysmeta (SystemMetadata) A SystemMetadata object
-#'
-sysmeta_to_other_entity <- function(sysmeta) {
-  .Deprecated("sysmeta_to_eml_other_entity",
-              package = "arcticdtautils",
-              old = "sysmeta_to_other_entity")
-}
-
-#' Create an EML physical object from System Metadata
+#' Create an EML physical object from system metadata
 #'
 #' This function creates a pre-canned EML physical object from what's in the
-#' System Metadata of an Object. Note that it sets an Online Distrubtion URL
+#' System Metadata of an object. Note that it sets an Online Distribution URL
 #' of the DataONE v2 resolve service for the PID.
 #'
-#' @param sysmeta (SystemMetadata) One or more System Metadata objects
+#' @param sysmeta (SystemMetadata) One or more System Metadata objects.
 #'
-#' @return (list of physical) The physical objects for each sysmeta
+#' @return (list) A list of physical objects for each sysmeta.
+#'
 #' @export
 #'
 #' @examples
@@ -210,26 +155,16 @@ sysmeta_to_eml_physical <- function(sysmeta) {
   lapply(sysmeta, work)
 }
 
-#' This function is deprecated. See \link{pid_to_eml_entity}.
-#'
-#' @param mn (MNode) The Member Node the objects exist on.
-#' @param path (character) The location on disk of the EML file.
-#' @param pids (character) One or more PIDs for the objects.
-#'
-set_other_entities <- function(mn, path, pids) {
-  .Deprecated(new = "pid_to_eml_entity",
-              package = "arcticdtautils",
-              old = "set_other_entities")
-}
 
 #' Get the Metacat docid for the given identifier
 #'
+#' Get the Metacat docid for the given identifier.
+#'
 #' @param sysmeta (SystemMetadata) The sysmeta of the object you want to find.
 #'
-#' @return (character) The docid
+#' @return (character) The docid.
 #'
-#'
-#'
+#' @noRd
 get_doc_id <- function(sysmeta) {
   stopifnot(is(sysmeta, "SystemMetadata"))
 
@@ -266,13 +201,17 @@ get_doc_id <- function(sysmeta) {
   doc_id
 }
 
-#' Adds a step to the methods document
+
+#' Add a methods step
+#'
+#' Add a methods step to an EML document.
 #'
 #' @param doc (eml) The EML document to add the method step to.
 #' @param title (character) The title of the method step.
 #' @param description (character) The description of the method.
 #'
-#' @return (eml) The modified EML document
+#' @return (eml) The modified EML document.
+#'
 #' @export
 #'
 #' @examples
@@ -299,11 +238,15 @@ add_methods_step <- function(doc, title, description) {
   doc
 }
 
-#' Clear all methods from the document.
+
+#' Clear all methods
+#'
+#' Clear all methods from an EML document.
 #'
 #' @param doc (eml) The document to clear methods from.
 #'
-#' @return (eml) The modified document.
+#' @return (eml) The modified EML document.
+#'
 #' @export
 #'
 #' @examples
@@ -320,26 +263,27 @@ clear_methods <- function(doc) {
   doc
 }
 
-#' Low-level helper for creating EML parties
+
+#' Create an EML party
 #'
-#' You usually will want to use the high-level functions such as
-#'\code{\link{eml_creator}} and \code{\link{eml_contact}} but using this is
-#' fine.
+#' You will usually want to use the high-level functions such as
+#' [eml_creator()] and [eml_contact()] but using this is fine.
 #'
-#' The \code{userId} argument assumes an ORCID so be sure to adjust for that.
+#' The `userId` argument assumes an ORCID so be sure to adjust for that.
 #'
-#' @param type (character) The type of party (e.g. 'contact')
-#' @param given_names (character) The party's given name(s)
-#' @param sur_name (character) The party's surname
-#' @param organization (character) The party's organization name
-#' @param position (character) The party's position
-#' @param email (character) The party's email address(es)
-#' @param phone (character) The party's phone number(s)
-#' @param address (character) The party's address(es)
-#' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ
-#' @param role (character) The party's role
+#' @param type (character) The type of party (e.g. 'contact').
+#' @param given_names (character) The party's given name(s).
+#' @param sur_name (character) The party's surname.
+#' @param organization (character) The party's organization name.
+#' @param position (character) The party's position.
+#' @param email (character) The party's email address(es).
+#' @param phone (character) The party's phone number(s).
+#' @param address (character) The party's address(es).
+#' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ.
+#' @param role (character) The party's role.
 #'
-#' @return An instance of the party specified by the in \code{type} argument
+#' @return (party) An instance of the party specified by the `type` argument.
+#'
 #' @export
 #'
 #' @examples
@@ -350,15 +294,15 @@ clear_methods <- function(doc) {
 #'           c("Data Scientist", "Programmer"))
 #'}
 eml_party <- function(type="associatedParty",
-                      given_names=NULL,
-                      sur_name=NULL,
-                      organization=NULL,
-                      position=NULL,
-                      email=NULL,
-                      phone=NULL,
-                      address=NULL,
-                      userId=NULL,
-                      role=NULL) {
+                      given_names = NULL,
+                      sur_name = NULL,
+                      organization = NULL,
+                      position = NULL,
+                      email = NULL,
+                      phone = NULL,
+                      address = NULL,
+                      userId = NULL,
+                      role = NULL) {
   if (all(sapply(c(sur_name, organization, position), is.null))) {
     stop(call. = FALSE,
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
@@ -440,13 +384,15 @@ eml_party <- function(type="associatedParty",
   party
 }
 
+
 #' Create an EML creator
 #'
-#' See \code{\link{eml_party}} for details.
+#' See [eml_party()] for details.
 #'
-#' @param ... Arguments passed on to eml_party
+#' @param ... Arguments passed on to [eml_party()].
 #'
-#' @return (creator) The new creator
+#' @return (creator) The new creator.
+#'
 #' @export
 #'
 #' @examples
@@ -460,13 +406,15 @@ eml_creator <- function(...) {
   eml_party("creator", ...)
 }
 
+
 #' Create an EML contact
 #'
-#' See \code{\link{eml_party}} for details.
+#' See [eml_party()] for details.
 #'
-#' @param ... Arguments passed on to eml_party
+#' @param ... Arguments passed on to [eml_party()].
 #'
-#' @return (contact) The new contact
+#' @return (contact) The new contact.
+#'
 #' @export
 #'
 #' @examples
@@ -483,11 +431,12 @@ eml_contact <- function(...) {
 
 #' Create an EML metadataProvider
 #'
-#' See \code{\link{eml_party}} for details.
+#' See [eml_party()] for details.
 #'
-#' @param ... Arguments passed on to eml_party
+#' @param ... Arguments passed on to [eml_party()].
 #'
-#' @return (metadataProvider) The new metadataProvider
+#' @return (metadataProvider) The new metadataProvider.
+#'
 #' @export
 #'
 #' @examples
@@ -496,13 +445,15 @@ eml_metadata_provider <- function(...) {
   eml_party("metadataProvider", ...)
 }
 
+
 #' Create an EML associatedParty
 #'
-#' See \code{\link{eml_party}} for details.
+#' See [eml_party()] for details.
 #'
-#' @param ... Arguments passed on to eml_party
+#' @param ... Arguments passed on to [eml_party()].
 #'
-#' @return (associatedParty) The new associatedParty
+#' @return (associatedParty) The new associatedParty.
+#'
 #' @export
 #'
 #' @examples
@@ -511,19 +462,22 @@ eml_associated_party <- function(...) {
   eml_party("associatedParty", ...)
 }
 
+
 #' Create an EML personnel
 #'
-#' See \code{\link{eml_party}} for details.
+#' See [eml_party()] for details.
 #'
-#' @param ... Arguments passed on to eml_party
-#' @param role (character) Personnel role, eg "principalInvestigator"
-#' @return (personnel) The new personnel
+#' @param ... Arguments passed on to [eml_party()].
+#' @param role (character) Personnel role, e.g. "principalInvestigator".
+#'
+#' @return (personnel) The new personnel.
+#'
 #' @export
 #'
 #' @examples
 #' eml_personnel("test", "user", email = "test@@user.com", role = "principalInvestigator")
 eml_personnel <- function(role = NULL, ...) {
-  if(is.null(role)) {
+  if (is.null(role)) {
     stop(call. = FALSE,
          "You must specify a role for a personnel.")
   }
@@ -531,12 +485,16 @@ eml_personnel <- function(role = NULL, ...) {
   eml_party("personnel", role = role, ...)
 }
 
+
 #' Create an EML individualName section
+#'
+#' Create an EML individualName section.
 #'
 #' @param given_names (character) One or more given names.
 #' @param sur_name (character) A sur (last) name.
 #'
-#' @return (individualName) The new individualName section
+#' @return (individualName) The new individualName section.
+#'
 #' @export
 #'
 #' @examples
@@ -565,7 +523,10 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
   indiv_name
 }
 
-#' Create an eml-project section.
+
+#' Create an EML project section
+#'
+#' Create an EML project section.
 #'
 #' Note - studyAreaDescription, designDescription, and relatedProject are not
 #' fully fleshed out. Need to pass these objects in directly if you want to use
@@ -574,14 +535,15 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @param title (character) Title of the project (Required). May have multiple titles.
 #' @param personnelList (list of personnel) Personnel involved with the project.
 #' @param abstract (character) Project abstract. Can pass as a character vector
-#' for separate paragraphs.
+#'   for separate paragraphs.
 #' @param funding (character) Funding sources for the project such as grant and
-#' contract numbers. Can pass as a character vector for separate paragraphs.
+#'   contract numbers. Can pass as a character vector for separate paragraphs.
 #' @param studyAreaDescription (studyAreaDescription)
 #' @param designDescription (designDescription)
 #' @param relatedProject (project)
 #'
 #' @return (project) The new project section.
+#'
 #' @export
 #'
 #' @examples
@@ -610,7 +572,7 @@ eml_project <- function(title,
   project@title <- as(titles, "ListOftitle")
 
   # Personnel
-  if(!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
+  if (!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
     stop(call. = FALSE,
          "All personnel in the list must be of type 'personnel'")
   }
@@ -618,7 +580,7 @@ eml_project <- function(title,
   project@personnel <- as(personnelList, "ListOfpersonnel")
 
   # Abstract
-  if(!is.null(abstract)) {
+  if (!is.null(abstract)) {
     abstract_paras <- lapply(abstract, function(x) {
       as(list(xml2::xml_new_root("para", as.character(x))), "para")
     })
@@ -626,7 +588,7 @@ eml_project <- function(title,
   }
 
   # Funding
-  if(!is.null(funding)) {
+  if (!is.null(funding)) {
     funding_paras <- lapply(funding, function(x) {
       as(list(xml2::xml_new_root("para", as.character(x))), "para")
     })
@@ -634,17 +596,17 @@ eml_project <- function(title,
   }
 
   # Study area description
-  if(!is.null(studyAreaDescription)) {
+  if (!is.null(studyAreaDescription)) {
     project@studyAreaDescription <- studyAreaDescription
   }
 
   # Design description
-  if(!is.null(designDescription)) {
+  if (!is.null(designDescription)) {
     project@designDescription <- designDescription
   }
 
   # Related Project
-  if(!is.null(relatedProject)) {
+  if (!is.null(relatedProject)) {
     project@relatedProject <- relatedProject
   }
 
@@ -652,6 +614,23 @@ eml_project <- function(title,
 }
 
 
+#' Create an EML geographicCoverage section
+#'
+#' A simple way to create an EML geographicCoverage section.
+#'
+#' For a bounding box, all coordinates should be unique.
+#' For a single point, the North and South bounding coordinates should be the same and
+#' the East and West bounding coordinates should be the same.
+#'
+#' @param description (character) A textual description.
+#' @param north (numeric) North bounding coordinate.
+#' @param east (numeric) East bounding coordinate.
+#' @param south (numeric) South bounding coordinate.
+#' @param west (numeric) West bounding coordinate.
+#'
+#' @return (geographicCoverage) The new geographicCoverage section.
+#'
+#' @export
 eml_geographic_coverage <- function(description, north, east, south, west) {
   cov <- new("geographicCoverage")
 
@@ -666,14 +645,17 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 }
 
 
-#' Create an EML address element.
+#' Create an EML address element
+#'
+#' A simple way to create an EML address element.
 #'
 #' @param delivery_points (character) One or more delivery points.
-#' @param city (character) City
-#' @param administrative_area (character) Administrative area
-#' @param postal_code (character) Postal code
+#' @param city (character) City.
+#' @param administrative_area (character) Administrative area.
+#' @param postal_code (character) Postal code.
 #'
 #' @return (address) An EML address object.
+#'
 #' @export
 #'
 #' @examples
@@ -715,16 +697,18 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 }
 
 
-
-#' Set the abstract on an EML document
+#' Set the abstract for an EML document
 #'
-#' @param doc (eml) An EML document
+#' Set the abstract for an EML document.
+#'
+#' @param doc (eml) An EML document.
 #' @param text (character) The abstract text. If \code{text} is length one, an
-#' abstract without \code{<para>} or \code{section} elements will be created.
-#' If \code{text} is greater than one in length, \code{para} elementes will be
-#' used for each element.
+#'   abstract without \code{<para>} or \code{<section>} elements will be created.
+#'   If \code{text} is greater than one in length, \code{para} elementes will be
+#'   used for each element.
 #'
-#' @return (eml) The modified EML document
+#' @return (eml) The modified EML document.
+#'
 #' @export
 #'
 #' @examples
@@ -750,12 +734,15 @@ set_abstract <- function(doc, text) {
 }
 
 
-#' Minimalistic helper function to generate EML abstracts
+#' Create an EML abstract
 #'
-#' @param text (character) Paragraphs of text, one paragraph per element in the
-#' character vector
+#' Create an EML abstract.
 #'
-#' @return (abstract) An EML abstract
+#' @param text (character) Paragraphs of text with one paragraph per element in the
+#'   character vector.
+#'
+#' @return (abstract) An EML abstract.
+#'
 #' @export
 #'
 #' @examples
@@ -783,16 +770,14 @@ eml_abstract <- function(text) {
 #'
 #' The attributes passed into this function are validated one-by-one and the
 #' progress of going through each attribute is printed to the screen along
-#' with any and all validation issues.
+#' with any and all validation issues. This is done by, for each attribute in the list,
+#' creating a minimum valid EML document and adding a new otherEntity with a new
+#' attributeList containing the single attribute to be validated.
 #'
-#' This is done by, for each attribute in the list, creating a minimum valid
-#' EML document and adding a new otherEntity with a new attributeList containing
-#' the single attribute to be validated.
+#' @param attributes (attributeList) An attributeList.
 #'
-#' @param attributes (attributeList) An attributeList
+#' @return (logical) Named vector indicating which attributes are valid.
 #'
-#' @return (boolean) Named vector of TRUE/FALSE indicating which attributes
-#' are valid
 #' @export
 #'
 #' @examples
@@ -856,16 +841,19 @@ eml_validate_attributes <- function(attributes) {
 }
 
 
-#' Add new entity (otherEntity, dataTable, etc) elements to an EML document from a table.
+#' Add new entity elements to an EML document from a table
 #'
-#' @param doc (eml) An EML document
+#' Add new entity elements to an EML document from a table.
+#'
+#' @param doc (eml) An EML document.
 #' @param entities (data.frame) A data.frame with columns type, path, pid, and
-#' format_id
+#'   format_id.
 #' @param resolve_base (character) Optional. Specify a DataONE CN resolve base
-#' URI which will be used for serializing download URLs into the EML. Most users
+#'  URI which will be used for serializing download URLs into the EML. Most users
 #'  should not override the default value.
 #'
 #' @return (eml) The modified EML document.
+#'
 #' @export
 #'
 #' @examples
@@ -915,7 +903,7 @@ eml_add_entities <- function(doc,
   }
 
   # Warn about existing entities
-  for(type in entity_types) {
+  for (type in entity_types) {
     if (type %in% entities$type && length(slot(doc@dataset, type)) > 0) {
       warning(paste0("You are adding one or more ", type, " elements. This function only adds entities and does not remove/replace them."))
     }
@@ -996,16 +984,15 @@ eml_add_entities <- function(doc,
 
 #' Convert otherEntities to dataTables
 #'
-#' Convert an EML 'otherEntity' object to a 'dataTable' object.  This will convert an
-#' otherEntity objectas currently constructed - it does not add a physical or add attributes.
+#' Convert an EML 'otherEntity' object to a 'dataTable' object. This will convert an
+#' otherEntity object as currently constructed - it does not add a physical or add attributes.
 #' However, if these are already in their respective slots, they will be retained.
 #'
-#' @param eml (S4) An EML S4 object
+#' @param eml (S4) An EML S4 object.
 #' @param otherEntity (S4 / integer) Either an EML otherEntity object or the index
-#' of an otherEntity within a ListOfotherEntity.  Integer input is recommended.
-#' @param validate_eml (logical) Optional.  Specify whether or not to validate the eml after
-#' completion.  Defaults to \code{TRUE}.  Recommended setting is \code{TRUE}.  Setting this to
-#' \code{FALSE} reduces execution time by ~ 50 percent.
+#'   of an otherEntity within a ListOfotherEntity. Integer input is recommended.
+#' @param validate_eml (logical) Optional. Whether or not to validate the EML after
+#'   completion. Setting this to `FALSE` reduces execution time by ~50 percent.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1068,14 +1055,17 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
 
 #' Search through EMLs
 #'
-#' This function returns indices within an EML list that contain an instance where \code{test == TRUE}. See examples for more information.
+#' This function returns indices within an EML list that contain an instance where
+#' `test == TRUE`. See examples for more information.
+#'
+#' @param eml_list (S4/List) An EML list object.
+#' @param element (character) Element to evaluate.
+#' @param test (function/character) A function to evaluate (see examples). If test is a character,
+#'   will evaluate if \code{element == test} (see example 1).
 #'
 #' @import EML
-#' @param eml_list (S4/List) an EML list object
-#' @param element (character) element to evaluate
-#' @param test (function/character) A function to evaluate (see examples). If test is a character, will evaluate if \code{element == test} (see example 1).
 #'
-#' @keywords eml
+#' @export
 #'
 #' @author Mitchell Maier mitchell.maier@@gmail.com
 #'
@@ -1097,8 +1087,6 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
 #' n <- which_in_eml(eml@@dataset@@dataTable, "numberType", function(x) {"natural" %in% x})
 #' # Answer: eml@@dataset@@dataTable[n]
 #' }
-#' @export
-#'
 which_in_eml <- function(eml_list, element, test) {
 
   stopifnot(isS4(eml_list))
@@ -1143,10 +1131,10 @@ which_in_eml <- function(eml_list, element, test) {
 #' Set a reference to an EML object
 #'
 #' This function creates a new object with the same class as \code{element_to_replace}
-#' using a reference to \code{element_to_reference}
+#' using a reference to \code{element_to_reference}.
 #'
-#' @param element_to_reference (S4) An EML object to reference
-#' @param element_to_replace (S4) An EML object to replace with a reference
+#' @param element_to_reference (S4) An EML object to reference.
+#' @param element_to_replace (S4) An EML object to replace with a reference.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1154,7 +1142,6 @@ which_in_eml <- function(eml_list, element, test) {
 #'
 #' @examples
 #' \dontrun{
-#'
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
@@ -1192,9 +1179,13 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' This function sets shared attributes using the attributes of the first \code{type}
 #' selected and creates references for all remaining objects of equivalent \code{type}.
 #'
-#' @param eml (S4) An EML S4 object
-#' @param attributeList (S4) Optional. An EML attributeList object. If not provided then it will default to the attributeList of the first \code{type} element
-#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList objects with references. Defaults to 'dataTable'
+#' @param eml (eml) An EML object.
+#' @param attributeList (attributeList) Optional. An EML attributeList object. If not provided
+#'   then it will default to the attributeList of the first \code{type} element.
+#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList
+#'   objects with references. Defaults to 'dataTable'.
+#'
+#' @return (eml) The modified EML document.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1202,18 +1193,16 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #'
 #' @examples
 #' \dontrun{
-#'
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 #' atts <- EML::set_attributes(EML::get_attributes(eml@@dataset@@dataTable[[1]]@@attributeList)$attributes)
 #'
 #' eml <- eml_set_shared_attributes(eml, atts, type = 'dataTable')
-#'
 #' }
 eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTable') {
   stopifnot(methods::is(eml, 'eml'))
-  if(!is.null(attributeList)) {
+  if (!is.null(attributeList)) {
     stopifnot(methods::is(attributeList, 'attributeList'))
   }
   stopifnot(type %in% c('dataTable', 'otherEntity'))

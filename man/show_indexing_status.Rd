@@ -7,15 +7,15 @@
 show_indexing_status(mn, pids)
 }
 \arguments{
-\item{mn}{(MNode) The Member Node to query}
+\item{mn}{(MNode) The Member Node to query.}
 
-\item{pids}{(character|list) One or more PIDs (or list of PIDs)}
+\item{pids}{(character/list) One or more PIDs.}
 }
 \value{
-Nothing
+\code{NULL}
 }
 \description{
-Show the indexing status of a set of PIDs
+Show the indexing status of a set of PIDs.
 }
 \examples{
 \dontrun{

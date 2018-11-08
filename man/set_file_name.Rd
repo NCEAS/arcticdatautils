@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{set_file_name}
 \alias{set_file_name}
-\title{Set the file name on an object}
+\title{Set the file name for an object}
 \usage{
 set_file_name(mn, pid, name)
 }
@@ -14,10 +14,10 @@ set_file_name(mn, pid, name)
 \item{name}{(character) The file name.}
 }
 \value{
-(logical) Whether the update succeeded, FALSE means there was an error.
+(logical) Whether the update succeeded.
 }
 \description{
-Set the file name on an object
+Set the file name for an object.
 }
 \examples{
 \dontrun{

@@ -7,13 +7,13 @@
 eml_metadata_provider(...)
 }
 \arguments{
-\item{...}{Arguments passed on to eml_party}
+\item{...}{Arguments passed on to \code{\link[=eml_party]{eml_party()}}.}
 }
 \value{
-(metadataProvider) The new metadataProvider
+(metadataProvider) The new metadataProvider.
 }
 \description{
-See \code{\link{eml_party}} for details.
+See \code{\link[=eml_party]{eml_party()}} for details.
 }
 \examples{
 eml_metadata_provider("test", "user", email = "test@user.com")

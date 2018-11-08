@@ -1,6 +1,52 @@
-# access.R
-#
-# High-level utility functions for getting and setting access rules for DataONE objects.
+# High-level utility functions for getting and setting access rules for DataONE objects
+
+
+#' Add access rules to the sysmeta object
+#'
+#' This is a function to add a standard set of access rules to
+#' every object so that the access rules don't differ across objects.
+#'
+#' @param sysmeta (SystemMetadata) The SystemMetadata to add rules to.
+#'
+#' @return The modified SystemMetadata object.
+#'
+#' @noRd
+add_access_rules <- function(sysmeta) {
+  if (!inherits(sysmeta, "SystemMetadata")) {
+    stop(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+  }
+
+  # Add myself explicitly as changePermission/write so I can update objects
+  # in the dev environment
+  if (env_get() == "development") {
+    sysmeta <- datapack::addAccessRule(sysmeta, env_load(skip_mn = TRUE)$submitter, "changePermission")
+  }
+
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+
+  sysmeta
+}
+
+
+#' Add access to the given System Metadata for the arctic-data-admins group
+#'
+#' @param sysmeta (sysmeta) System Metadata object.
+#'
+#' @noRd
+add_admin_group_access <- function(sysmeta) {
+  if (!inherits(sysmeta, "SystemMetadata")) {
+    message(paste0("An object of class ", class(sysmeta), " was passed in. Returning unmodified object.\n"))
+    return(sysmeta)
+  }
+
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "read")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "write")
+  sysmeta <- datapack::addAccessRule(sysmeta, "CN=arctic-data-admins,DC=dataone,DC=org", "changePermission")
+
+  sysmeta
+}
 
 
 #' Set the rights holder for an object
@@ -11,12 +57,13 @@
 #'
 #' @param mn (MNode) The Member Node.
 #' @param pids (character) The PIDs of the objects to set the rights holder for.
-#' @param subject (character) The identifier of the new rights holder, typially an ORCID or DN.
+#' @param subject (character) The identifier of the new rights holder, typically an ORCID or DN.
+#'
+#' @return (logical) Whether an update was needed.
 #'
 #' @import dataone
 #' @import datapack
 #'
-#' @return (logical) Whether an update was needed.
 #' @export
 #'
 #' @examples
@@ -108,11 +155,12 @@ set_rights_holder <- function(mn, pids, subject) {
 #'
 #' @param mn (MNode) The Member Node.
 #' @param pids (character) The PIDs of the objects to set permissions for.
-#' @param subjects (character) The identifiers of the subjects to set permissions for, typially an ORCID or DN.
+#' @param subjects (character) The identifiers of the subjects to set permissions for, typically an ORCID or DN.
 #' @param permissions (character) Optional. The permissions to set. Defaults to
-#' read, write, and changePermission.
+#'   read, write, and changePermission.
 #'
 #' @return (logical) Whether an update was needed.
+#'
 #' @export
 #'
 #' @examples
@@ -194,112 +242,6 @@ set_access <- function(mn, pids, subjects, permissions = c("read", "write", "cha
 }
 
 
-#' Set public read access for an object
-#'
-#' Set public read access for an object.
-#'
-#' @param mn (MNode) The Member Node.
-#' @param pids (character) The PIDs of the objects to set public read access for.
-#'
-#' @return (logical) Whether an update was needed.
-#' @export
-#'
-#' @examples
-#'\dontrun{
-#' cn <- CNode("STAGING2")
-#' mn <- getMNode(cn,"urn:node:mnTestKNB")
-#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
-#'    "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
-#' set_public_read(mn, pids)
-#'}
-set_public_read <- function(mn, pids) {
-  set_access(mn, pids, "public", "read")
-}
-
-
-#' Remove public read access for an object
-#'
-#' Remove public read access for an object.
-#'
-#' @param mn (MNode) The Member Node.
-#' @param pids (character) The PIDs of the objects to remove public read access for.
-#'
-#' @export
-#'
-#' @examples
-#'\dontrun{
-#' cn <- CNode("STAGING2")
-#' mn <- getMNode(cn,"urn:node:mnTestKNB")
-#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
-#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
-#' remove_public_read(mn, pids)
-#'}
-remove_public_read <- function(mn, pids) {
-  if (!is(mn, "MNode")) {
-    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
-  }
-
-  if (!all(is.character(pids),
-           all(nchar(pids) > 0))) {
-    stop("Argument 'pids' must be character class with non-zero number of characters.")
-  }
-
-
-  # Store the results of each attempted update
-  results <- c()
-
-  # Remove public read access for each PID
-  for (pid in pids) {
-    sysmeta <- tryCatch({
-      dataone::getSystemMetadata(mn, pid)
-    }, warning = function(w) {
-      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
-      w
-    }, error = function(e) {
-      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
-      message(e)
-      e
-    })
-
-    if (!inherits(sysmeta, "SystemMetadata")) {
-      stop("Failed to get System Metadata.")
-    }
-
-    # Track whether we have changed the record to avoid an uncessary update call
-    changed <- FALSE
-
-    if (!datapack::hasAccessRule(sysmeta, "public", "read")) {
-      message(paste0("Skipping setting public read because ", pid, " is not public."))
-      next
-    }
-
-    changed <- TRUE
-
-    message(paste0("Removing public read access on ", pid, "."))
-    sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)), ]
-
-    # Update the sysmeta
-    update_response <- tryCatch({
-      dataone::updateSystemMetadata(mn, pid, sysmeta)
-    },
-    error = function(e) {
-      message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
-      message(e)
-      e
-    })
-
-    if (inherits(update_response, "error")) {
-      stop("Failed update.")
-    }
-
-    # Save the result for this PID
-    results[pid] <- changed
-  }
-
-  results
-}
-
-
 #' Set rights holder with access policy for an object
 #'
 #' Set the given subject as the rights holder and with given permissions
@@ -308,11 +250,12 @@ remove_public_read <- function(mn, pids) {
 #'
 #' @param mn (MNode) The Member Node.
 #' @param pids (character) The PIDs of the objects to set the rights holder and access policy for.
-#' @param subject (character) The identifier of the new rights holder, typially an ORCID or DN.
+#' @param subject (character) The identifier of the new rights holder, typically an ORCID or DN.
 #' @param permissions (character) Optional. The permissions to set. Defaults to
-#' read, write, and changePermission.
+#'   read, write, and changePermission.
 #'
 #' @return (logical) Whether an update was needed.
+#'
 #' @export
 #'
 #' @examples
@@ -419,6 +362,113 @@ set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "wr
 }
 
 
+#' Set public read access for an object
+#'
+#' Set public read access for an object.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to set public read access for.
+#'
+#' @return (logical) Whether an update was needed.
+#'
+#' @export
+#'
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#'    "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' set_public_read(mn, pids)
+#'}
+set_public_read <- function(mn, pids) {
+  set_access(mn, pids, "public", "read")
+}
+
+
+#' Remove public read access for an object
+#'
+#' Remove public read access for an object.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to remove public read access for.
+#'
+#' @export
+#'
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#' "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' remove_public_read(mn, pids)
+#'}
+remove_public_read <- function(mn, pids) {
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))) {
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+
+  # Store the results of each attempted update
+  results <- c()
+
+  # Remove public read access for each PID
+  for (pid in pids) {
+    sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, pid)
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      message(e)
+      e
+    })
+
+    if (!inherits(sysmeta, "SystemMetadata")) {
+      stop("Failed to get System Metadata.")
+    }
+
+    # Track whether we have changed the record to avoid an uncessary update call
+    changed <- FALSE
+
+    if (!datapack::hasAccessRule(sysmeta, "public", "read")) {
+      message(paste0("Skipping setting public read because ", pid, " is not public."))
+      next
+    }
+
+    changed <- TRUE
+
+    message(paste0("Removing public read access on ", pid, "."))
+    sysmeta@accessPolicy <- sysmeta@accessPolicy[!(grepl("public", sysmeta@accessPolicy$subject) & grepl("read", sysmeta@accessPolicy$permission)), ]
+
+    # Update the sysmeta
+    update_response <- tryCatch({
+      dataone::updateSystemMetadata(mn, pid, sysmeta)
+    },
+    error = function(e) {
+      message(paste0("Failed to update System Metadata for PID '", pid, "'.\n"))
+      message(e)
+      e
+    })
+
+    if (inherits(update_response, "error")) {
+      stop("Failed update.")
+    }
+
+    # Save the result for this PID
+    results[pid] <- changed
+  }
+
+  results
+}
+
+
 #' Check whether an object has public read access
 #'
 #' Check whether objects have public read access.
@@ -426,13 +476,14 @@ set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "wr
 #'
 #' @param mn (MNode) The Member Node.
 #' @param pids (character) The PIDs of the objects to check for public read access.
-#' @param use.names (logical) Optional. If `TRUE` (the default), PIDs will
-#' be used as names for the result unless PIDs have names already, in which case
-#' those names will be used for the result.
+#' @param use.names (logical) If `TRUE`, PIDs will
+#'   be used as names for the result unless PIDs have names already, in which case
+#'   those names will be used for the result.
+#'
+#' @return (logical) Whether an object has public read access.
 #'
 #' @importFrom httr content
 #'
-#' @return (logical) Whether an object has public read access.
 #' @export
 #'
 #' @examples

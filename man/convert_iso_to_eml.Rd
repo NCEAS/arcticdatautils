@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.R
 \name{convert_iso_to_eml}
 \alias{convert_iso_to_eml}
-\title{Convert and ISO document to EML using an XSLT.}
+\title{Convert an ISO document to EML using an XSLT}
 \usage{
 convert_iso_to_eml(path, style = NA)
 }

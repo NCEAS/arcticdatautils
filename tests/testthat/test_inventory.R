@@ -1,6 +1,4 @@
-#' test_inventory.R
-
-context("inventory")
+context("Inventory")
 
 test_that("an inventory can be created correctly", {
   x <- inv_init()
@@ -8,10 +6,9 @@ test_that("an inventory can be created correctly", {
   expect_true(nrow(x) == 0)
 })
 
-
 test_that("an inventory can be updated with new information", {
-  test_inv <- data.frame(file = "A", pid="", created = FALSE, stringsAsFactors = FALSE)
-  new_inv <- data.frame(file = "A", pid="pidA", created = TRUE, stringsAsFactors = FALSE)
+  test_inv <- data.frame(file = "A", pid = "", created = FALSE, stringsAsFactors = FALSE)
+  new_inv <- data.frame(file = "A", pid = "pidA", created = TRUE, stringsAsFactors = FALSE)
   result <- inv_update(test_inv, new_inv)
 
   expect_true(result[1,"pid"] == "pidA")
