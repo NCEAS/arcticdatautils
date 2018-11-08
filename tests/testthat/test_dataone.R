@@ -1,4 +1,4 @@
-context("dataone")
+context("Helpers for the dataone package")
 
 node <- env_load()$mn
 

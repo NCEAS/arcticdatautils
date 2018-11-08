@@ -1,4 +1,4 @@
-# Helper functions for the DataONE R package
+# Helper functions for the dataone package
 
 
 #' Test whether a token is set

@@ -53,7 +53,7 @@ test_that("a contact can be created", {
 })
 
 test_that("a personnel can be created", {
-  personnel <- eml_personnel(given_names="test", sur_name="user", role="principalInvestigator")
+  personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator")
 
   expect_is(personnel, "personnel")
   expect_equal(personnel@individualName[[1]]@givenName[[1]]@.Data, "test")
@@ -62,7 +62,7 @@ test_that("a personnel can be created", {
 })
 
 test_that("a project can be created", {
-  test_personnel_1 <- eml_personnel(given_names="A", sur_name="User", organization="NCEAS", role="originator")
+  test_personnel_1 <- eml_personnel(given_names = "A", sur_name = "User", organization = "NCEAS", role = "originator")
 
   project <- eml_project("some title",
                          list(test_personnel_1),
@@ -79,8 +79,8 @@ test_that("a project can be created", {
 })
 
 test_that("a project can be created with multiple personnel, an abstract can be created with multiple paragraphs, awards with multiple awards", {
-  test_personnel_1 <- eml_personnel(given_names="A", sur_name="User", organization="NCEAS", role="originator")
-  test_personnel_2 <- eml_personnel(given_names="Testy", sur_name="Mactesterson", organization="A Test Org", role=c("user", "author"))
+  test_personnel_1 <- eml_personnel(given_names = "A", sur_name = "User", organization = "NCEAS", role = "originator")
+  test_personnel_2 <- eml_personnel(given_names = "Testy", sur_name = "Mactesterson", organization = "A Test Org", role = c("user", "author"))
 
   project <- eml_project("some title",
                          list(test_personnel_1, test_personnel_2),
@@ -185,7 +185,7 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
   expect_equivalent(otherEntity@physical, eml@dataset@dataTable[[1]]@physical)
 })
 
-test_that("which_in_eml Returns correct locations", {
+test_that("which_in_eml returns correct locations", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
@@ -303,7 +303,7 @@ test_that('eml_set_shared_attributes creates shared attribute references', {
   expect_true(EML::eml_validate(doc))
 })
 
-test_that('eml_party creates multiple giveName, organizationName, and positionName fields', {
+test_that('eml_party creates multiple givenName, organizationName, and positionName fields', {
   creator <- eml_party('creator', c('John', 'and Jack'), 'Smith', c('NCEAS', 'UCSB'),
                        c('Programmers', 'brothers'))
 

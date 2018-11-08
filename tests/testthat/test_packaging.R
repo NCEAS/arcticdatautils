@@ -1,6 +1,4 @@
-#' test_packaging.R
-
-context("packaging")
+context("Packaging")
 
 test_that("child pids are correctly determined", {
   inventory <- data.frame(pid = c("A", "B", "C"),
