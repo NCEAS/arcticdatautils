@@ -2,7 +2,7 @@
 
 [![Travis build status](https://travis-ci.org/NCEAS/arcticdatautils.svg?branch=master)](https://travis-ci.org/NCEAS/arcticdatautils)
 
-The `arcticadatautils` package contains code for doing lots of useful stuff that's too specific for the [dataone](https://github.com/DataONEorg/rdataone) package:
+The `arcticdatautils` package contains code for doing lots of useful stuff that's too specific for the [dataone](https://github.com/DataONEorg/rdataone) package:
 
 - Inserting large numbers of files into a Metacat Member Node
 - High-level [dataone](https://github.com/DataONEorg/rdataone) wrappers for working with Objects and Data Packages that streamline Arctic Data Center operations
