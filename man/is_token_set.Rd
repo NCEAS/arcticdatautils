@@ -2,18 +2,17 @@
 % Please edit documentation in R/dataone.R
 \name{is_token_set}
 \alias{is_token_set}
-\title{dataone.R}
+\title{Test whether a token is set}
 \usage{
 is_token_set(node)
 }
 \arguments{
-\item{node}{(MNode|CNode) The CN or MN you want to find a token for.}
+\item{node}{(MNode/CNode) The Member/Coordinating Node to query.}
 }
 \value{
 (logical)
 }
 \description{
-Helpers for the DataONE R package.
 Test whether a token is set.
 }
 \examples{

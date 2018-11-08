@@ -7,17 +7,16 @@
 eml_set_reference(element_to_reference, element_to_replace)
 }
 \arguments{
-\item{element_to_reference}{(S4) An EML object to reference}
+\item{element_to_reference}{(S4) An EML object to reference.}
 
-\item{element_to_replace}{(S4) An EML object to replace with a reference}
+\item{element_to_replace}{(S4) An EML object to replace with a reference.}
 }
 \description{
 This function creates a new object with the same class as \code{element_to_replace}
-using a reference to \code{element_to_reference}
+using a reference to \code{element_to_reference}.
 }
 \examples{
 \dontrun{
-
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))

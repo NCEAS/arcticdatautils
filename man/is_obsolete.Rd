@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.R
 \name{is_obsolete}
 \alias{is_obsolete}
-\title{Test whether the object is obsoleted by another object.}
+\title{Test whether the object is obsoleted by another object}
 \usage{
 is_obsolete(node, pids)
 }
@@ -15,7 +15,7 @@ is_obsolete(node, pids)
 (logical) Whether or not the object is obsoleted by another object.
 }
 \description{
-Test whether the object is obsoleted by another object.
+Test whether the object is obsoleted by another object
 }
 \examples{
 \dontrun{

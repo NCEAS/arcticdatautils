@@ -2,19 +2,19 @@
 % Please edit documentation in R/eml.R
 \name{eml_abstract}
 \alias{eml_abstract}
-\title{Minimalistic helper function to generate EML abstracts}
+\title{Create an EML abstract}
 \usage{
 eml_abstract(text)
 }
 \arguments{
-\item{text}{(character) Paragraphs of text, one paragraph per element in the
-character vector}
+\item{text}{(character) Paragraphs of text with one paragraph per element in the
+character vector.}
 }
 \value{
-(abstract) An EML abstract
+(abstract) An EML abstract.
 }
 \description{
-Minimalistic helper function to generate EML abstracts
+Create an EML abstract.
 }
 \examples{
 # Set an abstract with a single paragraph

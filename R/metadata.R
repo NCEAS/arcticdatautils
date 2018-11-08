@@ -1,27 +1,23 @@
-#' modify_metadata.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
-#'
-#' Functions related to fixing invalid ISO metadata.
-#'
-#' Some functions just test whether a validation issue is present. These are
-#' prefixed with the text "test". Exactly what they are testing should be
-#' described in the docstrings.
-#'
-#' Other functons fix the bad metadata in place (modifying the original file)
-#' and these functions are prefixed with "fix_". Exactly what they are fixing
-#' should be described in the docstrings.
-#'
-#' Example usage:
-#'
-#' # Find and fix documents in 'mydir' that have extra whitespace in their
-#' # topicCategory element(s)
-#'
-#' the_files <- dir(mydir)
-#' bad_enums <- the_files[which(sapply(the_files, test_has_bad_enum))]
-#  sapply(bad_enums, fix_bad_enums)
+# Functions related to fixing invalid ISO metadata
+
+# Some functions just test whether a validation issue is present. These are
+# prefixed with the text "test". Exactly what they are testing should be
+# described in the docstrings.
+#
+# Other functons fix the bad metadata in place (modifying the original file)
+# and these functions are prefixed with "fix_". Exactly what they are fixing
+# should be described in the docstrings.
+#
+# Example usage:
+#
+# Find and fix documents in 'mydir' that have extra whitespace in their
+# topicCategory element(s)
+#
+# the_files <- dir(mydir)
+# bad_enums <- the_files[which(sapply(the_files, test_has_bad_enum))]
+# sapply(bad_enums, fix_bad_enums)
 
 
-#' @param path (character) a path
 test_has_abstract <- function(path) {
   stopifnot(file.exists(path))
 
@@ -134,7 +130,7 @@ test_has_bad_enum <- function(path) {
 }
 
 
-#' Fix a metadata record with a bad topicCategory.
+#' Fix a metadata record with a bad topicCategory
 #'
 #' This is the case where the ISO schema says what's inside a
 #' gmd:MD_TopicCategoryCode element should match items from a controlled
@@ -143,9 +139,9 @@ test_has_bad_enum <- function(path) {
 #'
 #' 'oceans' != '     oceans     '
 #'
-#' @param path (character) a path
+#' @param path (character) A file path.
 #'
-
+#' @noRd
 fix_bad_enum <- function(path) {
   stopifnot(file.exists(path))
 
@@ -184,9 +180,9 @@ fix_bad_enum <- function(path) {
 #'   <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
 #' </gmd:topicCategory>
 #'
-#' @param path (character) Path
+#' @param path (character) A file path.
 #'
-
+#' @noRd
 fix_bad_topic <- function(path) {
   stopifnot(file.exists(path))
 
@@ -276,7 +272,7 @@ fix_bad_topic <- function(path) {
 }
 
 
-#' Uses XMLStarlet to pretty-print/beautify an XML document.
+#' Use XMLStarlet to pretty-print an XML document
 #'
 #' This command just runs `xmlstarlet path > path`, doing a simple
 #' pretty-printing of the file located at `path`.
@@ -291,12 +287,11 @@ fix_bad_topic <- function(path) {
 #' format` on the same file as you redirect to, you get a weird parse error from
 #' xmlstarlet.
 #'
+#' @param path (character) A file path.
 #'
-#' @param path Path to your file you want pretty-printed. (character)
+#' @return The result of the `system` command (0 = success).
 #'
-#' @return Returns the result of the `system` command (0 = success)
-#'
-
+#' @noRd
 pretty_print <- function(path) {
   stopifnot(file.exists(path),
             file.info(path)$size > 0)

@@ -1,9 +1,16 @@
-#' Score a metadata document against a MetaDIG Suite
+# Functions related to metadata quality
+
+
+#' Score a metadata document against a MetaDIG suite
 #'
-#' @param document (eml or character) Either an EML object or path to a file on disk.
-#' @param suite_id (character) Optional. Specificy a suite ID. Should be one of https://quality.nceas.ucsb.edu/quality/suites
+#' This function scores a metadata document against a MetaDIG suite.
+#' The default suite is for the Arctic Data Center.
 #'
-#' @return (data.frame) A sorted table of Check results
+#' @param document (eml/character) Either an EML object or path to a file on disk.
+#' @param suite_id (character) Specify a suite ID. Should be one of <https://quality.nceas.ucsb.edu/quality/suites>.
+#'
+#' @return (data.frame) A sorted data.frame of check results.
+#'
 #' @export
 #'
 #' @examples
