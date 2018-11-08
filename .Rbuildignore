@@ -2,6 +2,8 @@
 ^\.Rproj\.user$
 ^etc$
 ^docs$
+^\_pkgdown\.yml$
+^index\.md$
 ^\.travis\.yml$
-MAINTENANCE.md
 ^LICENSE$
+^MAINTENANCE\.md$
