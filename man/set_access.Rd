@@ -12,7 +12,7 @@ set_access(mn, pids, subjects, permissions = c("read", "write",
 
 \item{pids}{(character) The PIDs of the objects to set permissions for.}
 
-\item{subjects}{(character) The identifiers of the subjects to set permissions for, typially an ORCID or DN.}
+\item{subjects}{(character) The identifiers of the subjects to set permissions for, typically an ORCID or DN.}
 
 \item{permissions}{(character) Optional. The permissions to set. Defaults to
 read, write, and changePermission.}

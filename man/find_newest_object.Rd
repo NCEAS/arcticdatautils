@@ -2,14 +2,14 @@
 % Please edit documentation in R/util.R
 \name{find_newest_object}
 \alias{find_newest_object}
-\title{Find the newest (by dateUploaded) object within a given set of objects.}
+\title{Find the newest object within the given set of objects}
 \usage{
 find_newest_object(node, identifiers, rows = 1000)
 }
 \arguments{
-\item{node}{(MNode | CNode) The node to query}
+\item{node}{(MNode/CNode) The Member Node to query.}
 
-\item{identifiers}{(character) One or more identifiers}
+\item{identifiers}{(character) One or more identifiers.}
 
 \item{rows}{(numeric) Optional. Specify the size of the query result set.}
 }
@@ -18,7 +18,7 @@ find_newest_object(node, identifiers, rows = 1000)
 unlikely) the first element, in natural order, is returned.
 }
 \description{
-Find the newest (by dateUploaded) object within a given set of objects.
+Find the newest object, based on dateUploaded, within the given set of objects.
 }
 \examples{
 \dontrun{

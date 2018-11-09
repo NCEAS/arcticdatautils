@@ -1,11 +1,9 @@
-#' marking.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
-#'
-#' R commands for marking datasets before adding.
+# Functions for marking datasets before adding
 
 
-#' Divide packages and their files into themes.
+#' Divide packages and their files into themes
 #'
+#' @description
 #' Themes divide packages into groups based upon how the actions we will take
 #' to insert them. Packages are divided into one of three themes:
 #'
@@ -25,17 +23,18 @@
 #'    All other packages not in the above themes.
 #'
 #' Note: Adds a 'theme' column to 'inventory'.
-#' Note: Depeneds on the following columns:
+#' Note: Depends on the following columns:
 #'
 #'  - filename
 #'  - package_nfiles
 #'
 #'
-#' @param inventory (data.frame) An Inventory.
-#' @param nfiles_cutoff (integer) Number of cutoff files
+#' @param inventory (data.frame) An inventory.
+#' @param nfiles_cutoff (integer) Number of cutoff files.
 #'
-#' @return (data.frame) An Inventory.
-
+#' @return (data.frame) An inventory.
+#'
+#' @noRd
 theme_packages <- function(inventory, nfiles_cutoff=100) {
   stopifnot(is.data.frame(inventory),
             "package_nfiles" %in% names(inventory))
@@ -76,4 +75,3 @@ theme_packages <- function(inventory, nfiles_cutoff=100) {
 
   inventory
 }
-

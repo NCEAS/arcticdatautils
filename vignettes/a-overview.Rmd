@@ -1,0 +1,23 @@
+---
+title: "Overview"
+author: "Bryce Mecum"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Abbreviated API overview
+
+- `publish_update()`:
+    - Mint a DOI for a package
+    - Replace the metadata for a package
+    - Add/remove data in a package
+- `publish_object()`: Use before `publish_update()` if you're adding new data to a package
+- `update_resource_map()`: Edit the set of child packages for a package
+- `create_resource_map()`: Useful for creating a new package from scratch. For both project-level metadata packages or dataset-level packages
+- `set_rights_and_access()`: Use this to give a user edit rights to a package
+
+The package does way more than this but the above are the most common tasks.

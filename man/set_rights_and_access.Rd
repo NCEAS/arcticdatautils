@@ -12,7 +12,7 @@ set_rights_and_access(mn, pids, subject, permissions = c("read", "write",
 
 \item{pids}{(character) The PIDs of the objects to set the rights holder and access policy for.}
 
-\item{subject}{(character) The identifier of the new rights holder, typially an ORCID or DN.}
+\item{subject}{(character) The identifier of the new rights holder, typically an ORCID or DN.}
 
 \item{permissions}{(character) Optional. The permissions to set. Defaults to
 read, write, and changePermission.}

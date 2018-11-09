@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.R
 \name{new_uuid}
 \alias{new_uuid}
-\title{Helper function to generate a new UUID PID.}
+\title{Generate a new UUID PID}
 \usage{
 new_uuid()
 }
@@ -10,7 +10,7 @@ new_uuid()
 (character) A new UUID PID.
 }
 \description{
-Helper function to generate a new UUID PID.
+Generate a new UUID PID.
 }
 \examples{
 id <- new_uuid()

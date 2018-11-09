@@ -2,18 +2,18 @@
 % Please edit documentation in R/packaging.R
 \name{parse_resource_map}
 \alias{parse_resource_map}
-\title{Parse a Resource Map into a data.frame}
+\title{Parse a resource map into a data.frame}
 \usage{
 parse_resource_map(path)
 }
 \arguments{
-\item{path}{(character) Path to the resource map (an RDF/XML file)}
+\item{path}{(character) Path to the resource map (an RDF/XML file).}
 }
 \value{
-(data.frame) The statements in the Resource Map
+(data.frame) The statements in the resource map.
 }
 \description{
-Parse a Resource Map into a data.frame
+Parse a resource map into a data.frame.
 }
 \examples{
 \dontrun{

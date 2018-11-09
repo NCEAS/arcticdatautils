@@ -2,9 +2,7 @@
 % Please edit documentation in R/packaging.R
 \name{generate_resource_map}
 \alias{generate_resource_map}
-\title{Create a resource map RDF/XML file and save is to a temporary path.
-This is a convenience wrapper around the constructor of the `ResourceMap`
-class from `DataPackage`.}
+\title{Create a resource map RDF/XML file and save is to a temporary path}
 \usage{
 generate_resource_map(metadata_pid, data_pids = NULL,
   child_pids = NULL, other_statements = NULL,
@@ -12,25 +10,24 @@ generate_resource_map(metadata_pid, data_pids = NULL,
   resource_map_pid = NULL)
 }
 \arguments{
-\item{metadata_pid}{(character) PID of the metadata Object.}
+\item{metadata_pid}{(character) PID of the metadata object.}
 
-\item{data_pids}{(character) PID(s) of the data Objects.}
+\item{data_pids}{(character) PID(s) of the data objects.}
 
-\item{child_pids}{(character) Optional. PID(s) of child Resource Maps.}
+\item{child_pids}{(character) Optional. PID(s) of child resource maps.}
 
-\item{other_statements}{(data.frame) Extra statements to add to the Resource Map.}
+\item{other_statements}{(data.frame) Extra statements to add to the resource map.}
 
 \item{resolve_base}{(character) Optional. The resolve service base URL.}
 
-\item{resource_map_pid}{(character) PID of resource map.}
+\item{resource_map_pid}{(character) The PID of a resource map.}
 }
 \value{
-Absolute path to the Resource Map on disk (character)
+(character) Absolute path to the resource map on disk.
 }
 \description{
-Create a resource map RDF/XML file and save is to a temporary path.
-This is a convenience wrapper around the constructor of the `ResourceMap`
-class from `DataPackage`.
+This is a convenience wrapper around the constructor of the \code{ResourceMap}
+class from \code{DataPackage}.
 }
 \examples{
 \dontrun{

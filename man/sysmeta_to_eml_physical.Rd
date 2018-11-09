@@ -2,19 +2,19 @@
 % Please edit documentation in R/eml.R
 \name{sysmeta_to_eml_physical}
 \alias{sysmeta_to_eml_physical}
-\title{Create an EML physical object from System Metadata}
+\title{Create an EML physical object from system metadata}
 \usage{
 sysmeta_to_eml_physical(sysmeta)
 }
 \arguments{
-\item{sysmeta}{(SystemMetadata) One or more System Metadata objects}
+\item{sysmeta}{(SystemMetadata) One or more System Metadata objects.}
 }
 \value{
-(list of physical) The physical objects for each sysmeta
+(list) A list of physical objects for each sysmeta.
 }
 \description{
 This function creates a pre-canned EML physical object from what's in the
-System Metadata of an Object. Note that it sets an Online Distrubtion URL
+System Metadata of an object. Note that it sets an Online Distribution URL
 of the DataONE v2 resolve service for the PID.
 }
 \examples{

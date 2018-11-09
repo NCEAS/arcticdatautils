@@ -2,20 +2,20 @@
 % Please edit documentation in R/helpers.R
 \name{create_dummy_attributes_dataframe}
 \alias{create_dummy_attributes_dataframe}
-\title{Create dummy attributes data frame}
+\title{Create test attributes data.frame}
 \usage{
 create_dummy_attributes_dataframe(numberAttributes, factors = NULL)
 }
 \arguments{
-\item{numberAttributes}{(integer) Number of attributes to be created in the table}
+\item{numberAttributes}{(integer) Number of attributes to be created in the table.}
 
 \item{factors}{(character) Optional vector of factor names to include.}
 }
 \value{
-(data.frame) Data frame of attributes
+(data.frame) A data.frame of attributes.
 }
 \description{
-Create dummy attributes data frame
+Create a test data.frame of attributes.
 }
 \examples{
 \dontrun{

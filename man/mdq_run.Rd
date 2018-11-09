@@ -2,20 +2,21 @@
 % Please edit documentation in R/quality.R
 \name{mdq_run}
 \alias{mdq_run}
-\title{Score a metadata document against a MetaDIG Suite}
+\title{Score a metadata document against a MetaDIG suite}
 \usage{
 mdq_run(document, suite_id = "arctic.data.center.suite.1")
 }
 \arguments{
-\item{document}{(eml or character) Either an EML object or path to a file on disk.}
+\item{document}{(eml/character) Either an EML object or path to a file on disk.}
 
-\item{suite_id}{(character) Optional. Specificy a suite ID. Should be one of https://quality.nceas.ucsb.edu/quality/suites}
+\item{suite_id}{(character) Specify a suite ID. Should be one of \url{https://quality.nceas.ucsb.edu/quality/suites}.}
 }
 \value{
-(data.frame) A sorted table of Check results
+(data.frame) A sorted data.frame of check results.
 }
 \description{
-Score a metadata document against a MetaDIG Suite
+This function scores a metadata document against a MetaDIG suite.
+The default suite is for the Arctic Data Center.
 }
 \examples{
 \dontrun{

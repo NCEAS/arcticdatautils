@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{clear_methods}
 \alias{clear_methods}
-\title{Clear all methods from the document.}
+\title{Clear all methods}
 \usage{
 clear_methods(doc)
 }
@@ -10,10 +10,10 @@ clear_methods(doc)
 \item{doc}{(eml) The document to clear methods from.}
 }
 \value{
-(eml) The modified document.
+(eml) The modified EML document.
 }
 \description{
-Clear all methods from the document.
+Clear all methods from an EML document.
 }
 \examples{
 \dontrun{
