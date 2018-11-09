@@ -17,9 +17,7 @@ list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
 
 \item{formatType}{(character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.}
 
-\item{whitelist}{(character) A list of admin orcid Identifiers.  Can be a URL or a
-character vector of length 1.
-Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
+\item{whitelist}{(character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
 }
 \description{
 List recent submissions to a DataOne Member Node from all submitters not present
@@ -30,10 +28,14 @@ in the administrator whitelist: https://cn.dataone.org/cn/v2/accounts/CN=arctic-
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 
+View(arcticdatautils::list_submissions(adc, '2018-10-01', '2018-10-07'))
+
 # Return all submitted objects in the past month for the 'adc' node:
+library(lubridate)
 View(list_submissions(adc, Sys.Date() \%m+\% months(-1), Sys.Date(), '*'))
 
 # Return all submitted objects except for one user
+library(lubridate)
 View(list_submissions(adc, Sys.Date() \%m+\% months(-1), Sys.Date(), '*'),
                       whitelist = 'http://orcid.org/0000-0002-2561-5840')
 
