@@ -602,10 +602,14 @@ get_orcid_name <- function(orcid_url) {
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #'
+#' View(arcticdatautils::list_submissions(adc, '2018-10-01', '2018-10-07'))
+#'
 #' # Return all submitted objects in the past month for the 'adc' node:
+#' library(lubridate)
 #' View(list_submissions(adc, Sys.Date() %m+% months(-1), Sys.Date(), '*'))
 #'
 #' # Return all submitted objects except for one user
+#' library(lubridate)
 #' View(list_submissions(adc, Sys.Date() %m+% months(-1), Sys.Date(), '*'),
 #'                       whitelist = 'http://orcid.org/0000-0002-2561-5840')
 #'
@@ -638,7 +642,7 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
   whitelist <- httr::content(req, "text")
 
   # Construct query and return results
-  q = sprintf('dateUploaded:["%sT00:00:00Z" TO "%sT00:00:00Z"] AND formatType:%s', from, to, formatType)
+  q = sprintf('dateUploaded:["%sT00:00:00Z" TO "%sT23:59:59Z"] AND formatType:%s', from, to, formatType)
   results <- dataone::query(mn, list(q = q,
                                       fl = "identifier AND submitter AND dateUploaded AND formatType AND fileName",
                                       rows = 10000),
