@@ -1,4 +1,4 @@
-context("editing")
+context("Editing and managing data packages")
 
 mn <- env_load()$mn
 
@@ -345,7 +345,6 @@ test_that("update_physical works", {
   expect_equal(sum(stringr::str_detect(url_new, pkg$data[4])), 1)
 })
 
-
 test_that("update_package_object changes specified data object and rest of package is intact", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
@@ -396,7 +395,6 @@ test_that("update_package_object changes specified data object and rest of packa
   expect_true(stringr::str_detect(url_new[2], new_data_pid))
 })
 
-
 test_that("update_package_object errors if wrong input", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
@@ -430,7 +428,6 @@ test_that("update_package_object errors if wrong input", {
                                      rm_pid = 1))
   file.remove(file_path)
 })
-
 
 test_that("update_package_object updates EML", {
   if (!is_token_set(mn)) {

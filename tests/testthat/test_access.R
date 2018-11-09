@@ -1,4 +1,4 @@
-context("access")
+context("Access rules")
 
 mn <- env_load()$mn
 

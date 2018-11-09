@@ -1,10 +1,15 @@
-#' Extract the local identifier for an ACADIS ISO metadata XML file.
+# Various utility functions
+
+
+#' Extract the local identifier for an ACADIS ISO metadata XML file
 #'
 #' @param type (character) A string, one of "gateway" or "field-projects".
-#' @param file (character) A string, a connection, or raw vector
-#' (same as \code{\link[xml2]{read_xml}}).
+#' @param file (character) A string, connection, or raw vector
+#'   (same as [xml2::read_xml()]).
 #'
-#' @return The identifier string. (character)
+#' @return (character) The identifier string.
+#'
+#' @noRd
 extract_local_identifier <- function(type, file) {
   stopifnot(is.character(type), length(type) == 1)
   stopifnot(type %in% c("gateway", "field-projects"))
@@ -37,139 +42,15 @@ extract_local_identifier <- function(type, file) {
 }
 
 
-dataone_format_mappings <- list("avi" = "video/avi",
-                                "bmp" = "image/bmp",
-                                "bz2" = "application/x-bzip2",
-                                "csv" = "text/csv",
-                                "doc" = "application/msword",
-                                "docx" = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                "fasta" = "application/x-fasta",
-                                "gif" = "image/gif",
-                                "gz" = "application/x-gzip",
-                                "html" = "text/html",
-                                "ipynb" = "application/json",
-                                "jp2" = "image/jp2",
-                                "jpg" = "image/jpeg",
-                                "jpeg" = "image/jpeg",
-                                "kml" = "application/vnd.google-earth.kml/xml",
-                                "kmz" = "application/vnd.google-earth.kmz",
-                                "md" = "text/markdown",
-                                "mov" = "video/quicktime",
-                                "mp3" = "audio/mpeg",
-                                "mp4" = "video/mp4",
-                                "mpg" = "video/mpeg",
-                                "mpeg" = "video/mpeg",
-                                "n3" = "text/n3",
-                                "nc" = "netCDF-3",
-                                "pdf" = "application/pdf",
-                                "png" = "image/png",
-                                "ppt" = "application/vnd.ms-powerpoint",
-                                "pptx" = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                                "py" = "application/x-python",
-                                "qt" = "video/quicktime",
-                                "r" = "application/R",
-                                "rar" = "application/x-rar-compressed",
-                                "rdf" = "application/rdf/xml",
-                                "rmd" = "text/x-rmarkdown",
-                                "sas" = "application/SAS",
-                                "svg" = "image/svg/xml",
-                                "tar" = "application/x-tar",
-                                "tif" = "image/tiff",
-                                "tiff" = "image/tiff",
-                                "ttl" = "text/turtle",
-                                "tsv" = "text/tsv",
-                                "txt" = "text/plain",
-                                "wav" = "audio/x-wav",
-                                "wma" = "audio/x-ms-wma",
-                                "wmv" = "video/x-ms-wmv",
-                                "xls" = "application/vnd.ms-excel",
-                                "xlsx" = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                "xml" = "application/xml",
-                                "zip" = "application/zip")
-
-
-#' Guess format from filename for a vector of filenames.
-#'
-#' @param filenames (character)
-#'
-#' @return (character) DataOne format identifiers strings.
-#' @export
-#'
-#' @examples
-#'formatid <- guess_format_id("temperature_data.csv")
-#'
-guess_format_id <- function(filenames) {
-  extensions <- tolower(tools::file_ext(filenames))
-  filetypes <- vector(mode = "character", length = length(extensions))
-
-  for (i in seq_len(length(extensions))) {
-    extension <- extensions[i]
-
-    if (extension %in% names(dataone_format_mappings)) {
-      filetypes[i] <- dataone_format_mappings[extension][[1]]
-    } else {
-      filetypes[i] <- "application/octet-stream"
-    }
-  }
-
-  filetypes
-}
-
-
-#' Determine the DataONE format ID for the NetCDF file provided by path.
-#'
-#' @param path (character) Full or relative path to the file in question.
-#'
-#' @return (character) The DataONE format ID.
-get_netcdf_format_id <- function(path) {
-  stopifnot(is.character(path),
-            nchar(path) > 0,
-            file.exists(path))
-
-  if (!requireNamespace("ncdf4")) {
-    stop(call. = FALSE,
-         "The package 'ncdf4' must be installed to run this function. ",
-         "Please install it and try again.")
-  }
-
-  # Try to open the file, capturing errors
-  cdf_file <- try({
-    ncdf4::nc_open(path)
-  })
-
-  # If we failed to open the file, we can assume it's not a valid NetCDF file
-  # and we just return application/octet-stream as the format ID
-  if (inherits(cdf_file, "try-error")) {
-    return("application/octet-stream")
-  }
-
-  # Since we got this far, continue detecting the format
-  stopifnot("format" %in% names(cdf_file))
-  format_string <- cdf_file$format
-  stopifnot(is.character(format_string),
-            nchar(format_string) > 0)
-  format_id = ""
-
-  if (format_string == "NC_FORMAT_CLASSIC") {
-    format_id = "netCDF-3"
-  } else if (format_string == "NC_FORMAT_NETCDF4") {
-    format_id = "netCDF-4"
-  } else {
-    stop("Unknown NetCDF format discovered.")
-  }
-
-  return(format_id)
-}
-
-
-#' Print a random dataset.
+#' Print a random dataset
 #'
 #' @param inventory (data.frame) An inventory.
 #' @param theme (character) Optional. A package theme name.
 #' @param n (numeric) Optional. The number of files to show.
 #'
-#' @return Nothing.
-
+#' @return `NULL`
+#'
+#' @noRd
 show_random_dataset <- function(inventory, theme=NULL, n=10) {
   stopifnot(is.data.frame(inventory),
             all(c("file", "folder", "filename", "theme") %in% names(inventory)))
@@ -193,7 +74,7 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
   base_dir <- sampled_pkg[which(sampled_pkg$is_metadata == TRUE),"folder"]
 
   # startDebug
-  if (length(base_dir) != 0){
+  if (length(base_dir) != 0) {
     browser()
   }
   # endDebug
@@ -215,7 +96,7 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
 }
 
 
-#' Log a message to the console and to a logfile.
+#' Log a message to the console and to a logfile
 #'
 #' Reads from the environment variable 'LOG_PATH' and uses the value set there
 #' to decide the location of the log file. If that envvar isn't set, it defaults
@@ -223,8 +104,9 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
 #'
 #' @param message (character) Your log message.
 #'
-#' @return Nothing.
-
+#' @return `NULL`
+#'
+#' @noRd
 log_message <- function(message=NULL) {
   if (is.null(message) || !is.character(message) || nchar(message) < 1) {
     invisible(return(FALSE))
@@ -251,15 +133,16 @@ log_message <- function(message=NULL) {
 }
 
 
-#' Check if an object exists on a Member Node.
+#' Check if an object exists on a Member Node
 #'
 #' This is a simple check for the HTTP status of a /meta/{PID} call on the
-#' provided member node.
+#' provided Member Mode.
 #'
-#' @param node (MNode|CNode) The Node to query.
-#' @param pids (character) PID to check the existence of.
+#' @param node (MNode) The Member Node to query.
+#' @param pids (character) The PID(s) to check the existence of.
 #'
 #' @return (logical) Whether the object exists.
+#'
 #' @export
 #'
 #' @examples
@@ -297,13 +180,15 @@ object_exists <- function(node, pids) {
 }
 
 
-#' Convert and ISO document to EML using an XSLT.
+#' Convert an ISO document to EML using an XSLT
 #'
 #' Leave style=NA if you want to use the default ISO-to-EML stylesheet.
+#'
 #' @param path (character) Path to the file to convert.
 #' @param style (xslt) The XSLT object to be used for transformation.
 #'
 #' @return (character) Location of the converted file.
+#'
 #' @export
 #'
 #' @examples
@@ -329,14 +214,18 @@ convert_iso_to_eml <- function(path, style=NA) {
 }
 
 
-#' Extract the EML responsible-party blocks in a document, and parse the
-#' surName field to create proper givenName/surName structure
+#' Modify name structure for EML parties
 #'
-#' @param path file path to the EML document to process (character)
+#' Extract the EML responsible-party blocks in a document and parse the
+#' surName field to create proper givenName/surName structure.
 #'
-#' @return path (character) Path to the converted EML file.
+#' @param path (character) The path to the EML document to process.
+#'
+#' @return (character) The path to the converted EML file.
+#'
 #' @import XML
-
+#'
+#' @noRd
 substitute_eml_party <- function(path) {
   # Read in the EML document
   doc = XML::xmlParse(path)
@@ -365,15 +254,19 @@ substitute_eml_party <- function(path) {
   return(path)
 }
 
+
+#' Change EML name
+#'
 #' Utility function to extract a name string from an XML individualName node,
-#' parse it into tokens,and reformat the individualName with new children nodes
+#' parse it into tokens,and reformat the individualName with new children nodes.
 #'
-#' @param party the XML node containing a subclass of eml:ResponsibleParty
+#' @param party The XML node containing a subclass of eml:ResponsibleParty.
 #'
-#' @return the modified XML node
+#' @return The modified XML node.
 #'
 #' @import XML
-
+#'
+#' @noRd
 change_eml_name <- function(party) {
   # Check if there is an individualName element exists
   if (length(XML::getNodeSet(party, "./individualName")) == 0) {
@@ -441,13 +334,15 @@ change_eml_name <- function(party) {
 }
 
 
+#' Replace EML packageId with value
+#'
 #' Replace the EML 'packageId' attribute on the root element with a
 #' certain value.
 #'
 #' @param path (character) Path to the XML file to edit.
 #' @param replacement (character) The new value.
 #'
-
+#' @noRd
 replace_package_id <- function(path, replacement) {
   stopifnot(file.exists(path))
   stopifnot(is.character(replacement),
@@ -464,12 +359,13 @@ replace_package_id <- function(path, replacement) {
   path
 }
 
-#' Adds a string to the title element in the given file.
+
+#' Add a string to the title element in the given file
 #'
 #' @param path (character) Path to the XML file to edit.
 #' @param string (character) The new value.
 #'
-
+#' @noRd
 add_string_to_title <- function(path, string) {
   stopifnot(file.exists(path))
   stopifnot(is.character(string),
@@ -496,13 +392,14 @@ add_string_to_title <- function(path, string) {
 }
 
 
-#' Add a set of additional identifiers to an EML document.
+#' Add a set of additional identifiers to an EML document
 #'
 #' @param path (character) Path to the EML document.
 #' @param identifiers (character) Set of identifiers to add.
 #'
 #' @return (character) Path to the modified document.
-
+#'
+#' @noRd
 add_additional_identifiers <- function(path, identifiers) {
   stopifnot(is.character(path),
             nchar(path) > 0,
@@ -526,15 +423,16 @@ add_additional_identifiers <- function(path, identifiers) {
 }
 
 
-#' (Intelligently) join (possibly redudant) path parts together.
+#' Intelligently join possibly redundant path parts together
 #'
 #' Joins path strings like "./" to "./my/dir" as "./my/dir" instead of as
 #' "././my/dir.
 #'
 #' @param path_parts (character)
 #'
-#' @return (character)The joined path string.
-
+#' @return (character) The joined path string.
+#'
+#' @noRd
 path_join <- function(path_parts=c("")) {
   result <- paste0(path_parts, collapse = "")
 
@@ -554,48 +452,27 @@ path_join <- function(path_parts=c("")) {
   result
 }
 
-#' Test whether an object is a particular format ID.
+
+#' Determine whether the object with the given PID is a resource map
 #'
 #' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
-#' @param pids (character)
-#' @param format_id (character)
+#' @param pids (character) Vector of PIDs.
 #'
-#' @return (logical)
-
-is_format_id <- function(node, pids, format_id) {
-  stopifnot(class(node) %in% c("MNode", "CNode"))
-  stopifnot(all(is.character(pids)),
-            all(lengths(pids) > 0))
-  stopifnot(is.character(format_id),
-            nchar(format_id) > 0)
-
-  result <- vector("logical", length(pids))
-
-  for (i in seq_along(pids)) {
-    result[i] <- dataone::getSystemMetadata(node, pids[i])@formatId == format_id
-  }
-
-  result
-}
-
-#' Determines whether the object with the given PID is a resource map.
+#' @return (logical) Whether or not the object(s) are resource maps.
 #'
-#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
-#' @param pids (character) Vector of PIDs
-#'
-#' @return (logical) Whether or not the object(s) are resource maps
-
+#' @noRd
 is_resource_map <- function(node, pids) {
   is_format_id(node, pids, "http://www.openarchives.org/ore/terms")
 }
 
 
-#' Test whether the object is obsoleted by another object.
+#' Test whether the object is obsoleted by another object
 #'
 #' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
 #' @param pids (character) One or more PIDs to query against.
 #'
 #' @return (logical) Whether or not the object is obsoleted by another object.
+#'
 #' @export
 #'
 #' @examples
@@ -623,11 +500,11 @@ is_obsolete <- function(node, pids) {
 }
 
 
-#' Returns the subject of the set dataone_test_token
+#' Return the subject of the set dataone_test_token
 #'
 #' @return (character) The token subject.
 #'
-#'
+#' @noRd
 get_token_subject <- function() {
   info <- dataone::getTokenInfo(dataone::AuthenticationManager())
 
@@ -645,27 +522,31 @@ get_token_subject <- function() {
 }
 
 
-#' Get the identifier from a DataONE response.
+#' Get the identifier from a DataONE response
 #'
-#' Example resposne:
+#' Example response:
 #'
 #' <d1:identifier xmlns:d1="http://ns.dataone.org/service/types/v1">
 #'   urn:uuid:12aaf494-5840-434d-9cdb-c2597d58543e
 #' </d1:identifier>
 #'
-#' @param dataone_response ("XMLInternalDocument" "XMLAbstractDocument")
+#' @param dataone_response ("XMLInternalDocument"/"XMLAbstractDocument")
 #'
 #' @return (character) The PID.
-
+#'
+#' @noRd
 get_identifier <- function(dataone_response) {
   stopifnot("XMLInternalDocument" %in% class(dataone_response))
-  XML::xmlValue(XML::getNodeSet(dataone_response, "//d1:identifier/text()", namespaces = c("d1"="http://ns.dataone.org/service/types/v1"))[[1]])
+  XML::xmlValue(XML::getNodeSet(dataone_response, "//d1:identifier/text()", namespaces = c("d1" = "http://ns.dataone.org/service/types/v1"))[[1]])
 }
 
 
-#' Helper function to generate a new UUID PID.
+#' Generate a new UUID PID
+#'
+#' Generate a new UUID PID.
 #'
 #' @return (character) A new UUID PID.
+#'
 #' @export
 #'
 #' @examples
@@ -675,12 +556,14 @@ new_uuid <- function() {
 }
 
 
-#' Get the current package version.
+#' Get the current package version
 #'
 #' This function parses the installed DESCRIPTION file to get the latest
-#' version.
+#' version of the package.
 #'
 #' @return (character) The current package version.
+#'
+#' @noRd
 get_current_version <- function() {
   desc_file <- file.path(system.file("DESCRIPTION", package = "arcticdatautils"))
   desc_lines <- readLines(desc_file)
@@ -688,9 +571,11 @@ get_current_version <- function() {
 }
 
 
-#' Use the GitHub API to find the latest release for the package.
+#' Use the GitHub API to find the latest release for the package
 #'
 #' @return (character) The latest release.
+#'
+#' @noRd
 get_latest_release <- function() {
   req <- httr::GET("https://api.github.com/repos/NCEAS/arcticdatautils/releases")
   content <- httr::content(req)
@@ -702,10 +587,12 @@ get_latest_release <- function() {
 }
 
 
+#' Warn if package version is outdated
+#'
 #' Warns if the currently-installed version of the package is not the same
 #' version as the latest release on GitHub.
 #'
-
+#' @noRd
 warn_current_version <- function() {
   current <- get_current_version()
   latest <- get_latest_release()
@@ -716,17 +603,19 @@ warn_current_version <- function() {
 }
 
 
+#' Get the PIDs of all versions of an object
+#'
 #' Get the PIDs of all versions of an object.
 #'
-#' @param node (MNode|CNode) The node to query.
+#' @param node (MNode) The Member Node to query.
 #' @param pid (character) Any object in the chain.
 #'
 #' @return (character) A vector of PIDs in the chain, in order.
+#'
 #' @export
 #'
 #' @examples
 #'\dontrun{
-#' #Set environment
 #' cn <- CNode("STAGING2")
 #' mn <- getMNode(cn,"urn:node:mnTestKNB")
 #' pid <- "urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1"
@@ -776,18 +665,19 @@ get_all_versions <- function(node, pid) {
 }
 
 
-#' Get a structured list of PIDs for the objects in a package.
+#' Get a structured list of PIDs for the objects in a package
 #'
-#' This is a wrapper function around `get_package_direct` which takes either
-#' a resource map PID or a metadata PID as its `pid` argument.
+#' Get a structured list of PIDs for the objects in a package,
+#' including the resource map, metadata, and data objects.
 #'
-#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
+#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on.
 #' @param pid (character) The the resource map PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
+#'   useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
 #' @return (list) A structured list of the members of the package.
+#'
 #' @export
 #'
 #' @examples
@@ -834,16 +724,18 @@ get_package <- function(node, pid, file_names=FALSE, rows=5000) {
 }
 
 
-#' Get a structured list of PIDs for the objects in a package.
+#' Get a structured list of PIDs for the objects in a package
 #'
-#' @param node (MNode|CNode) The Coordinating/Member Node to run the query on.
+#' This function is used within [get_package()].
+#'
+#' @param node (MNode/CNode) The Coordinating/Member Node to run the query on.
 #' @param pid (character) The the metadata PID of the package.
 #' @param file_names (logical) Whether to return file names for all objects.
 #' @param rows (numeric) The number of rows to return in the query. This is only
-#' useful to set if you are warned about the result set being truncated. Defaults to 5000.
+#'   useful to set if you are warned about the result set being truncated. Defaults to 5000.
 #'
-
-get_package_direct <- function(node, pid, file_names=FALSE, rows = 5000) {
+#' @noRd
+get_package_direct <- function(node, pid, file_names = FALSE, rows = 5000) {
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -909,16 +801,17 @@ get_package_direct <- function(node, pid, file_names=FALSE, rows = 5000) {
   response
 }
 
-#' Get the resource map(s) for the given object.
+
+#' Get the resource map(s) for the given object
 #'
-#' @param node (MNode|CNode) The Node to query.
+#' @param node (MNode/CNode) The Member Node to query.
 #' @param pid (character) The object to get the resource map(s) for.
-#' @param rows (numeric) Optional. The number of query results to return. This
-#'   shouldn't need to be modified and the default, 1000, is very likely to be
-#'   more than enough.
+#' @param rows (numeric) Optional. The number of query results to return.
+#'   The default, 1000, is very likely to be more than enough.
 #'
 #' @return (character) The resource map(s) that contain `pid`.
-
+#'
+#' @noRd
 find_newest_resource_map <- function(node, pid, rows = 1000) {
   stopifnot(class(node) %in% c("MNode", "CNode"))
   stopifnot(is.character(pid),
@@ -962,14 +855,17 @@ find_newest_resource_map <- function(node, pid, rows = 1000) {
   find_newest_object(node, all_resource_map_pids)
 }
 
-#' Find the newest (by dateUploaded) object within a given set of objects.
+
+#' Find the newest object within the given set of objects
 #'
-#' @param node (MNode | CNode) The node to query
-#' @param identifiers (character) One or more identifiers
+#' Find the newest object, based on dateUploaded, within the given set of objects.
+#'
+#' @param node (MNode/CNode) The Member Node to query.
+#' @param identifiers (character) One or more identifiers.
 #' @param rows (numeric) Optional. Specify the size of the query result set.
 #'
 #' @return (character) The PID of the newest object. In the case of a tie (very
-#' unlikely) the first element, in natural order, is returned.
+#'   unlikely) the first element, in natural order, is returned.
 #'
 #' @export
 #'
@@ -1004,16 +900,17 @@ find_newest_object <- function(node, identifiers, rows=1000) {
 }
 
 
-#' Filters PIDs that are obsolete.
+#' Filters PIDs that are obsolete
 #'
 #' Whether or not a PID is obsolete is determined by whether its "obsoletedBy"
-#' property is set to another PID (TRUE) or is NA (FALSE).
+#' property is set to another PID (`TRUE`) or is `NA` (`FALSE`).
 #'
-#' @param node (MNode|CNode) The Node to query.
+#' @param node (MNode|CNode) The Member Node to query.
 #' @param pids (character) PIDs to check the obsoletion state of.
 #'
 #' @return (character) PIDs that are not obsoleted by another PID.
-
+#'
+#' @noRd
 filter_obsolete_pids <- function(node, pids) {
   pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(node, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
@@ -1021,11 +918,12 @@ filter_obsolete_pids <- function(node, pids) {
 
 #' Get an approximate list of the datasets in a user's profile
 #'
-#' This function is intended to be (poorly) simulate what a user sees when they
+#' This function is intended to (poorly) simulate what a user sees when they
 #' browse to their "My Data Sets" page (their #profile URL). It uses a similar
-#' Solr to what Metacat UI uses to generate the list. The results of this
-#' function may be the same as what's on the #profile page but may be missing
-#' some of the user's datasets when:
+#' Solr query to what Metacat UI uses to generate the list.
+#'
+#' The results of this function may be the same as what's on the #profile page
+#' but may be missing some of the user's datasets when:
 #'
 #' - The user has any datasets in their #profile that the person running the
 #' query (you) can't \code{read}. This is rare on arcticdata.io but possible
@@ -1036,10 +934,11 @@ filter_obsolete_pids <- function(node, pids) {
 #'
 #' @param mn (MNode) The Member Node to query.
 #' @param subject (character) The subject to find the datasets for. This is
-#' likely going to be your ORCID, e.g. http://orcid.org....
+#'   likely going to be an ORCID, e.g. http://orcid.org....
 #' @param fields (character) A vector of Solr fields to return.
 #'
-#' @return (data.frame) data.frame with the results.
+#' @return (data.frame) A data.frame with the results.
+#'
 #' @export
 #'
 #' @examples
@@ -1096,12 +995,16 @@ view_profile <- function(mn, subject, fields=c("identifier", "title")) {
   results
 }
 
+
 #' Show the indexing status of a set of PIDs
 #'
-#' @param mn (MNode) The Member Node to query
-#' @param pids (character|list) One or more PIDs (or list of PIDs)
+#' Show the indexing status of a set of PIDs.
 #'
-#' @return Nothing
+#' @param mn (MNode) The Member Node to query.
+#' @param pids (character/list) One or more PIDs.
+#'
+#' @return `NULL`
+#'
 #' @export
 #'
 #' @examples
@@ -1154,4 +1057,3 @@ show_indexing_status <- function(mn, pids) {
 
   close(pb)
 }
-

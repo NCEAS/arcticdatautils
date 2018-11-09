@@ -2,12 +2,12 @@
 % Please edit documentation in R/util.R
 \name{get_package}
 \alias{get_package}
-\title{Get a structured list of PIDs for the objects in a package.}
+\title{Get a structured list of PIDs for the objects in a package}
 \usage{
 get_package(node, pid, file_names = FALSE, rows = 5000)
 }
 \arguments{
-\item{node}{(MNode|CNode) The Coordinating/Member Node to run the query on.}
+\item{node}{(MNode/CNode) The Coordinating/Member Node to run the query on.}
 
 \item{pid}{(character) The the resource map PID of the package.}
 
@@ -20,8 +20,8 @@ useful to set if you are warned about the result set being truncated. Defaults t
 (list) A structured list of the members of the package.
 }
 \description{
-This is a wrapper function around `get_package_direct` which takes either
-a resource map PID or a metadata PID as its `pid` argument.
+Get a structured list of PIDs for the objects in a package,
+including the resource map, metadata, and data objects.
 }
 \examples{
 \dontrun{

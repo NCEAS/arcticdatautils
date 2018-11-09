@@ -6,11 +6,6 @@
 \alias{arcticdatautils-package}
 \title{arcticdatautils: Utilities for the Arctic Data Center}
 \description{
-The foo package provides three categories of important functions:
-foo, bar and baz.
+This package contains code for doing lots of useful stuff that's too specific for the
+dataone package, primarily functions that streamline Arctic Data Center operations.
 }
-\section{Foo functions}{
-
-The foo functions ...
-}
-

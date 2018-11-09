@@ -1,6 +1,4 @@
-#' test_util.R
-
-context("util")
+context("Utilities")
 
 test_that("paths can be joined", {
   expect_equal(path_join(""), "")

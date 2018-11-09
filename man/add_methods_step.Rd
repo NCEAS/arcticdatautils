@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{add_methods_step}
 \alias{add_methods_step}
-\title{Adds a step to the methods document}
+\title{Add a methods step}
 \usage{
 add_methods_step(doc, title, description)
 }
@@ -14,10 +14,10 @@ add_methods_step(doc, title, description)
 \item{description}{(character) The description of the method.}
 }
 \value{
-(eml) The modified EML document
+(eml) The modified EML document.
 }
 \description{
-Adds a step to the methods document
+Add a methods step to an EML document.
 }
 \examples{
 \dontrun{

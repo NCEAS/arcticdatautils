@@ -1,8 +1,4 @@
-#' test_environment.R
-#'
-#' Test functions related to loading handling application environment.
-
-context("environment")
+context("Environment")
 
 test_that("can load a simple environment file", {
   x <- yaml::yaml.load_file(system.file("./environment.yml", package = "arcticdatautils"))
@@ -11,14 +7,12 @@ test_that("can load a simple environment file", {
   expect_true(length(setdiff(c("development", "test", "production"), names(x))) == 0)
 })
 
-
 test_that("an environment string can be returned", {
   expect_is(env_get(), "character")
   expect_true(nchar(env_get()) > 0)
 })
 
 test_that("can correctly load the environment", {
-
   # Defaults to development if the env var isn't found
   Sys.setenv("ARCTICDATA_ENV" = "")
   expect_true(env_get() == "development")

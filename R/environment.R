@@ -1,10 +1,9 @@
-#' environment.R
-#' Author: Bryce Mecum <mecum@nceas.ucsb.edu>
+# Functions related to loading configuriation based upon the environment
+# the code is being run under.
+
+
+#' Get the current environment name
 #'
-#' Functions related to loading configuriation based upon the environment
-#' the code is being run under.
-
-
 #' Get the current environment name.
 #'
 #' @return (character) The environment name.
@@ -20,6 +19,9 @@ env_get <- function() {
   env
 }
 
+
+#' Load environmental variables from a YAML-formatted environment file
+#'
 #' Load environmental variables from a YAML-formatted environment file.
 #'
 #' This file should be formatted in the following way:
@@ -35,11 +37,10 @@ env_get <- function() {
 #'
 #' @return (list) A list of name-value pairs.
 #'
-#'
-#'
+#' @noRd
 env_load <- function(name=NULL, path=NULL, skip_mn=FALSE) {
   if (!requireNamespace("yaml")) {
-    stop(call. = FALSE, 
+    stop(call. = FALSE,
          "The package 'yaml' must be installed to run this function. ",
          "Please install it and try again.")
   }

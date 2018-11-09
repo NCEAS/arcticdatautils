@@ -7,13 +7,13 @@
 eml_associated_party(...)
 }
 \arguments{
-\item{...}{Arguments passed on to eml_party}
+\item{...}{Arguments passed on to \code{\link[=eml_party]{eml_party()}}.}
 }
 \value{
-(associatedParty) The new associatedParty
+(associatedParty) The new associatedParty.
 }
 \description{
-See \code{\link{eml_party}} for details.
+See \code{\link[=eml_party]{eml_party()}} for details.
 }
 \examples{
 eml_associated_party("test", "user", email = "test@user.com", role = "Principal Investigator")
