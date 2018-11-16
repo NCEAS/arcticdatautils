@@ -15,3 +15,20 @@ test_that("paths can be joined", {
   # Other tests
   expect_equal(path_join("~/src/arcticdata./inst/asdf"), "~/src/arcticdata/inst/asdf")
 })
+
+test_that('we can set public READ on all versions of a data package', {
+  cn <- CNode('STAGING')
+  mn <- getMNode(mn,'urn:node:mnTestARCTIC')
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  pkg <- create_dummy_package(mn)
+  remove_public_read(mn, unlist(pkg))
+  pkg_v2 <- publish_update(mn, pkg$metadata, pkg$resource_map, pkg$data, public = FALSE)
+  # Set public read on all versions
+  set_public_read_all_versions(mn, pkg$resource_map)
+  pids <- c(unlist(pkg), unlist(pkg_v2))
+
+  expect_true(all(is_public_read(mn, pids)))
+})
