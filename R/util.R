@@ -1057,3 +1057,38 @@ show_indexing_status <- function(mn, pids) {
 
   close(pb)
 }
+
+#' Set public READ access on all versions of PIDs in data package.
+#'
+#' Set public READ access on all versions of PIDs in data package.
+#'
+#' @param mn (MNode) The Member Node to query.
+#' @param resource_map_pid (character) The resource map identifier (PID).
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cn_staging <- CNode('STAGING')
+#' adc_test <- getMNode(cn_staging,'urn:node:mnTestARCTIC')
+#' # Create a dummy package then create another version with 'publish_update()'
+#' pkg <- create_dummy_package(adc_test)
+#' remove_public_read(mn, unlist(pkg))
+#' pkg_v2 <- publish_update(adc_test, pkg$metadata, pkg$resource_map, pkg$data, public = FALSE)
+#' # Set public read on all versions
+#' set_public_read_all_versions(adc_test, pkg$resource_map)
+#' }
+set_public_read_all_versions <- function(mn, resource_map_pid) {
+  stopifnot(is(mn, 'MNode'))
+  stopifnot(is_token_set(mn))
+  stopifnot(is.character(resource_map_pid))
+  stopifnot(arcticdatautils:::is_resource_map(mn, resource_map_pid))
+
+  versions <- get_all_versions(mn, resource_map_pid)
+  pids <- map(versions, get_package, node = mn) %>%
+    unlist() %>%
+    unique()
+  set_public_read(mn, pids)
+
+  return(invisible())
+}
