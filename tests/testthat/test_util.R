@@ -18,7 +18,7 @@ test_that("paths can be joined", {
 
 test_that('we can set public READ on all versions of a data package', {
   cn <- CNode('STAGING')
-  mn <- getMNode(mn,'urn:node:mnTestARCTIC')
+  mn <- getMNode(cn,'urn:node:mnTestARCTIC')
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
