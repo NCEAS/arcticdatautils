@@ -97,9 +97,11 @@ pid_to_eml_physical <- function(mn, pids) {
             all(nchar(pids)) > 0)
   names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
-  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
+  #it really doesn't like this in a liset
+  #sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
+  sysmeta <- getSystemMetadata(mn, pids)
 
-  eml$physical(sysmeta_to_eml_physical(sysmeta))
+  sysmeta_to_eml_physical(sysmeta)
 }
 
 
@@ -126,8 +128,6 @@ pid_to_eml_physical <- function(mn, pids) {
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
   work <- function(x) {
-    phys <- eml$physical()
-    phys$scope <- "document"
 
     if (is.na(x@fileName)) {
       ob_name <- "NA"
@@ -137,14 +137,13 @@ sysmeta_to_eml_physical <- function(sysmeta) {
 
 
     phys <- set_physical(objectName = ob_name,
-                         id = x@identifier,
                          size = format(x@size, scientific = FALSE),
                          sizeUnit = "bytes",
                          authentication = x@checksum,
                          authMethod = x@checksumAlgorithm,
                          url = paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
 
-
+    phys$scope <- "document"
     phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
 
     phys
