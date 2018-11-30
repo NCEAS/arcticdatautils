@@ -24,7 +24,7 @@
 #' }
 pid_to_eml_entity <- function(mn,
                               pid,
-                              entityType = "otherEntity",
+                              entity_type = "otherEntity",
                               ...) {
 
   stopifnot(is(mn, "MNode"))
@@ -32,7 +32,7 @@ pid_to_eml_entity <- function(mn,
             nchar(pid) > 0,
             length(pid) == 1)
 
-  stopifnot(entityType %in% c("dataTable",
+  stopifnot(entity_type %in% c("dataTable",
                               "spatialRaster",
                               "spatialVector",
                               "storedProcedure",
@@ -41,28 +41,28 @@ pid_to_eml_entity <- function(mn,
 
   systmeta <- getSystemMetadata(mn, pid)
 
-  if (entityType == "otherEntity"){
+  if (entity_type == "otherEntity"){
     entity <- eml$otherEntity(physical = pid_to_eml_physical(mn, pid), ...)
   }
-  else if (entityType == "dataTable"){
+  else if (entity_type == "dataTable"){
     entity <- eml$dataTable(physical = pid_to_eml_physical(mn, pid), ...)
   }
-  else if (entityType == "spatialRaster"){
+  else if (entity_type == "spatialRaster"){
     entity <- eml$spatialRaster(physical = pid_to_eml_physical(mn, pid), ...)
   }
-  else if (entityType == "spatialVector"){
+  else if (entity_type == "spatialVector"){
     entity <- eml$spatialVector(physical = pid_to_eml_physical(mn, pid), ...)
   }
-  else if (entityType == "storedProcedure"){
+  else if (entity_type == "storedProcedure"){
     entity <- eml$storedProcedure(physical = pid_to_eml_physical(mn, pid), ...)
   }
-  else if (entityType == "view"){
+  else if (entity_type == "view"){
     entity <- eml$view(physical = pid_to_eml_physical(mn, pid), ...)
   }
 
   # Set entity slots
   if (length(entity$id) == 0) {
-   # entity$id <- list(xml_attribute = systmeta@identifier)
+    # entity$id <- list(xml_attribute = systmeta@identifier)
     entity$id <- systmeta@identifier
   }
 
@@ -78,7 +78,7 @@ pid_to_eml_entity <- function(mn,
     }
   }
 
-  if (entityType == "otherEntity" && length(entity$entityType) == 0) {
+  if (entity_type == "otherEntity" && length(entity$entity_type) == 0) {
     entity$entityType <- "Other"
   }
 
@@ -151,8 +151,8 @@ sysmeta_to_eml_physical <- function(sysmeta) {
                          authMethod = x@checksumAlgorithm,
                          url = paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
 
-    phys$scope <- "document"
     phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
+
     phys
 }
 
