@@ -29,7 +29,8 @@ pid_to_eml_entity <- function(mn,
 
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
-            nchar(pid) > 0)
+            nchar(pid) > 0,
+            length(pid) == 1)
 
   stopifnot(entityType %in% c("dataTable",
                               "spatialRaster",
@@ -87,19 +88,17 @@ pid_to_eml_entity <- function(mn,
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' pid_to_eml_physical(mn, pkg$data)
+#' # Generate EML physical sections for an object in a data package
+#' pid_to_eml_physical(mn, pid)
 #' }
-pid_to_eml_physical <- function(mn, pids) {
+pid_to_eml_physical <- function(mn, pid) {
   stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
-  names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
+  stopifnot(is.character(pid),
+            all(nchar(pid)) > 0,
+            length(pid) == 1)
+  names(pid) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
-  #it really doesn't like this in a liset
-  #sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
-  sysmeta <- getSystemMetadata(mn, pids)
+  sysmeta <- getSystemMetadata(mn, pid)
 
   sysmeta_to_eml_physical(sysmeta)
 }
@@ -119,15 +118,12 @@ pid_to_eml_physical <- function(mn, pids) {
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' sm <- lapply(pkg$data, function(pid) {
-#'   getSystemMetadata(mn, pid)
-#' })
+#' # Generate EML physical object from a system metadata object
+#' sm <- getSystemMetadata(mn, pid)
 #' sysmeta_to_eml_physical(sm)
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
-  work <- function(x) {
+    stopifnot(is(sysmeta, "SystemMetadata"))
 
     if (is.na(x@fileName)) {
       ob_name <- "NA"
@@ -145,13 +141,7 @@ sysmeta_to_eml_physical <- function(sysmeta) {
 
     phys$scope <- "document"
     phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
-
     phys
-  }
-
-  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
-
-  lapply(sysmeta, work)
 }
 
 
