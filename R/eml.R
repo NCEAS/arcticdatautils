@@ -42,10 +42,22 @@ pid_to_eml_entity <- function(mn,
   systmeta <- getSystemMetadata(mn, pid)
 
   if (entityType == "otherEntity"){
-    entity <- eml$otherEntity(physical = pid_to_eml_physical(mn, pid))
+    entity <- eml$otherEntity(physical = pid_to_eml_physical(mn, pid), ...)
   }
   else if (entityType == "dataTable"){
-    entity <- eml$dataTable(physical = pid_to_eml_physical(mn, pid))
+    entity <- eml$dataTable(physical = pid_to_eml_physical(mn, pid), ...)
+  }
+  else if (entityType == "spatialRaster"){
+    entity <- eml$spatialRaster(physical = pid_to_eml_physical(mn, pid), ...)
+  }
+  else if (entityType == "spatialVector"){
+    entity <- eml$spatialVector(physical = pid_to_eml_physical(mn, pid), ...)
+  }
+  else if (entityType == "storedProcedure"){
+    entity <- eml$storedProcedure(physical = pid_to_eml_physical(mn, pid), ...)
+  }
+  else if (entityType == "view"){
+    entity <- eml$view(physical = pid_to_eml_physical(mn, pid), ...)
   }
 
   # Set entity slots
