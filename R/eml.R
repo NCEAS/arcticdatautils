@@ -1,6 +1,8 @@
 # Helper functions for creating EML metadata
 
 
+
+
 #' Create EML entity from a DataONE PID
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
