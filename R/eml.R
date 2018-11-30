@@ -442,22 +442,16 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
   stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
 
   # Create <individualName>
-  indiv_name <- new("individualName")
+  indiv_name <- eml$individualName()
 
   if (!is.null(given_names)) {
     stopifnot(all(sapply(given_names, is.character)))
     stopifnot(all(lengths(given_names) > 0))
 
-    givens <- lapply(given_names, function(given_name) {
-      x <- new("givenName")
-      x@.Data <- given_name
-      x
-    })
-
-    indiv_name@givenName <- new("ListOfgivenName", givens)
+    indiv_name$givenName = given_names
   }
 
-  indiv_name@surName <- new("surName", .Data = sur_name)
+  indiv_name$surName <- sur_name
 
   indiv_name
 }
