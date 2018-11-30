@@ -40,29 +40,33 @@ pid_to_eml_entity <- function(mn,
 
   systmeta <- getSystemMetadata(mn, pid)
 
-  # Create entity
-  entity <- new(entityType,
-                physical = pid_to_eml_physical(mn, pid),
-                ...)
+  if (entityType == "otherEntity"){
+    entity <- eml$otherEntity(physical = pid_to_eml_physical(mn, pid))
+  }
+  else if (entityType == "dataTable"){
+    entity <- eml$dataTable(physical = pid_to_eml_physical(mn, pid))
+  }
 
   # Set entity slots
-  if (length(slot(entity, "id")) == 0) {
-    entity@id <- new("xml_attribute", systmeta@identifier)
+  if (length(entity$id) == 0) {
+   # entity$id <- list(xml_attribute = systmeta@identifier)
+    entity$id <- systmeta@identifier
   }
 
-  if (length(slot(entity, "scope")) == 0) {
-    entity@scope <- new("xml_attribute", "document")
+  if (length(entity$scope) == 0) {
+    #entity$scope <- list(xml_attribute = "document")
+    entity$scope <- "document"
   }
 
-  if (length(slot(entity, "entityName")) == 0) {
+  if (length(entity$entityName) == 0) {
 
     if (!is.na(systmeta@fileName)) {
-      entity@entityName <- new("entityName", systmeta@fileName)
+      entity$entityName <- systmeta@fileName
     }
   }
 
-  if (entityType == "otherEntity" && length(slot(entity, "entityType")) == 0) {
-    entity@entityType <- "Other"
+  if (entityType == "otherEntity" && length(entity$entityType) == 0) {
+    entity$entityType <- "Other"
   }
 
   return(entity)
@@ -94,7 +98,8 @@ pid_to_eml_physical <- function(mn, pids) {
   names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
   sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
-  sysmeta_to_eml_physical(sysmeta)
+
+  eml$physical(sysmeta_to_eml_physical(sysmeta))
 }
 
 
@@ -121,31 +126,26 @@ pid_to_eml_physical <- function(mn, pids) {
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
   work <- function(x) {
-    phys <- new("physical")
-    phys@scope <- new("xml_attribute", "document")
+    phys <- eml$physical()
+    phys$scope <- "document"
 
     if (is.na(x@fileName)) {
-      phys@objectName <- new("objectName", "NA")
+      ob_name <- "NA"
     } else {
-      phys@objectName <- new("objectName", x@fileName)
+      ob_name <- x@fileName
     }
 
-    phys@size <- new("size", format(x@size, scientific = FALSE))
-    phys@size@unit <- new("xml_attribute", "bytes")
 
-    phys@authentication <- new("ListOfauthentication", list(new("authentication", x@checksum)))
-    phys@authentication[[1]]@method <- new("xml_attribute", x@checksumAlgorithm)
+    phys <- set_physical(objectName = ob_name,
+                         id = x@identifier,
+                         size = format(x@size, scientific = FALSE),
+                         sizeUnit = "bytes",
+                         authentication = x@checksum,
+                         authMethod = x@checksumAlgorithm,
+                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
 
-    phys@dataFormat <- new("dataFormat")
-    phys@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
-    phys@dataFormat@externallyDefinedFormat@formatName <- x@formatId
 
-    phys@distribution <- new("ListOfdistribution", list(new("distribution")))
-    phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
-    phys@distribution[[1]]@online <- new("online")
-    phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
-
-    slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
+    phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
 
     phys
   }
