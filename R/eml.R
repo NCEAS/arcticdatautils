@@ -203,68 +203,6 @@ get_doc_id <- function(sysmeta) {
 }
 
 
-#' Add a methods step
-#'
-#' Add a methods step to an EML document.
-#'
-#' @param doc (eml) The EML document to add the method step to.
-#' @param title (character) The title of the method step.
-#' @param description (character) The description of the method.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- add_methods_step(eml, "Field Sampling", "Samples were
-#' collected using a niskin water sampler.")
-#' }
-add_methods_step <- function(doc, title, description) {
-  stopifnot(is(doc, "eml"))
-  stopifnot(is(doc@dataset, "dataset"))
-  stopifnot(is.character(title),
-            nchar(title) > 0)
-  stopifnot(is.character(description),
-            nchar(description) > 0)
-
-  new_step <- new("methodStep",
-                  description  = new("description",
-                                     section = new("section", list(newXMLNode("title", title),
-                                                                   newXMLNode("para", description)))))
-
-  doc@dataset@methods@methodStep[[length(doc@dataset@methods@methodStep) + 1]] <- new_step
-
-  doc
-}
-
-
-#' Clear all methods
-#'
-#' Clear all methods from an EML document.
-#'
-#' @param doc (eml) The document to clear methods from.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- clear_methods(eml)
-#' }
-clear_methods <- function(doc) {
-  stopifnot(is(doc, "eml"))
-
-  # Clear the methods out
-  doc@dataset@methods <- new("MethodsType")
-
-  doc
-}
-
-
 #' Create an EML party
 #'
 #' You will usually want to use the high-level functions such as
