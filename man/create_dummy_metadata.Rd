@@ -12,7 +12,7 @@ create_dummy_metadata(mn, data_pids = NULL)
 \item{data_pids}{(character) Optional. PIDs for data objects the metadata documents.}
 }
 \value{
-(character) PID of published metadata document.
+(character) The PID of the published metadata document.
 }
 \description{
 Create a test EML metadata object.

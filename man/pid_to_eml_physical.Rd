@@ -12,7 +12,7 @@ pid_to_eml_physical(mn, pids)
 \item{pids}{(character) The PID of the object to create the sub-tree for.}
 }
 \value{
-(list) A list of otherEntity object(s).
+(list) A list of physical objects.
 }
 \description{
 This is a wrapper around \code{\link[=sysmeta_to_eml_physical]{sysmeta_to_eml_physical()}} which handles the task of
