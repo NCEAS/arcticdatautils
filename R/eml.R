@@ -41,24 +41,7 @@ pid_to_eml_entity <- function(mn,
 
   systmeta <- getSystemMetadata(mn, pid)
 
-  if (entity_type == "otherEntity"){
-    entity <- eml$otherEntity(physical = pid_to_eml_physical(mn, pid), ...)
-  }
-  else if (entity_type == "dataTable"){
-    entity <- eml$dataTable(physical = pid_to_eml_physical(mn, pid), ...)
-  }
-  else if (entity_type == "spatialRaster"){
-    entity <- eml$spatialRaster(physical = pid_to_eml_physical(mn, pid), ...)
-  }
-  else if (entity_type == "spatialVector"){
-    entity <- eml$spatialVector(physical = pid_to_eml_physical(mn, pid), ...)
-  }
-  else if (entity_type == "storedProcedure"){
-    entity <- eml$storedProcedure(physical = pid_to_eml_physical(mn, pid), ...)
-  }
-  else if (entity_type == "view"){
-    entity <- eml$view(physical = pid_to_eml_physical(mn, pid), ...)
-  }
+  entity <- eml[[entity_type]](physical = pid_to_eml_physical(mn, pid), ...)
 
   # Set entity slots
   if (length(entity$id) == 0) {
@@ -247,22 +230,7 @@ eml_party <- function(type="associatedParty",
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
 
-  if (type == "creator"){
-    party <- eml$creator()
-  }
-  else if (type == "contact"){
-    party <- eml$creator()
-  }
-  else if (type == "associatedParty"){
-    party <- eml$creator()
-  }
-  else if (type == "metadataProvider"){
-    party <- eml$creator()
-  }
-  else if (type == "personnel"){
-    party <- eml$creator()
-  }
-
+  party <- eml[[type]]()
 
   # Individual Name
   if (!is.null(sur_name)) {
