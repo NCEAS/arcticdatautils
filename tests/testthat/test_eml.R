@@ -2,52 +2,28 @@ context("EML")
 
 mn <- env_load()$mn
 
-test_that("multiple method steps can be added to an EML document", {
-  library(XML)
-  library(EML)
-
-  doc <- new("eml")
-  doc <- add_methods_step(doc, "title", "description")
-  doc <- add_methods_step(doc, "another", "method")
-
-  expect_length(doc@dataset@methods@methodStep, 2)
-})
-
-test_that("methods can be cleared from an EML document", {
-  library(EML)
-
-  doc <- new("eml")
-  doc <- add_methods_step(doc, "title", "description")
-
-  expect_length(doc@dataset@methods@methodStep, 1)
-
-  doc <- clear_methods(doc)
-  expect_length(doc@dataset@methods@methodStep, 0)
-})
-
 test_that("a creator can be created", {
   creator <- eml_creator("test", "user")
 
-  expect_is(creator, "creator")
-  expect_equal(creator@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(creator@individualName[[1]]@surName@.Data, "user")
+  expect_equal(creator$individualName$givenName, "test")
+  expect_equal(creator$individualName$surName, "user")
 })
 
 test_that("a contact can be created", {
   contact <- eml_contact("test", "user")
 
   expect_is(contact, "contact")
-  expect_equal(contact@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(contact@individualName[[1]]@surName@.Data, "user")
+  expect_equal(contact$individualName$givenName, "test")
+  expect_equal(contact$individualName$surName, "user")
 })
 
 test_that("a personnel can be created", {
   personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator")
 
   expect_is(personnel, "personnel")
-  expect_equal(personnel@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(personnel@individualName[[1]]@surName@.Data, "user")
-  expect_equal(personnel@role[[1]]@.Data, "principalInvestigator")
+  expect_equal(personnel$individualName$givenName, "test")
+  expect_equal(personnel$individualName$surName, "user")
+  expect_equal(personnel$role, "principalInvestigator")
 })
 
 test_that("a project can be created", {
