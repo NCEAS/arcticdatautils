@@ -247,51 +247,52 @@ eml_party <- function(type="associatedParty",
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
 
-  party <- new(type)
+  if (type == "creator"){
+    party <- eml$creator()
+  }
+  else if (type == "contact"){
+    party <- eml$creator()
+  }
+  else if (type == "associatedParty"){
+    party <- eml$creator()
+  }
+  else if (type == "metadataProvider"){
+    party <- eml$creator()
+  }
+  else if (type == "personnel"){
+    party <- eml$creator()
+  }
+
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party@individualName <- c(eml_individual_name(given_names, sur_name))
+    party$individualName <- c(eml_individual_name(given_names, sur_name))
   }
 
   # Organization Name
   if (!is.null(organization)) {
-    party@organizationName <- new('ListOforganizationName', lapply(organization, function(x) {new('organizationName', .Data = x)}))
+    party$organizationName <- organization
   }
 
   # Position
   if (!is.null(position)) {
-    party@positionName <- new('ListOfpositionName', lapply(position, function(x) {new('positionName', .Data = x)}))
+    party$positionName <- position
   }
 
   # Email
   if (!is.null(email)) {
-    party@electronicMailAddress <- new("ListOfelectronicMailAddress", lapply(email, function(x) { new("electronicMailAddress", .Data = x )}))
+    party$electronicMailAddress <- email
   }
 
   # Address
   if (!is.null(address)) {
-    # Upgade to a ListOfaddress if needed
-    if (is(address, "address")) {
-      address <- c(address)
-    }
-
-    party@address <- address
+    # This crams the entire address into the delivery point...not ideal
+    party$address <- eml$address(address)
   }
 
   # Phone
   if (!is.null(phone)) {
-    # Upgrade to phone is needed
-    if (is.character(phone)) {
-      phone <- new("ListOfphone", lapply(phone, function(x) as(x, "phone")))
-    }
-
-    # Upgade to a ListOfphone if needed
-    if (is(phone, "phone")) {
-      phone <- c(phone)
-    }
-
-    party@phone <- phone
+    party$phone <- phone
   }
 
   # userId
@@ -301,7 +302,9 @@ eml_party <- function(type="associatedParty",
       warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
     }
 
-    party@userId <- c(new("userId", .Data = userId, directory = "https://orcid.org"))
+    party$userId <- eml$userId()
+    party$userId$userId <- userID
+    party$userId$directory = "https://orcid.org"
   }
 
   # Role
@@ -314,9 +317,7 @@ eml_party <- function(type="associatedParty",
 
     # If type is personnel, role needs to be ListOfrole, otherwise just role
     if (type == "personnel") {
-      party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
-    } else {
-      party@role <- as(role, "role")
+      party$role <- role
     }
   }
 
