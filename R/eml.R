@@ -26,14 +26,15 @@
 #' }
 pid_to_eml_entity <- function(mn,
                               pid,
-                              entityType = "otherEntity",
+                              entity_type = "otherEntity",
                               ...) {
 
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
-            nchar(pid) > 0)
+            nchar(pid) > 0,
+            length(pid) == 1)
 
-  stopifnot(entityType %in% c("dataTable",
+  stopifnot(entity_type %in% c("dataTable",
                               "spatialRaster",
                               "spatialVector",
                               "storedProcedure",
@@ -42,29 +43,28 @@ pid_to_eml_entity <- function(mn,
 
   systmeta <- getSystemMetadata(mn, pid)
 
-  # Create entity
-  entity <- new(entityType,
-                physical = pid_to_eml_physical(mn, pid),
-                ...)
+  entity <- eml[[entity_type]](physical = pid_to_eml_physical(mn, pid), ...)
 
   # Set entity slots
-  if (length(slot(entity, "id")) == 0) {
-    entity@id <- new("xml_attribute", systmeta@identifier)
+  if (length(entity$id) == 0) {
+    # entity$id <- list(xml_attribute = systmeta@identifier)
+    entity$id <- systmeta@identifier
   }
 
-  if (length(slot(entity, "scope")) == 0) {
-    entity@scope <- new("xml_attribute", "document")
+  if (length(entity$scope) == 0) {
+    #entity$scope <- list(xml_attribute = "document")
+    entity$scope <- "document"
   }
 
-  if (length(slot(entity, "entityName")) == 0) {
+  if (length(entity$entityName) == 0) {
 
     if (!is.na(systmeta@fileName)) {
-      entity@entityName <- new("entityName", systmeta@fileName)
+      entity$entityName <- systmeta@fileName
     }
   }
 
-  if (entityType == "otherEntity" && length(slot(entity, "entityType")) == 0) {
-    entity@entityType <- "Other"
+  if (entity_type == "otherEntity" && length(entity$entity_type) == 0) {
+    entity$entityType <- "Other"
   }
 
   return(entity)
@@ -85,17 +85,18 @@ pid_to_eml_entity <- function(mn,
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' pid_to_eml_physical(mn, pkg$data)
+#' # Generate EML physical sections for an object in a data package
+#' pid_to_eml_physical(mn, pid)
 #' }
-pid_to_eml_physical <- function(mn, pids) {
+pid_to_eml_physical <- function(mn, pid) {
   stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
-  names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
+  stopifnot(is.character(pid),
+            all(nchar(pid)) > 0,
+            length(pid) == 1)
+  names(pid) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
-  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
+  sysmeta <- getSystemMetadata(mn, pid)
+
   sysmeta_to_eml_physical(sysmeta)
 }
 
@@ -114,47 +115,30 @@ pid_to_eml_physical <- function(mn, pids) {
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' sm <- lapply(pkg$data, function(pid) {
-#'   getSystemMetadata(mn, pid)
-#' })
+#' # Generate EML physical object from a system metadata object
+#' sm <- getSystemMetadata(mn, pid)
 #' sysmeta_to_eml_physical(sm)
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
-  work <- function(x) {
-    phys <- new("physical")
-    phys@scope <- new("xml_attribute", "document")
+    stopifnot(is(sysmeta, "SystemMetadata"))
 
     if (is.na(x@fileName)) {
-      phys@objectName <- new("objectName", "NA")
+      ob_name <- "NA"
     } else {
-      phys@objectName <- new("objectName", x@fileName)
+      ob_name <- x@fileName
     }
 
-    phys@size <- new("size", format(x@size, scientific = FALSE))
-    phys@size@unit <- new("xml_attribute", "bytes")
 
-    phys@authentication <- new("ListOfauthentication", list(new("authentication", x@checksum)))
-    phys@authentication[[1]]@method <- new("xml_attribute", x@checksumAlgorithm)
+    phys <- set_physical(objectName = ob_name,
+                         size = format(x@size, scientific = FALSE),
+                         sizeUnit = "bytes",
+                         authentication = x@checksum,
+                         authMethod = x@checksumAlgorithm,
+                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
 
-    phys@dataFormat <- new("dataFormat")
-    phys@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
-    phys@dataFormat@externallyDefinedFormat@formatName <- x@formatId
-
-    phys@distribution <- new("ListOfdistribution", list(new("distribution")))
-    phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
-    phys@distribution[[1]]@online <- new("online")
-    phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
-
-    slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
+    phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
 
     phys
-  }
-
-  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
-
-  lapply(sysmeta, work)
 }
 
 
@@ -204,68 +188,6 @@ get_doc_id <- function(sysmeta) {
 }
 
 
-#' Add a methods step
-#'
-#' Add a methods step to an EML document.
-#'
-#' @param doc (eml) The EML document to add the method step to.
-#' @param title (character) The title of the method step.
-#' @param description (character) The description of the method.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- add_methods_step(eml, "Field Sampling", "Samples were
-#' collected using a niskin water sampler.")
-#' }
-add_methods_step <- function(doc, title, description) {
-  stopifnot(is(doc, "eml"))
-  stopifnot(is(doc@dataset, "dataset"))
-  stopifnot(is.character(title),
-            nchar(title) > 0)
-  stopifnot(is.character(description),
-            nchar(description) > 0)
-
-  new_step <- new("methodStep",
-                  description  = new("description",
-                                     section = new("section", list(newXMLNode("title", title),
-                                                                   newXMLNode("para", description)))))
-
-  doc@dataset@methods@methodStep[[length(doc@dataset@methods@methodStep) + 1]] <- new_step
-
-  doc
-}
-
-
-#' Clear all methods
-#'
-#' Clear all methods from an EML document.
-#'
-#' @param doc (eml) The document to clear methods from.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- clear_methods(eml)
-#' }
-clear_methods <- function(doc) {
-  stopifnot(is(doc, "eml"))
-
-  # Clear the methods out
-  doc@dataset@methods <- new("MethodsType")
-
-  doc
-}
-
-
 #' Create an EML party
 #'
 #' You will usually want to use the high-level functions such as
@@ -310,51 +232,37 @@ eml_party <- function(type="associatedParty",
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
 
-  party <- new(type)
+  party <- eml[[type]]()
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party@individualName <- c(eml_individual_name(given_names, sur_name))
+    party$individualName <- c(eml_individual_name(given_names, sur_name))
   }
 
   # Organization Name
   if (!is.null(organization)) {
-    party@organizationName <- new('ListOforganizationName', lapply(organization, function(x) {new('organizationName', .Data = x)}))
+    party$organizationName <- organization
   }
 
   # Position
   if (!is.null(position)) {
-    party@positionName <- new('ListOfpositionName', lapply(position, function(x) {new('positionName', .Data = x)}))
+    party$positionName <- position
   }
 
   # Email
   if (!is.null(email)) {
-    party@electronicMailAddress <- new("ListOfelectronicMailAddress", lapply(email, function(x) { new("electronicMailAddress", .Data = x )}))
+    party$electronicMailAddress <- email
   }
 
   # Address
   if (!is.null(address)) {
-    # Upgade to a ListOfaddress if needed
-    if (is(address, "address")) {
-      address <- c(address)
-    }
-
-    party@address <- address
+    # This crams the entire address into the delivery point...not ideal
+    party$address <- eml$address(address)
   }
 
   # Phone
   if (!is.null(phone)) {
-    # Upgrade to phone is needed
-    if (is.character(phone)) {
-      phone <- new("ListOfphone", lapply(phone, function(x) as(x, "phone")))
-    }
-
-    # Upgade to a ListOfphone if needed
-    if (is(phone, "phone")) {
-      phone <- c(phone)
-    }
-
-    party@phone <- phone
+    party$phone <- phone
   }
 
   # userId
@@ -364,7 +272,9 @@ eml_party <- function(type="associatedParty",
       warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
     }
 
-    party@userId <- c(new("userId", .Data = userId, directory = "https://orcid.org"))
+    party$userId <- eml$userId()
+    party$userId$userId <- userID
+    party$userId$directory = "https://orcid.org"
   }
 
   # Role
@@ -377,9 +287,7 @@ eml_party <- function(type="associatedParty",
 
     # If type is personnel, role needs to be ListOfrole, otherwise just role
     if (type == "personnel") {
-      party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
-    } else {
-      party@role <- as(role, "role")
+      party$role <- role
     }
   }
 
@@ -505,22 +413,16 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
   stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
 
   # Create <individualName>
-  indiv_name <- new("individualName")
+  indiv_name <- eml$individualName()
 
   if (!is.null(given_names)) {
     stopifnot(all(sapply(given_names, is.character)))
     stopifnot(all(lengths(given_names) > 0))
 
-    givens <- lapply(given_names, function(given_name) {
-      x <- new("givenName")
-      x@.Data <- given_name
-      x
-    })
-
-    indiv_name@givenName <- new("ListOfgivenName", givens)
+    indiv_name$givenName = given_names
   }
 
-  indiv_name@surName <- new("surName", .Data = sur_name)
+  indiv_name$surName <- sur_name
 
   indiv_name
 }
