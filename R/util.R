@@ -1082,13 +1082,14 @@ set_public_read_all_versions <- function(mn, resource_map_pid) {
   stopifnot(is(mn, 'MNode'))
   stopifnot(is_token_set(mn))
   stopifnot(is.character(resource_map_pid))
-  stopifnot(is_resource_map(mn, resource_map_pid))
+  stopifnot(arcticdatautils:::is_resource_map(mn, resource_map_pid))
 
-  versions <- get_all_versions(mn, resource_map_pid)
-  pids <- lapply(versions, get_package, node = mn) %>%
+  pids <- get_package(mn, resource_map_pid) %>%
+    unlist()
+  versions <- lapply(pids, get_all_versions, node = mn) %>%
     unlist() %>%
     unique()
-  set_public_read(mn, pids)
+  set_public_read(mn, versions)
 
   return(invisible())
 }
