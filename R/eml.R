@@ -212,8 +212,8 @@ get_doc_id <- function(sysmeta) {
 #' \dontrun{
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
-#' eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
-#'           c("Data Scientist", "Programmer"))
+#' eml_party("creator", list("Dominic", "'Dom'"), "Mullen", list("NCEAS", "UCSB"),
+#'           list("Data Scientist", "Programmer"))
 #'}
 eml_party <- function(type="associatedParty",
                       given_names = NULL,
@@ -234,7 +234,7 @@ eml_party <- function(type="associatedParty",
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party$individualName <- c(eml_individual_name(given_names, sur_name))
+    party$individualName <- list(eml_individual_name(given_names, sur_name))
   }
 
   # Organization Name
@@ -271,7 +271,7 @@ eml_party <- function(type="associatedParty",
     }
 
     party$userId <- eml$userId()
-    party$userId$userId <- userID
+    party$userId$userId <- userId
     party$userId$directory = "https://orcid.org"
   }
 
@@ -434,12 +434,12 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' fully fleshed out. Need to pass these objects in directly if you want to use
 #' them.
 #'
-#' @param title (character) Title of the project (Required). May have multiple titles.
+#' @param title (character) Title of the project (Required). May have multiple titles constructed using `list`.
 #' @param personnelList (list of personnel) Personnel involved with the project.
-#' @param abstract (character) Project abstract. Can pass as a character vector
+#' @param abstract (character) Project abstract. Can pass as a list
 #'   for separate paragraphs.
 #' @param funding (character) Funding sources for the project such as grant and
-#'   contract numbers. Can pass as a character vector for separate paragraphs.
+#'   contract numbers. Can pass as a list for separate paragraphs.
 #' @param studyAreaDescription (studyAreaDescription)
 #' @param designDescription (designDescription)
 #' @param relatedProject (project)
@@ -449,9 +449,9 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' proj <- eml_project(c("Some title", "A second title if needed"),
-#'            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
-#'            c("Abstract paragraph 1", "Abstract paragraph 2"),
+#' proj <- eml_project(list("Some title", "A second title if needed"),
+#'            list(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+#'            list("Abstract paragraph 1", "Abstract paragraph 2"),
 #'            "Funding Agency: Award Number 12345")
 eml_project <- function(title,
                         personnelList,
@@ -466,50 +466,38 @@ eml_project <- function(title,
             all(nchar(title)) > 0)
   stopifnot(length(personnelList) > 0)
 
-  # Project
-  project <- new("project")
+  project <- eml$project()
 
   # Title
-  titles <- lapply(title, function(x) { as(x, "title") })
-  project@title <- as(titles, "ListOftitle")
+  project$title <- title
 
-  # Personnel
-  if (!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
-    stop(call. = FALSE,
-         "All personnel in the list must be of type 'personnel'")
-  }
+  project$personnel <- personnelList
 
-  project@personnel <- as(personnelList, "ListOfpersonnel")
+  doc$dataset$project <- project
 
   # Abstract
   if (!is.null(abstract)) {
-    abstract_paras <- lapply(abstract, function(x) {
-      as(list(xml2::xml_new_root("para", as.character(x))), "para")
-    })
-    project@abstract@para <- as(abstract_paras, "ListOfpara")
+    project$abstract <- eml$abstract(para = abstract)
   }
 
   # Funding
   if (!is.null(funding)) {
-    funding_paras <- lapply(funding, function(x) {
-      as(list(xml2::xml_new_root("para", as.character(x))), "para")
-    })
-    project@funding@para <- as(funding_paras, "ListOfpara")
+    project$funding <- eml$funding(para = funding)
   }
 
   # Study area description
   if (!is.null(studyAreaDescription)) {
-    project@studyAreaDescription <- studyAreaDescription
+    project$studyAreaDescription <- studyAreaDescription
   }
 
   # Design description
   if (!is.null(designDescription)) {
-    project@designDescription <- designDescription
+    project$designDescription <- designDescription
   }
 
   # Related Project
   if (!is.null(relatedProject)) {
-    project@relatedProject <- relatedProject
+    project$relatedProject <- relatedProject
   }
 
   project

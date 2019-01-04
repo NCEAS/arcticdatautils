@@ -18,7 +18,7 @@ test_that("a contact can be created", {
 })
 
 test_that("a personnel can be created", {
-  personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator")
+  personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator", userId = "https://orcid.org/WWWW-XXXX-YYYY-ZZZZ")
 
   expect_is(personnel, "personnel")
   expect_equal(personnel$individualName$givenName, "test")
@@ -34,32 +34,30 @@ test_that("a project can be created", {
                          "This is a test abstract",
                          "I won an award, yay")
 
-  expect_is(project, "project")
-  expect_equal(project@title[[1]]@.Data, "some title")
-  expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "A")
-  expect_equal(project@personnel[[1]]@individualName[[1]]@surName@.Data, "User")
-  expect_equal(project@personnel[[1]]@organizationName[[1]]@.Data, "NCEAS")
-  expect_equal(project@personnel[[1]]@role[[1]]@.Data, "originator")
-  expect_equal(xml2::xml_text(project@funding@para[[1]]@.Data[[1]]), "I won an award, yay")
+  expect_equal(project$title[[1]], "some title")
+  expect_equal(project$personnel[[1]]$individualName[[1]]$givenName[[1]], "A")
+  expect_equal(project$personnel[[1]]$individualName[[1]]$surName, "User")
+  expect_equal(project$personnel[[1]]$organizationName[[1]], "NCEAS")
+  expect_equal(project$personnel[[1]]$role[[1]], "originator")
+  expect_equal(project$funding$para[[1]], "I won an award, yay")
 })
 
 test_that("a project can be created with multiple personnel, an abstract can be created with multiple paragraphs, awards with multiple awards", {
   test_personnel_1 <- eml_personnel(given_names = "A", sur_name = "User", organization = "NCEAS", role = "originator")
-  test_personnel_2 <- eml_personnel(given_names = "Testy", sur_name = "Mactesterson", organization = "A Test Org", role = c("user", "author"))
+  test_personnel_2 <- eml_personnel(given_names = "Testy", sur_name = "Mactesterson", organization = "A Test Org", role = list("user", "author"))
 
   project <- eml_project("some title",
                          list(test_personnel_1, test_personnel_2),
-                         c("This is a test abstract", "This is the second paragraph"),
-                         c("I won an award, yay", "I won a second award, wow"))
+                         list("This is a test abstract", "This is the second paragraph"),
+                         list("I won an award, yay", "I won a second award, wow"))
 
-  expect_is(project, "project")
-  expect_equal(project@title[[1]]@.Data, "some title")
-  expect_equal(project@personnel[[2]]@individualName[[1]]@givenName[[1]]@.Data, "Testy")
-  expect_equal(project@personnel[[2]]@individualName[[1]]@surName@.Data, "Mactesterson")
-  expect_equal(project@personnel[[2]]@organizationName[[1]]@.Data, "A Test Org")
-  expect_equal(project@personnel[[2]]@role[[2]]@.Data, "author")
-  expect_equal(xml2::xml_text(project@abstract@para[[2]]@.Data[[1]]), "This is the second paragraph")
-  expect_equal(xml2::xml_text(project@funding@para[[2]]@.Data[[1]]), "I won a second award, wow")
+  expect_equal(project$title[[1]], "some title")
+  expect_equal(project$personnel[[2]]$individualName[[1]]$givenName[[1]], "Testy")
+  expect_equal(project$personnel[[2]]$individualName[[1]]$surName, "Mactesterson")
+  expect_equal(project$personnel[[2]]$organizationName[[1]], "A Test Org")
+  expect_equal(project$personnel[[2]]$role[[2]], "author")
+  expect_equal(project$abstract$para[[2]], "This is the second paragraph")
+  expect_equal(project$funding$para[[2]], "I won a second award, wow")
 })
 
 test_that("a dataTable and otherEntity can be added from a pid", {
