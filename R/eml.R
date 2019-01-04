@@ -587,20 +587,21 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 #' @examples
 #' # Create a new EML document
 #' library(EML)
-#' doc <- new("eml")
+#' doc <- eml()
 #'
 #' # Set an abstract with a single paragraph
-#' set_abstract(doc, c("Test abstract..."))
+#' set_abstract(doc, list("Test abstract..."))
 #'
 #' # Or one with multiple paragraphs
-#' set_abstract(doc, c("First para...", "second para..."))
+#' set_abstract(doc, list("First para...", "second para..."))
 set_abstract <- function(doc, text) {
-  stopifnot(is(doc, "eml"))
+  # need to rewrite this test
+  # stopifnot(is(doc, "eml"))
 
   if (length(text) == 1) {
-    doc@dataset@abstract <- eml_abstract(text)
+    doc$dataset$abstract <- eml_abstract(text)
   } else if (length(text) > 1) {
-    doc@dataset@abstract <- eml_abstract(text)
+    doc$dataset$abstract <- eml_abstract(text)
   }
 
   doc
@@ -611,29 +612,26 @@ set_abstract <- function(doc, text) {
 #'
 #' Create an EML abstract.
 #'
+#' Note that eml$abstract() provides the same functionality.
+#'
 #' @param text (character) Paragraphs of text with one paragraph per element in the
-#'   character vector.
+#'   character vector, constructed using `list`
 #'
 #' @return (abstract) An EML abstract.
 #'
-#' @export
 #'
 #' @examples
 #' # Set an abstract with a single paragraph
 #' eml_abstract("Test abstract...")
 #'
 #' # Or one with multiple paragraphs
-#' eml_abstract(c("First para...", "second para..."))
+#' eml_abstract(list("First para...", "second para..."))
 eml_abstract <- function(text) {
   stopifnot(is.character(text),
             length(text) > 0,
             all(nchar(text)) > 0)
 
-  if (length(text) == 1) {
-    abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
-  } else if (length(text) > 1) {
-    abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
-  }
+    abstract <- eml$abstract(para = text)
 
   abstract
 }
@@ -661,13 +659,14 @@ eml_abstract <- function(text) {
 #' eml_validate_attributes(attributes)
 #' }
 eml_validate_attributes <- function(attributes) {
-  stopifnot(is(attributes, "attributeList"))
+  # need to rewrite this check
+  # stopifnot(is(attributes, "attributeList"))
 
   # Define an interal applyable function to validate each attribute
   eml_validate_attribute <- function(attribute) {
-    stopifnot(is(attribute, "attribute"))
+    # stopifnot(is(attribute, "attribute"))
 
-    doc@dataset@otherEntity[[1]]@attributeList@attribute[[1]] <- attribute
+    doc$dataset$otherEntity$attributeList$attribute[[1]] <- attribute
 
     # Validate!
     eml_validate(doc)
@@ -676,20 +675,20 @@ eml_validate_attributes <- function(attributes) {
 
   # Create a minimum valid EML doc we'll re-use each time we validate a single
   # attribute
-  doc <- new("eml", packageId = "test", system = " test")
-  doc@dataset@title <- c(new("title", .Data = "test"))
-  doc@dataset@creator <- new("ListOfcreator", list(eml_creator("Test", "test")))
-  doc@dataset@contact <- new("ListOfcontact", list(eml_contact("Test", "test")))
+
 
   # Create a dummy otherEntity with our attributeList
-  entity <- new("otherEntity",
-                entityName = "name",
-                entityType = "type")
-  entity@attributeList <- new("attributeList")
-  doc@dataset@otherEntity <- new("ListOfotherEntity", list(entity))
 
-  results <- sapply(attributes@attribute, function(attribute) {
-    cat(paste0("Validating single attribute '", attribute@attributeName@.Data, "': "))
+  doc <- list(packageId = "test",
+              system = "test",
+              dataset = eml$dataset(
+                title = "test",
+                creator = eml$creator(individualName = eml$individualName(givenName = "test", surName = "test")),
+                contact = eml$contact(individualName = eml$individualName(givenName = "test", surName = "test")),
+                otherEntity = eml$otherEntity(entityName = "name", entityType = "otherEntity")))
+
+  results <- sapply(attributes$attribute, function(attribute) {
+    cat(paste0("Validating single attribute '", attribute$attributeName, "': "))
 
     result <- NULL
     result <- tryCatch({
@@ -708,7 +707,7 @@ eml_validate_attributes <- function(attributes) {
     }
   })
 
-  names(results) <- sapply(attributes@attribute, function(x) x@attributeName)
+  names(results) <- sapply(attributes$attribute, function(x) x$attributeName)
 
   results
 }
