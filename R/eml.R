@@ -512,6 +512,8 @@ eml_project <- function(title,
 #' For a single point, the North and South bounding coordinates should be the same and
 #' the East and West bounding coordinates should be the same.
 #'
+#' Note that EML::set_coverage() provides the same (and more) functionality
+#'
 #' @param description (character) A textual description.
 #' @param north (numeric) North bounding coordinate.
 #' @param east (numeric) East bounding coordinate.
@@ -520,16 +522,15 @@ eml_project <- function(title,
 #'
 #' @return (geographicCoverage) The new geographicCoverage section.
 #'
-#' @export
 eml_geographic_coverage <- function(description, north, east, south, west) {
-  cov <- new("geographicCoverage")
+  cov <- eml$geographicCoverage()
 
-  cov@geographicDescription <- description
+  cov$geographicDescription <- description
 
-  cov@boundingCoordinates@northBoundingCoordinate <- new("northBoundingCoordinate", as.character(north))
-  cov@boundingCoordinates@eastBoundingCoordinate <- new("eastBoundingCoordinate", as.character(east))
-  cov@boundingCoordinates@southBoundingCoordinate <- new("southBoundingCoordinate", as.character(south))
-  cov@boundingCoordinates@westBoundingCoordinate <- new("westBoundingCoordinate", as.character(west))
+  cov$boundingCoordinates$northBoundingCoordinate <- as.character(north)
+  cov$boundingCoordinates$eastBoundingCoordinate <- as.character(east)
+  cov$boundingCoordinates$southBoundingCoordinate <- as.character(south)
+  cov$boundingCoordinates$westBoundingCoordinate <- as.character(west)
 
   cov
 }
@@ -539,6 +540,8 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #'
 #' A simple way to create an EML address element.
 #'
+#' Note that EML::eml$address() provides the same functionality
+#'
 #' @param delivery_points (character) One or more delivery points.
 #' @param city (character) City.
 #' @param administrative_area (character) Administrative area.
@@ -546,7 +549,6 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #'
 #' @return (address) An EML address object.
 #'
-#' @export
 #'
 #' @examples
 #' NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")
@@ -556,32 +558,13 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
             is.character(administrative_area),
             (is.character(postal_code) || is.numeric(postal_code)))
 
-  address <- new("address")
+  address <- eml$address()
 
-  # Delivery point(s)
-  dps <- lapply(delivery_points, function(dp) {
-    x <- new("deliveryPoint")
-    x@.Data <- dp
-    x
-  })
+  address$deliveryPoint <- delivery_points
+  address$city <- city
+  address$administrativeArea <- administrative_area
+  address$postalCode <- as.character(postal_code)
 
-  # City
-  ct <- new("city")
-  ct@.Data <- city
-
-  # Administrative area
-  aa <- new("administrativeArea")
-  aa@.Data <- administrative_area
-
-  # Postal Code
-  pc <- new("postalCode")
-  pc@.Data <- as.character(postal_code)
-
-  # Put them all together
-  address@deliveryPoint <- new("ListOfdeliveryPoint", dps)
-  address@city <- ct
-  address@administrativeArea <- aa
-  address@postalCode <- pc
 
   address
 }
