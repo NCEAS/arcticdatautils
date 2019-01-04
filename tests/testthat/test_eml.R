@@ -122,12 +122,12 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
   expect_error(eml_otherEntity_to_dataTable(eml, "1"))
 
   # subscripts out of bounds
-  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[2]]))
+  expect_error(eml_otherEntity_to_dataTable(eml, eml$dataset$otherEntity[[2]]))
   expect_error(eml_otherEntity_to_dataTable(eml, 2))
 
   # Duplicate entityNames found
-  eml@dataset@otherEntity[[2]] <- eml@dataset@otherEntity[[1]]
-  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]]))
+  eml$dataset$otherEntity[[2]] <- eml$dataset$otherEntity[[1]]
+  expect_error(eml_otherEntity_to_dataTable(eml, eml$dataset$otherEntity[[1]]))
 
 })
 
@@ -137,16 +137,16 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
   }
 
   eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
-  otherEntity <- eml@dataset@otherEntity[[1]]
+  otherEntity <- eml$dataset$otherEntity[[1]]
 
-  eml <- eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]])
+  eml <- eml_otherEntity_to_dataTable(eml, eml$dataset$otherEntity[[1]])
 
   # test that otherEntity was removed
-  expect_length(eml@dataset@otherEntity, 0)
+  expect_length(eml$dataset$otherEntity, 0)
 
   # test that dataTable was added
-  expect_equal(otherEntity@entityName, eml@dataset@dataTable[[1]]@entityName)
-  expect_equivalent(otherEntity@physical, eml@dataset@dataTable[[1]]@physical)
+  expect_equal(otherEntity$entityName, eml$dataset$dataTable[[1]]$entityName)
+  expect_equivalent(otherEntity$physical, eml$dataset$dataTable[[1]]$physical)
 })
 
 test_that("which_in_eml returns correct locations", {
