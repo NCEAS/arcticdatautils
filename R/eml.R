@@ -7,7 +7,7 @@
 #' @param pid (character) The PID of the object to create the sub-tree for.
 #' @param entityType (character) What kind of objects to create from the input. One of "dataTable",
 #'   "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".
-#' @param ... (optional) Additional arguments to be passed to \code{new(entityType, ...)}.
+#' @param ... (optional) Additional arguments to be passed to \code{eml$entityType())}.
 #'
 #' @return (list) The entity object.
 #'
@@ -77,7 +77,7 @@ pid_to_eml_entity <- function(mn,
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pids (character) The PID of the object to create the sub-tree for.
 #'
-#' @return (list) A list of otherEntity object(s).
+#' @return (list) A list of physical object(s).
 #'
 #' @export
 #'
