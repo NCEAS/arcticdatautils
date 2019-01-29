@@ -193,41 +193,40 @@ test_that("which_in_eml returns correct locations", {
 
   attributeList <- EML::set_attributes(attributes)
 
-  dataTable_1 <- new("dataTable",
+  dataTable_1 <- eml$dataTable(
                      entityName = "2016_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
   dataTable_2 <- dataTable_1
 
-  dataTable_3 <- new("dataTable",
+  dataTable_3 <- eml$dataTable(
                      entityName = "2015_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
-  creator_1 <- new("creator",
-                   individualName = new("individualName",
+  creator_1 <- eml$creator(
+                   individualName = eml$individualName(
                                         surName = "LAST",
                                         givenName = "FIRST"))
-  creator_2 <- new("creator",
-                   individualName = new("individualName",
+  creator_2 <- eml$creator(
+    individualName = eml$individualName(
                                         surName = "LAST",
                                         givenName = "FIRST_2"))
   creator_3 <- creator_2
 
   title <- "Title"
 
-  dataset <- new("dataset",
+  dataset <- eml$dataset(
                  title = title,
-                 creator = c(creator_1, creator_2, creator_3),
-                 dataTable = c(dataTable_1, dataTable_2, dataTable_3))
+                 creator = list(creator_1, creator_2, creator_3),
+                 dataTable = list(dataTable_1, dataTable_2, dataTable_3))
 
-  eml <- new("eml",
-             dataset = dataset)
+  doc <- list(dataset = dataset)
 
-  expect_equal(c(2,3), which_in_eml(eml@dataset@creator, "givenName", "FIRST_2"))
-  expect_error(which_in_eml(eml@dataset@dataTable, "attributeName", "length_3"))
-  expect_equal(c(1,3), which_in_eml(eml@dataset@dataTable[[1]]@attributeList@attribute, "attributeName", function(x) {grepl("^length", x)}))
+  expect_equal(c(2,3), which_in_eml(doc$dataset$creator, "givenName", "FIRST_2"))
+  expect_error(which_in_eml(doc$dataset$dataTable, "attributeName", "length_3"))
+  expect_equal(c(1,3), which_in_eml(doc$dataset$dataTable[[1]]$attribute, "attributeName", function(x) {grepl("^length", x)}))
 })
 
 test_that('eml_set_reference sets a reference', {
