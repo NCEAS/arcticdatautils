@@ -394,15 +394,15 @@ publish_update <- function(mn,
   if (is.null(metadata_path)) {
     # Get the metadata doc
     message("Getting metadata from the MN.")
-    eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
+    doc <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
 
-  } else if (class(metadata_path) == "eml") {
+  } else if (class(metadata_path)[1] == "emld") {
       # If an eml object is provided, use it directly after validating
       if (!eml_validate(metadata_path)) {
         stop("The EML object is not valid.")
       }
 
-      eml <- metadata_path
+    doc <- metadata_path
 
   } else {
     # Alternatively, read an edited metadata file from disk if provided
@@ -411,7 +411,7 @@ publish_update <- function(mn,
     }
 
     message(paste0("Getting metadata from the path: ", metadata_path, "."))
-    eml <- EML::read_eml(metadata_path)
+    doc <- EML::read_eml(metadata_path)
   }
 
   # get the metadata sysmeta from the node
@@ -440,22 +440,22 @@ publish_update <- function(mn,
   # Update the metadata
 
   # Replace packageId
-  eml@packageId <- new("xml_attribute", metadata_updated_pid)
+  doc$packageId <- metadata_updated_pid
 
   # Replace system if needed
-  if (eml@system != "https://arcticdata.io") {
-    eml@system <- new("xml_attribute", "https://arcticdata.io")
+  if (doc$system != "https://search.dataone.org") {
+    doc$system <- "https://search.dataone.org"
   }
 
   # Replace access if needed
-  if (length(eml@access@allow) & (!is.null(metadata_path))) {
-    eml@access <- new("access")
+  if (length(doc$access$allow) & (!is.null(metadata_path))) {
+    doc$access <- eml$access()
   }
 
   # Write out the document to disk. We do this in part because
   # set_other_entities takes a path to the doc.
   eml_path <- tempfile()
-  EML::write_eml(eml, eml_path)
+  EML::write_eml(doc, eml_path)
 
   # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",
