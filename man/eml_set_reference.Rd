@@ -19,24 +19,24 @@ using a reference to \code{element_to_reference}.
 \dontrun{
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 
 # Set the first contact as a reference to the first creator
-eml@dataset@contact[[1]] <- eml_set_reference(eml@dataset@creator[[1]],
-eml@dataset@contact[[1]])
+doc$dataset$contact[[1]] <- eml_set_reference(doc$dataset$creator[[1]],
+doc$dataset$contact[[1]])
 
 # This is also useful when we want to set references to a subset of 'dataTable'
   or 'otherEntity' objects
 # Add a few more objects first to illustrate the use:
-eml@dataset@dataTable[[3]] <- eml@dataset@dataTable[[1]]
-eml@dataset@dataTable[[4]] <- eml@dataset@dataTable[[1]]
+doc$dataset$dataTable[[3]] <- doc$dataset$dataTable[[1]]
+doc$dataset$dataTable[[4]] <- doc$dataset$dataTable[[1]]
 # Add references to the second and third elements only (not the 4th):
 for (i in 2:3) {
-    eml@dataset@dataTable[[i]]@attributeList <- eml_set_reference(eml@dataset@dataTable[[1]]@attributeList,
-                                                      eml@dataset@dataTable[[i]]@attributeList)
+    doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(doc$dataset$dataTable[[1]]$attributeList,
+                                                      doc$dataset$dataTable[[i]]$attributeList)
 }
 # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
-eml@dataset@dataTable
+doc$dataset$dataTable
 }
 }
 \author{
