@@ -230,10 +230,11 @@ eml_party <- function(type="associatedParty",
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
 
+  party <- eml[[type]]()
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party$individualName <- eml_individual_name(given_names, sur_name)
+    party$individualName <- list(givenName = given_names, surName = sur_name)
   }
 
   # Organization Name
@@ -281,11 +282,10 @@ eml_party <- function(type="associatedParty",
            paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
     }
 
-    # If type is personnel, role needs to be ListOfrole, otherwise just role
-    if (type == "personnel") {
-      party$role <- role
-    }
+    party$role <- role
   }
+
+
 
   party
 }
@@ -390,39 +390,6 @@ eml_personnel <- function(role = NULL, ...) {
 
   eml_party("personnel", role = role, ...)
 }
-
-
-#' Create an EML individualName section
-#'
-#' Create an EML individualName section.
-#'
-#' @param given_names (character) One or more given names.
-#' @param sur_name (character) A sur (last) name.
-#'
-#' @return (individualName) The new individualName section.
-#'
-#' @export
-#'
-#' @examples
-#' eml_individual_name("some", "user")
-eml_individual_name <- function(given_names=NULL, sur_name) {
-  stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
-
-  # Create <individualName>
-  indiv_name <- eml$individualName()
-
-  if (!is.null(given_names)) {
-    stopifnot(all(sapply(given_names, is.character)))
-    stopifnot(all(lengths(given_names) > 0))
-
-    indiv_name$givenName = given_names
-  }
-
-  indiv_name$surName <- sur_name
-
-  indiv_name
-}
-
 
 #' Create an EML project section
 #'
@@ -878,12 +845,12 @@ which_in_eml <- function(doc, element, test) {
 #' eml@@dataset@@dataTable
 #' }
 eml_set_reference <- function(element_to_reference, element_to_replace) {
-  if (length(element_to_reference@id) == 0) {
+  if (length(element_to_reference$id) == 0) {
     stop('No id detected at element_to_reference@id. Please add an id in order to use references.')
   }
-  id <- element_to_reference@id[1]
+  id <- element_to_reference$id[1]
   class <- class(element_to_replace)[1]
-  element_to_replace <- new(class, reference = id)
+  element_to_replace <- list(references = id)
   return(element_to_replace)
 }
 
@@ -909,19 +876,19 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' \dontrun{
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-#' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
-#' atts <- EML::set_attributes(EML::get_attributes(eml@@dataset@@dataTable[[1]]@@attributeList)$attributes)
+#' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#' atts <- EML::set_attributes(EML::get_attributes(eml$dataset$dataTable[[1]]$attributeList)$attributes)
 #'
 #' eml <- eml_set_shared_attributes(eml, atts, type = 'dataTable')
 #' }
-eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTable') {
-  stopifnot(methods::is(eml, 'eml'))
-  if (!is.null(attributeList)) {
-    stopifnot(methods::is(attributeList, 'attributeList'))
-  }
-  stopifnot(type %in% c('dataTable', 'otherEntity'))
+eml_set_shared_attributes <- function(doc, attributeList = NULL, type = 'dataTable') {
+  stopifnot(methods::is(doc, 'emld'))
+  #if (!is.null(attributeList)) {
+  #  stopifnot(methods::is(attributeList, 'attributeList'))
+  #}
+  #stopifnot(type %in% c('dataTable', 'otherEntity'))
 
-  x <- slot(eml@dataset, type)
+  x <- doc$dataset[[type]]
   n <- length(x)
   if (n <= 1) {
     stop('1 or fewer entities') # add message
@@ -931,12 +898,12 @@ eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTab
   if (!is.null(attributeList)) {
     x[[1]]@attributeList <- attributeList
   }
-  x[[1]]@attributeList@id <- new('xml_attribute', uuid::UUIDgenerate(TRUE))
+  x[[1]]$attributeList$id <- stringi::stri_rand_strings(1, length = 10) # generate random identifier
   # Apply references to all other elements
   for (i in 2:n) {
-    x[[i]]@attributeList <- eml_set_reference(x[[1]]@attributeList, x[[i]]@attributeList)
+    x[[i]]$attributeList <- eml_set_reference(x[[1]]$attributeList, x[[i]]$attributeList)
   }
 
-  slot(eml@dataset, type) <- x
-  return(eml)
+  doc$dataset[[type]] <- x
+  return(doc)
 }
