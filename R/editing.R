@@ -443,7 +443,7 @@ publish_update <- function(mn,
   doc$packageId <- metadata_updated_pid
 
   # Replace system if needed
-  if (doc$system != "https://search.dataone.org") {
+  if (is.null(doc$system)) {
     doc$system <- "https://search.dataone.org"
   }
 
