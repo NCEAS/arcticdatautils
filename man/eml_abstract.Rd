@@ -20,9 +20,11 @@ Create an EML abstract.
 Note that eml$abstract() provides the same functionality.
 }
 \examples{
+\dontrun{
 # Set an abstract with a single paragraph
 eml_abstract("Test abstract...")
 
 # Or one with multiple paragraphs
 eml_abstract(list("First para...", "second para..."))
+}
 }
