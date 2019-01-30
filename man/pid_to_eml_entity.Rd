@@ -4,17 +4,17 @@
 \alias{pid_to_eml_entity}
 \title{Create EML entity from a DataONE PID}
 \usage{
-pid_to_eml_entity(mn, pid, entityType = "otherEntity", ...)
+pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 }
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
 \item{pid}{(character) The PID of the object to create the sub-tree for.}
 
+\item{...}{(optional) Additional arguments to be passed to \code{eml$entityType())}.}
+
 \item{entityType}{(character) What kind of objects to create from the input. One of "dataTable",
 "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".}
-
-\item{...}{(optional) Additional arguments to be passed to \code{new(entityType, ...)}.}
 }
 \value{
 (list) The entity object.

@@ -8,7 +8,7 @@ eml_abstract(text)
 }
 \arguments{
 \item{text}{(character) Paragraphs of text with one paragraph per element in the
-character vector.}
+character vector, constructed using \code{list}}
 }
 \value{
 (abstract) An EML abstract.
@@ -16,10 +16,13 @@ character vector.}
 \description{
 Create an EML abstract.
 }
+\details{
+Note that eml$abstract() provides the same functionality.
+}
 \examples{
 # Set an abstract with a single paragraph
 eml_abstract("Test abstract...")
 
 # Or one with multiple paragraphs
-eml_abstract(c("First para...", "second para..."))
+eml_abstract(list("First para...", "second para..."))
 }
