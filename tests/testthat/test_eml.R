@@ -12,7 +12,6 @@ test_that("a creator can be created", {
 test_that("a contact can be created", {
   contact <- eml_contact("test", "user")
 
-  expect_is(contact, "contact")
   expect_equal(contact$individualName$givenName, "test")
   expect_equal(contact$individualName$surName, "user")
 })
@@ -20,7 +19,6 @@ test_that("a contact can be created", {
 test_that("a personnel can be created", {
   personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator", userId = "https://orcid.org/WWWW-XXXX-YYYY-ZZZZ")
 
-  expect_is(personnel, "personnel")
   expect_equal(personnel$individualName$givenName, "test")
   expect_equal(personnel$individualName$surName, "user")
   expect_equal(personnel$role, "principalInvestigator")
@@ -34,12 +32,12 @@ test_that("a project can be created", {
                          "This is a test abstract",
                          "I won an award, yay")
 
-  expect_equal(project$title[[1]], "some title")
-  expect_equal(project$personnel[[1]]$individualName[[1]]$givenName[[1]], "A")
-  expect_equal(project$personnel[[1]]$individualName[[1]]$surName, "User")
-  expect_equal(project$personnel[[1]]$organizationName[[1]], "NCEAS")
-  expect_equal(project$personnel[[1]]$role[[1]], "originator")
-  expect_equal(project$funding$para[[1]], "I won an award, yay")
+  expect_equal(project$title, "some title")
+  expect_equal(project$personnel[[1]]$individualName$givenName, "A")
+  expect_equal(project$personnel[[1]]$individualName$surName, "User")
+  expect_equal(project$personnel[[1]]$organizationName, "NCEAS")
+  expect_equal(project$personnel[[1]]$role, "originator")
+  expect_equal(project$funding$para, "I won an award, yay")
 })
 
 test_that("a project can be created with multiple personnel, an abstract can be created with multiple paragraphs, awards with multiple awards", {
@@ -51,10 +49,10 @@ test_that("a project can be created with multiple personnel, an abstract can be 
                          list("This is a test abstract", "This is the second paragraph"),
                          list("I won an award, yay", "I won a second award, wow"))
 
-  expect_equal(project$title[[1]], "some title")
-  expect_equal(project$personnel[[2]]$individualName[[1]]$givenName[[1]], "Testy")
-  expect_equal(project$personnel[[2]]$individualName[[1]]$surName, "Mactesterson")
-  expect_equal(project$personnel[[2]]$organizationName[[1]], "A Test Org")
+  expect_equal(project$title, "some title")
+  expect_equal(project$personnel[[2]]$individualName$givenName, "Testy")
+  expect_equal(project$personnel[[2]]$individualName$surName, "Mactesterson")
+  expect_equal(project$personnel[[2]]$organizationName, "A Test Org")
   expect_equal(project$personnel[[2]]$role[[2]], "author")
   expect_equal(project$abstract$para[[2]], "This is the second paragraph")
   expect_equal(project$funding$para[[2]], "I won a second award, wow")
@@ -233,13 +231,13 @@ test_that('eml_set_reference sets a reference', {
   eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
   doc <- EML::read_eml(eml_path)
 
-  expect_error(eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]]))
+  expect_error(eml_set_reference(doc$dataset$creator, doc$dataset$contact))
 
   # Add id to use references
-  doc@dataset@creator[[1]]@id <- new('xml_attribute', 'creator_id')
-  doc@dataset@contact[[1]] <- eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]])
+  doc$dataset$creator$id <- 'creator_id'
+  doc$dataset$contact <- eml_set_reference(doc$dataset$creator, doc$dataset$contact)
 
-  expect_equal(doc@dataset@creator[[1]]@id[1], doc@dataset@contact[[1]]@references[1])
+  expect_equal(doc$dataset$creator$id, doc$dataset$contact$references)
   expect_true(EML::eml_validate(doc))
 })
 
@@ -253,16 +251,15 @@ test_that('eml_set_shared_attributes creates shared attribute references', {
                            stringsAsFactors = FALSE)
   attributeList <- EML::set_attributes(attributes)
 
-  dataTable_1 <- new('dataTable',
-                     entityName = '2016_data.csv',
+  dataTable_1 <- list(entityName = '2016_data.csv',
                      entityDescription = '2016 data',
                      attributeList = attributeList)
   dataTable_2 <- dataTable_1
-  doc@dataset@dataTable <- c(dataTable_1, dataTable_2)
+  doc$dataset$dataTable <- list(dataTable_1, dataTable_2)
 
   doc <- eml_set_shared_attributes(doc)
 
-  expect_equal(doc@dataset@dataTable[[1]]@id[1], doc@dataset@dataTable[[2]]@references[1])
+  expect_equal(doc$dataset$dataTable[[1]]$attributeList$id, doc$dataset$dataTable[[2]]$attributeList$references)
   expect_true(EML::eml_validate(doc))
 })
 
@@ -270,8 +267,7 @@ test_that('eml_party creates multiple givenName, organizationName, and positionN
   creator <- eml_party('creator', c('John', 'and Jack'), 'Smith', c('NCEAS', 'UCSB'),
                        c('Programmers', 'brothers'))
 
-  expect_is(creator, "creator")
-  expect_equal(unlist(EML::eml_get(creator, 'givenName')), c('John', 'and Jack'))
-  expect_equal(unlist(EML::eml_get(creator, 'organizationName')), c('NCEAS', 'UCSB'))
-  expect_equal(unlist(EML::eml_get(creator, 'positionName')), c('Programmers', 'brothers'))
+  expect_equal(EML::eml_get(creator, 'givenName'), EML::as_emld(list('John', 'and Jack')))
+  expect_equal(EML::eml_get(creator, 'organizationName'), EML::as_emld(list('NCEAS', 'UCSB')))
+  expect_equal(EML::eml_get(creator, 'positionName'), EML::as_emld(list('Programmers', 'brothers')))
 })
