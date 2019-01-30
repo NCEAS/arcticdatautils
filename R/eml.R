@@ -120,21 +120,21 @@ pid_to_eml_physical <- function(mn, pid) {
 sysmeta_to_eml_physical <- function(sysmeta) {
     stopifnot(is(sysmeta, "SystemMetadata"))
 
-    if (is.na(x@fileName)) {
+    if (is.na(sysmeta@fileName)) {
       ob_name <- "NA"
     } else {
-      ob_name <- x@fileName
+      ob_name <- sysmeta@fileName
     }
 
 
     phys <- set_physical(objectName = ob_name,
-                         size = format(x@size, scientific = FALSE),
+                         size = format(sysmeta@size, scientific = FALSE),
                          sizeUnit = "bytes",
-                         authentication = x@checksum,
-                         authMethod = x@checksumAlgorithm,
-                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
+                         authentication = sysmeta@checksum,
+                         authMethod = sysmeta@checksumAlgorithm,
+                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
 
-    phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = x@formatId))
+    phys$dataFormat <- eml$dataFormat(externallyDefinedFormat = list(formatName = sysmeta@formatId))
 
     phys
 }
@@ -230,11 +230,10 @@ eml_party <- function(type="associatedParty",
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
 
-  party <- eml[[type]]()
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party$individualName <- list(eml_individual_name(given_names, sur_name))
+    party$individualName <- eml_individual_name(given_names, sur_name)
   }
 
   # Organization Name
@@ -255,7 +254,7 @@ eml_party <- function(type="associatedParty",
   # Address
   if (!is.null(address)) {
     # This crams the entire address into the delivery point...not ideal
-    party$address <- eml$address(address)
+    party$address <- address
   }
 
   # Phone
@@ -270,7 +269,6 @@ eml_party <- function(type="associatedParty",
       warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
     }
 
-    party$userId <- eml$userId()
     party$userId$userId <- userId
     party$userId$directory = "https://orcid.org"
   }
@@ -587,7 +585,7 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 #' @examples
 #' # Create a new EML document
 #' library(EML)
-#' doc <- eml()
+#' doc <- list()
 #'
 #' # Set an abstract with a single paragraph
 #' set_abstract(doc, list("Test abstract..."))
@@ -599,9 +597,9 @@ set_abstract <- function(doc, text) {
   # stopifnot(is(doc, "eml"))
 
   if (length(text) == 1) {
-    doc$dataset$abstract <- eml_abstract(text)
+    doc$dataset$abstract <- eml$abstract(text)
   } else if (length(text) > 1) {
-    doc$dataset$abstract <- eml_abstract(text)
+    doc$dataset$abstract <- eml$abstract(text)
   }
 
   doc
@@ -719,8 +717,7 @@ eml_validate_attributes <- function(attributes) {
 #' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param doc (list) An EML document.
-#' @param otherEntity (integer/"ALL") Either "ALL", to indicate all otherEntities, or the
-#' index of the otherEntities to be transformed.
+#' @param otherEntity (integer/) The indicies of the otherEntities to be transformed.
 #' @param validate_eml (logical) Optional. Whether or not to validate the EML after
 #'   completion. Setting this to `FALSE` reduces execution time by ~50 percent.
 #'
@@ -741,15 +738,10 @@ eml_validate_attributes <- function(attributes) {
 #' # Integer input is recommended:
 #' doc <- eml_otherEntity_to_dataTable(doc, 1)
 #' }
-eml_otherEntity_to_dataTable <- function(doc, otherEntity_index = "ALL", validate_eml = TRUE) {
+eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   stopifnot(methods::is(doc, "emld"))
   stopifnot(is.logical(eml_validate(doc)))
-  stopifnot(is.numeric(otherEntity_index) | otherEntity_index == "ALL")
-
-  if (otherEntity_index == "ALL"){
-    index <- seq(1:length(doc$dataset$otherEntity))
-  }
-  else index = otherEntity_index
+  stopifnot(is.numeric(index))
 
   otherEntity <- doc$dataset$otherEntity[index]
 
@@ -760,8 +752,14 @@ eml_otherEntity_to_dataTable <- function(doc, otherEntity_index = "ALL", validat
 
   ## Add dt to bottom of dt list
   dts <- doc$dataset$dataTable
+  if (length(dts > 0)){
+    doc$dataset$dataTable <- list(dts, otherEntity)
+  }
+  else{
+    doc$dataset$dataTable <- otherEntity
+  }
 
-  doc$dataset$dataTable <- c(dts, otherEntity)
+
 
   ## delete otherEntity from list
   doc$dataset$otherEntity[index] <- NULL
