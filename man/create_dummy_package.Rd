@@ -12,7 +12,7 @@ create_dummy_package(mn, size = 2)
 \item{size}{(numeric) The number of files in the package, including the metadata file.}
 }
 \value{
-(character) A named character vector of the data PIDs in the package.
+(list) The PIDs for all elements in the data package.
 }
 \description{
 Create a test data package.

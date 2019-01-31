@@ -10,7 +10,7 @@ sysmeta_to_eml_physical(sysmeta)
 \item{sysmeta}{(SystemMetadata) One or more System Metadata objects.}
 }
 \value{
-(list) A list of physical objects for each sysmeta.
+(list) A list of physical objects.
 }
 \description{
 This function creates a pre-canned EML physical object from what's in the

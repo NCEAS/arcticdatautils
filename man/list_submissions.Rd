@@ -2,28 +2,13 @@
 % Please edit documentation in R/helpers.R
 \name{list_submissions}
 \alias{list_submissions}
-\title{List recent submissions to a DataONE Member Node}
+\title{List recent submissions to a DataOne Member Node}
 \usage{
-list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
-  formatType = "*",
-  whitelist = "https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org")
-
 list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
   formatType = "*",
   whitelist = "https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org")
 }
 \arguments{
-\item{mn}{(MNode) A DataONE Member Node.}
-
-\item{from}{(character) The date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}.}
-
-\item{to}{(character) The date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}.}
-
-\item{formatType}{(character) The format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.}
-
-\item{whitelist}{(character) An xml list of admin orcid Identifiers.
-Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org.}
-
 \item{mn}{(MNode) A DataOne Member Node}
 
 \item{from}{(character) the date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}}
@@ -34,28 +19,11 @@ Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=datao
 
 \item{whitelist}{(character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
 }
-\value{
-(data.frame)
-}
 \description{
-List recent submissions to a DataONE Member Node from all submitters not present
-in the administrator whitelist: \url{https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
-
 List recent submissions to a DataOne Member Node from all submitters not present
 in the administrator whitelist: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
 }
 \examples{
-\dontrun{
-cn <- dataone::CNode('PROD')
-adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-
-# Return all submitted objects in the past month for the 'adc' node:
-View(list_submissions(adc, Sys.Date() \%m+\% months(-1), Sys.Date(), '*'))
-
-# Return all submitted objects except for one user
-View(list_submissions(adc, Sys.Date() \%m+\% months(-1), Sys.Date(), '*'),
-                      whitelist = 'http://orcid.org/0000-0002-2561-5840')
-}
 \dontrun{
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
@@ -74,7 +42,5 @@ View(list_submissions(adc, Sys.Date() \%m+\% months(-1), Sys.Date(), '*'),
 }
 }
 \author{
-Dominic Mullen dmullen17@gmail.com
-
 Dominic Mullen dmullen17@gmail.com
 }

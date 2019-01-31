@@ -12,7 +12,7 @@ create_dummy_parent_package(mn, children)
 \item{children}{(character) Child package (resource maps) PIDs.}
 }
 \value{
-pid (character) A named character vector of PIDs, including parent package and child package PIDs.
+(list) The resource map PIDs for both the parent and child packages.
 }
 \description{
 Create a test parent data package.
