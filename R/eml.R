@@ -76,7 +76,7 @@ pid_to_eml_entity <- function(mn,
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pids (character) The PID of the object to create the sub-tree for.
 #'
-#' @return (list) A list of physical object(s).
+#' @return (list) A physical object.
 #'
 #' @export
 #'
@@ -106,7 +106,7 @@ pid_to_eml_physical <- function(mn, pid) {
 #'
 #' @param sysmeta (SystemMetadata) One or more System Metadata objects.
 #'
-#' @return (list) A list of physical objects for each sysmeta.
+#' @return (list) A list of physical objects.
 #'
 #' @export
 #'

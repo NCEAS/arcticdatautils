@@ -293,7 +293,7 @@ publish_update <- function(mn,
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
-    stop("You cannot use a DOI and set public=FALSE as the same time.")
+    stop("You cannot use a DOI and set 'public = FALSE' at the same time.")
   }
 
   # Do a simple sanity check on the PIDs passed in
