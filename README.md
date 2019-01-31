@@ -37,6 +37,7 @@ remotes::install_github("nceas/arcticdatautils")
 
 ## Support
 
+- Explore the pkgdown site for documentation: https://nceas.github.io/arcticdatautils/
 - Please submit bugs or other comments as [Issues](https://github.com/NCEAS/arcticdatautils/issues)
 - Maintainers of the package are @jeanetteclark and @jagoldstein
 
