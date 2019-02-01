@@ -1,6 +1,6 @@
 # Helper functions for creating EML metadata
 
-#' Create EML entity from a DataONE PID
+#' Create EML entity with physical section from a DataONE PID
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
@@ -199,7 +199,7 @@ get_doc_id <- function(sysmeta) {
 #' @param position (character) The party's position.
 #' @param email (character) The party's email address(es).
 #' @param phone (character) The party's phone number(s).
-#' @param address (character) The party's address(es).
+#' @param address (character) The party's address(es) as a valid EML address
 #' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ.
 #' @param role (character) The party's role.
 #'
@@ -211,8 +211,10 @@ get_doc_id <- function(sysmeta) {
 #' \dontrun{
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
-#' eml_party("creator", list("Dominic", "'Dom'"), "Mullen", list("NCEAS", "UCSB"),
-#'           list("Data Scientist", "Programmer"))
+#' eml_party("creator", given_names = list("Dominic", "'Dom'"),
+#'                      sur_name = "Mullen", list("NCEAS", "UCSB"),
+#'                      position = list("Data Scientist", "Programmer"),
+#'                      address = eml$address(deliveryPoint = "735 State St", city = "Santa Barbara", administrativeArea = "CA", postalCode = "85719"))
 #'}
 eml_party <- function(type="associatedParty",
                       given_names = NULL,
