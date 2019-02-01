@@ -133,7 +133,7 @@ sysmeta_to_eml_physical <- function(sysmeta) {
                          authMethod = sysmeta@checksumAlgorithm,
                          url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
 
-    phys$dataFormat <- list(dataformat = list(externallyDefinedFormat = list(formatName = sysmeta@formatId)))
+    phys$dataFormat <- list(externallyDefinedFormat = list(formatName = sysmeta@formatId))
 
     phys
 }
