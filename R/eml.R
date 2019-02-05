@@ -924,7 +924,8 @@ eml_set_shared_attributes <- function(doc, attributeList = NULL, type = 'dataTab
 #' returns the output as a simple list as opposed to an object of type
 #' `emld` by removing the attributes and context from the object. If an
 #' element containing children is returned all of it's children will be
-#' flattened into a named character vector.
+#' flattened into a named character vector. This function is best used
+#' to extract values from elements that have no children.
 #'
 #' @param doc (list) An EML object or child/descendant object
 #' @param element (character) Name of the element to be extracted. If
