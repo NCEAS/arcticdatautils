@@ -4,7 +4,7 @@
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
-#' @param entityType (character) What kind of objects to create from the input. One of "dataTable",
+#' @param entityType (character) What kind of object to create from the input. One of "dataTable",
 #'   "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".
 #' @param ... (optional) Additional arguments to be passed to \code{eml$entityType())}.
 #'
@@ -74,7 +74,7 @@ pid_to_eml_entity <- function(mn,
 #' creating the EML physical.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PID of the object to create the sub-tree for.
+#' @param pids (character) The PID of the object to create the physical for.
 #'
 #' @return (list) A physical object.
 #'
@@ -83,7 +83,7 @@ pid_to_eml_entity <- function(mn,
 #' @examples
 #' \dontrun{
 #' # Generate EML physical sections for an object in a data package
-#' pid_to_eml_physical(mn, pid)
+#' phys <- pid_to_eml_physical(mn, pid)
 #' }
 pid_to_eml_physical <- function(mn, pid) {
   stopifnot(is(mn, "MNode"))
@@ -230,6 +230,14 @@ eml_party <- function(type="associatedParty",
     stop(call. = FALSE,
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
+  if (!is.null(address) &
+      !"deliveryPoint" %in% names(address) &
+      !"administrativeArea" %in% names(address) &
+      !"postalCode" %in% names(address) &
+      !"city" %in% names(address)) {
+    stop(call. = FALSE,
+         "An address was given but no deliveryPoint, administrativeArea, city, or postalCode child elements were specified.")
+  }
 
   party <- list()
 
@@ -255,7 +263,6 @@ eml_party <- function(type="associatedParty",
 
   # Address
   if (!is.null(address)) {
-    # This crams the entire address into the delivery point...not ideal
     party$address <- address
   }
 
