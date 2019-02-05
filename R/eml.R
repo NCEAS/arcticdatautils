@@ -682,7 +682,7 @@ eml_validate_attributes <- function(attributes) {
 #' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param doc (list) An EML document.
-#' @param otherEntity (integer/) The indicies of the otherEntities to be transformed.
+#' @param otherEntity (integer) The indicies of the otherEntities to be transformed.
 #' @param validate_eml (logical) Optional. Whether or not to validate the EML after
 #'   completion. Setting this to `FALSE` reduces execution time by ~50 percent.
 #'
@@ -696,38 +696,51 @@ eml_validate_attributes <- function(attributes) {
 #' \dontrun{
 #' doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 #'
-#' # The following two calls are equivalent:
-#' doc <- eml_otherEntity_to_dataTable(doc, doc$dataset$otherEntity[[1]])
-#' doc <- eml_otherEntity_to_dataTable(doc, 1)
-#'
-#' # Integer input is recommended:
 #' doc <- eml_otherEntity_to_dataTable(doc, 1)
 #' }
 eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   stopifnot(methods::is(doc, "emld"))
   stopifnot(is.logical(eml_validate(doc)))
   stopifnot(is.numeric(index))
+  stopifnot(length(eml_get_simple(doc$dataset$otherEntity, "entityName")) >= length(index))
 
-  otherEntity <- doc$dataset$otherEntity[index]
+  ## set OE entityTypes to NULL and select the ones we want to use
 
-  ## Set entity type to NULL for converted OEs
-  for (i in 1:length(index)){
-    otherEntity[[i]]$entityType <- NULL
+  if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1){
+    # prepare OE to copy
+    otherEntity <- doc$dataset$otherEntity
+    otherEntity$entityType <- NULL
+    otherEntity <- list(otherEntity)
+    ## delete otherEntity from list
+    doc$dataset$otherEntity <- NULL
   }
 
-  ## Add dt to bottom of dt list
+
+  else {
+    otherEntity <- doc$dataset$otherEntity[index]
+
+    for (i in 1:length(index)){
+      otherEntity[[i]]$entityType <- NULL
+    }
+    ## delete otherEntity from list
+    doc$dataset$otherEntity <- doc$dataset$otherEntity[-index]
+  }
+
+
   dts <- doc$dataset$dataTable
-  if (length(dts > 0)){
-    doc$dataset$dataTable <- list(dts, otherEntity)
+
+  ## handle case where there is a single dataTable already in dataset
+  if (length(eml_get_simple(dts, "entityName")) == 1){
+    dts <- list(dts)
+    doc$dataset$dataTable <- c(dts, otherEntity)
   }
-  else{
-    doc$dataset$dataTable <- otherEntity
+
+  ## otherwise can use c() as opposed to list()
+  else {
+    doc$dataset$dataTable <- c(dts, otherEntity)
   }
 
 
-
-  ## delete otherEntity from list
-  doc$dataset$otherEntity[index] <- NULL
 
   ## return eml
   if (validate_eml == TRUE) {
@@ -903,4 +916,37 @@ eml_set_shared_attributes <- function(doc, attributeList = NULL, type = 'dataTab
 
   doc$dataset[[type]] <- x
   return(doc)
+}
+
+#' Get a simple list output from EML::eml_get()
+#'
+#' This function is a convenience wrapper around EML::eml_get() which
+#' returns the output as a simple list as opposed to an object of type
+#' `emld` by removing the attributes and context from the object. If an
+#' element containing children is returned all of it's children will be
+#' flattened into a named character vector.
+#'
+#' @param doc (list) An EML object or child/descendant object
+#' @param element (character) Name of the element to be extracted. If
+#' multiple occurrences are found, will extract all.
+#'
+#' @return out (vector) A list of values contained in element given
+#'
+#' @export
+#'
+#' @examples
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#'
+#' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#'
+#' datatable_names <- eml_get_simple(doc$dataset$dataTable, element = "entityName")
+#'
+#'
+eml_get_simple <- function(doc, element){
+  out <- eml_get(doc, element, from = "list")
+  out$`@context` <- NULL
+  attributes(out) <- NULL
+  out <- unlist(out)
+  return(out)
 }
