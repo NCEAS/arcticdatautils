@@ -14,7 +14,7 @@ then it will default to the attributeList of the first \code{type} element.}
 \item{type}{(character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList
 objects with references. Defaults to 'dataTable'.}
 
-\item{eml}{(eml) An EML object.}
+\item{eml}{(emld) An EML object.}
 }
 \value{
 (eml) The modified EML document.

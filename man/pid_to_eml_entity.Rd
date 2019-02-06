@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_entity}
 \alias{pid_to_eml_entity}
-\title{Create EML entity from a DataONE PID}
+\title{Create EML entity with physical section from a DataONE PID}
 \usage{
 pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 }
@@ -13,14 +13,14 @@ pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 
 \item{...}{(optional) Additional arguments to be passed to \code{eml$entityType())}.}
 
-\item{entityType}{(character) What kind of objects to create from the input. One of "dataTable",
+\item{entityType}{(character) What kind of object to create from the input. One of "dataTable",
 "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".}
 }
 \value{
 (list) The entity object.
 }
 \description{
-Create EML entity from a DataONE PID
+Create EML entity with physical section from a DataONE PID
 }
 \examples{
 \dontrun{

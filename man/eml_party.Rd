@@ -24,7 +24,7 @@ eml_party(type = "associatedParty", given_names = NULL,
 
 \item{phone}{(character) The party's phone number(s).}
 
-\item{address}{(character) The party's address(es).}
+\item{address}{(character) The party's address(es) as a valid EML address}
 
 \item{userId}{(character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ.}
 
@@ -44,7 +44,9 @@ The \code{userId} argument assumes an ORCID so be sure to adjust for that.
 \dontrun{
 eml_party("creator", "Test", "User")
 eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
-eml_party("creator", list("Dominic", "'Dom'"), "Mullen", list("NCEAS", "UCSB"),
-          list("Data Scientist", "Programmer"))
+eml_party("creator", given_names = list("Dominic", "'Dom'"),
+                     sur_name = "Mullen", list("NCEAS", "UCSB"),
+                     position = list("Data Scientist", "Programmer"),
+                     address = eml$address(deliveryPoint = "735 State St", city = "Santa Barbara", administrativeArea = "CA", postalCode = "85719"))
 }
 }
