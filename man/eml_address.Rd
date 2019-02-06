@@ -24,6 +24,3 @@ A simple way to create an EML address element.
 \details{
 Note that EML::eml$address() provides the same functionality
 }
-\examples{
-NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")
-}

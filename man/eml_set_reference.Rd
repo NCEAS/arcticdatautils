@@ -7,9 +7,9 @@
 eml_set_reference(element_to_reference, element_to_replace)
 }
 \arguments{
-\item{element_to_reference}{(S4) An EML object to reference.}
+\item{element_to_reference}{(list) An EML element to reference.}
 
-\item{element_to_replace}{(S4) An EML object to replace with a reference.}
+\item{element_to_replace}{(list) An EML element to replace with a reference.}
 }
 \description{
 This function creates a new object with the same class as \code{element_to_replace}

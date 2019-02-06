@@ -9,7 +9,7 @@ pid_to_eml_physical(mn, pid)
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
-\item{pids}{(character) The PID of the object to create the sub-tree for.}
+\item{pids}{(character) The PID of the object to create the physical for.}
 }
 \value{
 (list) A physical object.
@@ -21,6 +21,6 @@ creating the EML physical.
 \examples{
 \dontrun{
 # Generate EML physical sections for an object in a data package
-pid_to_eml_physical(mn, pid)
+phys <- pid_to_eml_physical(mn, pid)
 }
 }

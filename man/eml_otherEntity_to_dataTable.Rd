@@ -12,7 +12,7 @@ eml_otherEntity_to_dataTable(doc, index, validate_eml = TRUE)
 \item{validate_eml}{(logical) Optional. Whether or not to validate the EML after
 completion. Setting this to \code{FALSE} reduces execution time by ~50 percent.}
 
-\item{otherEntity}{(integer/) The indicies of the otherEntities to be transformed.}
+\item{otherEntity}{(integer) The indicies of the otherEntities to be transformed.}
 }
 \description{
 Convert an EML 'otherEntity' object to a 'dataTable' object. This will convert an
@@ -23,11 +23,6 @@ However, if these are already in their respective slots, they will be retained.
 \dontrun{
 doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 
-# The following two calls are equivalent:
-doc <- eml_otherEntity_to_dataTable(doc, doc$dataset$otherEntity[[1]])
-doc <- eml_otherEntity_to_dataTable(doc, 1)
-
-# Integer input is recommended:
 doc <- eml_otherEntity_to_dataTable(doc, 1)
 }
 }
