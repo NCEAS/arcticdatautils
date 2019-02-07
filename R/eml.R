@@ -728,15 +728,21 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
 
   dts <- doc$dataset$dataTable
 
-  ## handle case where there is a single dataTable already in dataset
-  if (length(eml_get_simple(dts, "entityName")) == 1){
-    dts <- list(dts)
-    doc$dataset$dataTable <- c(dts, otherEntity)
+  ## handle various datatable length cases
+  if (length(dts) == 0){
+    doc$dataset$dataTable <- otherEntity
+  }
+  else{
+    if (length(eml_get_simple(dts, "entityName")) == 1){
+      dts <- list(dts)
+      doc$dataset$dataTable <- c(dts, otherEntity)
+    }
+
+    else {
+      doc$dataset$dataTable <- c(dts, otherEntity)
+    }
   }
 
-  else {
-    doc$dataset$dataTable <- c(dts, otherEntity)
-  }
 
 
 
