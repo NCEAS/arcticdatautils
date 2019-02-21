@@ -271,3 +271,36 @@ test_that('eml_party creates multiple givenName, organizationName, and positionN
   expect_equal(EML::eml_get(creator, 'organizationName'), EML::as_emld(list('NCEAS', 'UCSB')))
   expect_equal(EML::eml_get(creator, 'positionName'), EML::as_emld(list('Programmers', 'brothers')))
 })
+
+test_that('reorder_pids orders pids correctly', {
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+  oe1 <- list(entityName = "object one", entityType = "other")
+  oe2 <- list(entityName = "object two", entityType = "other")
+  doc <- list(packageId = "an id", system = "a system",
+    dataset = list(
+    title = "A Mimimal Valid EML Dataset",
+    creator = me,
+    contact = me,
+    otherEntity = list(oe1, oe2)))
+
+  pid_list <- list("object two" = "some identifier2", "object one" = "some identifier1")
+
+  ordered_pids <- reorder_pids(pid_list, doc)
+  entity_names <- eml_get_simple(doc, "entityName")
+  expect_equal(names(ordered_pids), entity_names)
+})
+
+test_that('reorder_pids fails gracefully', {
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+  oe1 <- list(entityName = "object one", entityType = "other")
+  doc <- list(packageId = "an id", system = "a system",
+              dataset = list(
+                title = "A Mimimal Valid EML Dataset",
+                creator = me,
+                contact = me,
+                otherEntity = list(oe1)))
+
+  pid_list <- list("object two" = "some identifier2", "object one" = "some identifier1")
+
+  expect_error(reorder_pids(pid_list, doc))
+})
