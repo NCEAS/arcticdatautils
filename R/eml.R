@@ -74,7 +74,7 @@ pid_to_eml_entity <- function(mn,
 #' creating the EML physical.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PID of the object to create the physical for.
+#' @param pid (character) The PID of the object to create the physical for.
 #'
 #' @return (list) A physical object.
 #'
@@ -214,7 +214,10 @@ get_doc_id <- function(sysmeta) {
 #' eml_party("creator", given_names = list("Dominic", "'Dom'"),
 #'                      sur_name = "Mullen", list("NCEAS", "UCSB"),
 #'                      position = list("Data Scientist", "Programmer"),
-#'                      address = eml$address(deliveryPoint = "735 State St", city = "Santa Barbara", administrativeArea = "CA", postalCode = "85719"))
+#'                          address = eml$address(deliveryPoint = "735 State St",
+#'                          city = "Santa Barbara",
+#'                          administrativeArea = "CA",
+#'                          postalCode = "85719"))
 #'}
 eml_party <- function(type="associatedParty",
                       given_names = NULL,
@@ -407,7 +410,8 @@ eml_personnel <- function(role = NULL, ...) {
 #' fully fleshed out. Need to pass these objects in directly if you want to use
 #' them.
 #'
-#' @param title (character) Title of the project (Required). May have multiple titles constructed using `list`.
+#' @param title (character) Title of the project (Required). May have multiple titles
+#' constructed using `list`.
 #' @param personnelList (list of personnel) Personnel involved with the project.
 #' @param abstract (character) Project abstract. Can pass as a list
 #'   for separate paragraphs.
@@ -853,10 +857,13 @@ which_in_eml <- function(doc, element, test) {
 #' doc$dataset$dataTable[[4]] <- doc$dataset$dataTable[[1]]
 #' # Add references to the second and third elements only (not the 4th):
 #' for (i in 2:3) {
-#'     doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(doc$dataset$dataTable[[1]]$attributeList,
+#'     doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(
+#'                                                       doc$dataset$dataTable[[1]]$attributeList,
 #'                                                       doc$dataset$dataTable[[i]]$attributeList)
 #' }
-#' # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
+#' # If we print the entire 'dataTable' list we see elements 2 and 3 have
+#' references while 4 does not.
+#'
 #' doc$dataset$dataTable
 #' }
 eml_set_reference <- function(element_to_reference, element_to_replace) {
@@ -877,8 +884,8 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' @param eml (emld) An EML object.
 #' @param attributeList (attributeList) Optional. An EML attributeList object. If not provided
 #'   then it will default to the attributeList of the first \code{type} element.
-#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList
-#'   objects with references. Defaults to 'dataTable'.
+#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity'
+#'   attributeList objects with references. Defaults to 'dataTable'.
 #'
 #' @return (eml) The modified EML document.
 #'
@@ -891,7 +898,8 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
-#' atts <- EML::set_attributes(EML::get_attributes(eml$dataset$dataTable[[1]]$attributeList)$attributes)
+#' atts <- EML::set_attributes(
+#'                      EML::get_attributes(eml$dataset$dataTable[[1]]$attributeList)$attributes)
 #'
 #' eml <- eml_set_shared_attributes(eml, atts, type = 'dataTable')
 #' }
@@ -951,4 +959,44 @@ eml_get_simple <- function(doc, element){
   attributes(out) <- NULL
   out <- unlist(out)
   return(out)
+}
+
+#' Reorder a named list of objects according to the order in the metadata
+#'
+#' This function takes a named list of data objects, such as what is
+#' returned from `get_package`, and reorders them according to the order
+#' they are given in the EML document.
+#'
+#' @param pid_list (list) A named list of data pids
+#' @param doc (list) an `emld` document
+#'
+#' @return ordered_pids (list) A list of reordered pids
+#'
+#' @export
+#'
+#' @examples
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#
+#' ids <- get_package(adc, 'resource_map_doi:10.18739/A2S17SS1M', file_names = TRUE)
+#' doc <- EML::read_eml(dataone::getObject(adc, ids$metadata))
+#'
+#' # return all entity types
+#' ordered_pids <- reorder_pids(ids$data, doc)
+#'
+reorder_pids <- function(pid_list, doc){
+  stopifnot(!is.null(names(pid_list)))
+
+  entity_names <- eml_get_simple(doc, "entityName")
+
+  if (is.null(entity_names)){
+    stop("No entity names were found.")
+  }
+
+  if (length(entity_names) != length(pid_list)){
+    stop("Number of entities in EML and resource map do not match")
+  }
+
+  ordered_pids <- pid_list[order(match(names(pid_list), entity_names))]
+  return(ordered_pids)
 }
