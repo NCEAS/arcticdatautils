@@ -9,7 +9,8 @@ eml_project(title, personnelList, abstract = NULL, funding = NULL,
   relatedProject = NULL)
 }
 \arguments{
-\item{title}{(character) Title of the project (Required). May have multiple titles constructed using \code{list}.}
+\item{title}{(character) Title of the project (Required). May have multiple titles
+constructed using \code{list}.}
 
 \item{personnelList}{(list of personnel) Personnel involved with the project.}
 

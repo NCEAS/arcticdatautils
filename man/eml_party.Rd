@@ -47,6 +47,9 @@ eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-038
 eml_party("creator", given_names = list("Dominic", "'Dom'"),
                      sur_name = "Mullen", list("NCEAS", "UCSB"),
                      position = list("Data Scientist", "Programmer"),
-                     address = eml$address(deliveryPoint = "735 State St", city = "Santa Barbara", administrativeArea = "CA", postalCode = "85719"))
+                         address = eml$address(deliveryPoint = "735 State St",
+                         city = "Santa Barbara",
+                         administrativeArea = "CA",
+                         postalCode = "85719"))
 }
 }

@@ -11,10 +11,10 @@ pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 
 \item{pid}{(character) The PID of the object to create the sub-tree for.}
 
-\item{...}{(optional) Additional arguments to be passed to \code{eml$entityType())}.}
-
-\item{entityType}{(character) What kind of object to create from the input. One of "dataTable",
+\item{entity_type}{(character) What kind of object to create from the input. One of "dataTable",
 "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".}
+
+\item{...}{(optional) Additional arguments to be passed to \code{eml$entityType())}.}
 }
 \value{
 (list) The entity object.
@@ -27,7 +27,7 @@ Create EML entity with physical section from a DataONE PID
 # Generate EML otherEntity
 pid_to_eml_entity(mn,
                   pid,
-                  entityType = "otherEntity",
+                  entity_type = "otherEntity",
                   entityName = "Entity Name",
                   entityDescription = "Description about entity")
 }

@@ -4,7 +4,7 @@
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
-#' @param entityType (character) What kind of object to create from the input. One of "dataTable",
+#' @param entity_type (character) What kind of object to create from the input. One of "dataTable",
 #'   "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".
 #' @param ... (optional) Additional arguments to be passed to \code{eml$entityType())}.
 #'
@@ -17,7 +17,7 @@
 #' # Generate EML otherEntity
 #' pid_to_eml_entity(mn,
 #'                   pid,
-#'                   entityType = "otherEntity",
+#'                   entity_type = "otherEntity",
 #'                   entityName = "Entity Name",
 #'                   entityDescription = "Description about entity")
 #' }
@@ -685,7 +685,7 @@ eml_validate_attributes <- function(attributes) {
 #' However, if these are already in their respective slots, they will be retained.
 #'
 #' @param doc (list) An EML document.
-#' @param otherEntity (integer) The indicies of the otherEntities to be transformed.
+#' @param index (integer) The indicies of the otherEntities to be transformed.
 #' @param validate_eml (logical) Optional. Whether or not to validate the EML after
 #'   completion. Setting this to `FALSE` reduces execution time by ~50 percent.
 #'
@@ -881,13 +881,13 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' This function sets shared attributes using the attributes of the first \code{type}
 #' selected and creates references for all remaining objects of equivalent \code{type}.
 #'
-#' @param eml (emld) An EML object.
+#' @param doc (emld) An EML object.
 #' @param attributeList (attributeList) Optional. An EML attributeList object. If not provided
 #'   then it will default to the attributeList of the first \code{type} element.
 #' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity'
 #'   attributeList objects with references. Defaults to 'dataTable'.
 #'
-#' @return (eml) The modified EML document.
+#' @return (doc) The modified EML document.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'

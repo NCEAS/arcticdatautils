@@ -9,10 +9,10 @@ eml_otherEntity_to_dataTable(doc, index, validate_eml = TRUE)
 \arguments{
 \item{doc}{(list) An EML document.}
 
+\item{index}{(integer) The indicies of the otherEntities to be transformed.}
+
 \item{validate_eml}{(logical) Optional. Whether or not to validate the EML after
 completion. Setting this to \code{FALSE} reduces execution time by ~50 percent.}
-
-\item{otherEntity}{(integer) The indicies of the otherEntities to be transformed.}
 }
 \description{
 Convert an EML 'otherEntity' object to a 'dataTable' object. This will convert an

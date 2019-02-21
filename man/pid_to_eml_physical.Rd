@@ -9,7 +9,7 @@ pid_to_eml_physical(mn, pid)
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
-\item{pids}{(character) The PID of the object to create the physical for.}
+\item{pid}{(character) The PID of the object to create the physical for.}
 }
 \value{
 (list) A physical object.
