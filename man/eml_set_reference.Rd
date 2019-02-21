@@ -32,10 +32,13 @@ doc$dataset$dataTable[[3]] <- doc$dataset$dataTable[[1]]
 doc$dataset$dataTable[[4]] <- doc$dataset$dataTable[[1]]
 # Add references to the second and third elements only (not the 4th):
 for (i in 2:3) {
-    doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(doc$dataset$dataTable[[1]]$attributeList,
+    doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(
+                                                      doc$dataset$dataTable[[1]]$attributeList,
                                                       doc$dataset$dataTable[[i]]$attributeList)
 }
-# If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
+# If we print the entire 'dataTable' list we see elements 2 and 3 have
+references while 4 does not.
+
 doc$dataset$dataTable
 }
 }
