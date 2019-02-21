@@ -647,11 +647,11 @@ eml_validate_attributes <- function(attributes) {
 
   doc <- list(packageId = "test",
               system = "test",
-              dataset = eml$dataset(
+              dataset = list(
                 title = "test",
-                creator = eml$creator(individualName = eml$individualName(givenName = "test", surName = "test")),
-                contact = eml$contact(individualName = eml$individualName(givenName = "test", surName = "test")),
-                otherEntity = eml$otherEntity(entityName = "name", entityType = "otherEntity")))
+                creator = list(individualName = eml$individualName(givenName = "test", surName = "test")),
+                contact = list(individualName = eml$individualName(givenName = "test", surName = "test")),
+                otherEntity = list(entityName = "name", entityType = "otherEntity")))
 
   results <- sapply(attributes$attribute, function(attribute) {
     cat(paste0("Validating single attribute '", attribute$attributeName, "': "))

@@ -449,7 +449,7 @@ publish_update <- function(mn,
 
   # Replace access if needed
   if (length(doc$access$allow) & (!is.null(metadata_path))) {
-    doc$access <- eml$access()
+    doc$access <- list()
   }
 
   # Write out the document to disk. We do this in part because
