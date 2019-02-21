@@ -649,8 +649,8 @@ eml_validate_attributes <- function(attributes) {
               system = "test",
               dataset = list(
                 title = "test",
-                creator = list(individualName = eml$individualName(givenName = "test", surName = "test")),
-                contact = list(individualName = eml$individualName(givenName = "test", surName = "test")),
+                creator = list(individualName = list(givenName = "test", surName = "test")),
+                contact = list(individualName = list(givenName = "test", surName = "test")),
                 otherEntity = list(entityName = "name", entityType = "otherEntity")))
 
   results <- sapply(attributes$attribute, function(attribute) {
