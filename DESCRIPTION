@@ -30,6 +30,7 @@ Imports:
     methods,
     stringr,
     stringi,
+    sf,
     tools,
     uuid,
     xml2,
