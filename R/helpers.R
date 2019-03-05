@@ -566,16 +566,23 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
 read_zip_shapefile <- function(mn, pid){
 
   stopifnot(methods::is(mn, 'MNode'))
+  stopifnot(is.character(pid))
+
+  if (!requireNamespace("sf")) {
+    stop(call. = FALSE,
+         "The package 'sf' must be installed to run this function. ",
+         "Please install it and try again.")
+  }
 
   temp <- tempfile()
   writeBin(dataone::getObject(mn, pid), temp)
-  t <- unzip(temp, exdir = tempfile())
+  zip_contents <- unzip(temp, exdir = tempfile())
 
-  if (length(grep("shp", tools::file_ext(t))) != 1){
+  if (length(grep("shp", tools::file_ext(zip_contents))) != 1){
     stop("Zipped directory must contain one and only one .shp file")
   }
 
-  shapefile <- sf::st_read(t[grep("shp", tools::file_ext(t))], quiet = T, stringsAsFactors = F)
+  shapefile <- sf::st_read(zip_contents[grep("shp", tools::file_ext(zip_contents))], quiet = T, stringsAsFactors = F)
   unlink(temp)
   return(shapefile)
 }

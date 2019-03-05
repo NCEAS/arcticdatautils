@@ -30,7 +30,6 @@ Imports:
     methods,
     stringr,
     stringi,
-    sf,
     tools,
     uuid,
     xml2,
@@ -44,6 +43,7 @@ Suggests:
     RCurl,
     purrr,
     rmarkdown,
+    sf,
     testthat,
     xslt,
     yaml
