@@ -540,3 +540,42 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
 
   return(results)
 }
+
+#' Read a shapefile from a pid
+#'
+#' Read a shapefile from a pid that points to the zipped directory of the shapefile and associated files
+#' on a given member node.
+#'
+#' @param mn (MNode) A DataOne Member Node
+#' @param pid (character) An object identifier
+#'
+#' @return shapefile (sf) The shapefile as an `sf` object
+#'
+#' @export
+#'
+#' @author Jeanette Clark jclark@@nceas.ucsb.edu
+#'
+#' @examples
+#' \dontrun{
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#' pid <- "urn:uuid:294a365f-c0d1-4cc3-a508-2e16260aa70c"
+#'
+#' shapefile <- read_zip_shapefile(adc, pid)
+#' }
+read_zip_shapefile <- function(mn, pid){
+
+  stopifnot(methods::is(mn, 'MNode'))
+
+  temp <- tempfile()
+  writeBin(dataone::getObject(mn, pid), temp)
+  t <- unzip(temp, exdir = tempfile())
+
+  if (length(grep("shp", tools::file_ext(t))) != 1){
+    stop("Zipped directory must contain one and only one .shp file")
+  }
+
+  shapefile <- sf::st_read(t[grep("shp", tools::file_ext(t))], quiet = T, stringsAsFactors = F)
+  unlink(temp)
+  return(shapefile)
+}
