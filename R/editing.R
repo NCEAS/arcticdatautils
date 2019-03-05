@@ -191,10 +191,10 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 
   # Add packageId to metadata if the object is an xml file
   if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml", format_id)) {
-    eml <- EML::read_eml(path)
-    eml@packageId <- new("xml_attribute", new_pid)
+    doc <- EML::read_eml(path)
+    doc$packageId <- new_pid
     path <- tempfile()
-    EML::write_eml(eml, path)
+    EML::write_eml(doc, path)
     # File changed - update checksum
     sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
   }
