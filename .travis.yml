@@ -17,3 +17,4 @@ addons:
       - librdf0-dev
       - libnetcdf-dev
       - netcdf-bin
+      - libudunits2-dev
