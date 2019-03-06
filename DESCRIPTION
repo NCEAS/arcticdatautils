@@ -43,6 +43,7 @@ Suggests:
     RCurl,
     purrr,
     rmarkdown,
+    sf,
     testthat,
     xslt,
     yaml
