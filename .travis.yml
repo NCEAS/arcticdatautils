@@ -17,4 +17,7 @@ addons:
       - librdf0-dev
       - libnetcdf-dev
       - netcdf-bin
-      - libudunits2-dev
+      - libudunits2-dev # for udunits2
+      - libgeos-dev # for sf
+      - libproj-dev # for sf
+      - libgdal-dev # for sf
