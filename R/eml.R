@@ -794,7 +794,7 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
 #' }
 which_in_eml <- function(doc, element, test) {
 
-  stopifnot(methods::is(doc, "emld"))
+  stopifnot(methods::is(doc, "list"))
   stopifnot(is.character(element))
 
   if (is.character(test)) {
@@ -805,7 +805,7 @@ which_in_eml <- function(doc, element, test) {
     stopifnot(is.function(test))
   }
 
-  elements_test <- eml_get(eml_list, element)
+  elements_test <- eml_get(doc, element)
 
   if (is.null(elements_test)) {
     location <- NULL
