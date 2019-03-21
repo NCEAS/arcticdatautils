@@ -394,7 +394,7 @@ publish_update <- function(mn,
   if (is.null(metadata_path)) {
     # Get the metadata doc
     message("Getting metadata from the MN.")
-    doc <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
+    doc <- EML::read_eml(dataone::getObject(mn, metadata_pid))
 
   } else if (class(metadata_path)[1] == "emld") {
       # If an eml object is provided, use it directly after validating
