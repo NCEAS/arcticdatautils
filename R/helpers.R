@@ -576,7 +576,7 @@ read_zip_shapefile <- function(mn, pid){
 
   temp <- tempfile()
   writeBin(dataone::getObject(mn, pid), temp)
-  zip_contents <- unzip(temp, exdir = tempfile())
+  zip_contents <- utils::unzip(temp, exdir = tempfile())
 
   if (length(grep("shp", tools::file_ext(zip_contents))) != 1){
     stop("Zipped directory must contain one and only one .shp file")
