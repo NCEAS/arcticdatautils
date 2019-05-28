@@ -184,7 +184,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
   sysmeta@checksumAlgorithm <- "SHA1"
   slot(sysmeta, "obsoletes", check = FALSE) <- NA
   slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
-  sysmeta@fileName <- basename(path)
+  sysmeta@fileName <- reformat_file_name(basename(path), sysmeta)
 
   # Set the replication policy back to default
   sysmeta <- clear_replication_policy(sysmeta)
