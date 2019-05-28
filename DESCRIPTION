@@ -47,6 +47,8 @@ Suggests:
     testthat,
     xslt,
     yaml
+Remotes: 
+  ropensci/EML@1b3d0a2bd63e01a3af99c77aa6a0784c3da3ea06
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
