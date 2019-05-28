@@ -107,7 +107,7 @@ publish_object <- function(mn,
   if (public == TRUE) {
     sysmeta <- datapack::addAccessRule(sysmeta, "public", "read")
   }
-  sysmeta@fileName <- basename(path)
+  sysmeta@fileName <- reformat_file_name(basename(path), sysmeta)
 
   dataone::createObject(mn,
                         pid = pid,
@@ -184,7 +184,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
   sysmeta@checksumAlgorithm <- "SHA1"
   slot(sysmeta, "obsoletes", check = FALSE) <- NA
   slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
-  sysmeta@fileName <- basename(path)
+  sysmeta@fileName <- reformat_file_name(basename(path), sysmeta)
 
   # Set the replication policy back to default
   sysmeta <- clear_replication_policy(sysmeta)
@@ -978,4 +978,37 @@ update_package_object <- function(mn,
   cat("\nThe new data pid is:", new_data_pid)
 
   return(pkg_new)
+}
+
+#' Helper for publish_object. Reformat the filName in system metadata.
+#'
+#' Reformat the fileName field in an object's system metadata to follow Arctic Data Center
+#' system metdata naming conventions.  Publish_object calls this function to rename
+#' the fileName field in system metadata.
+#'
+#' @param path (character) full file path
+#' @param sysmeta (S4) A system metadata object
+#'
+reformat_file_name <- function(path, sysmeta) {
+  base_name <- basename(path)
+  if (sysmeta@formatId == 'http://www.openarchives.org/ore/terms') {
+    ext <- '.rdf.xml'
+  } else if (grepl('eml://ecoinformatics\\.org/eml*', sysmeta@formatId)) {
+    ext <- '.xml'
+    # remove extension then truncate to 50 characters
+    base_name <- tools::file_path_sans_ext(base_name) %>%
+      stringr::str_sub(1, 50)
+    # re-trim if we're in the middle of a word and add extension back on
+    index <- stringi::stri_locate_last_fixed(base_name, ' ')[1]
+    base_name <- stringr::str_sub(base_name, 1, index -1) %>%
+      paste0(ext)
+  } else {
+    ext <- paste0('.', tools::file_ext(base_name))
+  }
+
+  file_name <- stringr::str_replace_all(base_name, '[^[:alnum:]]', '_') %>%
+    stringr::str_sub(end = -(nchar(ext) + 1)) %>%
+    paste0(ext)
+
+  return(file_name)
 }
