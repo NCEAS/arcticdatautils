@@ -48,7 +48,7 @@ Suggests:
     xslt,
     yaml
 Remotes: 
-  ropensci/EML@1b3d0a2bd63e01a3af99c77aa6a0784c3da3ea06
+  ropensci/EML@7a1140796373b0b7216fdc756210f07e318cc1b8
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

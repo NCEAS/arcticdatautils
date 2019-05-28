@@ -996,7 +996,7 @@ reformat_file_name <- function(path, sysmeta) {
   } else if (grepl('eml://ecoinformatics\\.org/eml*', sysmeta@formatId)) {
     ext <- '.xml'
     # remove extension then truncate to 50 characters
-    base_name <- stringr::str_sub(base_name, end = -5) %>%
+    base_name <- tools::file_path_sans_ext(base_name) %>%
       stringr::str_sub(1, 50)
     # re-trim if we're in the middle of a word and add extension back on
     index <- stringi::stri_locate_last_fixed(base_name, ' ')[1]
