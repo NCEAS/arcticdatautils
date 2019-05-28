@@ -24,7 +24,7 @@ Imports:
     dataone,
     datapack,
     digest,
-    EML,
+    EML (== 1.0.1),
     httr,
     magrittr,
     methods,
