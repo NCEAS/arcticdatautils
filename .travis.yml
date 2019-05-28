@@ -21,3 +21,5 @@ addons:
       - libgeos-dev # for sf
       - libproj-dev # for sf
       - libgdal-dev # for sf
+      - libjq-dev
+      - libv8-dev
