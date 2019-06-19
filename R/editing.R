@@ -731,15 +731,43 @@ update_resource_map <- function(mn,
   me <- get_token_subject()
   set_rights_holder(mn, resource_map_pid, me)
 
+  # Get the old resource map so we can extract any statements we need out of it
+  # such as PROV statements
+  old_resource_map_path <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, resource_map_pid)), old_resource_map_path)
+  statements <- parse_resource_map(old_resource_map_path)
+  statements <- filter_packaging_statements(statements)
+  if (is.data.frame(other_statements)) {
+    statements <- rbind(statements,
+                        other_statements)
+  }
+
+  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/", "", c(statements$subject, statements$object)) %>%
+    gsub("%3A", ":", .)
+  prov_pids <- prov_pids[-(grep("^http", prov_pids))] %>% # might need to catch other things besides URLs
+    unique(.)
+
   # Create the replacement resource map
   if (is.null(identifier)) {
     identifier <- paste0("resource_map_", new_uuid())
   }
 
-  new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+  if (any(prov_pids %in% data_pids == FALSE)){
+    warning("Old provenance contains data pids not in new resource map. Provenance information will be removed")
+
+    new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
                                        resource_map_pid = identifier)
+  }
+  else if (all(prov_pids %in% data_pids == TRUE)) {
+    new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                         data_pids = data_pids,
+                                         child_pids = child_pids,
+                                         other_statements = statements,
+                                         resource_map_pid = identifier)
+  }
+
   stopifnot(file.exists(new_rm_path))
 
   rm(sysmeta)
