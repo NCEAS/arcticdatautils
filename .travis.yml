@@ -5,7 +5,9 @@ r:
   - oldrel
   - release
   - devel
-r_packages: ncdf4
+r_packages:
+  - ncdf4
+  - sf
 sudo: false
 cache: packages
 addons:
@@ -15,3 +17,9 @@ addons:
       - librdf0-dev
       - libnetcdf-dev
       - netcdf-bin
+      - libudunits2-dev # for udunits2
+      - libgeos-dev # for sf
+      - libproj-dev # for sf
+      - libgdal-dev # for sf
+      - libjq-dev
+      - libv8-dev

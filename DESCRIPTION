@@ -24,7 +24,7 @@ Imports:
     dataone,
     datapack,
     digest,
-    EML,
+    EML (== 1.0.1),
     httr,
     magrittr,
     methods,
@@ -43,9 +43,12 @@ Suggests:
     RCurl,
     purrr,
     rmarkdown,
+    sf,
     testthat,
     xslt,
     yaml
+Remotes: 
+  ropensci/EML@7a1140796373b0b7216fdc756210f07e318cc1b8
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
