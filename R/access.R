@@ -241,6 +241,100 @@ set_access <- function(mn, pids, subjects, permissions = c("read", "write", "cha
   result
 }
 
+#' Remove a subject from an object's access policy
+#'
+#' Remove the given subjects from the access policy for the given objects on the given Member Node.
+#' For each type of permission, this function checks if the permission is already set
+#' and only updates the System Metadata when a change is needed.
+#'
+#' @param mn (MNode) The Member Node.
+#' @param pids (character) The PIDs of the objects to set permissions for.
+#' @param subjects (character) The identifiers of the subjects to set permissions for, typically an ORCID or DN.
+#' @param permissions (character) Optional. The permissions to set. Defaults to
+#'   read, write, and changePermission.
+#'
+#' @return (logical) Whether an update was needed.
+#'
+#' @export
+#'
+#' @examples
+#'\dontrun{
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pids <- c("urn:uuid:3e5307c4-0bf3-4fd3-939c-112d4d11e8a1",
+#'    "urn:uuid:23c7cae4-0fc8-4241-96bb-aa8ed94d71fe")
+#' remove_access(mn, pids, subjects = "http://orcid.org/0000-000X-XXXX-XXXX",
+#'    permissions = c("read", "write", "changePermission"))
+#'}
+remove_access <- function(mn, pids, subjects, permissions = c("read", "write", "changePermission")) {
+  if (!is(mn, "MNode")) {
+    stop(paste0("Argument 'mn' is not an MNode but was a ", class(mn), " instead."))
+  }
+
+  if (!all(is.character(pids),
+           all(nchar(pids) > 0))) {
+    stop("Argument 'pids' must be character class with non-zero number of characters.")
+  }
+
+  if (!all(is.character(subjects),
+           all(nchar(subjects)) > 0)) {
+    stop("Argument 'subjects' must be character class with non-zero number of characters.")
+  }
+
+  if (any(grepl("^https:\\/\\/orcid\\.org", subjects))) {
+    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+  }
+
+  if (!all(permissions %in% c("read", "write", "changePermission"))) {
+    stop("Argument 'permissions' must be one or more of: 'read', 'write', 'changePermission'")
+  }
+
+
+  result <- c()
+
+  for (pid in pids) {
+    changed <- FALSE
+
+    sysmeta <- tryCatch({
+      dataone::getSystemMetadata(mn, pid)
+    }, warning = function(w) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      w
+    }, error = function(e) {
+      message(paste0("Failed to get System Metadata for PID '", pid, "'\non MN '", mn@endpoint, "'.\n"))
+      message(e)
+      e
+    })
+
+    if (!inherits(sysmeta, "SystemMetadata")) {
+      stop("Failed to get System Metadata.")
+    }
+
+    for (subject in subjects) {
+      for (permission in permissions) {
+        if (datapack::hasAccessRule(sysmeta, subject, permission)) {
+          sysmeta <- datapack::removeAccessRule(sysmeta, subject, permission)
+          changed <- TRUE
+        }
+      }
+    }
+
+    if (changed) {
+      result[pid] <- TRUE
+      message(paste0("Updating System Metadata for ", pid, "."))
+      dataone::updateSystemMetadata(mn, pid, sysmeta)
+    } else {
+      message(paste0("No changes needed for ", pid, ". Not updating."))
+      result[pid] <- FALSE
+    }
+  }
+
+  # Name the result vector
+  names(result) <- pids
+
+  result
+}
+
 
 #' Set rights holder with access policy for an object
 #'
