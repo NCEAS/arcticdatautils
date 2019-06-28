@@ -496,6 +496,9 @@ publish_update <- function(mn,
     metadata_updated_sysmeta <- datapack::removeAccessRule(metadata_updated_sysmeta, "public", "read")
   }
 
+  # Update fileName to follow ADC naming conventions
+  metadata_updated_sysmeta@fileName <- reformat_file_name(eml@dataset@title[[1]]@.Data, metadata_updated_sysmeta)
+
   set_rights_holder(mn, metadata_pid, me)
 
   dataone::updateObject(mn,
@@ -1007,6 +1010,7 @@ reformat_file_name <- function(path, sysmeta) {
   }
 
   file_name <- stringr::str_replace_all(base_name, '[^[:alnum:]]', '_') %>%
+    stringr::str_replace_all('_[_]*', '_') %>%  # replaces consecutive underscores with one
     stringr::str_sub(end = -(nchar(ext) + 1)) %>%
     paste0(ext)
 
