@@ -63,6 +63,9 @@ pid_to_eml_entity <- function(mn,
   if (entity_type == "otherEntity" && length(entity$entity_type) == 0) {
     entity$entityType <- "Other"
   }
+  else if (entity_type != "otherEntity"){
+    entity$entityType <- NULL
+  }
 
   return(entity)
 }
@@ -705,7 +708,7 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   stopifnot(methods::is(doc, "emld"))
   stopifnot(is.logical(eml_validate(doc)))
   stopifnot(is.numeric(index))
-  stopifnot(length(eml_get_simple(doc$dataset$otherEntity, "entityName")) >= length(index))
+  stopifnot(length(eml_get_simple(doc$dataset$otherEntity, "entityName")) >= index)
 
   ## set OE entityTypes to NULL and select the ones we want to use
 
@@ -823,7 +826,7 @@ which_in_eml <- function(doc, element, test) {
       location <- NULL
     }
   }
-
+  names(location) <- NULL
   return(location)
 }
 
