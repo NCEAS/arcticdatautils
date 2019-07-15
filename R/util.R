@@ -1082,7 +1082,7 @@ set_public_read_all_versions <- function(mn, resource_map_pid) {
   stopifnot(is(mn, 'MNode'))
   stopifnot(is_token_set(mn))
   stopifnot(is.character(resource_map_pid))
-  stopifnot(arcticdatautils:::is_resource_map(mn, resource_map_pid))
+  stopifnot(arcticdatautils::is_resource_map(mn, resource_map_pid))
 
   pids <- get_package(mn, resource_map_pid) %>%
     unlist()
