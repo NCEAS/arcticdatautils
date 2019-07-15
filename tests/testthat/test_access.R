@@ -71,6 +71,8 @@ test_that("access functions stop if system metadata is not found", {
 
   expect_error(set_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
 
+  expect_error(remove_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
+
   expect_error(set_public_read(mn, "test"))
 
   expect_error(remove_public_read(mn, "test"))
