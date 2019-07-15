@@ -1226,3 +1226,73 @@ eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTab
   slot(eml@dataset, type) <- x
   return(eml)
 }
+
+#' Fully validate an EML document against the KNB's online EML validator
+#'
+#' This function uses the same validation routine that arcticdata.io uses when
+#' you create or update a new science metadata object. The validator that the
+#' \code{\link[EML]{eml_validate}} function uses only checks for
+#' schema validity and produces error messages in another format than
+#' arcticdata.io so it can be hard to know ahead of time whether your upload
+#' will succeed or fail.
+#'
+#' You can access this tool in a web browser at
+#' \url{https://knb.ecoinformatics.org/emlparser}.
+#'
+#' This function simply shows the HTML response without parsing it into a nice,
+#' readable form so you'll have to read the output to know whether your
+#' document is fully valid.
+#'
+#' @param eml An \code{eml} class object or path to a file.
+#' @param quiet (logical) Whether or not to print the HTML response. Defaults
+#' to \code{FALSE}.
+#'
+#' @return The HTML response from the validator as an xml_document.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Get an example EML document from the EML package
+#' eml_path <- system.file(file.path("examples", "example-eml-valid.xml"),
+#'                                   package="EML")
+#' eml_validate_full(eml_path)
+#'
+#' # We can also pass in an `eml` object
+#' eml_doc <- EML::read_eml(eml_path)
+#' eml_validate_full(eml_doc)
+#' }
+eml_validate_full <- function(eml, quiet = FALSE) {
+  # Handle the eml argument and convert it to a file path we can use in
+  # httr::POST if it's not already a file path
+  if (class(eml) == "eml") {
+    eml_path <- tempfile()
+    EML::write_eml(eml, eml_path)
+    path <- eml_path
+  } else if (is.character(eml)) {
+    stopifnot(file.exists(eml))
+    path <- eml
+  } else {
+    stop(call. = FALSE,
+         "Objects of class ", class(eml), " not supported. ",
+         "Either pass an eml class object or a file path.")
+  }
+
+  # Read in the XML from disk as a characer vector and send a POST
+  # request to the EML parser
+  doc_text <- readChar(path, file.size(path))
+  req <- httr::POST("https://knb.ecoinformatics.org/emlparser/parse",
+                    body = list(action = "parse",
+                                filename = httr::upload_file(path)),
+                    encode = "multipart")
+  httr::stop_for_status(req)
+
+  # Parse response and, optionally, print it out
+  content <- httr::content(req)
+
+  if (!quiet) {
+    message(as.character(content))
+  }
+
+  invisible(content)
+}
