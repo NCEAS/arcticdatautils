@@ -91,7 +91,7 @@ test_that("a dataTable and otherEntity can be added from a pid", {
 
   # Create a dataTable
   DT <- pid_to_eml_entity(mn, pid2,
-                          entityType = "dataTable",
+                          entity_type = "dataTable",
                           entityName = dummy_entityName,
                           entityDescription = dummy_entityDescription,
                           attributeList = dummy_attributeList)
@@ -120,24 +120,23 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
   expect_error(eml_otherEntity_to_dataTable(doc, "1"))
 
   # subscripts out of bounds
-  expect_error(eml_otherEntity_to_dataTable(doc, doc$dataset$otherEntity[[2]]))
   expect_error(eml_otherEntity_to_dataTable(doc, 2))
 
-  # Duplicate entityNames found
+  # Duplicate entityNames found **function does not currently catch this**
   doc$dataset$otherEntity[[2]] <- doc$dataset$otherEntity[[1]]
-  expect_error(eml_otherEntity_to_dataTable(doc, doc$dataset$otherEntity[[1]]))
+  expect_error(eml_otherEntity_to_dataTable(doc, 1))
 
 })
 
-test_that("eml_otherEntity_to_dataTable fails gracefully", {
+test_that("eml_otherEntity_to_dataTable works", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
   doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
-  otherEntity <- doc$dataset$otherEntity[[1]]
+  otherEntity <- doc$dataset$otherEntity
 
-  doc <- eml_otherEntity_to_dataTable(doc, doc$dataset$otherEntity[[1]])
+  doc <- eml_otherEntity_to_dataTable(doc, 1)
 
   # test that otherEntity was removed
   expect_length(doc$dataset$otherEntity, 0)
@@ -191,39 +190,39 @@ test_that("which_in_eml returns correct locations", {
 
   attributeList <- EML::set_attributes(attributes)
 
-  dataTable_1 <- eml$dataTable(
+  dataTable_1 <- list(
                      entityName = "2016_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
   dataTable_2 <- dataTable_1
 
-  dataTable_3 <- eml$dataTable(
+  dataTable_3 <- list(
                      entityName = "2015_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
-  creator_1 <- eml$creator(
-                   individualName = eml$individualName(
+  creator_1 <- list(
+                   individualName = list(individualName = list(
                                         surName = "LAST",
-                                        givenName = "FIRST"))
-  creator_2 <- eml$creator(
-    individualName = eml$individualName(
+                                        givenName = "FIRST")))
+  creator_2 <- list(
+                  individualName = list(individualName = list(
                                         surName = "LAST",
-                                        givenName = "FIRST_2"))
+                                        givenName = "FIRST_2")))
   creator_3 <- creator_2
 
   title <- "Title"
 
-  dataset <- eml$dataset(
+  dataset <- list(dataset = list(
                  title = title,
                  creator = list(creator_1, creator_2, creator_3),
-                 dataTable = list(dataTable_1, dataTable_2, dataTable_3))
+                 dataTable = list(dataTable_1, dataTable_2, dataTable_3)))
 
-  doc <- list(dataset = dataset)
+  doc <- dataset
 
   expect_equal(c(2,3), which_in_eml(doc$dataset$creator, "givenName", "FIRST_2"))
-  expect_error(which_in_eml(doc$dataset$dataTable, "attributeName", "length_3"))
+  expect_error(which_in_eml(doc$dataset$dataTable, "attributeName", "length_3")) # not sure why this should fail?
   expect_equal(c(1,3), which_in_eml(doc$dataset$dataTable[[1]]$attribute, "attributeName", function(x) {grepl("^length", x)}))
 })
 

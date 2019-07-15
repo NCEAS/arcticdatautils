@@ -224,17 +224,17 @@ test_that("publish_update removes the deprecated eml@access element", {
   eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, pids$metadata), eml_path)
 
-  eml <- EML::read_eml(eml_path)
+  doc <- EML::read_eml(eml_path)
   # Populate dummy access element
-  eml@access@allow <- c(new("allow", .Data = "hello"))
-  write_eml(eml, eml_path)
+  doc$access <- list(allow  = "hello")
+  write_eml(doc, eml_path)
 
   new_pids <- publish_update(mn, pids$metadata, pids$resource_map, metadata_path = eml_path)
   updated_eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, new_pids$metadata), updated_eml_path)
 
   new_eml <- EML::read_eml(updated_eml_path)
-  expect_equal(0, length(new_eml@access@allow))
+  expect_equal(0, length(new_eml$access$allow))
 })
 
 test_that("publishing an object with a valid format ID succeeds", {
@@ -452,20 +452,20 @@ test_that("update_package_object updates EML", {
   attributeList1 <- EML::set_attributes(attributes1)
   phys <- pid_to_eml_physical(mn, pkg$data[1])
 
-  dummy_data_table <- new("dataTable",
+  dummy_data_table <- list(dataTable = list(
                           entityName = "Dummy Data Table",
                           entityDescription = "Dummy Description",
                           physical = phys,
-                          attributeList = attributeList1)
+                          attributeList = attributeList1))
 
-  eml <- EML::read_eml(rawToChar(getObject(mn, pkg$metadata)))
-  eml@dataset@dataTable <- c(dummy_data_table)
+  doc <- EML::read_eml(rawToChar(getObject(mn, pkg$metadata)))
+  doc$dataset$dataTable <- dummy_data_table
 
   otherEnts <- pid_to_eml_entity(mn, pkg$data[2:3], entityType = "otherEntity")
-  eml@dataset@otherEntity <- new("ListOfotherEntity", otherEnts)
+  doc$dataset$otherEntity <- otherEnts
 
   eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(eml, eml_path)
+  EML::write_eml(doc, eml_path)
 
   pkg <- publish_update(mn,
                         metadata_pid = pkg$metadata,
