@@ -605,10 +605,10 @@ is_public_read <- function(mn, pids, use.names = TRUE) {
   vapply(pids, USE.NAMES = use.names, FUN.VALUE = logical(1), FUN = function(pid) {
 
     url       <-  paste(mn@endpoint, "meta", utils::URLencode(pid, reserved = TRUE), sep = "/")
-    response  <-  dataone:::auth_get(url, node = mn)
+    response  <-  dataone::auth_get(url, node = mn)
 
     if (response$status_code != "200") {
-      error_desc <- dataone:::getErrorDescription(response)
+      error_desc <- dataone::getErrorDescription(response)
       if (grepl("READ not allowed", error_desc, ignore.case = TRUE)) {
         return(FALSE)
       } else {
