@@ -24,12 +24,13 @@ flattened into a named character vector. This function is best used
 to extract values from elements that have no children.
 }
 \examples{
+\dontrun{
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 
 doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 
 datatable_names <- eml_get_simple(doc$dataset$dataTable, element = "entityName")
-
+}
 
 }

@@ -948,13 +948,14 @@ eml_set_shared_attributes <- function(doc, attributeList = NULL, type = 'dataTab
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #'
 #' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 #'
 #' datatable_names <- eml_get_simple(doc$dataset$dataTable, element = "entityName")
-#'
+#'}
 #'
 eml_get_simple <- function(doc, element){
   out <- eml_get(doc, element, from = "list")
@@ -978,6 +979,7 @@ eml_get_simple <- function(doc, element){
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 #
@@ -986,6 +988,7 @@ eml_get_simple <- function(doc, element){
 #'
 #' # return all entity types
 #' ordered_pids <- reorder_pids(ids$data, doc)
+#'}
 #'
 reorder_pids <- function(pid_list, doc){
   stopifnot(!is.null(names(pid_list)))
