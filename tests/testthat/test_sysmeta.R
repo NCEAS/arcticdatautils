@@ -24,7 +24,7 @@ test_that("the replication policy gets defaulted correctly", {
 })
 
 test_that("all system metadata is retrieved", {
-  cn_staging <- CNode("STAGING")
+  cn_staging <- tryCatch(CNode("STAGING"), error = function(e) CNode("STAGING"))
   adc_test <- getMNode(cn_staging, "urn:node:mnTestARCTIC")
 
   rm_pid <- "resource_map_urn:uuid:3e3bb5de-ec63-4f13-a549-813f0cf28610"

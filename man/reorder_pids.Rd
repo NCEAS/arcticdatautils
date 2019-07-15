@@ -20,6 +20,7 @@ returned from \code{get_package}, and reorders them according to the order
 they are given in the EML document.
 }
 \examples{
+\dontrun{
 cn <- dataone::CNode('PROD')
 adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
 ids <- get_package(adc, 'resource_map_doi:10.18739/A2S17SS1M', file_names = TRUE)
@@ -27,5 +28,6 @@ doc <- EML::read_eml(dataone::getObject(adc, ids$metadata))
 
 # return all entity types
 ordered_pids <- reorder_pids(ids$data, doc)
+}
 
 }

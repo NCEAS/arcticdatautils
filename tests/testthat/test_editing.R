@@ -456,7 +456,7 @@ test_that("update_package_object updates EML", {
                           entityName = "Dummy Data Table",
                           entityDescription = "Dummy Description",
                           physical = phys,
-                          attributeList = attributeList1))
+                          attributeList = attributeList1)
 
   doc <- EML::read_eml(rawToChar(getObject(mn, pkg$metadata)))
   doc$dataset$dataTable <- dummy_data_table
