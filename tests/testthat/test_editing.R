@@ -452,7 +452,7 @@ test_that("update_package_object updates EML", {
   attributeList1 <- EML::set_attributes(attributes1)
   phys <- pid_to_eml_physical(mn, pkg$data[1])
 
-  dummy_data_table <- list(dataTable = list(
+  dummy_data_table <- list(
                           entityName = "Dummy Data Table",
                           entityDescription = "Dummy Description",
                           physical = phys,
