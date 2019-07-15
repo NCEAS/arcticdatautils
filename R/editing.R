@@ -452,6 +452,10 @@ publish_update <- function(mn,
     doc$access <- list()
   }
 
+  # Write out the document to disk. We do this in part because
+  # set_other_entities takes a path to the doc.
+  eml_path <- tempfile()
+  EML::write_eml(doc, eml_path)
 
   # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",
@@ -494,12 +498,6 @@ publish_update <- function(mn,
 
   # Update fileName to follow ADC naming conventions
   metadata_updated_sysmeta@fileName <- reformat_file_name(doc$dataset$title, metadata_updated_sysmeta)
-
-
-  # Write out the document to disk. We do this in part because
-  # set_other_entities takes a path to the doc.
-  eml_path <- tempfile()
-  EML::write_eml(doc, eml_path)
 
   set_rights_holder(mn, metadata_pid, me)
 
