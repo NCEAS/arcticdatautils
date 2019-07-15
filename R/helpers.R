@@ -368,10 +368,10 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 
   # Import EML
   eml_path_original <- file.path(system.file(package = "arcticdatautils"), "example-eml-full.xml")
-  eml <- EML::read_eml(eml_path_original)
+  doc <- EML::read_eml(eml_path_original)
 
   # Add objects to EML
-  eml@dataset@title[[1]]@.Data <- title
+  doc$dataset$title <- title
 
   attr <- data.frame(
     attributeName = c("Date", "Location", "Salinity", "Temperature"),
@@ -394,14 +394,14 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
   dT1 <- pid_to_eml_entity(mn,
                            pid = pid_csv1,
                            entityType = "dataTable")
-  dT1@attributeList <- attributeList
+  dT1$attributeList <- attributeList
 
   dT2 <- pid_to_eml_entity(mn,
                            pid = pid_csv2,
                            entityType = "dataTable")
-  dT2@attributeList <- attributeList
+  dT2$attributeList <- attributeList
 
-  eml@dataset@dataTable <- c(dT1, dT2)
+  doc$dataset$dataTable <- list(dT1, dT2)
 
   oE1 <- pid_to_eml_entity(mn,
                            pid = pid_jpg1,
@@ -411,10 +411,10 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
                            pid = pid_R1,
                            entityType = "otherEntity")
 
-  eml@dataset@otherEntity <- c(oE1, oE2)
+  doc$dataset$otherEntity <- list(oE1, oE2)
 
   eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(eml, eml_path)
+  EML::write_eml(doc, eml_path)
 
   pid_eml <- publish_object(mn,
                             path = eml_path,
