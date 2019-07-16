@@ -122,8 +122,8 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
   # subscripts out of bounds
   expect_error(eml_otherEntity_to_dataTable(doc, 2))
 
-  # Duplicate entityNames found **function does not currently catch this**
-  doc$dataset$otherEntity[[2]] <- doc$dataset$otherEntity[[1]]
+  # Duplicate entityNames found
+  doc$dataset$otherEntity <- list(doc$dataset$otherEntity, doc$dataset$otherEntity)
   expect_error(eml_otherEntity_to_dataTable(doc, 1))
 
 })
