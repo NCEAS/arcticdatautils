@@ -316,7 +316,7 @@ test_that("update_physical works", {
                                 path = "dummy_object.csv",
                                 format_id = "text/csv")
 
-  file.remove("dummy_object.csv")
+  unlink("dummy_object.csv")
 
   pkg_new <- publish_update(mn,
                             resource_map_pid = pkg$resource_map,
@@ -330,8 +330,12 @@ test_that("update_physical works", {
                              data_pid = pkg$data[2],
                              new_data_pid = new_data_pid)
 
-  url_original <- unlist(EML::eml_get(eml_original, "url"))
-  url_new <- unlist(EML::eml_get(eml_new, "url"))
+  t <- tempfile()
+  write_eml(eml_new, t)
+  eml_new <- read_eml(t)
+
+  url_original <- eml_get(eml_original, "url") %>% grep("^http", ., value = T) %>% unname()
+  url_new <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
 
   expect_equal(sum(stringr::str_detect(url_original, pkg$data[1])), 1)
   expect_equal(sum(stringr::str_detect(url_original, pkg$data[2])), 1)
@@ -384,8 +388,8 @@ test_that("update_package_object changes specified data object and rest of packa
 
   eml_new <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg_new$metadata)))
 
-  url_original <- unlist(EML::eml_get(eml_original, "url"))
-  url_new <- unlist(EML::eml_get(eml_new, "url"))
+  url_original <- eml_get(eml_original, "url") %>% grep("^http", ., value = T) %>% unname()
+  url_new <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
 
   expect_true(url_original[2] != url_new[2])
   expect_equal(url_original[1], url_new[1])
@@ -426,7 +430,7 @@ test_that("update_package_object errors if wrong input", {
                                      data_pid = file_path,
                                      new_data_path = "something",
                                      rm_pid = 1))
-  file.remove(file_path)
+  unlink(file_path)
 })
 
 test_that("update_package_object updates EML", {
@@ -452,8 +456,7 @@ test_that("update_package_object updates EML", {
   attributeList1 <- EML::set_attributes(attributes1)
   phys <- pid_to_eml_physical(mn, pkg$data[1])
 
-  dummy_data_table <- list(
-                          entityName = "Dummy Data Table",
+  dummy_data_table <- list(entityName = "Dummy Data Table",
                           entityDescription = "Dummy Description",
                           physical = phys,
                           attributeList = attributeList1)
@@ -461,7 +464,8 @@ test_that("update_package_object updates EML", {
   doc <- EML::read_eml(rawToChar(getObject(mn, pkg$metadata)))
   doc$dataset$dataTable <- dummy_data_table
 
-  otherEnts <- pid_to_eml_entity(mn, pkg$data[2:3], entityType = "otherEntity")
+  otherEnts <- list(pid_to_eml_entity(mn, pkg$data[2], entityType = "otherEntity"),
+                    pid_to_eml_entity(mn, pkg$data[3], entityType = "otherEntity"))
   doc$dataset$otherEntity <- otherEnts
 
   eml_path <- tempfile(fileext = ".xml")
@@ -489,11 +493,12 @@ test_that("update_package_object updates EML", {
                                    public = TRUE,
                                    use_doi = FALSE)
 
-  url_initial <- unlist(EML::eml_get(eml, "url"))
+  doc <- read_eml(getObject(mn, pkg$metadata))
+  url_initial <- eml_get(doc, "url") %>% grep("^http", ., value = T) %>% unname()
   expect_equal(sum(stringr::str_count(url_initial, data_pid)), 1)
 
   eml_new <- EML::read_eml(rawToChar(getObject(mn, pkg_new$metadata)))
-  url_final <- unlist(EML::eml_get(eml_new, "url"))
+  url_final <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
   expect_equal(sum(stringr::str_count(url_final, data_pid)), 0)
 
   pid_matches <- lapply(seq_along(pkg_new$data),
