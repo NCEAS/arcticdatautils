@@ -1003,6 +1003,8 @@ reformat_file_name <- function(path, sysmeta) {
       stringr::str_sub(1, 50)
     # re-trim if we're in the middle of a word and add extension back on
     index <- stringi::stri_locate_last_fixed(base_name, ' ')[1]
+    # Set index to the end of the string if there are no spaces.  Add + 1 because str_sub subtracts one to remove the white space.
+    if (is.na(index)) index <- nchar(base_name) + 1
     base_name <- stringr::str_sub(base_name, 1, index -1) %>%
       paste0(ext)
   } else {
