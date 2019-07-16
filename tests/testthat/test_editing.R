@@ -357,7 +357,9 @@ test_that("update_package_object changes specified data object and rest of packa
   pkg <- create_dummy_package_full(mn, title = "Check update_package_object")
 
   new_data_path <- "test_file.csv"
-  file.create(new_data_path)
+  dummy_data <- data.frame(col1 = 1:26, col2 = letters)
+  new_data_path <- tempfile(fileext = ".csv")
+  write.csv(dummy_data, new_data_path, row.names = FALSE)
 
   data_pid <- pkg$data[2]
 
