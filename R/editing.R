@@ -838,7 +838,7 @@ set_file_name <- function(mn, pid, name) {
 #' of a data object once it has been updated.
 #' This is a helper function for [update_package_object()].
 #'
-#' @param eml (eml) An EML class object.
+#' @param doc (emld) An EML object.
 #' @param mn (MNode) The Member Node of the data package.
 #' @param data_pid (character) The identifier of the data object to be updated.
 #' @param new_data_pid (character) The new identifier of the updated data object.
@@ -846,42 +846,72 @@ set_file_name <- function(mn, pid, name) {
 #' @importFrom stringr str_detect
 #'
 #' @noRd
-update_physical <- function(eml, mn, data_pid, new_data_pid) {
-  stopifnot(is(eml, "eml"))
+update_physical <- function(doc, mn, data_pid, new_data_pid) {
+  stopifnot(is(doc, "emld"))
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(data_pid), nchar(data_pid) > 0)
   stopifnot(is.character(new_data_pid), nchar(new_data_pid) > 0)
 
-  all_url <- unlist(EML::eml_get(eml, "url"))
+  all_url <- eml_get(doc, "url") %>%
+    grep("^http", ., value = T) %>%
+    unname()
+
   if (sum(stringr::str_detect(all_url, data_pid)) == 0) {
     stop("The obsoleted data PID does not match any physical sections, so the EML will not be updated.")
   }
 
-  dataTable_url <- unlist(EML::eml_get(eml@dataset@dataTable, "url"))
+  if (length(doc$dataset$dataTable) != 0){
+    dataTable_url <- eml_get(doc$dataset$dataTable, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(dataTable_url, data_pid))) {
-    position <- which(stringr::str_detect(dataTable_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@dataTable[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(dataTable_url, data_pid))) {
+      position <- which(stringr::str_detect(dataTable_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$dataTable)))){
+        doc$dataset$dataTable[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$dataTable))) == F & position == 1){
+        doc$dataset$dataTable$physical <- new_phys
+      }
+    }
   }
 
-  otherEntity_url <- unlist(EML::eml_get(eml@dataset@otherEntity, "url"))
+  if (length(doc$dataset$otherEntity) != 0){
+    otherEntity_url <- eml_get(doc$dataset$otherEntity, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(otherEntity_url, data_pid))) {
-    position <- which(stringr::str_detect(otherEntity_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@otherEntity[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(otherEntity_url, data_pid))) {
+      position <- which(stringr::str_detect(otherEntity_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$otherEntity)))){
+        doc$dataset$otherEntity[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$otherEntity))) == F & position == 1){
+        doc$dataset$otherEntity$physical <- new_phys
+      }
+    }
   }
 
-  spatialVector_url <- unlist(EML::eml_get(eml@dataset@spatialVector, "url"))
+  if (length(doc$dataset$spatialVector) != 0){
+    spatialVector_url <- eml_get(doc$dataset$spatialVector, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(spatialVector_url, data_pid))) {
-    position <- which(stringr::str_detect(spatialVector_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@spatialVector[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(spatialVector_url, data_pid))) {
+      position <- which(stringr::str_detect(spatialVector_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$spatialVector)))){
+        doc$dataset$spatialVector[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$spatialVector))) == F & position == 1){
+        doc$dataset$spatialVector$physical <- new_phys
+      }
+    }
   }
 
-  invisible(eml)
+  return(doc)
 }
 
 
@@ -943,7 +973,7 @@ update_package_object <- function(mn,
   stopifnot(is.logical(public))
 
   pkg <- get_package(mn, resource_map_pid)
-  eml <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
+  doc <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
 
   new_data_pid <- update_object(mn,
                                 pid = data_pid,
@@ -953,18 +983,13 @@ update_package_object <- function(mn,
   other_data_pids <- pkg$data[which(pkg$data != data_pid)] # wrapped in which for better NA handling
   new_data_pids <- c(other_data_pids, new_data_pid)
 
-  eml_new <- tryCatch(update_physical(eml = eml,
+  doc_new <- update_physical(doc = doc,
                                       mn = mn,
                                       data_pid = data_pid,
-                                      new_data_pid = new_data_pid),
-                      error = function(e) {
-                        message("The obsoleted data PID does not match any physical sections, so the EML will not be updated.",
-                                "\nCheck if the correct resource map PID was given.")
-                        return(eml)
-                      })
+                                      new_data_pid = new_data_pid)
 
-  eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(eml_new, eml_path)
+  eml_path <- tempfile()
+  EML::write_eml(doc_new, eml_path)
 
   pkg_new <- publish_update(mn,
                             metadata_pid = pkg$metadata,

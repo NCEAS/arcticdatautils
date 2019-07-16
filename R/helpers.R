@@ -364,6 +364,8 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
                            path = "dummy1.R",
                            format_id = "application/R")
 
+  unlink(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"))
+
   data_pids <- c(pid_csv1, pid_csv2, pid_jpg1, pid_R1)
 
   # Import EML
@@ -393,23 +395,23 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 
   dT1 <- pid_to_eml_entity(mn,
                            pid = pid_csv1,
-                           entityType = "dataTable")
+                           entity_type = "dataTable")
   dT1$attributeList <- attributeList
 
   dT2 <- pid_to_eml_entity(mn,
                            pid = pid_csv2,
-                           entityType = "dataTable")
+                           entity_type = "dataTable")
   dT2$attributeList <- attributeList
 
   doc$dataset$dataTable <- list(dT1, dT2)
 
   oE1 <- pid_to_eml_entity(mn,
                            pid = pid_jpg1,
-                           entityType = "otherEntity")
+                           entity_type = "otherEntity")
 
   oE2 <- pid_to_eml_entity(mn,
                            pid = pid_R1,
-                           entityType = "otherEntity")
+                           entity_type = "otherEntity")
 
   doc$dataset$otherEntity <- list(oE1, oE2)
 
@@ -425,7 +427,7 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
                                           metadata_pid = pid_eml,
                                           data_pids = data_pids)
 
-  file.remove(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"), eml_path)
+  file.remove(eml_path)
 
   return(list(resource_map = resource_map_pid,
               metadata = pid_eml,
