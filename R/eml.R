@@ -709,6 +709,10 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   stopifnot(is.logical(eml_validate(doc)))
   stopifnot(is.numeric(index))
   stopifnot(length(eml_get_simple(doc$dataset$otherEntity, "entityName")) >= index)
+  if (any(duplicated(eml_get_simple(doc$dataset, "entityName"))) == T){
+    stop(call. = FALSE,
+         "entityNames must be unique")
+  }
 
   ## set OE entityTypes to NULL and select the ones we want to use
 
