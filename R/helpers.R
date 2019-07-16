@@ -496,7 +496,7 @@ get_orcid_email <- function(orcid_url) {
 #' @param from (character) the date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}
 #' @param to (character) the date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}
 #' @param formatType (character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
-#' @param whitelist (logical) Whether to filter out ADC admins, as listed at: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
+#' @param use_whitelist (logical) Whether to filter out ADC admins, as listed at: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
 #'
 #' @export
 #'
