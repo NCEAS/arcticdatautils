@@ -465,8 +465,8 @@ get_orcid_name <- function(orcid_url) {
 #' @param orcid_url (character) A valid ORCID URL address.
 #'
 #' @return (character) Public e-mail addresses.
+#' @export
 #'
-#' @noRd
 #'
 #' @examples
 #' \dontrun{
