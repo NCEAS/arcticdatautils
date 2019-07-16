@@ -434,10 +434,9 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
               data = data_pids))
 }
 
-
 #' Retrieve a name from an ORCID URL
 #'
-#' Retrieve first and last name from an ORCID URL by scraping the page.
+#' Retrieve first and last name from an ORCID URL.
 #'
 #' @param orcid_url (character) A valid ORCID URL address.
 #'
@@ -449,19 +448,42 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 #' \dontrun{
 #' pi_name <- get_orcid_name('https://orcid.org/0000-0002-2561-5840')
 #' }
+
 get_orcid_name <- function(orcid_url) {
-  req <- httr::GET(orcid_url)
+  req <- httr::GET(paste0(orcid_url, "/person.json"))
   if (req$status_code != 200) {
     stop('Failed to read in ', orcid_url)
   }
+  json <- httr::content(req)
+  return(json$displayName)
+}
 
-  name <- httr::content(req, "text") %>%
-    stringr::str_extract("<title>.*<") %>%
-    stringr::str_split(" ") %>%
-    unlist() %>%
-    stringr::str_remove("<title>")
+#' Retrieve an email address from an ORCID URL
+#'
+#' Retrieve public email addresses from an ORCID URL.
+#'
+#' @param orcid_url (character) A valid ORCID URL address.
+#'
+#' @return (character) Public e-mail addresses.
+#'
+#' @noRd
+#'
+#' @examples
+#' \dontrun{
+#' pi_email <- get_orcid_email('https://orcid.org/0000-0002-2561-5840')
+#' }
 
-  return(paste(name[1], name[2]))
+get_orcid_email <- function(orcid_url) {
+  req <- httr::GET(paste0(orcid_url, "/person.json"))
+  if (req$status_code != 200) {
+    stop('Failed to read in ', orcid_url)
+  }
+  json <- httr::content(req)
+  email_list <- eml_get_simple(json$publicGroupedEmails, "email") %>% paste0(., collapse = ";")
+  if (is.null(email_list)){
+    email_list <- NA
+  }
+  return(email_list)
 }
 
 
@@ -474,7 +496,7 @@ get_orcid_name <- function(orcid_url) {
 #' @param from (character) the date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}
 #' @param to (character) the date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}
 #' @param formatType (character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
-#' @param whitelist (character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
+#' @param whitelist (logical) Whether to filter out ADC admins, as listed at: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
 #'
 #' @export
 #'
@@ -498,10 +520,10 @@ get_orcid_name <- function(orcid_url) {
 #'
 #' }
 list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType = '*',
-                             whitelist = 'https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org') {
-  if (!requireNamespace('lubridate', 'purrr', 'RCurl')) {
+                             use_whitelist = T) {
+  if (!requireNamespace('lubridate', "purrr", 'RCurl')) {
     stop(call. = FALSE,
-         'The packages "lubridate", "purrr", and "RCurl" must be installed to run this function. ',
+         'The packages "lubridate", "purrr, and "RCurl" must be installed to run this function. ',
          'Please install them and try again.')
   }
   stopifnot(methods::is(mn, 'MNode'))
@@ -517,8 +539,11 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
   if (!(formatType %in% c('RESOURCE', 'METADATA', 'DATA', '*'))) {
     stop('formatType must be one of: RESOURCE, METADATA, DATA, or *')
   }
+  if (as.Date(from) > as.Date(to)){
+    stop('"from" date must be after "to" date')
+  }
 
-  req <- httr::GET(whitelist)
+  req <- httr::GET('https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org')
   if(req$status_code != 200) {
     warning('Failed to read in', whitelist, '. Results will include admin submissions / edits.')
   }
@@ -530,12 +555,14 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
                                      fl = "identifier AND submitter AND dateUploaded AND formatType AND fileName",
                                      rows = 10000),
                             as = "data.frame")
-
-  # Filter out rows where the submitter is in the whitelist
-  results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
+  if (use_whitelist == T){
+    # Filter out rows where the submitter is in the whitelist
+    results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
+  }
 
   # Return full names based on orcid Id
   results$submitter_name <- purrr::map(results$submitter, get_orcid_name) %>% unlist()
+  results$submitter_email <- purrr::map(results$submitter, get_orcid_email) %>% unlist()
 
   # Arrange by dateUploaded
   results <- dplyr::arrange(results, dateUploaded)
