@@ -442,7 +442,7 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 #'
 #' @return (character) First and last name.
 #'
-#' @noRd
+#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -455,7 +455,13 @@ get_orcid_name <- function(orcid_url) {
     stop('Failed to read in ', orcid_url)
   }
   json <- httr::content(req)
-  return(json$displayName)
+
+  display_name <- json$displayName
+
+  if (is.null(display_name)){
+    display_name <- NA
+  }
+  return(display_name)
 }
 
 #' Retrieve an email address from an ORCID URL
