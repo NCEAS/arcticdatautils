@@ -21,6 +21,6 @@ eml_address(delivery_points, city, administrative_area, postal_code)
 \description{
 A simple way to create an EML address element.
 }
-\examples{
-NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")
+\details{
+Note that EML::eml$address() provides the same functionality
 }

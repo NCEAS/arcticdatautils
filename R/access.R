@@ -616,7 +616,7 @@ is_public_read <- function(mn, pids, use.names = TRUE) {
       }
     }
 
-    sysmeta <- datapack:::SystemMetadata(XML::xmlRoot(suppressMessages(XML::xmlParse((httr::content(response, as = "text"))))))
+    sysmeta <- datapack::SystemMetadata(XML::xmlRoot(suppressMessages(XML::xmlParse((httr::content(response, as = "text"))))))
     return(datapack::hasAccessRule(sysmeta, "public", "read"))
   })
 }

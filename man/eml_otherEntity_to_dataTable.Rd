@@ -4,13 +4,12 @@
 \alias{eml_otherEntity_to_dataTable}
 \title{Convert otherEntities to dataTables}
 \usage{
-eml_otherEntity_to_dataTable(eml, otherEntity, validate_eml = TRUE)
+eml_otherEntity_to_dataTable(doc, index, validate_eml = TRUE)
 }
 \arguments{
-\item{eml}{(S4) An EML S4 object.}
+\item{doc}{(list) An EML document.}
 
-\item{otherEntity}{(S4 / integer) Either an EML otherEntity object or the index
-of an otherEntity within a ListOfotherEntity. Integer input is recommended.}
+\item{index}{(integer) The indicies of the otherEntities to be transformed.}
 
 \item{validate_eml}{(logical) Optional. Whether or not to validate the EML after
 completion. Setting this to \code{FALSE} reduces execution time by ~50 percent.}
@@ -22,14 +21,9 @@ However, if these are already in their respective slots, they will be retained.
 }
 \examples{
 \dontrun{
-eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 
-# The following two calls are equivalent:
-eml <- eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]])
-eml <- eml_otherEntity_to_dataTable(eml, 1)
-
-# Integer input is recommended:
-eml <- eml_otherEntity_to_dataTable(eml, 1)
+doc <- eml_otherEntity_to_dataTable(doc, 1)
 }
 }
 \author{

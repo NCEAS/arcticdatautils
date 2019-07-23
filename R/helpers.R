@@ -364,14 +364,16 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
                            path = "dummy1.R",
                            format_id = "application/R")
 
+  unlink(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"))
+
   data_pids <- c(pid_csv1, pid_csv2, pid_jpg1, pid_R1)
 
   # Import EML
   eml_path_original <- file.path(system.file(package = "arcticdatautils"), "example-eml-full.xml")
-  eml <- EML::read_eml(eml_path_original)
+  doc <- EML::read_eml(eml_path_original)
 
   # Add objects to EML
-  eml@dataset@title[[1]]@.Data <- title
+  doc$dataset$title <- title
 
   attr <- data.frame(
     attributeName = c("Date", "Location", "Salinity", "Temperature"),
@@ -393,28 +395,28 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 
   dT1 <- pid_to_eml_entity(mn,
                            pid = pid_csv1,
-                           entityType = "dataTable")
-  dT1@attributeList <- attributeList
+                           entity_type = "dataTable")
+  dT1$attributeList <- attributeList
 
   dT2 <- pid_to_eml_entity(mn,
                            pid = pid_csv2,
-                           entityType = "dataTable")
-  dT2@attributeList <- attributeList
+                           entity_type = "dataTable")
+  dT2$attributeList <- attributeList
 
-  eml@dataset@dataTable <- c(dT1, dT2)
+  doc$dataset$dataTable <- list(dT1, dT2)
 
   oE1 <- pid_to_eml_entity(mn,
                            pid = pid_jpg1,
-                           entityType = "otherEntity")
+                           entity_type = "otherEntity")
 
   oE2 <- pid_to_eml_entity(mn,
                            pid = pid_R1,
-                           entityType = "otherEntity")
+                           entity_type = "otherEntity")
 
-  eml@dataset@otherEntity <- c(oE1, oE2)
+  doc$dataset$otherEntity <- list(oE1, oE2)
 
   eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(eml, eml_path)
+  EML::write_eml(doc, eml_path)
 
   pid_eml <- publish_object(mn,
                             path = eml_path,
@@ -425,41 +427,69 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
                                           metadata_pid = pid_eml,
                                           data_pids = data_pids)
 
-  file.remove(c("dummy1.csv", "dummy2.csv", "dummy1.jpg", "dummy1.R"), eml_path)
+  file.remove(eml_path)
 
   return(list(resource_map = resource_map_pid,
               metadata = pid_eml,
               data = data_pids))
 }
 
-
 #' Retrieve a name from an ORCID URL
 #'
-#' Retrieve first and last name from an ORCID URL by scraping the page.
+#' Retrieve first and last name from an ORCID URL.
 #'
 #' @param orcid_url (character) A valid ORCID URL address.
 #'
 #' @return (character) First and last name.
 #'
-#' @noRd
+#' @export
 #'
 #' @examples
 #' \dontrun{
 #' pi_name <- get_orcid_name('https://orcid.org/0000-0002-2561-5840')
 #' }
+
 get_orcid_name <- function(orcid_url) {
-  req <- httr::GET(orcid_url)
+  req <- httr::GET(paste0(orcid_url, "/person.json"))
   if (req$status_code != 200) {
     stop('Failed to read in ', orcid_url)
   }
+  json <- httr::content(req)
 
-  name <- httr::content(req, "text") %>%
-    stringr::str_extract("<title>.*<") %>%
-    stringr::str_split(" ") %>%
-    unlist() %>%
-    stringr::str_remove("<title>")
+  display_name <- json$displayName
 
-  return(paste(name[1], name[2]))
+  if (is.null(display_name)){
+    display_name <- NA
+  }
+  return(display_name)
+}
+
+#' Retrieve an email address from an ORCID URL
+#'
+#' Retrieve public email addresses from an ORCID URL.
+#'
+#' @param orcid_url (character) A valid ORCID URL address.
+#'
+#' @return (character) Public e-mail addresses.
+#' @export
+#'
+#'
+#' @examples
+#' \dontrun{
+#' pi_email <- get_orcid_email('https://orcid.org/0000-0002-2561-5840')
+#' }
+
+get_orcid_email <- function(orcid_url) {
+  req <- httr::GET(paste0(orcid_url, "/person.json"))
+  if (req$status_code != 200) {
+    stop('Failed to read in ', orcid_url)
+  }
+  json <- httr::content(req)
+  email_list <- eml_get_simple(json$publicGroupedEmails, "email") %>% paste0(., collapse = ";")
+  if (is.null(email_list)){
+    email_list <- NA
+  }
+  return(email_list)
 }
 
 
@@ -472,7 +502,7 @@ get_orcid_name <- function(orcid_url) {
 #' @param from (character) the date at which the query begins in 'YYYY/MM/DD' format. Defaults to \code{Sys.Date()}
 #' @param to (character) the date at which the query ends in 'YYYY/MM/DD' format.  Defaults to \code{Sys.Date()}
 #' @param formatType (character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.
-#' @param whitelist (character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
+#' @param use_whitelist (logical) Whether to filter out ADC admins, as listed at: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org
 #'
 #' @export
 #'
@@ -496,10 +526,10 @@ get_orcid_name <- function(orcid_url) {
 #'
 #' }
 list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType = '*',
-                             whitelist = 'https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org') {
-  if (!requireNamespace('lubridate', 'purrr', 'RCurl')) {
+                             use_whitelist = T) {
+  if (!requireNamespace('lubridate', "purrr", 'RCurl')) {
     stop(call. = FALSE,
-         'The packages "lubridate", "purrr", and "RCurl" must be installed to run this function. ',
+         'The packages "lubridate", "purrr, and "RCurl" must be installed to run this function. ',
          'Please install them and try again.')
   }
   stopifnot(methods::is(mn, 'MNode'))
@@ -515,8 +545,11 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
   if (!(formatType %in% c('RESOURCE', 'METADATA', 'DATA', '*'))) {
     stop('formatType must be one of: RESOURCE, METADATA, DATA, or *')
   }
+  if (as.Date(from) > as.Date(to)){
+    stop('"from" date must be after "to" date')
+  }
 
-  req <- httr::GET(whitelist)
+  req <- httr::GET('https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org')
   if(req$status_code != 200) {
     warning('Failed to read in', whitelist, '. Results will include admin submissions / edits.')
   }
@@ -528,12 +561,14 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
                                      fl = "identifier AND submitter AND dateUploaded AND formatType AND fileName",
                                      rows = 10000),
                             as = "data.frame")
-
-  # Filter out rows where the submitter is in the whitelist
-  results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
+  if (use_whitelist == T){
+    # Filter out rows where the submitter is in the whitelist
+    results <- results[-which(stringr::str_detect(whitelist, results$submitter)),]
+  }
 
   # Return full names based on orcid Id
   results$submitter_name <- purrr::map(results$submitter, get_orcid_name) %>% unlist()
+  results$submitter_email <- purrr::map(results$submitter, get_orcid_email) %>% unlist()
 
   # Arrange by dateUploaded
   results <- dplyr::arrange(results, dateUploaded)

@@ -2,63 +2,26 @@ context("EML")
 
 mn <- env_load()$mn
 
-test_that("a methods step can be added to an EML document", {
-  library(XML)
-  library(EML)
-
-  doc <- new("eml")
-  doc <- add_methods_step(doc, "title", "description")
-
-  expect_equal(XML::xmlValue(doc@dataset@methods@methodStep[[1]]@description@section[[1]]@.Data[[1]]), "title")
-  expect_equal(XML::xmlValue(doc@dataset@methods@methodStep[[1]]@description@section[[1]]@.Data[[2]]), "description")
-})
-
-test_that("multiple method steps can be added to an EML document", {
-  library(XML)
-  library(EML)
-
-  doc <- new("eml")
-  doc <- add_methods_step(doc, "title", "description")
-  doc <- add_methods_step(doc, "another", "method")
-
-  expect_length(doc@dataset@methods@methodStep, 2)
-})
-
-test_that("methods can be cleared from an EML document", {
-  library(EML)
-
-  doc <- new("eml")
-  doc <- add_methods_step(doc, "title", "description")
-
-  expect_length(doc@dataset@methods@methodStep, 1)
-
-  doc <- clear_methods(doc)
-  expect_length(doc@dataset@methods@methodStep, 0)
-})
-
 test_that("a creator can be created", {
-  creator <- eml_creator("test", "user")
+  creator <- eml_creator("tester", "user")
 
-  expect_is(creator, "creator")
-  expect_equal(creator@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(creator@individualName[[1]]@surName@.Data, "user")
+  expect_equal(creator$individualName$givenName, "tester")
+  expect_equal(creator$individualName$surName, "user")
 })
 
 test_that("a contact can be created", {
   contact <- eml_contact("test", "user")
 
-  expect_is(contact, "contact")
-  expect_equal(contact@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(contact@individualName[[1]]@surName@.Data, "user")
+  expect_equal(contact$individualName$givenName, "test")
+  expect_equal(contact$individualName$surName, "user")
 })
 
 test_that("a personnel can be created", {
-  personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator")
+  personnel <- eml_personnel(given_names = "test", sur_name = "user", role = "principalInvestigator", userId = "https://orcid.org/WWWW-XXXX-YYYY-ZZZZ")
 
-  expect_is(personnel, "personnel")
-  expect_equal(personnel@individualName[[1]]@givenName[[1]]@.Data, "test")
-  expect_equal(personnel@individualName[[1]]@surName@.Data, "user")
-  expect_equal(personnel@role[[1]]@.Data, "principalInvestigator")
+  expect_equal(personnel$individualName$givenName, "test")
+  expect_equal(personnel$individualName$surName, "user")
+  expect_equal(personnel$role, "principalInvestigator")
 })
 
 test_that("a project can be created", {
@@ -69,32 +32,30 @@ test_that("a project can be created", {
                          "This is a test abstract",
                          "I won an award, yay")
 
-  expect_is(project, "project")
-  expect_equal(project@title[[1]]@.Data, "some title")
-  expect_equal(project@personnel[[1]]@individualName[[1]]@givenName[[1]]@.Data, "A")
-  expect_equal(project@personnel[[1]]@individualName[[1]]@surName@.Data, "User")
-  expect_equal(project@personnel[[1]]@organizationName[[1]]@.Data, "NCEAS")
-  expect_equal(project@personnel[[1]]@role[[1]]@.Data, "originator")
-  expect_equal(xml2::xml_text(project@funding@para[[1]]@.Data[[1]]), "I won an award, yay")
+  expect_equal(project$title, "some title")
+  expect_equal(project$personnel[[1]]$individualName$givenName, "A")
+  expect_equal(project$personnel[[1]]$individualName$surName, "User")
+  expect_equal(project$personnel[[1]]$organizationName, "NCEAS")
+  expect_equal(project$personnel[[1]]$role, "originator")
+  expect_equal(project$funding$para, "I won an award, yay")
 })
 
 test_that("a project can be created with multiple personnel, an abstract can be created with multiple paragraphs, awards with multiple awards", {
   test_personnel_1 <- eml_personnel(given_names = "A", sur_name = "User", organization = "NCEAS", role = "originator")
-  test_personnel_2 <- eml_personnel(given_names = "Testy", sur_name = "Mactesterson", organization = "A Test Org", role = c("user", "author"))
+  test_personnel_2 <- eml_personnel(given_names = "Testy", sur_name = "Mactesterson", organization = "A Test Org", role = list("user", "author"))
 
   project <- eml_project("some title",
                          list(test_personnel_1, test_personnel_2),
-                         c("This is a test abstract", "This is the second paragraph"),
-                         c("I won an award, yay", "I won a second award, wow"))
+                         list("This is a test abstract", "This is the second paragraph"),
+                         list("I won an award, yay", "I won a second award, wow"))
 
-  expect_is(project, "project")
-  expect_equal(project@title[[1]]@.Data, "some title")
-  expect_equal(project@personnel[[2]]@individualName[[1]]@givenName[[1]]@.Data, "Testy")
-  expect_equal(project@personnel[[2]]@individualName[[1]]@surName@.Data, "Mactesterson")
-  expect_equal(project@personnel[[2]]@organizationName[[1]]@.Data, "A Test Org")
-  expect_equal(project@personnel[[2]]@role[[2]]@.Data, "author")
-  expect_equal(xml2::xml_text(project@abstract@para[[2]]@.Data[[1]]), "This is the second paragraph")
-  expect_equal(xml2::xml_text(project@funding@para[[2]]@.Data[[1]]), "I won a second award, wow")
+  expect_equal(project$title, "some title")
+  expect_equal(project$personnel[[2]]$individualName$givenName, "Testy")
+  expect_equal(project$personnel[[2]]$individualName$surName, "Mactesterson")
+  expect_equal(project$personnel[[2]]$organizationName, "A Test Org")
+  expect_equal(project$personnel[[2]]$role[[2]], "author")
+  expect_equal(project$abstract$para[[2]], "This is the second paragraph")
+  expect_equal(project$funding$para[[2]], "I won a second award, wow")
 })
 
 test_that("a dataTable and otherEntity can be added from a pid", {
@@ -104,7 +65,8 @@ test_that("a dataTable and otherEntity can be added from a pid", {
 
   data_path <- tempfile()
   writeLines(LETTERS, data_path)
-  pid <- publish_object(mn, data_path, "text/csv")
+  pid1 <- publish_object(mn, data_path, "text/csv")
+  pid2 <- publish_object(mn, data_path, "text/csv")
 
   eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
 
@@ -119,28 +81,28 @@ test_that("a dataTable and otherEntity can be added from a pid", {
   dummy_entityDescription <- "Test_Description"
 
   # Create an otherEntity
-  OE <- pid_to_eml_entity(mn, pid,
+  OE <- pid_to_eml_entity(mn, pid1,
                     entityName = dummy_entityName,
                     entityDescription = dummy_entityDescription,
                     attributeList = dummy_attributeList)
-  expect_s4_class(OE, "otherEntity")
-  expect_true(slot(OE, "entityName") == dummy_entityName)
-  expect_true(slot(OE, "entityDescription") == dummy_entityDescription)
+
+  expect_true(OE$entityName == dummy_entityName)
+  expect_true(OE$entityDescription == dummy_entityDescription)
 
   # Create a dataTable
-  DT <- pid_to_eml_entity(mn, pid,
-                          entityType = "dataTable",
+  DT <- pid_to_eml_entity(mn, pid2,
+                          entity_type = "dataTable",
                           entityName = dummy_entityName,
                           entityDescription = dummy_entityDescription,
                           attributeList = dummy_attributeList)
-  expect_s4_class(DT, "dataTable")
-  expect_true(slot(DT, "entityName") == dummy_entityName)
-  expect_true(slot(DT, "entityDescription") == dummy_entityDescription)
 
-  doc@dataset@otherEntity[[1]] <- OE
+  expect_true(DT$entityName == dummy_entityName)
+  expect_true(DT$entityDescription == dummy_entityDescription)
+
+  doc$dataset$otherEntity <- OE
   expect_true(EML::eml_validate(doc))
 
-  doc@dataset@dataTable[[1]] <- DT
+  doc$dataset$dataTable <- DT
   expect_true(EML::eml_validate(doc))
 
   unlink(data_path)
@@ -151,38 +113,37 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
     skip("No token set. Skipping test.")
   }
 
-  eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+  doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 
   # incorrect inputs
   expect_error(eml_otherEntity_to_dataTable("dummy input"))
-  expect_error(eml_otherEntity_to_dataTable(eml, "1"))
+  expect_error(eml_otherEntity_to_dataTable(doc, "1"))
 
   # subscripts out of bounds
-  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[2]]))
-  expect_error(eml_otherEntity_to_dataTable(eml, 2))
+  expect_error(eml_otherEntity_to_dataTable(doc, 2))
 
   # Duplicate entityNames found
-  eml@dataset@otherEntity[[2]] <- eml@dataset@otherEntity[[1]]
-  expect_error(eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]]))
+  doc$dataset$otherEntity <- list(doc$dataset$otherEntity, doc$dataset$otherEntity)
+  expect_error(eml_otherEntity_to_dataTable(doc, 1))
 
 })
 
-test_that("eml_otherEntity_to_dataTable fails gracefully", {
+test_that("eml_otherEntity_to_dataTable works", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
 
-  eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
-  otherEntity <- eml@dataset@otherEntity[[1]]
+  doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+  otherEntity <- doc$dataset$otherEntity
 
-  eml <- eml_otherEntity_to_dataTable(eml, eml@dataset@otherEntity[[1]])
+  doc <- eml_otherEntity_to_dataTable(doc, 1)
 
   # test that otherEntity was removed
-  expect_length(eml@dataset@otherEntity, 0)
+  expect_length(doc$dataset$otherEntity, 0)
 
   # test that dataTable was added
-  expect_equal(otherEntity@entityName, eml@dataset@dataTable[[1]]@entityName)
-  expect_equivalent(otherEntity@physical, eml@dataset@dataTable[[1]]@physical)
+  expect_equal(otherEntity$entityName, doc$dataset$dataTable[[1]]$entityName)
+  expect_equivalent(otherEntity$physical, doc$dataset$dataTable[[1]]$physical)
 })
 
 test_that("which_in_eml returns correct locations", {
@@ -229,54 +190,53 @@ test_that("which_in_eml returns correct locations", {
 
   attributeList <- EML::set_attributes(attributes)
 
-  dataTable_1 <- new("dataTable",
+  dataTable_1 <- list(
                      entityName = "2016_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
   dataTable_2 <- dataTable_1
 
-  dataTable_3 <- new("dataTable",
+  dataTable_3 <- list(
                      entityName = "2015_data.csv",
                      entityDescription = "2016 data",
                      attributeList = attributeList)
 
-  creator_1 <- new("creator",
-                   individualName = new("individualName",
+  creator_1 <- list(
+                   individualName = list(individualName = list(
                                         surName = "LAST",
-                                        givenName = "FIRST"))
-  creator_2 <- new("creator",
-                   individualName = new("individualName",
+                                        givenName = "FIRST")))
+  creator_2 <- list(
+                  individualName = list(individualName = list(
                                         surName = "LAST",
-                                        givenName = "FIRST_2"))
+                                        givenName = "FIRST_2")))
   creator_3 <- creator_2
 
   title <- "Title"
 
-  dataset <- new("dataset",
+  dataset <- list(dataset = list(
                  title = title,
-                 creator = c(creator_1, creator_2, creator_3),
-                 dataTable = c(dataTable_1, dataTable_2, dataTable_3))
+                 creator = list(creator_1, creator_2, creator_3),
+                 dataTable = list(dataTable_1, dataTable_2, dataTable_3)))
 
-  eml <- new("eml",
-             dataset = dataset)
+  doc <- dataset
 
-  expect_equal(c(2,3), which_in_eml(eml@dataset@creator, "givenName", "FIRST_2"))
-  expect_error(which_in_eml(eml@dataset@dataTable, "attributeName", "length_3"))
-  expect_equal(c(1,3), which_in_eml(eml@dataset@dataTable[[1]]@attributeList@attribute, "attributeName", function(x) {grepl("^length", x)}))
+  expect_equal(c(2,3), which_in_eml(doc$dataset$creator, "givenName", "FIRST_2"))
+  expect_error(which_in_eml(doc$dataset$dataTable, "attributeName", "length_3")) # not sure why this should fail?
+  expect_equal(c(1,3), which_in_eml(doc$dataset$dataTable[[1]]$attribute, "attributeName", function(x) {grepl("^length", x)}))
 })
 
 test_that('eml_set_reference sets a reference', {
   eml_path <- file.path(system.file(package = "arcticdatautils"), "example-eml.xml")
   doc <- EML::read_eml(eml_path)
 
-  expect_error(eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]]))
+  expect_error(eml_set_reference(doc$dataset$creator, doc$dataset$contact))
 
   # Add id to use references
-  doc@dataset@creator[[1]]@id <- new('xml_attribute', 'creator_id')
-  doc@dataset@contact[[1]] <- eml_set_reference(doc@dataset@creator[[1]], doc@dataset@contact[[1]])
+  doc$dataset$creator$id <- 'creator_id'
+  doc$dataset$contact <- eml_set_reference(doc$dataset$creator, doc$dataset$contact)
 
-  expect_equal(doc@dataset@creator[[1]]@id[1], doc@dataset@contact[[1]]@references[1])
+  expect_equal(doc$dataset$creator$id, doc$dataset$contact$references)
   expect_true(EML::eml_validate(doc))
 })
 
@@ -290,16 +250,15 @@ test_that('eml_set_shared_attributes creates shared attribute references', {
                            stringsAsFactors = FALSE)
   attributeList <- EML::set_attributes(attributes)
 
-  dataTable_1 <- new('dataTable',
-                     entityName = '2016_data.csv',
+  dataTable_1 <- list(entityName = '2016_data.csv',
                      entityDescription = '2016 data',
                      attributeList = attributeList)
   dataTable_2 <- dataTable_1
-  doc@dataset@dataTable <- c(dataTable_1, dataTable_2)
+  doc$dataset$dataTable <- list(dataTable_1, dataTable_2)
 
   doc <- eml_set_shared_attributes(doc)
 
-  expect_equal(doc@dataset@dataTable[[1]]@id[1], doc@dataset@dataTable[[2]]@references[1])
+  expect_equal(doc$dataset$dataTable[[1]]$attributeList$id, doc$dataset$dataTable[[2]]$attributeList$references)
   expect_true(EML::eml_validate(doc))
 })
 
@@ -307,8 +266,40 @@ test_that('eml_party creates multiple givenName, organizationName, and positionN
   creator <- eml_party('creator', c('John', 'and Jack'), 'Smith', c('NCEAS', 'UCSB'),
                        c('Programmers', 'brothers'))
 
-  expect_is(creator, "creator")
-  expect_equal(unlist(EML::eml_get(creator, 'givenName')), c('John', 'and Jack'))
-  expect_equal(unlist(EML::eml_get(creator, 'organizationName')), c('NCEAS', 'UCSB'))
-  expect_equal(unlist(EML::eml_get(creator, 'positionName')), c('Programmers', 'brothers'))
+  expect_equal(EML::eml_get(creator, 'givenName'), EML::as_emld(list('John', 'and Jack')))
+  expect_equal(EML::eml_get(creator, 'organizationName'), EML::as_emld(list('NCEAS', 'UCSB')))
+  expect_equal(EML::eml_get(creator, 'positionName'), EML::as_emld(list('Programmers', 'brothers')))
+})
+
+test_that('reorder_pids orders pids correctly', {
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+  oe1 <- list(entityName = "object one", entityType = "other")
+  oe2 <- list(entityName = "object two", entityType = "other")
+  doc <- list(packageId = "an id", system = "a system",
+    dataset = list(
+    title = "A Mimimal Valid EML Dataset",
+    creator = me,
+    contact = me,
+    otherEntity = list(oe1, oe2)))
+
+  pid_list <- list("object two" = "some identifier2", "object one" = "some identifier1")
+
+  ordered_pids <- reorder_pids(pid_list, doc)
+  entity_names <- eml_get_simple(doc, "entityName")
+  expect_equal(names(ordered_pids), entity_names)
+})
+
+test_that('reorder_pids fails gracefully', {
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+  oe1 <- list(entityName = "object one", entityType = "other")
+  doc <- list(packageId = "an id", system = "a system",
+              dataset = list(
+                title = "A Mimimal Valid EML Dataset",
+                creator = me,
+                contact = me,
+                otherEntity = list(oe1)))
+
+  pid_list <- list("object two" = "some identifier2", "object one" = "some identifier1")
+
+  expect_error(reorder_pids(pid_list, doc))
 })

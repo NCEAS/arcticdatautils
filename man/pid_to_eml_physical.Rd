@@ -4,15 +4,15 @@
 \alias{pid_to_eml_physical}
 \title{Create EML physical objects for the given set of PIDs}
 \usage{
-pid_to_eml_physical(mn, pids)
+pid_to_eml_physical(mn, pid)
 }
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
-\item{pids}{(character) The PID of the object to create the sub-tree for.}
+\item{pid}{(character) The PID of the object to create the physical for.}
 }
 \value{
-(list) A list of physical objects.
+(list) A physical object.
 }
 \description{
 This is a wrapper around \code{\link[=sysmeta_to_eml_physical]{sysmeta_to_eml_physical()}} which handles the task of
@@ -20,8 +20,7 @@ creating the EML physical.
 }
 \examples{
 \dontrun{
-# Generate EML physical objects for all the data in a package
-pkg <- get_package(mn, pid)
-pid_to_eml_physical(mn, pkg$data)
+# Generate EML physical sections for an object in a data package
+phys <- pid_to_eml_physical(mn, pid)
 }
 }

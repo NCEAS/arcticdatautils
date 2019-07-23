@@ -5,8 +5,7 @@
 \title{List recent submissions to a DataOne Member Node}
 \usage{
 list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
-  formatType = "*",
-  whitelist = "https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org")
+  formatType = "*", use_whitelist = T)
 }
 \arguments{
 \item{mn}{(MNode) A DataOne Member Node}
@@ -17,7 +16,7 @@ list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
 
 \item{formatType}{(character) the format of objects to query. Must be one of: RESOURCE, METADATA, DATA, or *.}
 
-\item{whitelist}{(character) An xml list of admin orcid Identifiers. Defaults to https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
+\item{use_whitelist}{(logical) Whether to filter out ADC admins, as listed at: https://cn.dataone.org/cn/v2/accounts/CN=arctic-data-admins,DC=dataone,DC=org}
 }
 \description{
 List recent submissions to a DataOne Member Node from all submitters not present
