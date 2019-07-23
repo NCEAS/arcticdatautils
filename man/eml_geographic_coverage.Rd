@@ -27,4 +27,6 @@ A simple way to create an EML geographicCoverage section.
 For a bounding box, all coordinates should be unique.
 For a single point, the North and South bounding coordinates should be the same and
 the East and West bounding coordinates should be the same.
+
+Note that EML::set_coverage() provides the same (and more) functionality
 }
