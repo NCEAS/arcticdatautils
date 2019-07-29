@@ -700,7 +700,7 @@ update_resource_map <- function(mn,
                                 child_pids = NULL,
                                 other_statements = NULL,
                                 identifier = NULL,
-                                public = FALSE,
+                                public = TRUE,
                                 check_first = TRUE) {
 
   # Check arguments
