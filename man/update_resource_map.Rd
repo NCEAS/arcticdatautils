@@ -6,7 +6,7 @@
 \usage{
 update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
   child_pids = NULL, other_statements = NULL, identifier = NULL,
-  public = FALSE, check_first = TRUE)
+  public = TRUE, check_first = TRUE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}
