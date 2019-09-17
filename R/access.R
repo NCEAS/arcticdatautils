@@ -90,7 +90,7 @@ set_rights_holder <- function(mn, pids, subject) {
   }
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
-    stop("Argument 'subject' cannot contain 'https:', use 'http:' instead.")
+    subject <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subject)
   }
 
 
