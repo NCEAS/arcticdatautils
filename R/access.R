@@ -91,8 +91,7 @@ set_rights_holder <- function(mn, pids, subject) {
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
     subject <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subject)
-    warning = function(w) {
-      message("Subject contains https, transforming to http")
+    message("Subject contains https, transforming to http")
   }
 
 
@@ -189,11 +188,10 @@ set_access <- function(mn, pids, subjects, permissions = c("read", "write", "cha
     stop("Argument 'subjects' must be character class with non-zero number of characters.")
   }
 
-  if (grepl("^https:\\/\\/orcid\\.org", subject)) {
-    subject <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subject)
-    warning = function(w) {
-      message("Subject contains https, transforming to http")
-    }
+  if (grepl("^https:\\/\\/orcid\\.org", subjects)) {
+    subjects <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subjects)
+    message("Subject contains https, transforming to http")
+  }
 
   if (!all(permissions %in% c("read", "write", "changePermission"))) {
     stop("Argument 'permissions' must be one or more of: 'read', 'write', 'changePermission'")
@@ -285,8 +283,9 @@ remove_access <- function(mn, pids, subjects, permissions = c("read", "write", "
     stop("Argument 'subjects' must be character class with non-zero number of characters.")
   }
 
-  if (any(grepl("^https:\\/\\/orcid\\.org", subjects))) {
-    stop("Argument 'subjects' cannot contain 'https:', use 'http:' instead.")
+  if (grepl("^https:\\/\\/orcid\\.org", subjects)) {
+    subjects <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subjects)
+    message("Subject contains https, transforming to http")
   }
 
   if (!all(permissions %in% c("read", "write", "changePermission"))) {
@@ -382,9 +381,8 @@ set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "wr
 
   if (grepl("^https:\\/\\/orcid\\.org", subject)) {
     subject <- gsub("^https:\\/\\/orcid\\.org", "http:\\/\\/orcid\\.org", subject)
-    warning = function(w) {
-      message("Subject contains https, transforming to http")
-    }
+    message("Subject contains https, transforming to http")
+  }
 
   if (!all(permissions %in% c("read", "write", "changePermission"))) {
     stop("Argument 'permissions' must be one or more of: 'read', 'write', 'changePermission'")
