@@ -190,7 +190,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
   sysmeta <- clear_replication_policy(sysmeta)
 
   # Add packageId to metadata if the object is an xml file
-  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml", format_id)) {
+  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml|^https://eml.ecoinformatics.org/eml-2.2.0", format_id)) {
     doc <- EML::read_eml(path)
     doc$packageId <- new_pid
     path <- tempfile()
@@ -460,7 +460,7 @@ publish_update <- function(mn,
   # Create System Metadata for the updated EML file
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
-                                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                                  formatId = metadata_sysmeta@formatId, #keep formatId the same as previous version
                                   size = file.size(eml_path),
                                   checksum = digest::digest(eml_path, algo = "sha1", serialize = FALSE, file = TRUE),
                                   checksumAlgorithm = "SHA1",
