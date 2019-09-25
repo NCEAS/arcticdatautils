@@ -4,7 +4,10 @@
 \alias{format_eml}
 \title{Generate the EML 2.1.1 format ID}
 \usage{
-format_eml()
+format_eml(version)
+}
+\arguments{
+\item{version}{The version of EML ('2.1.1' or '2.2.0')}
 }
 \value{
 (character) The format ID for EML 2.1.1.
