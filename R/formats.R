@@ -249,6 +249,7 @@ format_iso <- function() {
 #' Generate the EML 2.1.1 format ID
 #'
 #' Returns the EML 2.1.1 format ID.
+#' @param version The version of EML ('2.1.1' or '2.2.0')
 #'
 #' @return (character) The format ID for EML 2.1.1.
 #'
@@ -261,6 +262,12 @@ format_iso <- function() {
 #' env <- env_load()
 #' publish_object(env$mn, "path_to_some_EML_file", format_eml())
 #' }
-format_eml <- function() {
-  "eml://ecoinformatics.org/eml-2.1.1"
+format_eml <- function(version) {
+  if (version %in% c("2.1","2.1.1", "1", 1)){
+    "eml://ecoinformatics.org/eml-2.1.1"
+  }
+  else if (version %in% c("2.2","2.2.0", "2", 2)){
+    "https://eml.ecoinformatics.org/eml-2.2.0"
+  }
+  else print("Please specify a recognized version name, either '2.1.1' or '2.2.0'")
 }
