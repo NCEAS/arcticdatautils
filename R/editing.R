@@ -1036,7 +1036,7 @@ reformat_file_name <- function(path, sysmeta) {
   base_name <- basename(path)
   if (sysmeta@formatId == 'http://www.openarchives.org/ore/terms') {
     ext <- '.rdf.xml'
-  } else if (grepl('eml://ecoinformatics\\.org/eml*', sysmeta@formatId)) {
+  } else if (grepl('ecoinformatics\\.org/eml*', sysmeta@formatId)) {
     ext <- '.xml'
     # remove extension then truncate to 50 characters
     base_name <- tools::file_path_sans_ext(base_name) %>%
