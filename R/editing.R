@@ -253,6 +253,8 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 #'   access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as arguments exist on the MN before continuing.
 #'   Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
+#' @param format_id (character) Optional. When omitted, the updated object will have the same formatId as `metadata_pid`. If set, will attempt
+#'   to use the value instead.
 #'
 #' @return (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 #'
@@ -289,7 +291,8 @@ publish_update <- function(mn,
                            parent_data_pids = NULL,
                            parent_child_pids = NULL,
                            public = TRUE,
-                           check_first = TRUE) {
+                           check_first = TRUE,
+                           format_id = NULL) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -326,6 +329,10 @@ publish_update <- function(mn,
 
   if (!is.null(parent_child_pids)) {
     stopifnot(all(is.character(parent_child_pids)))
+  }
+
+  if (!is.null(format_id)) {
+    stopifnot(is.character(format_id) && nchar(format_id) > 0)
   }
 
   # Check to see if the obsoleted package is in the list of parent_child_pids
@@ -458,9 +465,17 @@ publish_update <- function(mn,
   EML::write_eml(doc, eml_path)
 
   # Create System Metadata for the updated EML file
+  # First, figure out what formatId we should use on the new object
+  if (!is.null(format_id)) {
+    message("Overridding format ID on new metadata object of: ", format_id, " instead of ", metadata_sysmeta@formatId, ".")
+    metadata_updated_format_id <- format_id
+  } else {
+    metadata_updated_format_id <- metadata_sysmeta@formatId
+  }
+
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
-                                  formatId = metadata_sysmeta@formatId, #keep formatId the same as previous version
+                                  formatId = metadata_updated_format_id,
                                   size = file.size(eml_path),
                                   checksum = digest::digest(eml_path, algo = "sha1", serialize = FALSE, file = TRUE),
                                   checksumAlgorithm = "SHA1",

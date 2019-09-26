@@ -271,3 +271,22 @@ format_eml <- function(version) {
   }
   else print("Please specify a recognized version name, either '2.1.1' or '2.2.0'")
 }
+
+#' Generate the EML 2.2.0 format ID
+#'
+#' Returns the EML 2.2.0 format ID.
+#'
+#' @return (character) The format ID for EML 2.2.0
+#'
+#' @export
+#'
+#' @examples
+#' format_eml()
+#' \dontrun{
+#' # Upload a local EML 2.2.0 file:
+#' env <- env_load()
+#' publish_object(env$mn, "path_to_some_EML_file", format_eml_220())
+#' }
+format_eml_220 <- function() {
+  "https://eml.ecoinformatics.org/eml-2.2.0"
+}
