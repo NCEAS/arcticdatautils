@@ -512,3 +512,20 @@ test_that("update_package_object updates EML", {
   expect_equal(sum(unlist(pid_matches)),
                length(url_final))
 })
+
+test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  meta <- publish_object(mn,
+                         path = file.path(
+                           system.file(package = "arcticdatautils"),
+                           "example-eml.xml"),
+                         format_id = format_eml())
+  ore <- create_resource_map(mn, meta)
+  pkg <- publish_update(mn, meta, ore, format_id = format_eml_220())
+  sm <- getSystemMetadata(mn, pkg$metadata)
+
+  expect_equal(sm@formatId, format_eml_220())
+})
