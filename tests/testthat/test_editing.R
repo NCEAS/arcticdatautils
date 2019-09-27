@@ -207,7 +207,7 @@ test_that("update_object updates the packageId for EML object updates", {
   eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, eml_pid), eml_path)
 
-  new_pid <- update_object(mn, eml_pid, eml_path, format_id = format_eml())
+  new_pid <- update_object(mn, eml_pid, eml_path, format_id = format_eml("2.1"))
   updated_eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, new_pid), updated_eml_path)
 
@@ -522,10 +522,10 @@ test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", 
                          path = file.path(
                            system.file(package = "arcticdatautils"),
                            "example-eml.xml"),
-                         format_id = format_eml())
+                         format_id = format_eml("2.1"))
   ore <- create_resource_map(mn, meta)
-  pkg <- publish_update(mn, meta, ore, format_id = format_eml_220())
+  pkg <- publish_update(mn, meta, ore, format_id = format_eml("2.2"))
   sm <- getSystemMetadata(mn, pkg$metadata)
 
-  expect_equal(sm@formatId, format_eml_220())
+  expect_equal(sm@formatId, format_eml("2.2"))
 })

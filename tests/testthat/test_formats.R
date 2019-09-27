@@ -6,7 +6,7 @@ test_that("valid formats are valid and invalid ones are not", {
 })
 
 test_that("a format can be returned", {
-  fmt <- format_eml()
+  fmt <- format_eml("2.2")
   expect_is(fmt, "character")
   expect_gt(length(fmt), 0)
 })
