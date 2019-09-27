@@ -16,10 +16,10 @@ format_eml(version)
 Returns the EML 2.1.1 format ID.
 }
 \examples{
-format_eml()
+format_eml("2.1.1")
 \dontrun{
 # Upload a local EML 2.1.1 file:
 env <- env_load()
-publish_object(env$mn, "path_to_some_EML_file", format_eml())
+publish_object(env$mn, "path_to_some_EML_file", format_eml("2.1"))
 }
 }
