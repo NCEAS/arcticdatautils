@@ -621,3 +621,22 @@ read_zip_shapefile <- function(mn, pid){
   unlink(temp)
   return(shapefile)
 }
+
+
+
+recover_failed_submission <- function(node, pid, path){
+  stopifnot(is(node, "MNode"))
+  stopifnot(is.character(pid), nchar(pid) > 0, arcticdatautils::object_exists(mn, pid))
+
+  convert_to_text <- dataone::getObject(node, pid) %>%
+    rawToChar()
+  remove_error_tag <- paste0(convert_to_text, collapse = "") %>%
+    stringr::str_remove("EML draft.*`") %>%
+    stringr::str_remove(".*</error>`") %>%
+    stringr::str_remove_all("&nbsp;") %>%
+    stringr::str_trim()
+
+  doc <- EML::read_eml(remove_error_tag)
+  emld::eml_validate(doc)
+  EML::write_eml(doc, path)
+}
