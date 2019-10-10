@@ -623,6 +623,31 @@ read_zip_shapefile <- function(mn, pid){
 }
 
 
+#' Recovers failed submissions
+#'
+#' Recovers failed submissions and write the new, valid EML to a given path
+#'
+#' @param node (MNode) The Member Node to publish the object to.
+#' @param pid The PID of the EML metadata document to be recovered.
+#' @param path path to write XML
+#'
+#' @return recovers and write the valid EML to the indicated path
+#'
+#' @export
+#'
+#' @author Rachel Sun rachelsun@@ucsb.edu
+#'
+#' @examples
+#' \dontrun{
+#' # Set environment
+#' cn <- CNode("STAGING2")
+#' mn <- getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "urn:uuid:c40b93d9-a15a-47d0-9a5f-06e7056c93c1"
+#' path <- system.file("extdata", "example.xml", package = "emld")
+#' recover_failed_submission <- function(mn, pid, path)
+#'}
+
+
 
 recover_failed_submission <- function(node, pid, path){
   stopifnot(is(node, "MNode"))
