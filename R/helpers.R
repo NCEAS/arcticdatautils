@@ -642,7 +642,7 @@ read_zip_shapefile <- function(mn, pid){
 #' # Set environment
 #' cn <- dataone::CNode("STAGING2")
 #' mn <- dataone::getMNode(cn,"urn:node:mnTestKNB")
-#' pid <- "urn:uuid:c40b93d9-a15a-47d0-9a5f-06e7056c93c1"
+#' pid <- "urn:uuid:b1a234f0-eed5-4f58-b8d5-6334ce07c010"
 #' path <- tempfile("file", fileext = ".xml")
 #' recover_failed_submission(mn, pid, path)
 #' eml <- EML::read_eml(path)
@@ -652,12 +652,13 @@ read_zip_shapefile <- function(mn, pid){
 
 recover_failed_submission <- function(node, pid, path){
   stopifnot(is(node, "MNode"))
-  stopifnot(is.character(pid), nchar(pid) > 0, arcticdatautils::object_exists(mn, pid))
+  stopifnot(is.character(pid), nchar(pid) > 0, arcticdatautils::object_exists(node, pid))
 
   convert_to_text <- dataone::getObject(node, pid) %>%
     rawToChar()
   remove_error_tag <- paste0(convert_to_text, collapse = "") %>%
     stringr::str_remove(".*</error>`") %>%
+    stringr::str_remove("EML draft.*`") %>%
     stringr::str_remove_all("&nbsp;") %>%
     stringr::str_trim()
 
