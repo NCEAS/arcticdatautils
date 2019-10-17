@@ -44,8 +44,7 @@ test_that("write a valid EML to the given path", {
   }
 
   create_dummy_package()
-
-}
+})
 
 test_that("recover a failed submission", {
   cn <- dataone::CNode('PROD')
@@ -53,8 +52,7 @@ test_that("recover a failed submission", {
   if (!is_token_set(adc)) {
     skip("No token set. Skipping test.")
   }
-
-  pids <- query(adc, list(q="fileName:(*eml_draft* AND -*Mullen*)",
+  pids <- dataone::query(adc, list(q="fileName:(*eml_draft* AND -*Mullen*)",
                          fl = "id",
                          rows="50"))
 
@@ -65,5 +63,4 @@ test_that("recover a failed submission", {
   doc <- EML::read_eml(path)
   expect_true(EML::eml_validate(doc))
 
-  }
-)
+})
