@@ -47,18 +47,18 @@ test_that("write a valid EML to the given path", {
 })
 
 test_that("recover a failed submission", {
-  cn <- dataone::CNode('PROD')
-  adc <- dataone::getMNode(cn, 'urn:node:ARCTIC')
-  if (!is_token_set(adc)) {
+  cn_staging <- dataone::CNode('STAGING')
+  adc_test <- dataone::getMNode(cn_staging,'urn:node:mnTestARCTIC')
+  if (!is_token_set(adc_test)) {
     skip("No token set. Skipping test.")
   }
-  pids <- dataone::query(adc, list(q="fileName:(*eml_draft* AND -*Mullen*)",
+  pids <- dataone::query(adc_test, list(q="fileName:(*eml_draft* AND -*Mullen*)",
                          fl = "id",
                          rows="50"))
 
   path <- tempfile(fileext = ".xml")
 
-  recover_failed_submission(adc, pids[[1]]$id[1], path)
+  recover_failed_submission(adc_test, pids[[1]]$id[1], path)
 
   doc <- EML::read_eml(path)
   expect_true(EML::eml_validate(doc))
