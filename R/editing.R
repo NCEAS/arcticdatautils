@@ -190,7 +190,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
   sysmeta <- clear_replication_policy(sysmeta)
 
   # Add packageId to metadata if the object is an xml file
-  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml|^https://eml.ecoinformatics.org/eml-2.2.0", format_id)) {
+  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml|^https://eml.ecoinformatics.org", format_id)) {
     doc <- EML::read_eml(path)
     doc$packageId <- new_pid
     path <- tempfile()
