@@ -207,7 +207,7 @@ test_that("update_object updates the packageId for EML object updates", {
   eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, eml_pid), eml_path)
 
-  new_pid <- update_object(mn, eml_pid, eml_path, format_id = format_eml())
+  new_pid <- update_object(mn, eml_pid, eml_path, format_id = format_eml("2.1"))
   updated_eml_path <- tempfile(fileext = ".xml")
   writeBin(dataone::getObject(mn, new_pid), updated_eml_path)
 
@@ -511,4 +511,21 @@ test_that("update_package_object updates EML", {
   # and has not been updated, expect_equal will error
   expect_equal(sum(unlist(pid_matches)),
                length(url_final))
+})
+
+test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  meta <- publish_object(mn,
+                         path = file.path(
+                           system.file(package = "arcticdatautils"),
+                           "example-eml.xml"),
+                         format_id = format_eml("2.1"))
+  ore <- create_resource_map(mn, meta)
+  pkg <- publish_update(mn, meta, ore, format_id = format_eml("2.2"))
+  sm <- getSystemMetadata(mn, pkg$metadata)
+
+  expect_equal(sm@formatId, format_eml("2.2"))
 })

@@ -9,7 +9,7 @@ Authors@R: c(
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
   person("Emily", "O'Dean", email = "eodean10@gmail.com", role = "ctb"),
   person("Robyn", "Thiessen-Bock", email = "robyn.thiessenbock@gmail.com", role = "ctb"),
-  person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb")
+  person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb"),
   person("Rachel", "Sun", email = "rachelsun@ucsb.edu", role = "ctb")
   )
 Description: A set of utilities for working with the Arctic Data Center 
