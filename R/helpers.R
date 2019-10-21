@@ -621,3 +621,44 @@ read_zip_shapefile <- function(mn, pid){
   unlink(temp)
   return(shapefile)
 }
+
+#' Recovers failed submissions
+#'
+#' Recovers failed submissions and write the new, valid EML to a given path
+#'
+#' @param node (MNode) The Member Node to publish the object to.
+#' @param pid The PID of the EML metadata document to be recovered.
+#' @param path path to write XML.
+#'
+#' @return recovers and write the valid EML to the indicated path
+#'
+#' @export
+#'
+#' @author Rachel Sun rachelsun@ucsb.edu
+#'
+#' @examples
+#' \dontrun{
+#' # Set environment
+#' cn <- dataone::CNode("STAGING2")
+#' mn <- dataone::getMNode(cn,"urn:node:mnTestKNB")
+#' pid <- "urn:uuid:b1a234f0-eed5-4f58-b8d5-6334ce07c010"
+#' path <- tempfile("file", fileext = ".xml")
+#' recover_failed_submission(mn, pid, path)
+#' eml <- EML::read_eml(path)
+#'}
+recover_failed_submission <- function(node, pid, path){
+  stopifnot(is(node, "MNode"))
+  stopifnot(is.character(pid), nchar(pid) > 0, arcticdatautils::object_exists(node, pid))
+
+  convert_to_text <- dataone::getObject(node, pid) %>%
+    rawToChar()
+  remove_error_tag <- paste0(convert_to_text, collapse = "") %>%
+    stringr::str_remove(".*</error>`") %>%
+    stringr::str_remove("EML draft.*`") %>%
+    stringr::str_remove_all("&nbsp;") %>%
+    stringr::str_trim()
+
+  doc <- EML::read_eml(remove_error_tag)
+  emld::eml_validate(doc)
+  EML::write_eml(doc, path)
+}
