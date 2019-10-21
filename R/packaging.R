@@ -63,7 +63,7 @@ insert_file <- function(inventory, file, env=NULL) {
     inventory_file[1,"created"] <- create_object(inventory_file[1,],
                                                  sysmeta,
                                                  env$base_path,
-                                                 mn)
+                                                 env$mn)
   }
 
   if (inventory_file[1,"created"] == FALSE) {
