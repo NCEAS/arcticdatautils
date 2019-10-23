@@ -26,7 +26,6 @@ Imports:
     datapack,
     digest,
     EML (>= 2.0),
-    emld,
     httr,
     magrittr,
     methods,
