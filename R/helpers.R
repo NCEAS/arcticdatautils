@@ -663,6 +663,6 @@ recover_failed_submission <- function(node, pid, path){
     stringr::str_trim()
 
   doc <- EML::read_eml(remove_error_tag)
-  emld::eml_validate(doc)
+  EML::eml_validate(doc)
   EML::write_eml(doc, path)
 }
