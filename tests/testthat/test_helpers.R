@@ -36,7 +36,7 @@ test_that("list_submissions returns correct output", {
   expect_equal(out$submitter_name[1], 'Rachel Obbard')
 })
 
-test_that("recover a failed submission", {
+test_that("A failed submission can be recovered", {
   #test runs without a token
 
   cn <- dataone::CNode('PROD')
