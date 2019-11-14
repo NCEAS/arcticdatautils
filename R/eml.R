@@ -1,13 +1,12 @@
 # Helper functions for creating EML metadata
 
-
-#' Create EML entity from a DataONE PID
+#' Create EML entity with physical section from a DataONE PID
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
-#' @param entityType (character) What kind of objects to create from the input. One of "dataTable",
+#' @param entity_type (character) What kind of object to create from the input. One of "dataTable",
 #'   "spatialRaster", "spatialVector", "storedProcedure", "view", or "otherEntity".
-#' @param ... (optional) Additional arguments to be passed to \code{new(entityType, ...)}.
+#' @param ... (optional) Additional arguments to be passed to \code{eml$entityType())}.
 #'
 #' @return (list) The entity object.
 #'
@@ -18,20 +17,21 @@
 #' # Generate EML otherEntity
 #' pid_to_eml_entity(mn,
 #'                   pid,
-#'                   entityType = "otherEntity",
+#'                   entity_type = "otherEntity",
 #'                   entityName = "Entity Name",
 #'                   entityDescription = "Description about entity")
 #' }
 pid_to_eml_entity <- function(mn,
                               pid,
-                              entityType = "otherEntity",
+                              entity_type = "otherEntity",
                               ...) {
 
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(pid),
-            nchar(pid) > 0)
+            nchar(pid) > 0,
+            length(pid) == 1)
 
-  stopifnot(entityType %in% c("dataTable",
+  stopifnot(entity_type %in% c("dataTable",
                               "spatialRaster",
                               "spatialVector",
                               "storedProcedure",
@@ -40,29 +40,31 @@ pid_to_eml_entity <- function(mn,
 
   systmeta <- getSystemMetadata(mn, pid)
 
-  # Create entity
-  entity <- new(entityType,
-                physical = pid_to_eml_physical(mn, pid),
-                ...)
+  entity <- list(physical = pid_to_eml_physical(mn, pid), ...)
 
   # Set entity slots
-  if (length(slot(entity, "id")) == 0) {
-    entity@id <- new("xml_attribute", systmeta@identifier)
+  if (length(entity$id) == 0) {
+    # entity$id <- list(xml_attribute = systmeta@identifier)
+    entity$id <- systmeta@identifier
   }
 
-  if (length(slot(entity, "scope")) == 0) {
-    entity@scope <- new("xml_attribute", "document")
+  if (length(entity$scope) == 0) {
+    #entity$scope <- list(xml_attribute = "document")
+    entity$scope <- "document"
   }
 
-  if (length(slot(entity, "entityName")) == 0) {
+  if (length(entity$entityName) == 0) {
 
     if (!is.na(systmeta@fileName)) {
-      entity@entityName <- new("entityName", systmeta@fileName)
+      entity$entityName <- systmeta@fileName
     }
   }
 
-  if (entityType == "otherEntity" && length(slot(entity, "entityType")) == 0) {
-    entity@entityType <- "Other"
+  if (entity_type == "otherEntity" && length(entity$entity_type) == 0) {
+    entity$entityType <- "Other"
+  }
+  else if (entity_type != "otherEntity"){
+    entity$entityType <- NULL
   }
 
   return(entity)
@@ -75,25 +77,26 @@ pid_to_eml_entity <- function(mn,
 #' creating the EML physical.
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pids (character) The PID of the object to create the sub-tree for.
+#' @param pid (character) The PID of the object to create the physical for.
 #'
-#' @return (list) A list of physical objects.
+#' @return (list) A physical object.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' pid_to_eml_physical(mn, pkg$data)
+#' # Generate EML physical sections for an object in a data package
+#' phys <- pid_to_eml_physical(mn, pid)
 #' }
-pid_to_eml_physical <- function(mn, pids) {
+pid_to_eml_physical <- function(mn, pid) {
   stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(pids),
-            all(nchar(pids)) > 0)
-  names(pids) <- ''  # Named inputs produce a named output list - which is invalid in EML
+  stopifnot(is.character(pid),
+            all(nchar(pid)) > 0,
+            length(pid) == 1)
+  names(pid) <- ''  # Named inputs produce a named output list - which is invalid in EML
 
-  sysmeta <- lapply(pids, function(pid) { getSystemMetadata(mn, pid) })
+  sysmeta <- getSystemMetadata(mn, pid)
+
   sysmeta_to_eml_physical(sysmeta)
 }
 
@@ -112,47 +115,30 @@ pid_to_eml_physical <- function(mn, pids) {
 #'
 #' @examples
 #' \dontrun{
-#' # Generate EML physical objects for all the data in a package
-#' pkg <- get_package(mn, pid)
-#' sm <- lapply(pkg$data, function(pid) {
-#'   getSystemMetadata(mn, pid)
-#' })
+#' # Generate EML physical object from a system metadata object
+#' sm <- getSystemMetadata(mn, pid)
 #' sysmeta_to_eml_physical(sm)
 #' }
 sysmeta_to_eml_physical <- function(sysmeta) {
-  work <- function(x) {
-    phys <- new("physical")
-    phys@scope <- new("xml_attribute", "document")
+    stopifnot(is(sysmeta, "SystemMetadata"))
 
-    if (is.na(x@fileName)) {
-      phys@objectName <- new("objectName", "NA")
+    if (is.na(sysmeta@fileName)) {
+      ob_name <- "NA"
     } else {
-      phys@objectName <- new("objectName", x@fileName)
+      ob_name <- sysmeta@fileName
     }
 
-    phys@size <- new("size", format(x@size, scientific = FALSE))
-    phys@size@unit <- new("xml_attribute", "bytes")
 
-    phys@authentication <- new("ListOfauthentication", list(new("authentication", x@checksum)))
-    phys@authentication[[1]]@method <- new("xml_attribute", x@checksumAlgorithm)
+    phys <- set_physical(objectName = ob_name,
+                         size = format(sysmeta@size, scientific = FALSE),
+                         sizeUnit = "bytes",
+                         authentication = sysmeta@checksum,
+                         authMethod = sysmeta@checksumAlgorithm,
+                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
 
-    phys@dataFormat <- new("dataFormat")
-    phys@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
-    phys@dataFormat@externallyDefinedFormat@formatName <- x@formatId
-
-    phys@distribution <- new("ListOfdistribution", list(new("distribution")))
-    phys@distribution[[1]]@scope  <- new("xml_attribute", "document")
-    phys@distribution[[1]]@online <- new("online")
-    phys@distribution[[1]]@online@url <- new("url", paste0("https://cn.dataone.org/cn/v2/resolve/", x@identifier))
-
-    slot(phys@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
+    phys$dataFormat <- list(externallyDefinedFormat = list(formatName = sysmeta@formatId))
 
     phys
-  }
-
-  if (!is(sysmeta, "list")) sysmeta <- list(sysmeta)
-
-  lapply(sysmeta, work)
 }
 
 
@@ -202,68 +188,6 @@ get_doc_id <- function(sysmeta) {
 }
 
 
-#' Add a methods step
-#'
-#' Add a methods step to an EML document.
-#'
-#' @param doc (eml) The EML document to add the method step to.
-#' @param title (character) The title of the method step.
-#' @param description (character) The description of the method.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- add_methods_step(eml, "Field Sampling", "Samples were
-#' collected using a niskin water sampler.")
-#' }
-add_methods_step <- function(doc, title, description) {
-  stopifnot(is(doc, "eml"))
-  stopifnot(is(doc@dataset, "dataset"))
-  stopifnot(is.character(title),
-            nchar(title) > 0)
-  stopifnot(is.character(description),
-            nchar(description) > 0)
-
-  new_step <- new("methodStep",
-                  description  = new("description",
-                                     section = new("section", list(newXMLNode("title", title),
-                                                                   newXMLNode("para", description)))))
-
-  doc@dataset@methods@methodStep[[length(doc@dataset@methods@methodStep) + 1]] <- new_step
-
-  doc
-}
-
-
-#' Clear all methods
-#'
-#' Clear all methods from an EML document.
-#'
-#' @param doc (eml) The document to clear methods from.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' eml <- read_eml("~/Documents/metadata.xml")
-#' eml <- clear_methods(eml)
-#' }
-clear_methods <- function(doc) {
-  stopifnot(is(doc, "eml"))
-
-  # Clear the methods out
-  doc@dataset@methods <- new("MethodsType")
-
-  doc
-}
-
-
 #' Create an EML party
 #'
 #' You will usually want to use the high-level functions such as
@@ -278,7 +202,7 @@ clear_methods <- function(doc) {
 #' @param position (character) The party's position.
 #' @param email (character) The party's email address(es).
 #' @param phone (character) The party's phone number(s).
-#' @param address (character) The party's address(es).
+#' @param address (character) The party's address(es) as a valid EML address
 #' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ.
 #' @param role (character) The party's role.
 #'
@@ -290,8 +214,13 @@ clear_methods <- function(doc) {
 #' \dontrun{
 #' eml_party("creator", "Test", "User")
 #' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
-#' eml_party("creator", c("Dominic", "'Dom'"), "Mullen", c("NCEAS", "UCSB"),
-#'           c("Data Scientist", "Programmer"))
+#' eml_party("creator", given_names = list("Dominic", "'Dom'"),
+#'                      sur_name = "Mullen", list("NCEAS", "UCSB"),
+#'                      position = list("Data Scientist", "Programmer"),
+#'                          address = eml$address(deliveryPoint = "735 State St",
+#'                          city = "Santa Barbara",
+#'                          administrativeArea = "CA",
+#'                          postalCode = "85719"))
 #'}
 eml_party <- function(type="associatedParty",
                       given_names = NULL,
@@ -307,52 +236,45 @@ eml_party <- function(type="associatedParty",
     stop(call. = FALSE,
          "You must specify at least one of sur_name, organization, or position to make a valid creator")
   }
+  if (!is.null(address) &
+      !"deliveryPoint" %in% names(address) &
+      !"administrativeArea" %in% names(address) &
+      !"postalCode" %in% names(address) &
+      !"city" %in% names(address)) {
+    stop(call. = FALSE,
+         "An address was given but no deliveryPoint, administrativeArea, city, or postalCode child elements were specified.")
+  }
 
-  party <- new(type)
+  party <- list()
 
   # Individual Name
   if (!is.null(sur_name)) {
-    party@individualName <- c(eml_individual_name(given_names, sur_name))
+    party$individualName <- list(givenName = given_names, surName = sur_name)
   }
 
   # Organization Name
   if (!is.null(organization)) {
-    party@organizationName <- new('ListOforganizationName', lapply(organization, function(x) {new('organizationName', .Data = x)}))
+    party$organizationName <- organization
   }
 
   # Position
   if (!is.null(position)) {
-    party@positionName <- new('ListOfpositionName', lapply(position, function(x) {new('positionName', .Data = x)}))
+    party$positionName <- position
   }
 
   # Email
   if (!is.null(email)) {
-    party@electronicMailAddress <- new("ListOfelectronicMailAddress", lapply(email, function(x) { new("electronicMailAddress", .Data = x )}))
+    party$electronicMailAddress <- email
   }
 
   # Address
   if (!is.null(address)) {
-    # Upgade to a ListOfaddress if needed
-    if (is(address, "address")) {
-      address <- c(address)
-    }
-
-    party@address <- address
+    party$address <- address
   }
 
   # Phone
   if (!is.null(phone)) {
-    # Upgrade to phone is needed
-    if (is.character(phone)) {
-      phone <- new("ListOfphone", lapply(phone, function(x) as(x, "phone")))
-    }
-
-    # Upgade to a ListOfphone if needed
-    if (is(phone, "phone")) {
-      phone <- c(phone)
-    }
-
-    party@phone <- phone
+    party$phone <- phone
   }
 
   # userId
@@ -362,7 +284,8 @@ eml_party <- function(type="associatedParty",
       warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
     }
 
-    party@userId <- c(new("userId", .Data = userId, directory = "https://orcid.org"))
+    party$userId$userId <- userId
+    party$userId$directory = "https://orcid.org"
   }
 
   # Role
@@ -373,13 +296,10 @@ eml_party <- function(type="associatedParty",
            paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
     }
 
-    # If type is personnel, role needs to be ListOfrole, otherwise just role
-    if (type == "personnel") {
-      party@role <- as(lapply(role, as, Class = "role"), "ListOfrole")
-    } else {
-      party@role <- as(role, "role")
-    }
+    party$role <- role
   }
+
+
 
   party
 }
@@ -485,45 +405,6 @@ eml_personnel <- function(role = NULL, ...) {
   eml_party("personnel", role = role, ...)
 }
 
-
-#' Create an EML individualName section
-#'
-#' Create an EML individualName section.
-#'
-#' @param given_names (character) One or more given names.
-#' @param sur_name (character) A sur (last) name.
-#'
-#' @return (individualName) The new individualName section.
-#'
-#' @export
-#'
-#' @examples
-#' eml_individual_name("some", "user")
-eml_individual_name <- function(given_names=NULL, sur_name) {
-  stopifnot(is.character(sur_name) && nchar(sur_name) > 0)
-
-  # Create <individualName>
-  indiv_name <- new("individualName")
-
-  if (!is.null(given_names)) {
-    stopifnot(all(sapply(given_names, is.character)))
-    stopifnot(all(lengths(given_names) > 0))
-
-    givens <- lapply(given_names, function(given_name) {
-      x <- new("givenName")
-      x@.Data <- given_name
-      x
-    })
-
-    indiv_name@givenName <- new("ListOfgivenName", givens)
-  }
-
-  indiv_name@surName <- new("surName", .Data = sur_name)
-
-  indiv_name
-}
-
-
 #' Create an EML project section
 #'
 #' Create an EML project section.
@@ -532,12 +413,13 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' fully fleshed out. Need to pass these objects in directly if you want to use
 #' them.
 #'
-#' @param title (character) Title of the project (Required). May have multiple titles.
+#' @param title (character) Title of the project (Required). May have multiple titles
+#' constructed using `list`.
 #' @param personnelList (list of personnel) Personnel involved with the project.
-#' @param abstract (character) Project abstract. Can pass as a character vector
+#' @param abstract (character) Project abstract. Can pass as a list
 #'   for separate paragraphs.
 #' @param funding (character) Funding sources for the project such as grant and
-#'   contract numbers. Can pass as a character vector for separate paragraphs.
+#'   contract numbers. Can pass as a list for separate paragraphs.
 #' @param studyAreaDescription (studyAreaDescription)
 #' @param designDescription (designDescription)
 #' @param relatedProject (project)
@@ -547,9 +429,9 @@ eml_individual_name <- function(given_names=NULL, sur_name) {
 #' @export
 #'
 #' @examples
-#' proj <- eml_project(c("Some title", "A second title if needed"),
-#'            c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
-#'            c("Abstract paragraph 1", "Abstract paragraph 2"),
+#' proj <- eml_project(list("Some title", "A second title if needed"),
+#'            list(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+#'            list("Abstract paragraph 1", "Abstract paragraph 2"),
 #'            "Funding Agency: Award Number 12345")
 eml_project <- function(title,
                         personnelList,
@@ -559,55 +441,42 @@ eml_project <- function(title,
                         designDescription = NULL,
                         relatedProject = NULL) {
 
-  stopifnot(is.character(title),
-            length(title) > 0,
-            all(nchar(title)) > 0)
-  stopifnot(length(personnelList) > 0)
 
-  # Project
-  project <- new("project")
-
-  # Title
-  titles <- lapply(title, function(x) { as(x, "title") })
-  project@title <- as(titles, "ListOftitle")
-
-  # Personnel
-  if (!all(sapply(personnelList, function(x) { is(x, "personnel") }))) {
+  if (is.null(eml_get_simple(personnelList, "role"))) {
     stop(call. = FALSE,
-         "All personnel in the list must be of type 'personnel'")
+         "Each person in the personnelList must have a role.")
   }
 
-  project@personnel <- as(personnelList, "ListOfpersonnel")
+  project <- list()
+
+  # Title
+  project$title <- title
+
+  project$personnel <- personnelList
 
   # Abstract
   if (!is.null(abstract)) {
-    abstract_paras <- lapply(abstract, function(x) {
-      as(list(xml2::xml_new_root("para", as.character(x))), "para")
-    })
-    project@abstract@para <- as(abstract_paras, "ListOfpara")
+    project$abstract <- list(para = abstract)
   }
 
   # Funding
   if (!is.null(funding)) {
-    funding_paras <- lapply(funding, function(x) {
-      as(list(xml2::xml_new_root("para", as.character(x))), "para")
-    })
-    project@funding@para <- as(funding_paras, "ListOfpara")
+    project$funding <- list(para = funding)
   }
 
   # Study area description
   if (!is.null(studyAreaDescription)) {
-    project@studyAreaDescription <- studyAreaDescription
+    project$studyAreaDescription <- studyAreaDescription
   }
 
   # Design description
   if (!is.null(designDescription)) {
-    project@designDescription <- designDescription
+    project$designDescription <- designDescription
   }
 
   # Related Project
   if (!is.null(relatedProject)) {
-    project@relatedProject <- relatedProject
+    project$relatedProject <- relatedProject
   }
 
   project
@@ -622,6 +491,8 @@ eml_project <- function(title,
 #' For a single point, the North and South bounding coordinates should be the same and
 #' the East and West bounding coordinates should be the same.
 #'
+#' Note that EML::set_coverage() provides the same (and more) functionality
+#'
 #' @param description (character) A textual description.
 #' @param north (numeric) North bounding coordinate.
 #' @param east (numeric) East bounding coordinate.
@@ -630,16 +501,15 @@ eml_project <- function(title,
 #'
 #' @return (geographicCoverage) The new geographicCoverage section.
 #'
-#' @export
 eml_geographic_coverage <- function(description, north, east, south, west) {
-  cov <- new("geographicCoverage")
+  cov <- list()
 
-  cov@geographicDescription <- description
+  cov$geographicDescription <- description
 
-  cov@boundingCoordinates@northBoundingCoordinate <- new("northBoundingCoordinate", as.character(north))
-  cov@boundingCoordinates@eastBoundingCoordinate <- new("eastBoundingCoordinate", as.character(east))
-  cov@boundingCoordinates@southBoundingCoordinate <- new("southBoundingCoordinate", as.character(south))
-  cov@boundingCoordinates@westBoundingCoordinate <- new("westBoundingCoordinate", as.character(west))
+  cov$boundingCoordinates$northBoundingCoordinate <- as.character(north)
+  cov$boundingCoordinates$eastBoundingCoordinate <- as.character(east)
+  cov$boundingCoordinates$southBoundingCoordinate <- as.character(south)
+  cov$boundingCoordinates$westBoundingCoordinate <- as.character(west)
 
   cov
 }
@@ -649,6 +519,8 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #'
 #' A simple way to create an EML address element.
 #'
+#' Note that EML::eml$address() provides the same functionality
+#'
 #' @param delivery_points (character) One or more delivery points.
 #' @param city (character) City.
 #' @param administrative_area (character) Administrative area.
@@ -656,42 +528,19 @@ eml_geographic_coverage <- function(description, north, east, south, west) {
 #'
 #' @return (address) An EML address object.
 #'
-#' @export
-#'
-#' @examples
-#' NCEASadd <- eml_address("735 State St #300", "Santa Barbara", "CA", "93101")
 eml_address <- function(delivery_points, city, administrative_area, postal_code) {
   stopifnot(is.character(delivery_points),
             is.character(city),
             is.character(administrative_area),
             (is.character(postal_code) || is.numeric(postal_code)))
 
-  address <- new("address")
+  address <- list()
 
-  # Delivery point(s)
-  dps <- lapply(delivery_points, function(dp) {
-    x <- new("deliveryPoint")
-    x@.Data <- dp
-    x
-  })
+  address$deliveryPoint <- delivery_points
+  address$city <- city
+  address$administrativeArea <- administrative_area
+  address$postalCode <- as.character(postal_code)
 
-  # City
-  ct <- new("city")
-  ct@.Data <- city
-
-  # Administrative area
-  aa <- new("administrativeArea")
-  aa@.Data <- administrative_area
-
-  # Postal Code
-  pc <- new("postalCode")
-  pc@.Data <- as.character(postal_code)
-
-  # Put them all together
-  address@deliveryPoint <- new("ListOfdeliveryPoint", dps)
-  address@city <- ct
-  address@administrativeArea <- aa
-  address@postalCode <- pc
 
   address
 }
@@ -709,25 +558,14 @@ eml_address <- function(delivery_points, city, administrative_area, postal_code)
 #'
 #' @return (eml) The modified EML document.
 #'
-#' @export
-#'
-#' @examples
-#' # Create a new EML document
-#' library(EML)
-#' doc <- new("eml")
-#'
-#' # Set an abstract with a single paragraph
-#' set_abstract(doc, c("Test abstract..."))
-#'
-#' # Or one with multiple paragraphs
-#' set_abstract(doc, c("First para...", "second para..."))
 set_abstract <- function(doc, text) {
-  stopifnot(is(doc, "eml"))
+  # need to rewrite this test
+  # stopifnot(is(doc, "eml"))
 
   if (length(text) == 1) {
-    doc@dataset@abstract <- eml_abstract(text)
+    doc$dataset$abstract <- list(abstract = text)
   } else if (length(text) > 1) {
-    doc@dataset@abstract <- eml_abstract(text)
+    doc$dataset$abstract <- list(abstract = text)
   }
 
   doc
@@ -738,29 +576,28 @@ set_abstract <- function(doc, text) {
 #'
 #' Create an EML abstract.
 #'
+#' Note that eml$abstract() provides the same functionality.
+#'
 #' @param text (character) Paragraphs of text with one paragraph per element in the
-#'   character vector.
+#'   character vector, constructed using `list`
 #'
 #' @return (abstract) An EML abstract.
 #'
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Set an abstract with a single paragraph
 #' eml_abstract("Test abstract...")
 #'
 #' # Or one with multiple paragraphs
-#' eml_abstract(c("First para...", "second para..."))
+#' eml_abstract(list("First para...", "second para..."))
+#' }
 eml_abstract <- function(text) {
   stopifnot(is.character(text),
             length(text) > 0,
             all(nchar(text)) > 0)
 
-  if (length(text) == 1) {
-    abstract <- new("abstract", .Data = new("TextType", .Data = "hi"))
-  } else if (length(text) > 1) {
-    abstract <- new("abstract", para = new("ListOfpara", lapply(text, function(x) new("para", x))))
-  }
+    abstract <- list(abstract = list(para = text))
 
   abstract
 }
@@ -788,13 +625,13 @@ eml_abstract <- function(text) {
 #' eml_validate_attributes(attributes)
 #' }
 eml_validate_attributes <- function(attributes) {
-  stopifnot(is(attributes, "attributeList"))
+
 
   # Define an interal applyable function to validate each attribute
   eml_validate_attribute <- function(attribute) {
-    stopifnot(is(attribute, "attribute"))
+    stopifnot(!is.null(names(attribute)))
 
-    doc@dataset@otherEntity[[1]]@attributeList@attribute[[1]] <- attribute
+    doc$dataset$otherEntity$attributeList$attribute[[1]] <- attribute
 
     # Validate!
     eml_validate(doc)
@@ -803,20 +640,20 @@ eml_validate_attributes <- function(attributes) {
 
   # Create a minimum valid EML doc we'll re-use each time we validate a single
   # attribute
-  doc <- new("eml", packageId = "test", system = " test")
-  doc@dataset@title <- c(new("title", .Data = "test"))
-  doc@dataset@creator <- new("ListOfcreator", list(eml_creator("Test", "test")))
-  doc@dataset@contact <- new("ListOfcontact", list(eml_contact("Test", "test")))
+
 
   # Create a dummy otherEntity with our attributeList
-  entity <- new("otherEntity",
-                entityName = "name",
-                entityType = "type")
-  entity@attributeList <- new("attributeList")
-  doc@dataset@otherEntity <- new("ListOfotherEntity", list(entity))
 
-  results <- sapply(attributes@attribute, function(attribute) {
-    cat(paste0("Validating single attribute '", attribute@attributeName@.Data, "': "))
+  doc <- list(packageId = "test",
+              system = "test",
+              dataset = list(
+                title = "test",
+                creator = list(individualName = list(givenName = "test", surName = "test")),
+                contact = list(individualName = list(givenName = "test", surName = "test")),
+                otherEntity = list(entityName = "name", entityType = "otherEntity")))
+
+  results <- sapply(attributes$attribute, function(attribute) {
+    cat(paste0("Validating single attribute '", attribute$attributeName, "': "))
 
     result <- NULL
     result <- tryCatch({
@@ -835,152 +672,10 @@ eml_validate_attributes <- function(attributes) {
     }
   })
 
-  names(results) <- sapply(attributes@attribute, function(x) x@attributeName)
+  names(results) <- sapply(attributes$attribute, function(x) x$attributeName)
 
   results
 }
-
-
-#' Add new entity elements to an EML document from a table
-#'
-#' Add new entity elements to an EML document from a table.
-#'
-#' @param doc (eml) An EML document.
-#' @param entities (data.frame) A data.frame with columns type, path, pid, and
-#'   format_id.
-#' @param resolve_base (character) Optional. Specify a DataONE CN resolve base
-#'  URI which will be used for serializing download URLs into the EML. Most users
-#'  should not override the default value.
-#'
-#' @return (eml) The modified EML document.
-#'
-#' @export
-#'
-#' @examples
-#' # Create entities from files on disk
-#' \dontrun{
-#'   types <- c("dataTable")
-#'   paths <- list.files(., full.names = TRUE) # Get full paths to some files
-#'   pids <- vapply(paths, function(x) {
-#'     paste0("urn:uuid:", uuid::UUIDgenerate())
-#'   }, "") # Generate some UUID PIDs
-#' Try to guess format IDs, you should check this afterwards
-#'   format_ids <- guess_format_id(paths)
-#'
-#'   entity_df <- data.frame(type = types,
-#'                           path = paths,
-#'                           pid = pids,
-#'                           format_id = format_ids,
-#'                           stringsAsFactors = FALSE)
-#'
-#'   doc <- new("eml")
-#'   doc <- eml_add_entities(doc, entity_df)
-#'}
-#'
-#' # Read in a CSV containing the info about files on disk
-#' \dontrun{
-#'   entity_df <- read.csv("./my_entities.csv", stringsAsFactors = FALSE)
-#'   doc <- new("eml")
-#'   doc <- eml_add_entities(doc, entity_df)
-#' }
-eml_add_entities <- function(doc,
-                             entities,
-                             resolve_base="https://cn.dataone.org/cn/v2/resolve/") {
-  stopifnot(is(doc, "eml"))
-
-  if (!is(entities, "data.frame")) {
-    stop("The argument 'entities' must be a 'data.frame'.")
-  }
-
-  if (!identical(sort(names(entities)), c("format_id", "path", "pid", "type"))) {
-    stop("The columns in the data.frame you passed in for the 'entities' argument did not have the expected column names of type, path, pid, format_id and it must.", call. = FALSE)
-  }
-
-  entity_types <- c("dataTable", "spatialRaster", "spatialVector", "storedProcedure", "view", "otherEntity")
-
-  if (!all(entities$type %in% entity_types)) {
-    stop(call. = FALSE, paste0("The `type` column must only include values from: ", paste(entity_types, collapse = ", "), "."))
-  }
-
-  # Warn about existing entities
-  for (type in entity_types) {
-    if (type %in% entities$type && length(slot(doc@dataset, type)) > 0) {
-      warning(paste0("You are adding one or more ", type, " elements. This function only adds entities and does not remove/replace them."))
-    }
-  }
-
-  # Internal function to create a single entity
-  eml_entity <- function(type, path, pid, format_id) {
-    # Convert args to character vectors if needed
-    if (is.factor(type)) type <- as.character(type)
-    if (is.factor(path)) path <- as.character(path)
-    if (is.factor(pid)) pid <- as.character(pid)
-    if (is.factor(format_id)) format_id <- as.character(format_id)
-
-    stopifnot(file.exists(path))
-    stopifnot(is.character(path), nchar(path) > 0)
-    stopifnot(is.character(pid), nchar(pid) > 0)
-    stopifnot(is.character(format_id), nchar(format_id) > 0)
-
-    file_name <- basename(path)
-
-    entity <- new(type)
-    entity@id <- new("xml_attribute", pid)
-    entity@scope <- new("xml_attribute", "document")
-
-    entity@entityName <- new("entityName", .Data = file_name)
-
-    if (type == "otherEntity") {
-      entity@entityType <- "Other"
-    }
-
-    # otherEntity/physical
-    physical <- new("physical")
-    physical@scope <- new("xml_attribute", "document")
-    physical@objectName <- new("objectName", file_name)
-
-    physical@size <- new("size", format(file.size(path), scientific = FALSE))
-    physical@size@unit <- new("xml_attribute", "bytes")
-    physical@authentication <- new("ListOfauthentication", list(new("authentication", digest::digest(path, algo = "sha1", file = TRUE))))
-    physical@authentication[[1]]@method <- new("xml_attribute", "SHA-1")
-
-    physical@dataFormat <- new("dataFormat")
-    physical@dataFormat@externallyDefinedFormat <- new("externallyDefinedFormat")
-    physical@dataFormat@externallyDefinedFormat@formatName <- format_id
-
-    physical@distribution <- new("ListOfdistribution", list(new("distribution")))
-    physical@distribution[[1]]@scope  <- new("xml_attribute", "document")
-    physical@distribution[[1]]@online <- new("online")
-    physical@distribution[[1]]@online@url <- new("url", paste0(resolve_base, pid))
-
-    slot(physical@distribution[[1]]@online@url, "function") <- new("xml_attribute", "download")
-
-    entity@physical <- new("ListOfphysical", list(physical))
-
-    entity
-  }
-
-  # Create new entities
-  new_entities <- lapply(entity_types, function(type) {
-    lapply(which(entities$type == type), function(i) {
-      eml_entity(entities[i, "type"],
-                 entities[i,"path"],
-                 entities[i,"pid"],
-                 entities[i,"format_id"])
-    })
-  })
-
-  names(new_entities) <- entity_types # Name the list so we can [[ by type
-
-  # Merge new entities into existing
-  for (type in entity_types) {
-    slot(doc@dataset, type) <- new(paste0("ListOf", type), c(slot(doc@dataset, type),
-                                                             new(paste0("ListOf", type), new_entities[[type]])))
-  }
-
-  doc
-}
-
 
 #' Convert otherEntities to dataTables
 #'
@@ -988,9 +683,8 @@ eml_add_entities <- function(doc,
 #' otherEntity object as currently constructed - it does not add a physical or add attributes.
 #' However, if these are already in their respective slots, they will be retained.
 #'
-#' @param eml (S4) An EML S4 object.
-#' @param otherEntity (S4 / integer) Either an EML otherEntity object or the index
-#'   of an otherEntity within a ListOfotherEntity. Integer input is recommended.
+#' @param doc (list) An EML document.
+#' @param index (integer) The indicies of the otherEntities to be transformed.
 #' @param validate_eml (logical) Optional. Whether or not to validate the EML after
 #'   completion. Setting this to `FALSE` reduces execution time by ~50 percent.
 #'
@@ -1002,54 +696,68 @@ eml_add_entities <- function(doc,
 #'
 #' @examples
 #' \dontrun{
-#' eml <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+#' doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
 #'
-#' # The following two calls are equivalent:
-#' eml <- eml_otherEntity_to_dataTable(eml, eml@@dataset@@otherEntity[[1]])
-#' eml <- eml_otherEntity_to_dataTable(eml, 1)
-#'
-#' # Integer input is recommended:
-#' eml <- eml_otherEntity_to_dataTable(eml, 1)
+#' doc <- eml_otherEntity_to_dataTable(doc, 1)
 #' }
-eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) {
-  ## Argument checks
-  stopifnot(methods::is(eml, "eml"))
-  stopifnot(any(is.numeric(otherEntity), methods::is(otherEntity, "otherEntity")))
-  stopifnot(is.logical(validate_eml))
+eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
+  stopifnot(methods::is(doc, "emld"))
+  stopifnot(is.logical(eml_validate(doc)))
+  stopifnot(is.numeric(index))
+  stopifnot(length(eml_get_simple(doc$dataset$otherEntity, "entityName")) >= index)
+  if (any(duplicated(eml_get_simple(doc$dataset, "entityName"))) == T){
+    stop(call. = FALSE,
+         "entityNames must be unique")
+  }
 
-  ## Handle different inputs for 'otherEntity'
-  if (is.numeric(otherEntity)) {
-    index <- otherEntity
-    otherEntity <- eml@dataset@otherEntity[[index]]
-  } else {
-    index <- which_in_eml(eml@dataset@otherEntity,
-                          "entityName",
-                          otherEntity@entityName)
-    if (length(index) > 1) {
-      stop("Duplicate 'entityName' found in 'eml@dataset@otherEntity', please use a numeric index (1, 2, etc.) to specify which 'otherEntity' you would like to convert.")
+  ## set OE entityTypes to NULL and select the ones we want to use
+
+  if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1){
+    ## prepare OE to copy
+    otherEntity <- doc$dataset$otherEntity
+    otherEntity$entityType <- NULL
+    otherEntity <- list(otherEntity)
+    ## delete otherEntity from list
+    doc$dataset$otherEntity <- NULL
+  }
+
+
+  else {
+    otherEntity <- doc$dataset$otherEntity[index]
+
+    for (i in 1:length(index)){
+      otherEntity[[i]]$entityType <- NULL
+    }
+    ## delete otherEntity from list
+    doc$dataset$otherEntity <- doc$dataset$otherEntity[-index]
+  }
+
+
+  dts <- doc$dataset$dataTable
+
+  ## handle various datatable length cases
+  if (length(dts) == 0){
+    doc$dataset$dataTable <- otherEntity
+  }
+  else{
+    if (length(eml_get_simple(dts, "entityName")) == 1){
+      dts <- list(dts)
+      doc$dataset$dataTable <- c(dts, otherEntity)
+    }
+
+    else {
+      doc$dataset$dataTable <- c(dts, otherEntity)
     }
   }
 
-  ## convert otherEntity to dataTable
-  dt <- utils::capture.output(otherEntity) %>%
-    stringr::str_trim() %>%
-    stringr::str_replace_all("otherEntity", "dataTable") %>%
-    paste(sep = "", collapse = "") %>%
-    EML::read_eml()
 
-  ## Add dt to bottom of dt list
-  type <- "dataTable"
-  slot(eml@dataset, type) <- new(paste0("ListOf", type), c(slot(eml@dataset, type),
-                                                           new(paste0("ListOf", type), list(dt))))
 
-  ## delete otherEntity from list
-  eml@dataset@otherEntity[[index]] <- NULL
 
   ## return eml
   if (validate_eml == TRUE) {
-    eml_validate(eml)
+    eml_validate(doc)
   }
-  return(eml)
+  return(doc)
 }
 
 
@@ -1058,7 +766,7 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
 #' This function returns indices within an EML list that contain an instance where
 #' `test == TRUE`. See examples for more information.
 #'
-#' @param eml_list (S4/List) An EML list object.
+#' @param doc (list) An EML object.
 #' @param element (character) Element to evaluate.
 #' @param test (function/character) A function to evaluate (see examples). If test is a character,
 #'   will evaluate if \code{element == test} (see example 1).
@@ -1072,25 +780,24 @@ eml_otherEntity_to_dataTable <- function(eml, otherEntity, validate_eml = TRUE) 
 #' @examples
 #' \dontrun{
 #' # Question: Which creators have a surName "Smith"?
-#' n <- which_in_eml(eml@@dataset@@creator, "surName", "Smith")
-#' # Answer: eml@@dataset@@creator[n]
+#' n <- which_in_eml(eml$dataset$creator, "surName", "Smith")
+#' # Answer: eml$dataset$creator[n]
 #'
 #' # Question: Which dataTables have an entityName that begins with "2016"
-#' n <- which_in_eml(eml@@dataset@@dataTable, "entityName", function(x) {grepl("^2016", x)})
-#' # Answer: eml@@dataset@@dataTable[n]
+#' n <- which_in_eml(eml$dataset$dataTable, "entityName", function(x) {grepl("^2016", x)})
+#' # Answer: eml$dataset$dataTable[n]
 #'
 #' # Question: Which attributes in dataTable[[1]] have a numberType "natural"?
-#' n <- which_in_eml(eml@@dataset@@dataTable[[1]]@@attributeList@@attribute, "numberType", "natural")
-#' # Answer: eml@@dataset@@dataTable[[1]]@@attributeList@@attribute[n]
+#' n <- which_in_eml(eml$dataset$dataTable[[1]]$attributeList$attribute, "numberType", "natural")
+#' # Answer: eml$dataset$dataTable[[1]]$attributeList$attribute[n]
 #'
 #' #' # Question: Which dataTables have at least one attribute with a numberType "natural"?
-#' n <- which_in_eml(eml@@dataset@@dataTable, "numberType", function(x) {"natural" %in% x})
-#' # Answer: eml@@dataset@@dataTable[n]
+#' n <- which_in_eml(eml$dataset$dataTable, "numberType", function(x) {"natural" %in% x})
+#' # Answer: eml$dataset$dataTable[n]
 #' }
-which_in_eml <- function(eml_list, element, test) {
+which_in_eml <- function(doc, element, test) {
 
-  stopifnot(isS4(eml_list))
-  stopifnot(methods::is(eml_list,"list"))
+  stopifnot(methods::is(doc, "list"))
   stopifnot(is.character(element))
 
   if (is.character(test)) {
@@ -1101,29 +808,25 @@ which_in_eml <- function(eml_list, element, test) {
     stopifnot(is.function(test))
   }
 
-  # Find location
-  location <- unlist(lapply(seq_along(eml_list), function(i) {
-    elements_test <- unlist(EML::eml_get(eml_list[[i]], element))
+  elements_test <- eml_get(doc, element)
 
-    if (is.null(elements_test)) {
-      out <- NULL
+  if (is.null(elements_test)) {
+    location <- NULL
+
+  } else {
+    result <- test(elements_test)
+
+    if (length(isTRUE(result)) > 1) {
+      stop("Test must only return one value.")
+
+    } else if (length(isTRUE(result)) == 1){
+      location <- which(result == TRUE)
 
     } else {
-      result <- test(elements_test)
-
-      if (length(result) > 1) {
-        stop("Test must only return one value.")
-
-      } else if (result == TRUE) {
-        out <- i
-
-      } else {
-        out <- NULL
-      }
+      location <- NULL
     }
-    return(out)
-  }))
-
+  }
+  names(location) <- NULL
   return(location)
 }
 
@@ -1133,8 +836,8 @@ which_in_eml <- function(eml_list, element, test) {
 #' This function creates a new object with the same class as \code{element_to_replace}
 #' using a reference to \code{element_to_reference}.
 #'
-#' @param element_to_reference (S4) An EML object to reference.
-#' @param element_to_replace (S4) An EML object to replace with a reference.
+#' @param element_to_reference (list) An EML element to reference.
+#' @param element_to_replace (list) An EML element to replace with a reference.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1144,32 +847,34 @@ which_in_eml <- function(eml_list, element, test) {
 #' \dontrun{
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-#' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
 #'
 #' # Set the first contact as a reference to the first creator
-#' eml@@dataset@@contact[[1]] <- eml_set_reference(eml@@dataset@@creator[[1]],
-#' eml@@dataset@@contact[[1]])
+#' doc$dataset$contact[[1]] <- eml_set_reference(doc$dataset$creator[[1]],
+#' doc$dataset$contact[[1]])
 #'
 #' # This is also useful when we want to set references to a subset of 'dataTable'
 #'   or 'otherEntity' objects
 #' # Add a few more objects first to illustrate the use:
-#' eml@@dataset@@dataTable[[3]] <- eml@@dataset@@dataTable[[1]]
-#' eml@@dataset@@dataTable[[4]] <- eml@@dataset@@dataTable[[1]]
+#' doc$dataset$dataTable[[3]] <- doc$dataset$dataTable[[1]]
+#' doc$dataset$dataTable[[4]] <- doc$dataset$dataTable[[1]]
 #' # Add references to the second and third elements only (not the 4th):
 #' for (i in 2:3) {
-#'     eml@@dataset@@dataTable[[i]]@@attributeList <- eml_set_reference(eml@@dataset@@dataTable[[1]]@@attributeList,
-#'                                                       eml@@dataset@@dataTable[[i]]@@attributeList)
+#'     doc$dataset$dataTable[[i]]$attributeList <- eml_set_reference(
+#'                                                       doc$dataset$dataTable[[1]]$attributeList,
+#'                                                       doc$dataset$dataTable[[i]]$attributeList)
 #' }
-#' # If we print the entire 'dataTable' list we see elements 2 and 3 have references while 4 does not.
-#' eml@@dataset@@dataTable
+#' # If we print the entire 'dataTable' list we see elements 2 and 3 have
+#' references while 4 does not.
+#'
+#' doc$dataset$dataTable
 #' }
 eml_set_reference <- function(element_to_reference, element_to_replace) {
-  if (length(element_to_reference@id) == 0) {
-    stop('No id detected at element_to_reference@id. Please add an id in order to use references.')
+  if (length(element_to_reference$id) == 0) {
+    stop('No id detected at element_to_reference$id. Please add an id in order to use references.')
   }
-  id <- element_to_reference@id[1]
-  class <- class(element_to_replace)[1]
-  element_to_replace <- new(class, reference = id)
+  id <- element_to_reference$id[1]
+  element_to_replace <- list(references = id)
   return(element_to_replace)
 }
 
@@ -1179,13 +884,13 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' This function sets shared attributes using the attributes of the first \code{type}
 #' selected and creates references for all remaining objects of equivalent \code{type}.
 #'
-#' @param eml (eml) An EML object.
+#' @param doc (emld) An EML object.
 #' @param attributeList (attributeList) Optional. An EML attributeList object. If not provided
 #'   then it will default to the attributeList of the first \code{type} element.
-#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity' attributeList
-#'   objects with references. Defaults to 'dataTable'.
+#' @param type (character) Optional. Specifies whether to replace 'dataTable' or 'otherEntity'
+#'   attributeList objects with references. Defaults to 'dataTable'.
 #'
-#' @return (eml) The modified EML document.
+#' @return (doc) The modified EML document.
 #'
 #' @author Dominic Mullen dmullen17@@gmail.com
 #'
@@ -1195,19 +900,17 @@ eml_set_reference <- function(element_to_reference, element_to_replace) {
 #' \dontrun{
 #' cn <- dataone::CNode('PROD')
 #' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-#' eml <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
-#' atts <- EML::set_attributes(EML::get_attributes(eml@@dataset@@dataTable[[1]]@@attributeList)$attributes)
+#' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#' atts <- EML::set_attributes(
+#'                      EML::get_attributes(eml$dataset$dataTable[[1]]$attributeList)$attributes)
 #'
 #' eml <- eml_set_shared_attributes(eml, atts, type = 'dataTable')
 #' }
-eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTable') {
-  stopifnot(methods::is(eml, 'eml'))
-  if (!is.null(attributeList)) {
-    stopifnot(methods::is(attributeList, 'attributeList'))
-  }
+eml_set_shared_attributes <- function(doc, attributeList = NULL, type = 'dataTable') {
+  stopifnot(methods::is(doc, 'emld'))
   stopifnot(type %in% c('dataTable', 'otherEntity'))
 
-  x <- slot(eml@dataset, type)
+  x <- doc$dataset[[type]]
   n <- length(x)
   if (n <= 1) {
     stop('1 or fewer entities') # add message
@@ -1215,14 +918,91 @@ eml_set_shared_attributes <- function(eml, attributeList = NULL, type = 'dataTab
 
   # If a new attributeList is provided set it
   if (!is.null(attributeList)) {
-    x[[1]]@attributeList <- attributeList
+    x[[1]]$attributeList <- attributeList
   }
-  x[[1]]@attributeList@id <- new('xml_attribute', uuid::UUIDgenerate(TRUE))
+  x[[1]]$attributeList$id <- stringi::stri_rand_strings(1, length = 10) # generate random identifier
   # Apply references to all other elements
   for (i in 2:n) {
-    x[[i]]@attributeList <- eml_set_reference(x[[1]]@attributeList, x[[i]]@attributeList)
+    x[[i]]$attributeList <- eml_set_reference(x[[1]]$attributeList, x[[i]]$attributeList)
   }
 
-  slot(eml@dataset, type) <- x
-  return(eml)
+  doc$dataset[[type]] <- x
+  return(doc)
+}
+
+#' Get a simple list output from EML::eml_get()
+#'
+#' This function is a convenience wrapper around EML::eml_get() which
+#' returns the output as a simple list as opposed to an object of type
+#' `emld` by removing the attributes and context from the object. If an
+#' element containing children is returned all of it's children will be
+#' flattened into a named character vector. This function is best used
+#' to extract values from elements that have no children.
+#'
+#' @param doc (list) An EML object or child/descendant object
+#' @param element (character) Name of the element to be extracted. If
+#' multiple occurrences are found, will extract all.
+#'
+#' @return out (vector) A list of values contained in element given
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#'
+#' doc <- EML::read_eml(dataone::getObject(adc, 'doi:10.18739/A2S17SS1M'))
+#'
+#' datatable_names <- eml_get_simple(doc$dataset$dataTable, element = "entityName")
+#'}
+#'
+eml_get_simple <- function(doc, element){
+  out <- eml_get(doc, element, from = "list")
+  out$`@context` <- NULL
+  attributes(out) <- NULL
+  out <- unlist(out)
+  return(out)
+}
+
+#' Reorder a named list of objects according to the order in the metadata
+#'
+#' This function takes a named list of data objects, such as what is
+#' returned from `get_package`, and reorders them according to the order
+#' they are given in the EML document.
+#'
+#' @param pid_list (list) A named list of data pids
+#' @param doc (list) an `emld` document
+#'
+#' @return ordered_pids (list) A list of reordered pids
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cn <- dataone::CNode('PROD')
+#' adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
+#
+#' ids <- get_package(adc, 'resource_map_doi:10.18739/A2S17SS1M', file_names = TRUE)
+#' doc <- EML::read_eml(dataone::getObject(adc, ids$metadata))
+#'
+#' # return all entity types
+#' ordered_pids <- reorder_pids(ids$data, doc)
+#'}
+#'
+reorder_pids <- function(pid_list, doc){
+  stopifnot(!is.null(names(pid_list)))
+
+  entity_names <- eml_get_simple(doc, "entityName")
+
+  if (is.null(entity_names)){
+    stop("No entity names were found.")
+  }
+
+  if (length(entity_names) != length(pid_list)){
+    stop("Number of entities in EML and resource map do not match")
+  }
+
+  ordered_pids <- pid_list[order(match(names(pid_list), entity_names))]
+  return(ordered_pids)
 }

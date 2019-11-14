@@ -190,11 +190,11 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
   sysmeta <- clear_replication_policy(sysmeta)
 
   # Add packageId to metadata if the object is an xml file
-  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml", format_id)) {
-    eml <- EML::read_eml(path)
-    eml@packageId <- new("xml_attribute", new_pid)
+  if (grepl("^eml:\\/\\/ecoinformatics.org\\/eml|^https://eml.ecoinformatics.org", format_id)) {
+    doc <- EML::read_eml(path)
+    doc$packageId <- new_pid
     path <- tempfile()
-    EML::write_eml(eml, path)
+    EML::write_eml(doc, path)
     # File changed - update checksum
     sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
   }
@@ -253,6 +253,8 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 #'   access policies are not affected.
 #' @param check_first (logical) Optional. Whether to check the PIDs passed in as arguments exist on the MN before continuing.
 #'   Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
+#' @param format_id (character) Optional. When omitted, the updated object will have the same formatId as `metadata_pid`. If set, will attempt
+#'   to use the value instead.
 #'
 #' @return (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 #'
@@ -289,7 +291,8 @@ publish_update <- function(mn,
                            parent_data_pids = NULL,
                            parent_child_pids = NULL,
                            public = TRUE,
-                           check_first = TRUE) {
+                           check_first = TRUE,
+                           format_id = NULL) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -326,6 +329,10 @@ publish_update <- function(mn,
 
   if (!is.null(parent_child_pids)) {
     stopifnot(all(is.character(parent_child_pids)))
+  }
+
+  if (!is.null(format_id)) {
+    stopifnot(is.character(format_id) && nchar(format_id) > 0)
   }
 
   # Check to see if the obsoleted package is in the list of parent_child_pids
@@ -394,15 +401,15 @@ publish_update <- function(mn,
   if (is.null(metadata_path)) {
     # Get the metadata doc
     message("Getting metadata from the MN.")
-    eml <- EML::read_eml(rawToChar(dataone::getObject(mn, metadata_pid)), asText = TRUE)
+    doc <- EML::read_eml(dataone::getObject(mn, metadata_pid))
 
-  } else if (class(metadata_path) == "eml") {
+  } else if (class(metadata_path)[1] == "emld") {
       # If an eml object is provided, use it directly after validating
       if (!eml_validate(metadata_path)) {
         stop("The EML object is not valid.")
       }
 
-      eml <- metadata_path
+    doc <- metadata_path
 
   } else {
     # Alternatively, read an edited metadata file from disk if provided
@@ -411,7 +418,7 @@ publish_update <- function(mn,
     }
 
     message(paste0("Getting metadata from the path: ", metadata_path, "."))
-    eml <- EML::read_eml(metadata_path)
+    doc <- EML::read_eml(metadata_path)
   }
 
   # get the metadata sysmeta from the node
@@ -440,27 +447,35 @@ publish_update <- function(mn,
   # Update the metadata
 
   # Replace packageId
-  eml@packageId <- new("xml_attribute", metadata_updated_pid)
+  doc$packageId <- metadata_updated_pid
 
   # Replace system if needed
-  if (eml@system != "https://arcticdata.io") {
-    eml@system <- new("xml_attribute", "https://arcticdata.io")
+  if (is.null(doc$system)) {
+    doc$system <- "https://search.dataone.org"
   }
 
   # Replace access if needed
-  if (length(eml@access@allow) & (!is.null(metadata_path))) {
-    eml@access <- new("access")
+  if (length(doc$access$allow) & (!is.null(metadata_path))) {
+    doc$access <- list()
   }
 
   # Write out the document to disk. We do this in part because
   # set_other_entities takes a path to the doc.
   eml_path <- tempfile()
-  EML::write_eml(eml, eml_path)
+  EML::write_eml(doc, eml_path)
 
   # Create System Metadata for the updated EML file
+  # First, figure out what formatId we should use on the new object
+  if (!is.null(format_id)) {
+    message("Overridding format ID on new metadata object of: ", format_id, " instead of ", metadata_sysmeta@formatId, ".")
+    metadata_updated_format_id <- format_id
+  } else {
+    metadata_updated_format_id <- metadata_sysmeta@formatId
+  }
+
   metadata_updated_sysmeta <- new("SystemMetadata",
                                   identifier = metadata_updated_pid,
-                                  formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                                  formatId = metadata_updated_format_id,
                                   size = file.size(eml_path),
                                   checksum = digest::digest(eml_path, algo = "sha1", serialize = FALSE, file = TRUE),
                                   checksumAlgorithm = "SHA1",
@@ -495,6 +510,9 @@ publish_update <- function(mn,
   } else {
     metadata_updated_sysmeta <- datapack::removeAccessRule(metadata_updated_sysmeta, "public", "read")
   }
+
+  # Update fileName to follow ADC naming conventions
+  metadata_updated_sysmeta@fileName <- reformat_file_name(doc$dataset$title, metadata_updated_sysmeta)
 
   set_rights_holder(mn, metadata_pid, me)
 
@@ -697,7 +715,7 @@ update_resource_map <- function(mn,
                                 child_pids = NULL,
                                 other_statements = NULL,
                                 identifier = NULL,
-                                public = FALSE,
+                                public = TRUE,
                                 check_first = TRUE) {
 
   # Check arguments
@@ -863,7 +881,7 @@ set_file_name <- function(mn, pid, name) {
 #' of a data object once it has been updated.
 #' This is a helper function for [update_package_object()].
 #'
-#' @param eml (eml) An EML class object.
+#' @param doc (emld) An EML object.
 #' @param mn (MNode) The Member Node of the data package.
 #' @param data_pid (character) The identifier of the data object to be updated.
 #' @param new_data_pid (character) The new identifier of the updated data object.
@@ -871,42 +889,72 @@ set_file_name <- function(mn, pid, name) {
 #' @importFrom stringr str_detect
 #'
 #' @noRd
-update_physical <- function(eml, mn, data_pid, new_data_pid) {
-  stopifnot(is(eml, "eml"))
+update_physical <- function(doc, mn, data_pid, new_data_pid) {
+  stopifnot(is(doc, "emld"))
   stopifnot(is(mn, "MNode"))
   stopifnot(is.character(data_pid), nchar(data_pid) > 0)
   stopifnot(is.character(new_data_pid), nchar(new_data_pid) > 0)
 
-  all_url <- unlist(EML::eml_get(eml, "url"))
+  all_url <- eml_get(doc, "url") %>%
+    grep("^http", ., value = T) %>%
+    unname()
+
   if (sum(stringr::str_detect(all_url, data_pid)) == 0) {
     stop("The obsoleted data PID does not match any physical sections, so the EML will not be updated.")
   }
 
-  dataTable_url <- unlist(EML::eml_get(eml@dataset@dataTable, "url"))
+  if (length(doc$dataset$dataTable) != 0){
+    dataTable_url <- eml_get(doc$dataset$dataTable, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(dataTable_url, data_pid))) {
-    position <- which(stringr::str_detect(dataTable_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@dataTable[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(dataTable_url, data_pid))) {
+      position <- which(stringr::str_detect(dataTable_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$dataTable)))){
+        doc$dataset$dataTable[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$dataTable))) == F & position == 1){
+        doc$dataset$dataTable$physical <- new_phys
+      }
+    }
   }
 
-  otherEntity_url <- unlist(EML::eml_get(eml@dataset@otherEntity, "url"))
+  if (length(doc$dataset$otherEntity) != 0){
+    otherEntity_url <- eml_get(doc$dataset$otherEntity, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(otherEntity_url, data_pid))) {
-    position <- which(stringr::str_detect(otherEntity_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@otherEntity[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(otherEntity_url, data_pid))) {
+      position <- which(stringr::str_detect(otherEntity_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$otherEntity)))){
+        doc$dataset$otherEntity[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$otherEntity))) == F & position == 1){
+        doc$dataset$otherEntity$physical <- new_phys
+      }
+    }
   }
 
-  spatialVector_url <- unlist(EML::eml_get(eml@dataset@spatialVector, "url"))
+  if (length(doc$dataset$spatialVector) != 0){
+    spatialVector_url <- eml_get(doc$dataset$spatialVector, "url") %>%
+      grep("^http", ., value = T) %>%
+      unname()
 
-  if (any(stringr::str_detect(spatialVector_url, data_pid))) {
-    position <- which(stringr::str_detect(spatialVector_url, data_pid))
-    new_phys <- pid_to_eml_physical(mn, new_data_pid)
-    eml@dataset@spatialVector[[position]]@physical@.Data <- new_phys
+    if (any(stringr::str_detect(spatialVector_url, data_pid))) {
+      position <- which(stringr::str_detect(spatialVector_url, data_pid))
+      new_phys <- pid_to_eml_physical(mn, new_data_pid)
+      if(all(is.null(names(doc$dataset$spatialVector)))){
+        doc$dataset$spatialVector[[position]]$physical <- new_phys
+      }
+      else if (all(is.null(names(doc$dataset$spatialVector))) == F & position == 1){
+        doc$dataset$spatialVector$physical <- new_phys
+      }
+    }
   }
 
-  invisible(eml)
+  return(doc)
 }
 
 
@@ -968,7 +1016,7 @@ update_package_object <- function(mn,
   stopifnot(is.logical(public))
 
   pkg <- get_package(mn, resource_map_pid)
-  eml <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
+  doc <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
 
   new_data_pid <- update_object(mn,
                                 pid = data_pid,
@@ -978,18 +1026,13 @@ update_package_object <- function(mn,
   other_data_pids <- pkg$data[which(pkg$data != data_pid)] # wrapped in which for better NA handling
   new_data_pids <- c(other_data_pids, new_data_pid)
 
-  eml_new <- tryCatch(update_physical(eml = eml,
+  doc_new <- update_physical(doc = doc,
                                       mn = mn,
                                       data_pid = data_pid,
-                                      new_data_pid = new_data_pid),
-                      error = function(e) {
-                        message("The obsoleted data PID does not match any physical sections, so the EML will not be updated.",
-                                "\nCheck if the correct resource map PID was given.")
-                        return(eml)
-                      })
+                                      new_data_pid = new_data_pid)
 
-  eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(eml_new, eml_path)
+  eml_path <- tempfile()
+  EML::write_eml(doc_new, eml_path)
 
   pkg_new <- publish_update(mn,
                             metadata_pid = pkg$metadata,
@@ -1021,13 +1064,15 @@ reformat_file_name <- function(path, sysmeta) {
   base_name <- basename(path)
   if (sysmeta@formatId == 'http://www.openarchives.org/ore/terms') {
     ext <- '.rdf.xml'
-  } else if (grepl('eml://ecoinformatics\\.org/eml*', sysmeta@formatId)) {
+  } else if (grepl('ecoinformatics\\.org/eml*', sysmeta@formatId)) {
     ext <- '.xml'
     # remove extension then truncate to 50 characters
     base_name <- tools::file_path_sans_ext(base_name) %>%
       stringr::str_sub(1, 50)
     # re-trim if we're in the middle of a word and add extension back on
     index <- stringi::stri_locate_last_fixed(base_name, ' ')[1]
+    # Set index to the end of the string if there are no spaces.  Add + 1 because str_sub subtracts one to remove the white space.
+    if (is.na(index)) index <- nchar(base_name) + 1
     base_name <- stringr::str_sub(base_name, 1, index -1) %>%
       paste0(ext)
   } else {
@@ -1035,6 +1080,7 @@ reformat_file_name <- function(path, sysmeta) {
   }
 
   file_name <- stringr::str_replace_all(base_name, '[^[:alnum:]]', '_') %>%
+    stringr::str_replace_all('_[_]*', '_') %>%  # replaces consecutive underscores with one
     stringr::str_sub(end = -(nchar(ext) + 1)) %>%
     paste0(ext)
 

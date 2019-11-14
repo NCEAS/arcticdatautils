@@ -9,15 +9,16 @@ eml_project(title, personnelList, abstract = NULL, funding = NULL,
   relatedProject = NULL)
 }
 \arguments{
-\item{title}{(character) Title of the project (Required). May have multiple titles.}
+\item{title}{(character) Title of the project (Required). May have multiple titles
+constructed using \code{list}.}
 
 \item{personnelList}{(list of personnel) Personnel involved with the project.}
 
-\item{abstract}{(character) Project abstract. Can pass as a character vector
+\item{abstract}{(character) Project abstract. Can pass as a list
 for separate paragraphs.}
 
 \item{funding}{(character) Funding sources for the project such as grant and
-contract numbers. Can pass as a character vector for separate paragraphs.}
+contract numbers. Can pass as a list for separate paragraphs.}
 
 \item{studyAreaDescription}{(studyAreaDescription)}
 
@@ -37,8 +38,8 @@ fully fleshed out. Need to pass these objects in directly if you want to use
 them.
 }
 \examples{
-proj <- eml_project(c("Some title", "A second title if needed"),
-           c(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
-           c("Abstract paragraph 1", "Abstract paragraph 2"),
+proj <- eml_project(list("Some title", "A second title if needed"),
+           list(eml_personnel("Bryce", "Mecum", role = "principalInvestigator")),
+           list("Abstract paragraph 1", "Abstract paragraph 2"),
            "Funding Agency: Award Number 12345")
 }

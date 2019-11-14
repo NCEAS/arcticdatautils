@@ -1,6 +1,6 @@
 Package: arcticdatautils
 Title: Utilities for the Arctic Data Center
-Version: 0.6.4
+Version: 0.7.0
 Authors@R: c(
   person("Bryce", "Mecum", email = "mecum@nceas.ucsb.edu", role = c("aut", "cre")),
   person("Matt", "Jones", email = "jones@nceas.ucsb.edu", role = "ctb"),
@@ -9,7 +9,8 @@ Authors@R: c(
   person("Dominic", "Mullen", email = "dmullen17@gmail.com", role = "ctb"),
   person("Emily", "O'Dean", email = "eodean10@gmail.com", role = "ctb"),
   person("Robyn", "Thiessen-Bock", email = "robyn.thiessenbock@gmail.com", role = "ctb"),
-  person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb")
+  person("Derek", "Strong", email = "dstrong@nceas.ucsb.edu", role = "ctb"),
+  person("Rachel", "Sun", email = "rachelsun@ucsb.edu", role = "ctb")
   )
 Description: A set of utilities for working with the Arctic Data Center 
   (https://arcticdata.io).
@@ -24,7 +25,7 @@ Imports:
     dataone,
     datapack,
     digest,
-    EML (== 1.0.1),
+    EML (>= 2.0),
     httr,
     magrittr,
     methods,
@@ -47,8 +48,6 @@ Suggests:
     testthat,
     xslt,
     yaml
-Remotes: 
-  ropensci/EML@7a1140796373b0b7216fdc756210f07e318cc1b8
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

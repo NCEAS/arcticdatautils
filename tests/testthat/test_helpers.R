@@ -33,16 +33,22 @@ test_that("list_submissions returns correct output", {
   }
 
   out <- list_submissions(adc, '2018-10-01', '2018-10-03')
-  expect_equal(out$submitter_name[1], 'Baptiste Vandecrux')
+  expect_equal(out$submitter_name[1], 'Rachel Obbard')
 })
 
-test_that('list_submissions returns correct output', {
-  cn <- dataone::CNode('PROD')
-  adc <- dataone::getMNode(cn,'urn:node:ARCTIC')
-  if (!is_token_set(adc)) {
-    skip("No token set. Skipping test.")
-  }
+test_that("A failed submission can be recovered", {
+  #test runs without a token
 
-  out <- list_submissions(adc, '2018-10-01', '2018-10-03')
-  expect_equal(out$submitter_name[1], 'Baptiste Vandecrux')
+  cn <- dataone::CNode('PROD')
+  adc <- dataone::getMNode(cn, 'urn:node:ARCTIC')
+  pids <- dataone::query(adc, list(q="fileName:(*eml_draft* AND -*Mullen*)",
+                         fl = "id",
+                         rows="50"))
+
+  path <- tempfile(fileext = ".xml")
+
+  recover_failed_submission(adc, pids[[1]]$id[1], path)
+
+  doc <- EML::read_eml(path)
+  expect_true(EML::eml_validate(doc))
 })

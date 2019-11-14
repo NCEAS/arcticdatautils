@@ -1,6 +1,6 @@
 context("Access rules")
 
-mn <- env_load()$mn
+mn <- tryCatch(env_load()$mn, error = function(e) env_load()$mn)
 
 test_that("get_package works for a simple package", {
   if (!is_token_set(mn)) {
@@ -9,11 +9,12 @@ test_that("get_package works for a simple package", {
 
   pkg <- create_dummy_package(mn)
   Sys.sleep(1)
-  get_pkg <- get_package(mn, pkg$metadata)
+  get_pkg <- get_package(mn, pkg$resource_map)
 
   expect_true(pkg$metadata == get_pkg$metadata)
   expect_true(pkg$resource_map == get_pkg$resource_map)
   expect_true(pkg$data == get_pkg$data)
+  expect_warning(get_package(mn, pkg$metadata))
 })
 
 test_that("get_package works for a package with a child package", {
@@ -60,7 +61,7 @@ test_that("get_package works the same when given a metadata pid as it does when 
   }
 
   child_pkg <- create_dummy_package(mn)
-  a <- get_package(mn, child_pkg$metadata)
+  a <- suppressWarnings(get_package(mn, child_pkg$metadata))
   b <- get_package(mn, child_pkg$resource_map)
 
   expect_equal(a, b)
@@ -70,6 +71,8 @@ test_that("access functions stop if system metadata is not found", {
   expect_error(set_rights_holder(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
 
   expect_error(set_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
+
+  expect_error(remove_access(mn, "test", "http://orcid.org/0000-000X-XXXX-XXXX"))
 
   expect_error(set_public_read(mn, "test"))
 
