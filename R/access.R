@@ -118,11 +118,9 @@ set_rights_holder <- function(mn, pids, subject) {
 
     # Change rightsHolder (if needed)
     if (sysmeta@rightsHolder == subject) {
-      message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
       result[i] <- TRUE
     } else {
       # Update System Metadata
-      message(paste0("Updating rightsHolder for PID ", pid, " from ", sysmeta@rightsHolder, " to ", subject, "."))
 
       sysmeta@rightsHolder <- subject
 
