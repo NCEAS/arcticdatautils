@@ -458,8 +458,6 @@ generate_resource_map <- function(metadata_pid,
   resource_map <- new("ResourceMap",
                       id = resource_map_pid)
 
-  message("Generating resource map with pids ", paste0(head(unlist(c(metadata_pid, data_pids, child_pids)), n = 10), collapse = ", "), ".")
-
   resource_map <- datapack::createFromTriples(resource_map,
                                               relations = relationships,
                                               identifiers = unlist(c(metadata_pid, data_pids, child_pids)),
