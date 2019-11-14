@@ -780,8 +780,8 @@ update_resource_map <- function(mn,
     }
     else if (any(prov_pids %in% data_pids == FALSE)){
       warning("Old provenance contains data pids not in new resource map. Provenance information will be removed. \n
-            You can get old provenance statements back using: \n
-            old_prov <- get_prov(mn, rm_pid) \n
+            You can get old provenance statements back using:
+            old_prov <- recover_prov(mn, rm_pid)
             rm_new <- update_resource_map(mn, rm_pid, metadata_pid, data_pids, other_statements = old_prov, keep_prov = T)")
 
     new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
