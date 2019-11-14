@@ -86,7 +86,7 @@ test_that("is_public_read returns true for public packages and false for private
     skip("No token set. Skipping test.")
   }
 
-  pkg <- create_dummy_package(mn)
+  pkg <- create_dummy_package(mn, size = 3)
 
   public_response <- is_public_read(mn, pkg$resource_map)
   remove_public_read(mn, pkg$resource_map)

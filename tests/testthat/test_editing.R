@@ -529,3 +529,62 @@ test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", 
 
   expect_equal(sm@formatId, format_eml("2.2"))
 })
+
+test_that("PROV is carried forward if data pids don't change", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <- suppressMessages(add_dummy_prov(mn, package$resource_map))
+
+  # Publish an update on it
+  update <- publish_update(mn,
+                           package$metadata,
+                           package_prov,
+                           package$data,
+                           check_first = FALSE)
+
+  t <- recover_prov(mn, update$resource_map)
+
+  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/|https://cn-stage.test.dataone.org/cn/v[0-9]/resolve/", "", c(t$subject, t$object)) %>%
+    gsub("%3A", ":", .)
+  prov_pids <- prov_pids[-(grep("^http", prov_pids))] %>%
+    unique(.)
+
+  expect_equal(sort(prov_pids), sort(update$data))
+
+})
+
+test_that("PROV is handled with appropriate warnings", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <-  suppressMessages(add_dummy_prov(mn, package$resource_map))
+  data_new <- create_dummy_object(mn)
+  # Publish an update on it
+  expect_warning(update <- publish_update(mn,
+                           package$metadata,
+                           package_prov,
+                           data_new,
+                           keep_prov = TRUE,
+                           check_first = FALSE), "Provenance information is retained")
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <- suppressMessages(add_dummy_prov(mn, package$resource_map))
+  data_new <- create_dummy_object(mn)
+
+  # Publish an update on it
+  expect_warning(update <- publish_update(mn,
+                                          package$metadata,
+                                          package_prov,
+                                          data_new,
+                                          keep_prov = FALSE,
+                                          check_first = FALSE), "Provenance information will be removed")
+
+})
