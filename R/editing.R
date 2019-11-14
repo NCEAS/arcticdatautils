@@ -292,7 +292,8 @@ publish_update <- function(mn,
                            parent_child_pids = NULL,
                            public = TRUE,
                            check_first = TRUE,
-                           format_id = NULL) {
+                           format_id = NULL,
+                           keep_prov = FALSE) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -424,8 +425,6 @@ publish_update <- function(mn,
   # get the metadata sysmeta from the node
   metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
 
-  message("Downloaded EML and sysmeta...")
-
   # Generate PIDs for our updated objects
   if (is.null(identifier)) {
     if (use_doi) {
@@ -543,11 +542,11 @@ publish_update <- function(mn,
                                                     child_pids = child_pids,
                                                     identifier = resmap_updated_pid,
                                                     public = public,
-                                                    check_first = check_first)
+                                                    check_first = check_first,
+                                                    keep_prov = keep_prov)
 
   set_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
-  message("Updated resource map")
 
   # Update the parent resource map to add the new package
   #######################################################
@@ -555,8 +554,6 @@ publish_update <- function(mn,
     if (is.null(parent_metadata_pid)) {
       stop("Missing required parameters to update parent package.")
     }
-
-    message("Updating parent resource map...")
 
     # Check to see if the just-updated package is in the list of
     # parent_child_pids, notify the user, and add it to the list
@@ -571,7 +568,8 @@ publish_update <- function(mn,
                                                              data_pids = parent_data_pids,
                                                              child_pids = parent_child_pids,
                                                              public = public,
-                                                             check_first = check_first)
+                                                             check_first = check_first,
+                                                             keep_prov = keep_prov)
 
     set_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
@@ -716,7 +714,8 @@ update_resource_map <- function(mn,
                                 other_statements = NULL,
                                 identifier = NULL,
                                 public = TRUE,
-                                check_first = TRUE) {
+                                check_first = TRUE,
+                                keep_prov = FALSE) {
 
   # Check arguments
   stopifnot(is(mn, "MNode"))
@@ -760,7 +759,9 @@ update_resource_map <- function(mn,
                         other_statements)
   }
 
-  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/", "", c(statements$subject, statements$object)) %>%
+  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/|https://cn-stage.test.dataone.org/cn/v[0-9]/resolve/",
+                    "",
+                    c(statements$subject, statements$object)) %>%
     gsub("%3A", ":", .)
   prov_pids <- prov_pids[-(grep("^http", prov_pids))] %>% # might need to catch other things besides URLs
     unique(.)
@@ -770,27 +771,46 @@ update_resource_map <- function(mn,
     identifier <- paste0("resource_map_", new_uuid())
   }
 
-  if (any(prov_pids %in% data_pids == FALSE)){
-    warning("Old provenance contains data pids not in new resource map. Provenance information will be removed")
+  if (keep_prov == FALSE){
+    if (is.null(prov_pids)){
+      new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                           data_pids = data_pids,
+                                           child_pids = child_pids,
+                                           resource_map_pid = identifier)
+    }
+    else if (any(prov_pids %in% data_pids == FALSE)){
+      warning("Old provenance contains data pids not in new resource map. Provenance information will be removed. \n
+            You can get old provenance statements back using: \n
+            old_prov <- get_prov(mn, rm_pid) \n
+            rm_new <- update_resource_map(mn, rm_pid, metadata_pid, data_pids, other_statements = old_prov, keep_prov = T)")
 
     new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
                                        resource_map_pid = identifier)
+    }
+    else if (all(prov_pids %in% data_pids) == TRUE) {
+      new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                           data_pids = data_pids,
+                                           child_pids = child_pids,
+                                           other_statements = statements,
+                                           resource_map_pid = identifier)
+    }
   }
-  else if (all(prov_pids %in% data_pids == TRUE)) {
+  else if (keep_prov == TRUE) {
+    if (any(prov_pids %in% data_pids == FALSE)){
+      warning("Old provenance contains data pids not in new resource map. Provenance information is retained since keep_prov is set to TRUE")
+    }
     new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                          data_pids = data_pids,
                                          child_pids = child_pids,
                                          other_statements = statements,
                                          resource_map_pid = identifier)
   }
-
   stopifnot(file.exists(new_rm_path))
 
   rm(sysmeta)
 
-  message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(is(sysmeta, "SystemMetadata"))
 
@@ -815,7 +835,6 @@ update_resource_map <- function(mn,
   }
 
   # Update it
-  message(paste0("Updating resource map..."))
   resmap_update_response <- dataone::updateObject(mn,
                                                   pid = resource_map_pid,
                                                   newpid = identifier,
@@ -1086,3 +1105,23 @@ reformat_file_name <- function(path, sysmeta) {
 
   return(file_name)
 }
+
+#' Get a data.frame of prov statements from a resource map pid.
+#'
+#' This is a function that is useful if you need to recover lost prov statements. It returns
+#' a data.frame of statements that can be passed to `update_resource_map` in the `other_statements`
+#' argument.
+#'
+#' @param mn (mn) A memeber node instance
+#' @param rm_pid (character) A resource map identifier
+#' @return a data.frame of prov statments
+#' @export
+recover_prov <- function(mn, rm_pid){
+  old_resource_map_path <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, rm_pid)), old_resource_map_path)
+  statements <- parse_resource_map(old_resource_map_path)
+  statements <- filter_packaging_statements(statements)
+  unlink(old_resource_map_path)
+  return(statements)
+}
+
