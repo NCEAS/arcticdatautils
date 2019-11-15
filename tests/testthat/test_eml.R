@@ -360,6 +360,6 @@ test_that('eml_nsf_to_project handles bad funding numbers gracefully', {
 test_that('eml_nsf_to_project fails gracefully', {
 
   awards <- c("abcdef", "12345")
+  expect_error(suppressWarnings(proj <- eml_nsf_to_project(awards)), "No valid award numbers were found")
 
-  expect_error(proj <- eml_nsf_to_project(awards), "No valid award numbers were found")
 })

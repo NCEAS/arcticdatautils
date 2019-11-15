@@ -1019,6 +1019,7 @@ reorder_pids <- function(pid_list, doc){
 #' @return project (emld) An EML project section
 #'
 #' @export
+#' @importFrom rlang .data
 #'
 #' @examples
 #' awards <- c("1203146", "1203473", "1603116")
@@ -1034,7 +1035,7 @@ reorder_pids <- function(pid_list, doc){
 #'
 #' doc$dataset$project <- proj
 #'
-#' eml_validate(doc)
+#' EML::eml_validate(doc)
 #'
 eml_nsf_to_project <- function(awards){
 
@@ -1045,7 +1046,7 @@ eml_nsf_to_project <- function(awards){
   result <- lapply(award_nums, function(x){
     url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
 
-    t <- fromJSON(url)
+    t <- jsonlite::fromJSON(url)
 
     if ("serviceNotification" %in% names(t$response)) {
       warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."))
@@ -1068,30 +1069,30 @@ eml_nsf_to_project <- function(awards){
     co_pis <- lapply(result, function(x){
       stringi::stri_split_fixed(unlist(x$response$award$coPDPI), pattern = " ", simplify = T) %>%
         as.data.frame(stringsAsFactors = F) %>%
-        unite("firstName", V1, V2, sep = " ") %>%
-        mutate(firstName = trimws(firstName, which = "both")) %>%
-        rename(lastName = V3) %>%
-        select(firstName, lastName)
+        tidyr::unite("firstName", .data$V1, .data$V2, sep = " ") %>%
+        dplyr::mutate(firstName = trimws(.data$firstName, which = "both")) %>%
+        dplyr::rename(lastName = .data$V3) %>%
+        dplyr::select(.data$firstName, .data$lastName)
     })
 
     co_pis <- do.call("rbind", co_pis) %>%
-      mutate(role = "coPrincipalInvestigator")
+      dplyr::mutate(role = "coPrincipalInvestigator")
 
     pis <- lapply(result, function(x){
       n <- stringi::stri_split_fixed(unlist(x$response$award$pdPIName), pattern = " ", simplify = T) %>%
         as.data.frame(stringsAsFactors = F) %>%
-        unite("firstName", V1, V2, sep = " ") %>%
-        mutate(firstName = trimws(firstName, which = "both")) %>%
-        rename(lastName = V3) %>%
-        select(firstName, lastName)
+        tidyr::unite("firstName", .data$V1, .data$V2, sep = " ") %>%
+        dplyr::mutate(firstName = trimws(.data$firstName, which = "both")) %>%
+        dplyr::rename(lastName = .data$V3) %>%
+        dplyr::select(.data$firstName, .data$lastName)
     })
 
     pis <- do.call("rbind", pis) %>%
-      mutate(role = "principalInvestigator")
+      dplyr::mutate(role = "principalInvestigator")
 
-    people <- bind_rows(co_pis, pis)
+    people <- dplyr::bind_rows(co_pis, pis)
+
     p_list <- list()
-
     for (i in 1:nrow(people)){
       p_list[[i]] <- eml_personnel(given_names = people$firstName[i],
                                    sur_name = people$lastName[i],
