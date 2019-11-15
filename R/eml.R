@@ -1021,35 +1021,48 @@ reorder_pids <- function(pid_list, doc){
 #' @export
 #'
 #' @examples
+#' awards <- c("1203146", "1203473", "1603116")
 #'
-#' proj <- eml_nsf_to_proejct(awards = c("1203146", "1203473", "1603116"))
+#' proj <- eml_nsf_to_project(awards)
 #'
+#' me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+#'
+#' doc <- list(packageId = "id", system = "system",
+#'            dataset = list(title = "A Mimimal Valid EML Dataset",
+#'                           creator = me,
+#'                           contact = me))
+#'
+#' doc$dataset$project <- proj
+#'
+#' eml_validate(doc)
 #'
 eml_nsf_to_project <- function(awards){
+
+  stopifnot(is.character(awards))
+
   award_nums <- awards
 
-  result_o <- lapply(award_nums, function(x){
+  result <- lapply(award_nums, function(x){
     url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
 
     t <- fromJSON(url)
+
+    if ("serviceNotification" %in% names(t$response)) {
+      warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."))
+      t <- NULL
+    }
+    else if (length(t$response$award) == 0){
+      warning(paste("Empty result for award", x, "\n this award will not be included in the project section."))
+      t <- NULL
+    }
+    else t
   })
 
-  result <- list()
-  for (i in 1:length(result_o)){
-    if ("serviceNotification" %in% names(result_o[[i]]$response)) {
-      warning(paste(result_o[[i]]$response$serviceNotification$notificationType, "for award", award_nums[i], "\n this award will not be included in the project section."))
-      result[[i]] <- NULL
-      award_nums[i] <- NA
-    }
-    else if (length(result_o[[i]]$response$award) == 0){
-      warning(paste("Empty result for award", award_nums[i]))
-      result[[i]] <- NULL
-    }
-    else {result[[i]] <- result_o[[i]]}
-  }
 
 
-  award_nums <- subset(award_nums, !is.na(award_nums))
+  i <- lapply(result, function(x) {!is.null(x)})
+  result <- result[unlist(i)]
+  award_nums <- award_nums[unlist(i)]
 
   if (length(award_nums) > 0){
     co_pis <- lapply(result, function(x){
