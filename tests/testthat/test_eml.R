@@ -306,7 +306,7 @@ test_that('reorder_pids fails gracefully', {
 
 test_that('eml_nsf_to_project generates a valid project section', {
 
-  # for a single award
+  # for a single award, EML 2.1.1
   awards <- "1203146"
   proj <- eml_nsf_to_project(awards)
 
@@ -321,10 +321,27 @@ test_that('eml_nsf_to_project generates a valid project section', {
 
   expect_true(eml_validate(doc))
 
-  # for multiple awards
+  # for multiple awards, EML 2.1.1
   awards <- c("1203146", "1203473", "1603116")
 
   proj <- eml_nsf_to_project(awards)
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc$dataset$project <- proj
+
+  expect_true(eml_validate(doc))
+
+  # for multiple awards, EML 2.2.0
+  awards <- c("1203146", "1203473", "1603116")
+
+  emld::eml_version("eml-2.2.0")
+  proj <- eml_nsf_to_project(awards, eml_version = "2.2")
 
   me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
 
@@ -363,3 +380,5 @@ test_that('eml_nsf_to_project fails gracefully', {
   expect_error(suppressWarnings(proj <- eml_nsf_to_project(awards)), "No valid award numbers were found")
 
 })
+
+

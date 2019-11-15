@@ -1015,7 +1015,7 @@ reorder_pids <- function(pid_list, doc){
 #' or more award numbers
 #'
 #' @param awards (list) A list of NSF award numbers as characters
-#'
+#' @param eml_version (char) EML version to use (2.1.1 or 2.2.0)
 #' @return project (emld) An EML project section
 #'
 #' @export
@@ -1024,7 +1024,7 @@ reorder_pids <- function(pid_list, doc){
 #' @examples
 #' awards <- c("1203146", "1203473", "1603116")
 #'
-#' proj <- eml_nsf_to_project(awards)
+#' proj <- eml_nsf_to_project(awards, eml_version = "2.1.1")
 #'
 #' me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
 #'
@@ -1040,6 +1040,7 @@ reorder_pids <- function(pid_list, doc){
 eml_nsf_to_project <- function(awards, eml_version = "2.1"){
 
   stopifnot(is.character(awards))
+  stopifnot(eml_version %in% c("2.1", "2.1.0", "2.2", "2.2.0"))
 
   award_nums <- awards
 
@@ -1105,6 +1106,19 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
     if (eml_version %in% c("2.1", "2.1.1")){
       award_nums <- paste("NSF", award_nums)
       proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+    }
+    else if (eml_version %in% c("2.2", "2.2.0")){
+      awards <- list()
+
+      for (i in 1:length(award_nums)){
+        awards[[i]] <- list(title = titles[i],
+                            funderName = "National Science Foundation",
+                            funderIdentifier = "https://doi.org/10.13039/00000001",
+                            awardNumber = award_nums[i],
+                            awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
+      }
+
+      proj <- list(title = titles, personnel = p_list, award = awards)
     }
 
   }
