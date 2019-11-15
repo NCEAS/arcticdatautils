@@ -1037,7 +1037,7 @@ reorder_pids <- function(pid_list, doc){
 #'
 #' EML::eml_validate(doc)
 #'
-eml_nsf_to_project <- function(awards){
+eml_nsf_to_project <- function(awards, eml_version = "2.1"){
 
   stopifnot(is.character(awards))
 
@@ -1049,22 +1049,20 @@ eml_nsf_to_project <- function(awards){
     t <- jsonlite::fromJSON(url)
 
     if ("serviceNotification" %in% names(t$response)) {
-      warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."))
+      warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."), call. = FALSE)
       t <- NULL
     }
     else if (length(t$response$award) == 0){
-      warning(paste("Empty result for award", x, "\n this award will not be included in the project section."))
+      warning(paste("Empty result for award", x, "\n this award will not be included in the project section."), call. = FALSE)
       t <- NULL
     }
     else t
   })
 
 
-
   i <- lapply(result, function(x) {!is.null(x)})
   result <- result[unlist(i)]
   award_nums <- award_nums[unlist(i)]
-  award_nums <- paste("NSF", award_nums)
 
   if (length(award_nums) > 0){
     co_pis <- lapply(result, function(x){
@@ -1104,7 +1102,11 @@ eml_nsf_to_project <- function(awards){
       unlist(x$response$award$title)
     })
 
-    proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+    if (eml_version %in% c("2.1", "2.1.1")){
+      award_nums <- paste("NSF", award_nums)
+      proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+    }
+
   }
   else if (length(award_nums) == 0){
     stop(call. = F,
