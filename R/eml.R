@@ -1064,6 +1064,7 @@ eml_nsf_to_project <- function(awards){
   i <- lapply(result, function(x) {!is.null(x)})
   result <- result[unlist(i)]
   award_nums <- award_nums[unlist(i)]
+  award_nums <- paste("NSF", award_nums)
 
   if (length(award_nums) > 0){
     co_pis <- lapply(result, function(x){
