@@ -34,7 +34,6 @@ Imports:
     rlang,
     stringr,
     stringi,
-    tidyr,
     tools,
     uuid,
     xml2,

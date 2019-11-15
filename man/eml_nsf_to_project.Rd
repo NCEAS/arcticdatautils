@@ -23,7 +23,7 @@ or more award numbers
 \examples{
 awards <- c("1203146", "1203473", "1603116")
 
-proj <- eml_nsf_to_project(awards)
+proj <- eml_nsf_to_project(awards, eml_version = "2.1.1")
 
 me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
 
