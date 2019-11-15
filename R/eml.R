@@ -1006,3 +1006,94 @@ reorder_pids <- function(pid_list, doc){
   ordered_pids <- pid_list[order(match(names(pid_list), entity_names))]
   return(ordered_pids)
 }
+
+#' Create an EML project section from a list of NSF award numbers
+#'
+#' This function takes a list of NSF award numbers and uses it to
+#' query the NSF API to get the award title, PIs, and coPIs. The
+#' return value is an EML project section. The function supports 1
+#' or more award numbers
+#'
+#' @param awards (list) A list of NSF award numbers as characters
+#'
+#' @return project (emld) An EML project section
+#'
+#' @export
+#'
+#' @examples
+#'
+#' proj <- eml_nsf_to_proejct(awards = c("1203146", "1203473", "1603116"))
+#'
+#'
+eml_nsf_to_project <- function(awards){
+  award_nums <- awards
+
+  result_o <- lapply(award_nums, function(x){
+    url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
+
+    t <- fromJSON(url)
+  })
+
+  result <- list()
+  for (i in 1:length(result_o)){
+    if ("serviceNotification" %in% names(result_o[[i]]$response)) {
+      warning(paste(result_o[[i]]$response$serviceNotification$notificationType, "for award", award_nums[i], "\n this award will not be included in the project section."))
+      result[[i]] <- NULL
+      award_nums[i] <- NA
+    }
+    else if (length(result_o[[i]]$response$award) == 0){
+      warning(paste("Empty result for award", award_nums[i]))
+      result[[i]] <- NULL
+    }
+    else {result[[i]] <- result_o[[i]]}
+  }
+
+
+  award_nums <- subset(award_nums, !is.na(award_nums))
+
+  if (length(award_nums) > 0){
+    co_pis <- lapply(result, function(x){
+      stringi::stri_split_fixed(unlist(x$response$award$coPDPI), pattern = " ", simplify = T) %>%
+        as.data.frame(stringsAsFactors = F) %>%
+        unite("firstName", V1, V2, sep = " ") %>%
+        mutate(firstName = trimws(firstName, which = "both")) %>%
+        rename(lastName = V3) %>%
+        select(firstName, lastName)
+    })
+
+    co_pis <- do.call("rbind", co_pis) %>%
+      mutate(role = "coPrincipalInvestigator")
+
+    pis <- lapply(result, function(x){
+      n <- stringi::stri_split_fixed(unlist(x$response$award$pdPIName), pattern = " ", simplify = T) %>%
+        as.data.frame(stringsAsFactors = F) %>%
+        unite("firstName", V1, V2, sep = " ") %>%
+        mutate(firstName = trimws(firstName, which = "both")) %>%
+        rename(lastName = V3) %>%
+        select(firstName, lastName)
+    })
+
+    pis <- do.call("rbind", pis) %>%
+      mutate(role = "principalInvestigator")
+
+    people <- bind_rows(co_pis, pis)
+    p_list <- list()
+
+    for (i in 1:nrow(people)){
+      p_list[[i]] <- eml_personnel(given_names = people$firstName[i],
+                                   sur_name = people$lastName[i],
+                                   role = people$role[i])
+    }
+
+    titles <- lapply(result, function(x){
+      unlist(x$response$award$title)
+    })
+
+    proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+  }
+  else if (length(award_nums) == 0){
+    stop(call. = F,
+         "No valid award numbers were found.")
+  }
+
+}
