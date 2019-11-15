@@ -24,19 +24,22 @@ Depends:
 Imports:
     dataone,
     datapack,
+    dplyr,
     digest,
     EML (>= 2.0),
     httr,
+    jsonlite,
     magrittr,
     methods,
+    rlang,
     stringr,
     stringi,
+    tidyr,
     tools,
     uuid,
     xml2,
     XML
 Suggests:
-    dplyr,
     humaniformat,
     knitr,
     lubridate,
