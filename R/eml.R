@@ -1040,7 +1040,7 @@ reorder_pids <- function(pid_list, doc){
 eml_nsf_to_project <- function(awards, eml_version = "2.1"){
 
   stopifnot(is.character(awards))
-  stopifnot(eml_version %in% c("2.1", "2.1.0", "2.2", "2.2.0"))
+  stopifnot(eml_version %in% c("2.1", "2.1.1", "2.2", "2.2.0"))
 
   award_nums <- awards
 
@@ -1060,71 +1060,72 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
     else t
   })
 
-
   i <- lapply(result, function(x) {!is.null(x)})
   result <- result[unlist(i)]
   award_nums <- award_nums[unlist(i)]
 
-  if (length(award_nums) > 0){
-    co_pis <- lapply(result, function(x){
-      stringi::stri_split_fixed(unlist(x$response$award$coPDPI), pattern = " ", simplify = T) %>%
-        as.data.frame(stringsAsFactors = F) %>%
-        tidyr::unite("firstName", .data$V1, .data$V2, sep = " ") %>%
-        dplyr::mutate(firstName = trimws(.data$firstName, which = "both")) %>%
-        dplyr::rename(lastName = .data$V3) %>%
-        dplyr::select(.data$firstName, .data$lastName)
-    })
-
-    co_pis <- do.call("rbind", co_pis) %>%
-      dplyr::mutate(role = "coPrincipalInvestigator")
-
-    pis <- lapply(result, function(x){
-      n <- stringi::stri_split_fixed(unlist(x$response$award$pdPIName), pattern = " ", simplify = T) %>%
-        as.data.frame(stringsAsFactors = F) %>%
-        tidyr::unite("firstName", .data$V1, .data$V2, sep = " ") %>%
-        dplyr::mutate(firstName = trimws(.data$firstName, which = "both")) %>%
-        dplyr::rename(lastName = .data$V3) %>%
-        dplyr::select(.data$firstName, .data$lastName)
-    })
-
-    pis <- do.call("rbind", pis) %>%
-      dplyr::mutate(role = "principalInvestigator")
-
-    people <- dplyr::bind_rows(co_pis, pis)
-
-    p_list <- list()
-    for (i in 1:nrow(people)){
-      p_list[[i]] <- eml_personnel(given_names = people$firstName[i],
-                                   sur_name = people$lastName[i],
-                                   role = people$role[i])
-    }
-
-    titles <- lapply(result, function(x){
-      unlist(x$response$award$title)
-    })
-
-    if (eml_version %in% c("2.1", "2.1.1")){
-      award_nums <- paste("NSF", award_nums)
-      proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
-    }
-    else if (eml_version %in% c("2.2", "2.2.0")){
-      awards <- list()
-
-      for (i in 1:length(award_nums)){
-        awards[[i]] <- list(title = titles[i],
-                            funderName = "National Science Foundation",
-                            funderIdentifier = "https://doi.org/10.13039/00000001",
-                            awardNumber = award_nums[i],
-                            awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
-      }
-
-      proj <- list(title = titles, personnel = p_list, award = awards)
-    }
-
-  }
-  else if (length(award_nums) == 0){
+  if (length(award_nums) == 0){
     stop(call. = F,
          "No valid award numbers were found.")
   }
+
+  # create function to extract first name and middle initial (if present)
+  # as firstName, and whatever else exists as lastName
+  extract_name <- function(x){
+    lapply(x, function(x) {
+      data.frame(
+        firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
+        lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
+        stringsAsFactors = F)})
+  }
+
+  co_pis <- lapply(result, function(x){
+    extract_name(x$response$award$coPDPI)
+  })
+
+  co_pis <- unlist(co_pis, recursive = F)
+  co_pis <- do.call("rbind", co_pis) %>%
+    dplyr::mutate(role = "coPrincipalInvestigator")
+
+  pis <- lapply(result, function(x){
+    extract_name(x$response$award$pdPIName)
+  })
+
+  pis <- unlist(pis, recursive = F)
+  pis <- do.call("rbind", pis) %>%
+    dplyr::mutate(role = "principalInvestigator")
+
+  people <- dplyr::bind_rows(co_pis, pis)
+
+  p_list <- list()
+  for (i in 1:nrow(people)){
+    p_list[[i]] <- eml_personnel(given_names = people$firstName[i],
+                                 sur_name = people$lastName[i],
+                                 role = people$role[i])
+  }
+
+  titles <- lapply(result, function(x){
+    unlist(x$response$award$title)
+  })
+
+  if (eml_version %in% c("2.1", "2.1.1")){
+    award_nums <- paste("NSF", award_nums)
+    proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+  }
+  else if (eml_version %in% c("2.2", "2.2.0")){
+    awards <- list()
+
+    for (i in 1:length(award_nums)){
+      awards[[i]] <- list(title = titles[i],
+                          funderName = "National Science Foundation",
+                          funderIdentifier = "https://doi.org/10.13039/00000001",
+                          awardNumber = award_nums[i],
+                          awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
+    }
+
+    proj <- list(title = titles, personnel = p_list, award = awards)
+  }
+
+
 
 }
