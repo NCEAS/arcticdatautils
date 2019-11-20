@@ -31,7 +31,6 @@ Imports:
     jsonlite,
     magrittr,
     methods,
-    rlang,
     stringr,
     stringi,
     tools,

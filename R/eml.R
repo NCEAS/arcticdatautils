@@ -1019,7 +1019,6 @@ reorder_pids <- function(pid_list, doc){
 #' @return project (emld) An EML project section
 #'
 #' @export
-#' @importFrom rlang .data
 #'
 #' @examples
 #' awards <- c("1203146", "1203473", "1603116")
