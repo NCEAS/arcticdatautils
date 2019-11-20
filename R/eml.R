@@ -1006,3 +1006,125 @@ reorder_pids <- function(pid_list, doc){
   ordered_pids <- pid_list[order(match(names(pid_list), entity_names))]
   return(ordered_pids)
 }
+
+#' Create an EML project section from a list of NSF award numbers
+#'
+#' This function takes a list of NSF award numbers and uses it to
+#' query the NSF API to get the award title, PIs, and coPIs. The
+#' return value is an EML project section. The function supports 1
+#' or more award numbers
+#'
+#' @param awards (list) A list of NSF award numbers as characters
+#' @param eml_version (char) EML version to use (2.1.1 or 2.2.0)
+#' @return project (emld) An EML project section
+#'
+#' @export
+#'
+#' @examples
+#' awards <- c("1203146", "1203473", "1603116")
+#'
+#' proj <- eml_nsf_to_project(awards, eml_version = "2.1.1")
+#'
+#' me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+#'
+#' doc <- list(packageId = "id", system = "system",
+#'            dataset = list(title = "A Mimimal Valid EML Dataset",
+#'                           creator = me,
+#'                           contact = me))
+#'
+#' doc$dataset$project <- proj
+#'
+#' EML::eml_validate(doc)
+#'
+eml_nsf_to_project <- function(awards, eml_version = "2.1"){
+
+  stopifnot(is.character(awards))
+  stopifnot(eml_version %in% c("2.1", "2.1.1", "2.2", "2.2.0"))
+
+  award_nums <- awards
+
+  result <- lapply(award_nums, function(x){
+    url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
+
+    t <- jsonlite::fromJSON(url)
+
+    if ("serviceNotification" %in% names(t$response)) {
+      warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."), call. = FALSE)
+      t <- NULL
+    }
+    else if (length(t$response$award) == 0){
+      warning(paste("Empty result for award", x, "\n this award will not be included in the project section."), call. = FALSE)
+      t <- NULL
+    }
+    else t
+  })
+
+  i <- lapply(result, function(x) {!is.null(x)})
+  result <- result[unlist(i)]
+  award_nums <- award_nums[unlist(i)]
+
+  if (length(award_nums) == 0){
+    stop(call. = F,
+         "No valid award numbers were found.")
+  }
+
+  co_pis <- lapply(result, function(x){
+    extract_name(x$response$award$coPDPI)
+  })
+
+  co_pis <- unlist(co_pis, recursive = F)
+  co_pis <- do.call("rbind", co_pis) %>%
+    dplyr::mutate(role = "coPrincipalInvestigator")
+
+  pis <- lapply(result, function(x){
+    extract_name(x$response$award$pdPIName)
+  })
+
+  pis <- unlist(pis, recursive = F)
+  pis <- do.call("rbind", pis) %>%
+    dplyr::mutate(role = "principalInvestigator")
+
+  people <- dplyr::bind_rows(co_pis, pis)
+
+  p_list <- list()
+  for (i in 1:nrow(people)){
+    p_list[[i]] <- eml_personnel(given_names = people$firstName[i],
+                                 sur_name = people$lastName[i],
+                                 role = people$role[i])
+  }
+
+  titles <- lapply(result, function(x){
+    unlist(x$response$award$title)
+  })
+
+  if (eml_version %in% c("2.1", "2.1.1")){
+    award_nums <- paste("NSF", award_nums)
+    proj <- eml_project(title = titles, personnelList = p_list, funding = award_nums)
+  }
+  else if (eml_version %in% c("2.2", "2.2.0")){
+    awards <- list()
+
+    for (i in 1:length(award_nums)){
+      awards[[i]] <- list(title = titles[i],
+                          funderName = "National Science Foundation",
+                          funderIdentifier = "https://doi.org/10.13039/00000001",
+                          awardNumber = award_nums[i],
+                          awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
+    }
+
+    proj <- list(title = titles, personnel = p_list, award = awards)
+    return(proj)
+  }
+}
+
+# Extract first and last name from NSF API results
+#
+# The NSF API jams the first name, last name, and middle initial if it exists into a single string.
+# This simple helper uses some regex to split the names up.
+extract_name <- function(x){
+  lapply(x, function(x) {
+    data.frame(
+      firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
+      lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
+      stringsAsFactors = F)})
+}
