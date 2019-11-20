@@ -1068,16 +1068,6 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
          "No valid award numbers were found.")
   }
 
-  # create function to extract first name and middle initial (if present)
-  # as firstName, and whatever else exists as lastName
-  extract_name <- function(x){
-    lapply(x, function(x) {
-      data.frame(
-        firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
-        lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
-        stringsAsFactors = F)})
-  }
-
   co_pis <- lapply(result, function(x){
     extract_name(x$response$award$coPDPI)
   })
@@ -1123,8 +1113,18 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
     }
 
     proj <- list(title = titles, personnel = p_list, award = awards)
+    return(proj)
   }
+}
 
-
-
+# Extract first and last name from NSF API results
+#
+# The NSF API jams the first name, last name, and middle initial if it exists into a single string.
+# This simple helper uses some regex to split the names up.
+extract_name <- function(x){
+  lapply(x, function(x) {
+    data.frame(
+      firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
+      lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
+      stringsAsFactors = F)})
 }
