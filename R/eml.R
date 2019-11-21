@@ -1073,8 +1073,10 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
   })
 
   co_pis <- unlist(co_pis, recursive = F)
-  co_pis <- do.call("rbind", co_pis) %>%
-    dplyr::mutate(role = "coPrincipalInvestigator")
+  co_pis <- do.call("rbind", co_pis)
+  if (!is.null(co_pis)){
+    co_pis$role <- "coPrincipalInvestigator"
+  }
 
   pis <- lapply(result, function(x){
     extract_name(x$response$award$pdPIName)
