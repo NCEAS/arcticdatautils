@@ -303,3 +303,82 @@ test_that('reorder_pids fails gracefully', {
 
   expect_error(reorder_pids(pid_list, doc))
 })
+
+test_that('eml_nsf_to_project generates a valid project section', {
+
+  # for a single award, EML 2.1.1
+  awards <- "1203146"
+  proj <- eml_nsf_to_project(awards)
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc$dataset$project <- proj
+
+  expect_true(eml_validate(doc))
+
+  # for multiple awards, EML 2.1.1
+  awards <- c("1203146", "1203473", "1603116")
+
+  proj <- eml_nsf_to_project(awards)
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc$dataset$project <- proj
+
+  expect_true(eml_validate(doc))
+
+  # for multiple awards, EML 2.2.0
+  awards <- c("1203146", "1203473", "1603116")
+
+  emld::eml_version("eml-2.2.0")
+  proj <- eml_nsf_to_project(awards, eml_version = "2.2")
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc$dataset$project <- proj
+
+  expect_true(eml_validate(doc))
+
+})
+
+test_that('eml_nsf_to_project handles bad funding numbers gracefully', {
+
+  awards <- c("abcdef", "1203473", "12345")
+
+  expect_warning(proj <- eml_nsf_to_project(awards), "this award will not be included in the project section")
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc$dataset$project <- proj
+
+  expect_true(eml_validate(doc))
+})
+
+test_that('eml_nsf_to_project fails gracefully', {
+
+  awards <- c("abcdef", "12345")
+  expect_error(suppressWarnings(proj <- eml_nsf_to_project(awards)), "No valid award numbers were found")
+
+})
+
+
