@@ -49,7 +49,8 @@ access policies are not affected.}
 Checks that objects exist and are of the right format type. This speeds up the function, especially when \code{data_pids} has many elements.}
 
 \item{format_id}{(character) Optional. When omitted, the updated object will have the same formatId as \code{metadata_pid}. If set, will attempt
-to use the value instead.}
+to use the value instead.
+@param keep_prov (logical) Option to force publish_update to keep prov}
 }
 \value{
 (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.

@@ -29,6 +29,8 @@ nested under the package.}
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as
 arguments exist on the MN before continuing. This speeds up the function,
 especially when \code{data_pids} has many elements.}
+
+\item{keep_prov}{(character) Option to force prov to be forwarded into new resource map}
 }
 \value{
 (character) The PID of the updated resource map.

@@ -255,6 +255,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 #'   Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
 #' @param format_id (character) Optional. When omitted, the updated object will have the same formatId as `metadata_pid`. If set, will attempt
 #'   to use the value instead.
+#'   @param keep_prov (logical) Option to force publish_update to keep prov
 #'
 #' @return (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 #'
@@ -689,6 +690,7 @@ create_resource_map <- function(mn,
 #' @param resource_map_pid (character) The PID of the resource map to be updated.
 #' @param other_statements (data.frame) Extra statements to add to the resource map.
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
+#' @param keep_prov (character) Option to force prov to be forwarded into new resource map
 #'
 #' @return (character) The PID of the updated resource map.
 #'
