@@ -755,7 +755,10 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
 
   ## return eml
   if (validate_eml == TRUE) {
-    eml_validate(doc)
+    valid_eml <- eml_validate(doc)
+    if (!valid_eml) {
+      return(attributes(valid_eml))
+    }
   }
   return(doc)
 }
