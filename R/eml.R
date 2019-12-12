@@ -712,17 +712,17 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
 
   ## set OE entityTypes to NULL and select the ones we want to use
 
-  if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1){
+  if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1) {
     ## prepare OE to copy
     otherEntity <- doc$dataset$otherEntity
+    ## If there are copies of entities from the editor then otherEnt can incorrectly be a list
+    if (is.null(names(otherEntity))) {
+      otherEntity <- otherEntity[[1]]
+    }
     otherEntity$entityType <- NULL
-    otherEntity <- list(otherEntity)
     ## delete otherEntity from list
     doc$dataset$otherEntity <- NULL
-  }
-
-
-  else {
+  } else {
     otherEntity <- doc$dataset$otherEntity[index]
 
     for (i in 1:length(index)){
@@ -738,8 +738,7 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   ## handle various datatable length cases
   if (length(dts) == 0){
     doc$dataset$dataTable <- otherEntity
-  }
-  else{
+  } else{
     if (length(eml_get_simple(dts, "entityName")) == 1){
       dts <- list(dts)
       doc$dataset$dataTable <- c(dts, otherEntity)
@@ -750,16 +749,14 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
     }
   }
 
-
-
-
   ## return eml
   if (validate_eml == TRUE) {
     valid_eml <- eml_validate(doc)
     if (!valid_eml) {
-      return(attributes(valid_eml))
+      stop(attributes(valid_eml))
     }
   }
+
   return(doc)
 }
 
