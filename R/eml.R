@@ -1086,7 +1086,8 @@ eml_nsf_to_project <- function(awards, eml_version = "2.1"){
   pis <- do.call("rbind", pis) %>%
     dplyr::mutate(role = "principalInvestigator")
 
-  people <- dplyr::bind_rows(co_pis, pis)
+  people <- dplyr::bind_rows(co_pis, pis) %>%
+    dplyr::distinct()
 
   p_list <- list()
   for (i in 1:nrow(people)){
