@@ -715,7 +715,7 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1) {
     ## prepare OE to copy
     otherEntity <- doc$dataset$otherEntity
-    ## If there are copies of entities from the editor then otherEnt can incorrectly be a list
+    ## Handle case where otherEntity is in a list of length 1 (boxed)
     if (is.null(names(otherEntity))) {
       otherEntity <- otherEntity[[1]]
     }
