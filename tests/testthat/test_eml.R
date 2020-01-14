@@ -134,6 +134,7 @@ test_that("eml_otherEntity_to_dataTable works", {
   }
 
   doc <- read_eml(system.file("example-eml.xml", package = "arcticdatautils"))
+  doc$dataset$otherEntity$attributeList <- EML::set_attributes(create_dummy_attributes_dataframe(1))
   otherEntity <- doc$dataset$otherEntity
 
   doc <- eml_otherEntity_to_dataTable(doc, 1)
@@ -142,8 +143,8 @@ test_that("eml_otherEntity_to_dataTable works", {
   expect_length(doc$dataset$otherEntity, 0)
 
   # test that dataTable was added
-  expect_equal(otherEntity$entityName, doc$dataset$dataTable[[1]]$entityName)
-  expect_equivalent(otherEntity$physical, doc$dataset$dataTable[[1]]$physical)
+  expect_equal(otherEntity$entityName, doc$dataset$dataTable$entityName)
+  expect_equivalent(otherEntity$physical, doc$dataset$dataTable$physical)
 })
 
 test_that("which_in_eml returns correct locations", {
