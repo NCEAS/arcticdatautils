@@ -230,7 +230,6 @@ set_access <- function(mn, pids, subjects, permissions = c("read", "write", "cha
       message(paste0("Updating System Metadata for ", pid, "."))
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     } else {
-      message(paste0("No changes needed for ", pid, ". Not updating."))
       result[pid] <- FALSE
     }
   }
@@ -325,7 +324,6 @@ remove_access <- function(mn, pids, subjects, permissions = c("read", "write", "
       message(paste0("Updating System Metadata for ", pid, "."))
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     } else {
-      message(paste0("No changes needed for ", pid, ". Not updating."))
       result[pid] <- FALSE
     }
   }
@@ -446,8 +444,6 @@ set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "wr
       if (inherits(update_response, "error")) {
         stop("Failed update.")
       }
-    } else {
-      message(paste0("No changes needed for ", pid, "."))
     }
 
     # Save the result for this PID
