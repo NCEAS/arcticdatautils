@@ -286,7 +286,7 @@ test_that("publish_update removes 'resource_map_pid' from 'parent_child_pids' ar
                            parent_child_pids = child$resource_map, check_first = F)
   parent <- get_package(mn, child$parent_resource_map)
 
-  expect_equal(child$resource_map, parent$child_packages)
+  expect_equivalent(child$resource_map, parent$child_packages)
 })
 
 test_that("publish_update errors if the non-current resource map or metadata pid is provided", {
