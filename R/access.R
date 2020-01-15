@@ -118,11 +118,9 @@ set_rights_holder <- function(mn, pids, subject) {
 
     # Change rightsHolder (if needed)
     if (sysmeta@rightsHolder == subject) {
-      message(paste0("rightsHolder field is already set to ", subject, ". System Metadata not updated."))
       result[i] <- TRUE
     } else {
       # Update System Metadata
-      message(paste0("Updating rightsHolder for PID ", pid, " from ", sysmeta@rightsHolder, " to ", subject, "."))
 
       sysmeta@rightsHolder <- subject
 
@@ -232,7 +230,6 @@ set_access <- function(mn, pids, subjects, permissions = c("read", "write", "cha
       message(paste0("Updating System Metadata for ", pid, "."))
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     } else {
-      message(paste0("No changes needed for ", pid, ". Not updating."))
       result[pid] <- FALSE
     }
   }
@@ -327,7 +324,6 @@ remove_access <- function(mn, pids, subjects, permissions = c("read", "write", "
       message(paste0("Updating System Metadata for ", pid, "."))
       dataone::updateSystemMetadata(mn, pid, sysmeta)
     } else {
-      message(paste0("No changes needed for ", pid, ". Not updating."))
       result[pid] <- FALSE
     }
   }
@@ -448,8 +444,6 @@ set_rights_and_access <- function(mn, pids, subject, permissions = c("read", "wr
       if (inherits(update_response, "error")) {
         stop("Failed update.")
       }
-    } else {
-      message(paste0("No changes needed for ", pid, "."))
     }
 
     # Save the result for this PID
