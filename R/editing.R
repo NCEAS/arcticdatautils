@@ -424,8 +424,6 @@ publish_update <- function(mn,
   # get the metadata sysmeta from the node
   metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
 
-  message("Downloaded EML and sysmeta...")
-
   # Generate PIDs for our updated objects
   if (is.null(identifier)) {
     if (use_doi) {
@@ -547,16 +545,12 @@ publish_update <- function(mn,
 
   set_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
-  message("Updated resource map")
-
   # Update the parent resource map to add the new package
   #######################################################
   if (!is.null(parent_resmap_pid)) {
     if (is.null(parent_metadata_pid)) {
       stop("Missing required parameters to update parent package.")
     }
-
-    message("Updating parent resource map...")
 
     # Check to see if the just-updated package is in the list of
     # parent_child_pids, notify the user, and add it to the list
@@ -627,7 +621,6 @@ create_resource_map <- function(mn,
             nchar(metadata_pid) > 0)
 
   if (check_first) {
-    message("Checking all the object passed in as arguments exist before going on...")
 
     stopifnot(object_exists(mn, metadata_pid))
     if (!is.null(data_pids))
@@ -726,7 +719,6 @@ update_resource_map <- function(mn,
             nchar(metadata_pid) > 0)
 
   if (check_first) {
-    message("Checking all the object passed in as arguments exist before going on...")
 
     stopifnot(object_exists(mn, resource_map_pid))
     stopifnot(object_exists(mn, metadata_pid))
@@ -762,7 +754,6 @@ update_resource_map <- function(mn,
 
   rm(sysmeta)
 
-  message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(is(sysmeta, "SystemMetadata"))
 
@@ -787,7 +778,6 @@ update_resource_map <- function(mn,
   }
 
   # Update it
-  message(paste0("Updating resource map..."))
   resmap_update_response <- dataone::updateObject(mn,
                                                   pid = resource_map_pid,
                                                   newpid = identifier,
