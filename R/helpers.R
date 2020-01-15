@@ -289,6 +289,7 @@ create_dummy_parent_package <- function(mn, children) {
 #' }
 create_dummy_attributes_dataframe <- function(numberAttributes, factors = NULL) {
   names <- vapply(seq_len(numberAttributes), function(x) { paste0("Attribute ", x)}, "")
+  domains <- rep("textDomain", numberAttributes)
 
   if(!is.null(factors)) {
     domains <- c(rep("textDomain", numberAttributes - length(factors)),
