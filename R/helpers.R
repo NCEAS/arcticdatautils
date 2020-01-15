@@ -32,8 +32,24 @@ create_dummy_metadata <- function(mn, data_pids = NULL) {
   # Copy the original EML file to a temporary place
   original_file <- file.path(system.file(package = "arcticdatautils"),
                              "example-eml.xml")
+  doc <- read_eml(original_file)
+
+  if (is.null(data_pids)){
+    doc$dataset$otherEntity <- NULL
+  }
+  else if (!is.null(data_pids)){
+    oe <- list()
+    for (i in 1:length(data_pids)){
+      oe[[i]] <- list(entityName = "dummy_object",
+                      entityDescription = data_pids[i],
+                      entityType = "text/plain")
+    }
+
+    doc$dataset$otherEntity <- oe
+  }
+
   metadata_file <- tempfile()
-  file.copy(original_file, metadata_file)
+  write_eml(doc, metadata_file)
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
@@ -648,9 +664,6 @@ read_zip_shapefile <- function(mn, pid){
 #' recover_failed_submission(mn, pid, path)
 #' eml <- EML::read_eml(path)
 #'}
-
-
-
 recover_failed_submission <- function(node, pid, path){
   stopifnot(is(node, "MNode"))
   stopifnot(is.character(pid), nchar(pid) > 0, arcticdatautils::object_exists(node, pid))
@@ -667,3 +680,36 @@ recover_failed_submission <- function(node, pid, path){
   EML::eml_validate(doc)
   EML::write_eml(doc, path)
 }
+
+#' Add prov to a dummy package
+#'
+#' Adds provenance information to a dummy package for testing
+#'
+#' @param mn member node (the ADC test node)
+#' @param rm_pid resource map identifier
+#'
+add_dummy_prov <- function(mn, rm_pid){
+  if (mn@env == "prod") {
+    stop("Cannot create dummy prov on a production node.")
+  }
+  if (mn@identifier == "urn:node:mnTestARCTIC"){
+    d1c <- dataone::D1Client("STAGING", "urn:node:mnTestARCTIC")
+  }
+  else if (mn@identifier != "urn:node:mnTestARCTIC"){
+    stop("Use the ADC test node")
+  }
+
+  pkg <- getDataPackage(d1c, id=rm_pid, lazyLoad=TRUE, limit="0MB", quiet=T)
+  objs <- selectMember(pkg, name="sysmeta@fileName", value='dummy_object')
+  if (length(objs) < 2){
+    stop(.call = FALSE,
+         "Dummy package must have at least 2 data objects")
+  }
+  sourceObjId <- selectMember(pkg, name="sysmeta@fileName", value='dummy_object')[[1]]
+  outputObjId <- selectMember(pkg, name="sysmeta@fileName", value='dummy_object')[[2]]
+
+  pkg <- describeWorkflow(pkg, sources=sourceObjId, derivations=outputObjId)
+
+  resmapId_new <- uploadDataPackage(d1c, pkg, public = TRUE, quiet = FALSE)
+}
+

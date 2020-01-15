@@ -6,7 +6,7 @@
 \usage{
 update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
   child_pids = NULL, other_statements = NULL, identifier = NULL,
-  public = TRUE, check_first = TRUE)
+  public = TRUE, check_first = TRUE, keep_prov = FALSE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}
@@ -29,6 +29,8 @@ nested under the package.}
 \item{check_first}{(logical) Optional. Whether to check the PIDs passed in as
 arguments exist on the MN before continuing. This speeds up the function,
 especially when \code{data_pids} has many elements.}
+
+\item{keep_prov}{(character) Option to force prov to be forwarded into new resource map}
 }
 \value{
 (character) The PID of the updated resource map.

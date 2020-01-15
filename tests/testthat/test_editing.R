@@ -302,217 +302,6 @@ test_that("publish_update errors if the non-current resource map or metadata pid
 })
 
 
-test_that("update_physical works", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  pkg <- create_dummy_package_full(mn, title = "Update physical check")
-
-  file.create("dummy_object.csv")
-
-  new_data_pid <- update_object(mn,
-                                pid = pkg$data[2],
-                                path = "dummy_object.csv",
-                                format_id = "text/csv")
-
-  unlink("dummy_object.csv")
-
-  pkg_new <- publish_update(mn,
-                            resource_map_pid = pkg$resource_map,
-                            metadata_pid = pkg$metadata,
-                            data_pids = c(pkg$data[-2], new_data_pid))
-
-  eml_original <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
-
-  eml_new <- update_physical(eml_original,
-                             mn,
-                             data_pid = pkg$data[2],
-                             new_data_pid = new_data_pid)
-
-  t <- tempfile()
-  write_eml(eml_new, t)
-  eml_new <- read_eml(t)
-
-  url_original <- eml_get(eml_original, "url") %>% grep("^http", ., value = T) %>% unname()
-  url_new <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
-
-  expect_equal(sum(stringr::str_detect(url_original, pkg$data[1])), 1)
-  expect_equal(sum(stringr::str_detect(url_original, pkg$data[2])), 1)
-  expect_equal(sum(stringr::str_detect(url_original, pkg$data[3])), 1)
-  expect_equal(sum(stringr::str_detect(url_original, pkg$data[4])), 1)
-
-  expect_equal(sum(stringr::str_detect(url_new, new_data_pid)), 1)
-  expect_equal(sum(stringr::str_detect(url_new, pkg$data[1])), 1)
-  expect_equal(sum(stringr::str_detect(url_new, pkg$data[2])), 0)
-  expect_equal(sum(stringr::str_detect(url_new, pkg$data[3])), 1)
-  expect_equal(sum(stringr::str_detect(url_new, pkg$data[4])), 1)
-})
-
-test_that("update_package_object changes specified data object and rest of package is intact", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  pkg <- create_dummy_package_full(mn, title = "Check update_package_object")
-
-  new_data_path <- "test_file.csv"
-  dummy_data <- data.frame(col1 = 1:26, col2 = letters)
-  new_data_path <- tempfile(fileext = ".csv")
-  write.csv(dummy_data, new_data_path, row.names = FALSE)
-
-  data_pid <- pkg$data[2]
-
-  pkg_new <- update_package_object(mn,
-                                   data_pid = data_pid,
-                                   new_data_path = new_data_path,
-                                   resource_map_pid = pkg$resource_map,
-                                   format_id = "text/csv")
-
-  file.remove(new_data_path)
-
-  # test: other objects are retained
-  expect_equal(all(pkg$data[-2] %in% pkg_new$data), TRUE)
-
-  # test: metadata changes
-  expect_false(pkg$metadata == pkg_new$metadata)
-
-  # test: new data PID is a version of old data PID
-  versions <- get_all_versions(mn, data_pid)
-  latest_version <- versions[length(versions)]
-
-  new_data_pid <- pkg_new$data[!pkg_new$data %in% pkg$data]
-
-  expect_equal(latest_version, new_data_pid)
-
-  # test: EML is updated
-  eml_original <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
-
-  eml_new <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg_new$metadata)))
-
-  url_original <- eml_get(eml_original, "url") %>% grep("^http", ., value = T) %>% unname()
-  url_new <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
-
-  expect_true(url_original[2] != url_new[2])
-  expect_equal(url_original[1], url_new[1])
-  expect_equal(url_original[3], url_new[3])
-  expect_equal(url_original[4], url_new[4])
-
-  expect_true(stringr::str_detect(url_new[2], new_data_pid))
-})
-
-test_that("update_package_object errors if wrong input", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  file_path <- tempfile(fileext = ".csv")
-
-  expect_error(update_package_object(LETTERS,
-                                     data_pid = file_path,
-                                     new_data_path = "something",
-                                     rm_pid = "something"))
-
-  expect_error(update_package_object(mn,
-                                     data_pid = c(1, 2),
-                                     new_data_path = "something",
-                                     rm_pid = "something"))
-
-  expect_error(update_package_object(mn,
-                                     data_pid = "something",
-                                     new_data_path = "something",
-                                     rm_pid = "something"))
-
-  expect_error(update_package_object(mn,
-                                     data_pid = "something",
-                                     new_data_path = TRUE,
-                                     rm_pid = "something"))
-
-  expect_error(update_package_object(mn,
-                                     data_pid = file_path,
-                                     new_data_path = "something",
-                                     rm_pid = 1))
-  unlink(file_path)
-})
-
-test_that("update_package_object updates EML", {
-  if (!is_token_set(mn)) {
-    skip("No token set. Skipping test.")
-  }
-
-  pkg <- create_dummy_package(mn, size = 4)
-
-  attributes1 <- data.frame(
-    attributeName = c("col1", "col2"),
-    attributeDefinition = c("Numbers", "Letters in the alphabet"),
-    measurementScale = c("ratio", "nominal"),
-    domain = c("numericDomain", "textDomain"),
-    formatString = c(NA, NA),
-    definition = c(NA, "ABCDEFG..."),
-    unit = c("dimensionless", NA),
-    numberType = c("integer", NA),
-    missingValueCode = c(NA, NA),
-    missingValueCodeExplanation = c(NA, NA),
-    stringsAsFactors = FALSE)
-
-  attributeList1 <- EML::set_attributes(attributes1)
-  phys <- pid_to_eml_physical(mn, pkg$data[1])
-
-  dummy_data_table <- list(entityName = "Dummy Data Table",
-                          entityDescription = "Dummy Description",
-                          physical = phys,
-                          attributeList = attributeList1)
-
-  doc <- EML::read_eml(rawToChar(getObject(mn, pkg$metadata)))
-  doc$dataset$dataTable <- dummy_data_table
-
-  otherEnts <- list(pid_to_eml_entity(mn, pkg$data[2], entityType = "otherEntity"),
-                    pid_to_eml_entity(mn, pkg$data[3], entityType = "otherEntity"))
-  doc$dataset$otherEntity <- otherEnts
-
-  eml_path <- tempfile(fileext = ".xml")
-  EML::write_eml(doc, eml_path)
-
-  pkg <- publish_update(mn,
-                        metadata_pid = pkg$metadata,
-                        resource_map_pid = pkg$resource_map,
-                        data_pids = pkg$data,
-                        metadata_path = eml_path,
-                        public = TRUE,
-                        use_doi = FALSE)
-
-  dummy_data <- data.frame(col1 = 1:26, col2 = letters)
-  new_data_path <- tempfile(fileext = ".csv")
-  write.csv(dummy_data, new_data_path, row.names = FALSE)
-
-  data_pid <- pkg$data[1]
-
-  pkg_new <- update_package_object(mn,
-                                   data_pid,
-                                   new_data_path,
-                                   pkg$resource_map,
-                                   format_id = "text/csv",
-                                   public = TRUE,
-                                   use_doi = FALSE)
-
-  doc <- read_eml(getObject(mn, pkg$metadata))
-  url_initial <- eml_get(doc, "url") %>% grep("^http", ., value = T) %>% unname()
-  expect_equal(sum(stringr::str_count(url_initial, data_pid)), 1)
-
-  eml_new <- EML::read_eml(rawToChar(getObject(mn, pkg_new$metadata)))
-  url_final <- eml_get(eml_new, "url") %>% grep("^http", ., value = T) %>% unname()
-  expect_equal(sum(stringr::str_count(url_final, data_pid)), 0)
-
-  pid_matches <- lapply(seq_along(pkg_new$data),
-                        function(i) {stringr::str_count(url_final, pkg_new$data[i])})
-
-  # confirm that URLs have a matching PID
-  # if new PID corresponds to a dataset that had a dataTable/otherEntity
-  # and has not been updated, expect_equal will error
-  expect_equal(sum(unlist(pid_matches)),
-               length(url_final))
-})
-
 test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
@@ -528,4 +317,63 @@ test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", 
   sm <- getSystemMetadata(mn, pkg$metadata)
 
   expect_equal(sm@formatId, format_eml("2.2"))
+})
+
+test_that("PROV is carried forward if data pids don't change", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <- suppressMessages(add_dummy_prov(mn, package$resource_map))
+
+  # Publish an update on it
+  update <- publish_update(mn,
+                           package$metadata,
+                           package_prov,
+                           package$data,
+                           check_first = FALSE)
+
+  t <- recover_prov(mn, update$resource_map)
+
+  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/|https://cn-stage.test.dataone.org/cn/v[0-9]/resolve/", "", c(t$subject, t$object)) %>%
+    gsub("%3A", ":", .)
+  prov_pids <- prov_pids[-(grep("^http", prov_pids))] %>%
+    unique(.)
+
+  expect_equal(sort(prov_pids), sort(update$data))
+
+})
+
+test_that("PROV is handled with appropriate warnings", {
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <-  suppressMessages(add_dummy_prov(mn, package$resource_map))
+  data_new <- create_dummy_object(mn)
+  # Publish an update on it
+  expect_warning(update <- publish_update(mn,
+                           package$metadata,
+                           package_prov,
+                           data_new,
+                           keep_prov = TRUE,
+                           check_first = FALSE), "Provenance information is retained")
+
+  # Make a test package and add prov
+  package <- create_dummy_package(mn, size = 3)
+  package_prov <- suppressMessages(add_dummy_prov(mn, package$resource_map))
+  data_new <- create_dummy_object(mn)
+
+  # Publish an update on it
+  expect_warning(update <- publish_update(mn,
+                                          package$metadata,
+                                          package_prov,
+                                          data_new,
+                                          keep_prov = FALSE,
+                                          check_first = FALSE), "Provenance information will be removed")
+
 })

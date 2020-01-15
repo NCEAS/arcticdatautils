@@ -255,6 +255,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 #'   Checks that objects exist and are of the right format type. This speeds up the function, especially when `data_pids` has many elements.
 #' @param format_id (character) Optional. When omitted, the updated object will have the same formatId as `metadata_pid`. If set, will attempt
 #'   to use the value instead.
+#'   @param keep_prov (logical) Option to force publish_update to keep prov
 #'
 #' @return (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
 #'
@@ -292,7 +293,8 @@ publish_update <- function(mn,
                            parent_child_pids = NULL,
                            public = TRUE,
                            check_first = TRUE,
-                           format_id = NULL) {
+                           format_id = NULL,
+                           keep_prov = FALSE) {
 
   # Don't allow setting a dataset to private when it uses a DOI
   if (use_doi && !public) {
@@ -424,8 +426,6 @@ publish_update <- function(mn,
   # get the metadata sysmeta from the node
   metadata_sysmeta <- dataone::getSystemMetadata(mn, metadata_pid)
 
-  message("Downloaded EML and sysmeta...")
-
   # Generate PIDs for our updated objects
   if (is.null(identifier)) {
     if (use_doi) {
@@ -543,11 +543,11 @@ publish_update <- function(mn,
                                                     child_pids = child_pids,
                                                     identifier = resmap_updated_pid,
                                                     public = public,
-                                                    check_first = check_first)
+                                                    check_first = check_first,
+                                                    keep_prov = keep_prov)
 
   set_rights_holder(mn, response[["resource_map"]], metadata_sysmeta@rightsHolder)
 
-  message("Updated resource map")
 
   # Update the parent resource map to add the new package
   #######################################################
@@ -555,8 +555,6 @@ publish_update <- function(mn,
     if (is.null(parent_metadata_pid)) {
       stop("Missing required parameters to update parent package.")
     }
-
-    message("Updating parent resource map...")
 
     # Check to see if the just-updated package is in the list of
     # parent_child_pids, notify the user, and add it to the list
@@ -571,7 +569,8 @@ publish_update <- function(mn,
                                                              data_pids = parent_data_pids,
                                                              child_pids = parent_child_pids,
                                                              public = public,
-                                                             check_first = check_first)
+                                                             check_first = check_first,
+                                                             keep_prov = keep_prov)
 
     set_rights_holder(mn, response[["parent_resource_map"]], metadata_sysmeta@rightsHolder)
   }
@@ -691,6 +690,7 @@ create_resource_map <- function(mn,
 #' @param resource_map_pid (character) The PID of the resource map to be updated.
 #' @param other_statements (data.frame) Extra statements to add to the resource map.
 #' @param identifier (character) Manually specify the identifier for the new metadata object.
+#' @param keep_prov (character) Option to force prov to be forwarded into new resource map
 #'
 #' @return (character) The PID of the updated resource map.
 #'
@@ -716,7 +716,8 @@ update_resource_map <- function(mn,
                                 other_statements = NULL,
                                 identifier = NULL,
                                 public = TRUE,
-                                check_first = TRUE) {
+                                check_first = TRUE,
+                                keep_prov = FALSE) {
 
   # Check arguments
   stopifnot(is(mn, "MNode"))
@@ -749,20 +750,69 @@ update_resource_map <- function(mn,
   me <- get_token_subject()
   set_rights_holder(mn, resource_map_pid, me)
 
+  # Get the old resource map so we can extract any statements we need out of it
+  # such as PROV statements
+  old_resource_map_path <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, resource_map_pid)), old_resource_map_path)
+  statements <- parse_resource_map(old_resource_map_path)
+  statements <- filter_packaging_statements(statements)
+  if (is.data.frame(other_statements)) {
+    statements <- rbind(statements,
+                        other_statements)
+  }
+
+  prov_pids <- gsub("https://cn-stage-2.test.dataone.org/cn/v[0-9]/resolve/|https://cn.dataone.org/cn/v[0-9]/resolve/|https://cn-stage.test.dataone.org/cn/v[0-9]/resolve/",
+                    "",
+                    c(statements$subject, statements$object)) %>%
+    gsub("%3A", ":", .)
+  prov_pids <- prov_pids[-(grep("^http", prov_pids))] %>% # might need to catch other things besides URLs
+    unique(.)
+
   # Create the replacement resource map
   if (is.null(identifier)) {
     identifier <- paste0("resource_map_", new_uuid())
   }
 
-  new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+  if (keep_prov == FALSE){
+    if (is.null(prov_pids)){
+      new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                           data_pids = data_pids,
+                                           child_pids = child_pids,
+                                           resource_map_pid = identifier)
+    }
+    else if (any(prov_pids %in% data_pids == FALSE)){
+      warning("Old provenance contains data pids not in new resource map. Provenance information will be removed. \n
+            You can get old provenance statements back using:
+            old_prov <- recover_prov(mn, rm_pid)
+            rm_new <- update_resource_map(mn, rm_pid, metadata_pid, data_pids, other_statements = old_prov, keep_prov = T)")
+
+    new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
                                        data_pids = data_pids,
                                        child_pids = child_pids,
                                        resource_map_pid = identifier)
+    }
+    else if (all(prov_pids %in% data_pids) == TRUE) {
+      new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                           data_pids = data_pids,
+                                           child_pids = child_pids,
+                                           other_statements = statements,
+                                           resource_map_pid = identifier)
+    }
+  }
+  else if (keep_prov == TRUE) {
+    if (any(prov_pids %in% data_pids == FALSE)){
+      warning("Old provenance contains data pids not in new resource map. Provenance information is retained since keep_prov is set to TRUE")
+    }
+    new_rm_path <- generate_resource_map(metadata_pid = metadata_pid,
+                                         data_pids = data_pids,
+                                         child_pids = child_pids,
+                                         other_statements = statements,
+                                         resource_map_pid = identifier)
+  }
   stopifnot(file.exists(new_rm_path))
 
   rm(sysmeta)
 
-  message(paste0("Getting updated copy of System Metadata for ", resource_map_pid))
   sysmeta <- dataone::getSystemMetadata(mn, resource_map_pid)
   stopifnot(is(sysmeta, "SystemMetadata"))
 
@@ -787,7 +837,6 @@ update_resource_map <- function(mn,
   }
 
   # Update it
-  message(paste0("Updating resource map..."))
   resmap_update_response <- dataone::updateObject(mn,
                                                   pid = resource_map_pid,
                                                   newpid = identifier,
@@ -847,181 +896,6 @@ set_file_name <- function(mn, pid, name) {
 }
 
 
-#' Update physical of an updated data object
-#'
-#' This function updates the EML with the new physical
-#' of a data object once it has been updated.
-#' This is a helper function for [update_package_object()].
-#'
-#' @param doc (emld) An EML object.
-#' @param mn (MNode) The Member Node of the data package.
-#' @param data_pid (character) The identifier of the data object to be updated.
-#' @param new_data_pid (character) The new identifier of the updated data object.
-#'
-#' @importFrom stringr str_detect
-#'
-#' @noRd
-update_physical <- function(doc, mn, data_pid, new_data_pid) {
-  stopifnot(is(doc, "emld"))
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(data_pid), nchar(data_pid) > 0)
-  stopifnot(is.character(new_data_pid), nchar(new_data_pid) > 0)
-
-  all_url <- eml_get(doc, "url") %>%
-    grep("^http", ., value = T) %>%
-    unname()
-
-  if (sum(stringr::str_detect(all_url, data_pid)) == 0) {
-    stop("The obsoleted data PID does not match any physical sections, so the EML will not be updated.")
-  }
-
-  if (length(doc$dataset$dataTable) != 0){
-    dataTable_url <- eml_get(doc$dataset$dataTable, "url") %>%
-      grep("^http", ., value = T) %>%
-      unname()
-
-    if (any(stringr::str_detect(dataTable_url, data_pid))) {
-      position <- which(stringr::str_detect(dataTable_url, data_pid))
-      new_phys <- pid_to_eml_physical(mn, new_data_pid)
-      if(all(is.null(names(doc$dataset$dataTable)))){
-        doc$dataset$dataTable[[position]]$physical <- new_phys
-      }
-      else if (all(is.null(names(doc$dataset$dataTable))) == F & position == 1){
-        doc$dataset$dataTable$physical <- new_phys
-      }
-    }
-  }
-
-  if (length(doc$dataset$otherEntity) != 0){
-    otherEntity_url <- eml_get(doc$dataset$otherEntity, "url") %>%
-      grep("^http", ., value = T) %>%
-      unname()
-
-    if (any(stringr::str_detect(otherEntity_url, data_pid))) {
-      position <- which(stringr::str_detect(otherEntity_url, data_pid))
-      new_phys <- pid_to_eml_physical(mn, new_data_pid)
-      if(all(is.null(names(doc$dataset$otherEntity)))){
-        doc$dataset$otherEntity[[position]]$physical <- new_phys
-      }
-      else if (all(is.null(names(doc$dataset$otherEntity))) == F & position == 1){
-        doc$dataset$otherEntity$physical <- new_phys
-      }
-    }
-  }
-
-  if (length(doc$dataset$spatialVector) != 0){
-    spatialVector_url <- eml_get(doc$dataset$spatialVector, "url") %>%
-      grep("^http", ., value = T) %>%
-      unname()
-
-    if (any(stringr::str_detect(spatialVector_url, data_pid))) {
-      position <- which(stringr::str_detect(spatialVector_url, data_pid))
-      new_phys <- pid_to_eml_physical(mn, new_data_pid)
-      if(all(is.null(names(doc$dataset$spatialVector)))){
-        doc$dataset$spatialVector[[position]]$physical <- new_phys
-      }
-      else if (all(is.null(names(doc$dataset$spatialVector))) == F & position == 1){
-        doc$dataset$spatialVector$physical <- new_phys
-      }
-    }
-  }
-
-  return(doc)
-}
-
-
-#' Update a data object and associated resource map and metadata
-#'
-#' This function updates a data object and then automatically
-#' updates the package resource map with the new data PID. If an object
-#' already has a `dataTable`, `otherEntity`, or `spatialVector`
-#' with a working physical section, the EML will be updated with the new physical.
-#' It is a convenience wrapper around [update_object()] and [publish_update()].
-#'
-#' @param mn (MNode) The Member Node of the data package.
-#' @param data_pid (character) PID for data object to update.
-#' @param new_data_path (character) Path to new data object.
-#' @param resource_map_pid (character) PID for resource map to update.
-#' @param format_id (character) Optional. The format ID to set for the object.
-#'   When not set, [guess_format_id()] will be used
-#'   to guess the format ID. Should be a \href{https://cn.dataone.org/cn/v2/formats}{DataONE format ID}.
-#' @param public (logical) Optional. Make the update public. If `FALSE`,
-#'   will set the metadata and resource map to private (but not the data objects).
-#'   This applies to the new metadata PID and its resource map and data object.
-#'   Access policies are not affected.
-#' @param use_doi (logical) Optional. If `TRUE`, a new DOI will be minted.
-#' @param ... Other arguments to pass into [publish_update()].
-#'
-#' @return (character) Named character vector of PIDs in the data package, including PIDs
-#' for the metadata, resource map, and data objects.
-#'
-#' @import dataone
-#' @import EML
-#'
-#' @export
-#'
-#' @seealso [update_object()] [publish_update()]
-#'
-#' @examples
-#' \dontrun{
-#' cnTest <- dataone::CNode("STAGING")
-#' mnTest <- dataone::getMNode(cnTest,"urn:node:mnTestARCTIC")
-#'
-#' pkg <- create_dummy_package_full(mnTest, title = "My package")
-#'
-#' file.create("new_file.csv")
-#' update_package_object(mnTest, pkg$data[1], "new_file.csv", pkg$resource_map, format_id = "text/csv")
-#' file.remove("new_file.csv")
-#' }
-update_package_object <- function(mn,
-                                  data_pid,
-                                  new_data_path,
-                                  resource_map_pid,
-                                  format_id = NULL,
-                                  public = TRUE,
-                                  use_doi = FALSE,
-                                  ...) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(data_pid), nchar(data_pid) > 0)
-  stopifnot(is.character(new_data_path), nchar(new_data_path) > 0, file.exists(new_data_path))
-  stopifnot(is.character(resource_map_pid), nchar(resource_map_pid) > 0)
-  stopifnot(is.logical(public))
-
-  pkg <- get_package(mn, resource_map_pid)
-  doc <- EML::read_eml(rawToChar(dataone::getObject(mn, pkg$metadata)))
-
-  new_data_pid <- update_object(mn,
-                                pid = data_pid,
-                                path = new_data_path,
-                                format_id = format_id)
-
-  other_data_pids <- pkg$data[which(pkg$data != data_pid)] # wrapped in which for better NA handling
-  new_data_pids <- c(other_data_pids, new_data_pid)
-
-  doc_new <- update_physical(doc = doc,
-                                      mn = mn,
-                                      data_pid = data_pid,
-                                      new_data_pid = new_data_pid)
-
-  eml_path <- tempfile()
-  EML::write_eml(doc_new, eml_path)
-
-  pkg_new <- publish_update(mn,
-                            metadata_pid = pkg$metadata,
-                            resource_map_pid = pkg$resource_map,
-                            metadata_path = eml_path,
-                            data_pids = new_data_pids,
-                            child_pids = pkg$child_packages,
-                            public = public,
-                            use_doi = use_doi,
-                            ...)
-
-  file.remove(eml_path)
-
-  cat("\nThe new data pid is:", new_data_pid)
-
-  return(pkg_new)
-}
 
 #' Helper for publish_object. Reformat the filName in system metadata.
 #'
@@ -1058,3 +932,23 @@ reformat_file_name <- function(path, sysmeta) {
 
   return(file_name)
 }
+
+#' Get a data.frame of prov statements from a resource map pid.
+#'
+#' This is a function that is useful if you need to recover lost prov statements. It returns
+#' a data.frame of statements that can be passed to `update_resource_map` in the `other_statements`
+#' argument.
+#'
+#' @param mn (mn) A memeber node instance
+#' @param rm_pid (character) A resource map identifier
+#' @return a data.frame of prov statments
+#' @export
+recover_prov <- function(mn, rm_pid){
+  old_resource_map_path <- tempfile()
+  writeLines(rawToChar(dataone::getObject(mn, rm_pid)), old_resource_map_path)
+  statements <- parse_resource_map(old_resource_map_path)
+  statements <- filter_packaging_statements(statements)
+  unlink(old_resource_map_path)
+  return(statements)
+}
+

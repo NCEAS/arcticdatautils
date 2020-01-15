@@ -9,7 +9,7 @@ publish_update(mn, metadata_pid, resource_map_pid, data_pids = NULL,
   use_doi = FALSE, parent_resmap_pid = NULL,
   parent_metadata_pid = NULL, parent_data_pids = NULL,
   parent_child_pids = NULL, public = TRUE, check_first = TRUE,
-  format_id = NULL)
+  format_id = NULL, keep_prov = FALSE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to update the object on.}
@@ -49,7 +49,8 @@ access policies are not affected.}
 Checks that objects exist and are of the right format type. This speeds up the function, especially when \code{data_pids} has many elements.}
 
 \item{format_id}{(character) Optional. When omitted, the updated object will have the same formatId as \code{metadata_pid}. If set, will attempt
-to use the value instead.}
+to use the value instead.
+@param keep_prov (logical) Option to force publish_update to keep prov}
 }
 \value{
 (character) Named character vector of PIDs in the data package, including PIDs for the metadata, resource map, and data objects.
