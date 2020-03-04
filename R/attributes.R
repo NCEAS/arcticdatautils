@@ -46,10 +46,14 @@ get_ncdf4_attributes <- function(nc) {
   for (i in seq_along(attributes)) {
     result[i,"attributeName"] <- attributes[i]
     attribute <- ncdf4::ncatt_get(nc, attributes[i])
-    names <- names(attribute)
+    att_names <- names(attribute)
 
-    for (name in names) {
-      result[i, name] <- attribute[[name]]
+    for (name in att_names) {
+      if (length(attribute[[name]]) > 1){
+        result[i, name] <- paste(attribute[[name]], collapse = ";")
+      }
+      else if (length(attribute[[name]]) == 1)
+        result[i, name] <- attribute[[name]]
     }
   }
 
