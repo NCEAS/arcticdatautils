@@ -1131,3 +1131,79 @@ extract_name <- function(x){
       lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
       stringsAsFactors = F)})
 }
+
+
+#' Add Number of Header Lines to Physical
+#'
+#' When a csv file contains multiple header lines, this function can be used to account for that in the dataTable physical
+#'
+#'
+#' @param mn (MNode) The Member Node to publish the object to.
+#' @param lines (character) number of rows to be ignored before the row containing column names
+#' @param pid pid of csv file
+#'de
+#' @return Returns physical with number of header lines field
+#'
+#' @export
+#'
+#' @author Rachel Sun rachelsun@ucsb.edu
+#'
+#' @examples
+#' \dontrun{
+#' # Set environment
+#'
+#' # Generate EML physical section for an object in a data package with header lines'
+#'
+#' library(EML)
+#' library(dataone)
+#'
+#' cn_staging <- CNode('STAGING')
+#' mn_test <- getMNode(cn_staging,'urn:node:mnTestARCTIC')
+#'
+#' pkg <- arcticdatautils::create_dummy_package_full(mn_test, "A Dummy Package")
+#'
+#' doc <- EML::read_eml(getObject(mn_test, pkg$metadata))
+#'
+#' pid <- pkg$data[1]
+#'
+#' lines <- sample(1:100, 1)
+#'
+#' phys <- arcticdatautils::eml_add_csv_headers(mn_test, lines, pid)
+#'
+#' doc$dataset$dataTable[[1]]$physical <- phys
+#'
+#' eml_validate(doc)
+#'
+#'}
+
+eml_add_csv_headers <- function(mn, lines, pid){
+
+  stopifnot(methods::is(mn, 'MNode'))
+  if (!is_token_set(mn)) {
+    stop('No token set')
+  }
+
+  stopifnot(is.character(pid),
+            all(nchar(pid)) > 0,
+            length(pid) == 1)
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+
+  if (is.na(sysmeta@fileName)) {
+    ob_name <- "NA"
+  } else {
+    ob_name <- sysmeta@fileName
+  }
+
+  physical <- EML::set_physical(objectName = ob_name,
+                                size = format(sysmeta@size, scientific = FALSE),
+                                sizeUnit = 'bytes',
+                                authentication = sysmeta@checksum,
+                                authMethod = sysmeta@checksumAlgorithm,
+                                numHeaderLines = lines,
+                                fieldDelimiter = ',',
+                                attributeOrientation = 'column',
+                                url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
+
+  physical
+}
