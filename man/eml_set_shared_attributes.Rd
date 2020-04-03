@@ -4,8 +4,7 @@
 \alias{eml_set_shared_attributes}
 \title{Set shared attribute references}
 \usage{
-eml_set_shared_attributes(doc, attributeList = NULL,
-  type = "dataTable")
+eml_set_shared_attributes(doc, attributeList = NULL, type = "dataTable")
 }
 \arguments{
 \item{doc}{(emld) An EML object.}

@@ -4,10 +4,14 @@
 \alias{generate_resource_map}
 \title{Create a resource map RDF/XML file and save is to a temporary path}
 \usage{
-generate_resource_map(metadata_pid, data_pids = NULL,
-  child_pids = NULL, other_statements = NULL,
+generate_resource_map(
+  metadata_pid,
+  data_pids = NULL,
+  child_pids = NULL,
+  other_statements = NULL,
   resolve_base = "https://cn.dataone.org/cn/v2/resolve",
-  resource_map_pid = NULL)
+  resource_map_pid = NULL
+)
 }
 \arguments{
 \item{metadata_pid}{(character) PID of the metadata object.}

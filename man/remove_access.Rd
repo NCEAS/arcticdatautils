@@ -4,8 +4,12 @@
 \alias{remove_access}
 \title{Remove a subject from an object's access policy}
 \usage{
-remove_access(mn, pids, subjects, permissions = c("read", "write",
-  "changePermission"))
+remove_access(
+  mn,
+  pids,
+  subjects,
+  permissions = c("read", "write", "changePermission")
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}

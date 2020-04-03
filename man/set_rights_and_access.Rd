@@ -4,8 +4,12 @@
 \alias{set_rights_and_access}
 \title{Set rights holder with access policy for an object}
 \usage{
-set_rights_and_access(mn, pids, subject, permissions = c("read", "write",
-  "changePermission"))
+set_rights_and_access(
+  mn,
+  pids,
+  subject,
+  permissions = c("read", "write", "changePermission")
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}
