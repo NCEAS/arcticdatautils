@@ -4,8 +4,13 @@
 \alias{list_submissions}
 \title{List recent submissions to a DataOne Member Node}
 \usage{
-list_submissions(mn, from = Sys.Date(), to = Sys.Date(),
-  formatType = "*", use_whitelist = T)
+list_submissions(
+  mn,
+  from = Sys.Date(),
+  to = Sys.Date(),
+  formatType = "*",
+  use_whitelist = T
+)
 }
 \arguments{
 \item{mn}{(MNode) A DataOne Member Node}
