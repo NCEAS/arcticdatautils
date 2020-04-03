@@ -1162,17 +1162,11 @@ extract_name <- function(x){
 #'
 #' pkg <- arcticdatautils::create_dummy_package_full(mn_test, "A Dummy Package")
 #'
-#' doc <- EML::read_eml(getObject(mn_test, pkg$metadata))
-#'
 #' pid <- pkg$data[1]
 #'
 #' lines <- sample(1:100, 1)
 #'
 #' phys <- arcticdatautils::eml_add_csv_headers(mn_test, lines, pid)
-#'
-#' doc$dataset$dataTable[[1]]$physical <- phys
-#'
-#' eml_validate(doc)
 #'
 #'}
 
