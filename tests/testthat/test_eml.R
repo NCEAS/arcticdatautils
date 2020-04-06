@@ -383,26 +383,31 @@ test_that('eml_nsf_to_project fails gracefully', {
 })
 
 
-test_that("The number of header lines is added to a csv physical", {
-  library(EML)
-  library(dataone)
-  library(testthat)
+test_that('Data object physical created for an EML', {
 
   cn_staging <- CNode('STAGING')
-  mn_test <- getMNode(cn_staging,'urn:node:mnTestARCTIC')
+  mn_test <- getMNode(cn_staging, 'urn:node:mnTestARCTIC')
 
   pkg <- arcticdatautils::create_dummy_package_full(mn_test, "A Dummy Package")
 
   doc <- EML::read_eml(getObject(mn_test, pkg$metadata))
-
   pid <- pkg$data[1]
 
-  lines <- sample(1:100, 1)
+  lines <- sample(1:100,1)
 
-  phys <- arcticdatautils::eml_add_csv_headers(mn_test, lines, pid)
+  physical <- arcticdatautils::pid_to_eml_physical(mn_test, pid, headers = lines)
 
-  doc$dataset$dataTable[[1]]$physical <- phys
+  attributes <- arcticdatautils::create_dummy_attributes_dataframe(2)
+  attributeList <- set_attributes(attributes)
 
-  testthat::expect_true(EML::eml_validate(doc))
+  dataTable <- eml$dataTable(entityName = "dummy1.csv",
+                             entityDescription = "test csv",
+                             physical = physical,
+                             attributeList = attributeList)
+
+  doc$dataset$dataTable[[1]] <- dataTable
+
+  expect_true(EML::eml_validate(doc))
+
 })
 
