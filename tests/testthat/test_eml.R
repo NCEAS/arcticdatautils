@@ -400,7 +400,7 @@ test_that('Data object physical created for an EML', {
   attributes <- arcticdatautils::create_dummy_attributes_dataframe(2)
   attributeList <- set_attributes(attributes)
 
-  dataTable <- doc$dataTable(entityName = "dummy1.csv",
+  dataTable <- list(entityName = "dummy1.csv",
                              entityDescription = "test csv",
                              physical = physical,
                              attributeList = attributeList)
