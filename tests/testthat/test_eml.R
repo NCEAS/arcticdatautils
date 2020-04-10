@@ -385,6 +385,10 @@ test_that('eml_nsf_to_project fails gracefully', {
 
 test_that('Data object physical created for an EML', {
 
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
   cn_staging <- CNode('STAGING')
   mn_test <- getMNode(cn_staging, 'urn:node:mnTestARCTIC')
 
