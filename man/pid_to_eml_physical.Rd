@@ -4,14 +4,14 @@
 \alias{pid_to_eml_physical}
 \title{Create EML physical objects for the given set of PIDs}
 \usage{
-pid_to_eml_physical(mn, pid, headers = 1)
+pid_to_eml_physical(mn, pid, num_header_lines = 1)
 }
 \arguments{
 \item{mn}{(MNode) Member Node where the PID is associated with an object.}
 
 \item{pid}{(character) The PID of the object to create the physical for.}
 
-\item{headers}{(double) The number of headers in a csv file. Default is equal to 1.}
+\item{num_header_lines}{(double) The number of headers in a csv/Excel file. Default is equal to 1.}
 }
 \value{
 (list) A physical object.
@@ -22,6 +22,6 @@ This function creates a data object's physical.
 \examples{
 \dontrun{
 # Generate EML physical sections for an object in a data package
-phys <- pid_to_eml_physical(mn, pid, headers)
+phys <- pid_to_eml_physical(mn, pid, num_header_lines)
 }
 }

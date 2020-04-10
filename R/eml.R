@@ -70,57 +70,6 @@ pid_to_eml_entity <- function(mn,
   return(entity)
 }
 
-
-#' Create EML physical objects for the given set of PIDs
-#'
-#' This function creates a data object's physical.
-#'
-#' @param mn (MNode) Member Node where the PID is associated with an object.
-#' @param pid (character) The PID of the object to create the physical for.
-#' @param headers (double) The number of headers in a csv file. Default is equal to 1.
-#'
-#' @return (list) A physical object.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Generate EML physical sections for an object in a data package
-#' phys <- pid_to_eml_physical(mn, pid, headers)
-#' }
-pid_to_eml_physical <- function(mn, pid, headers = 1) {
-  stopifnot(is(mn, "MNode"))
-
-  if (!is_token_set(mn)) {
-    stop('No token set')
-  }
-  stopifnot(is.character(pid),
-            all(nchar(pid)) > 0,
-            length(pid) == 1)
-  names(pid) <- ''  # Named inputs produce a named output list - which is invalid in EML
-
-  sysmeta <- dataone::getSystemMetadata(mn, pid)
-
-  if (is.na(sysmeta@fileName)) {
-    ob_name <- "NA"
-  } else {
-    ob_name <- sysmeta@fileName
-  }
-
-  physical <- EML::set_physical(objectName = ob_name,
-                                size = format(sysmeta@size, scientific = FALSE),
-                                sizeUnit = 'bytes',
-                                authentication = sysmeta@checksum,
-                                authMethod = sysmeta@checksumAlgorithm,
-                                numHeaderLines = headers,
-                                fieldDelimiter = ',',
-                                attributeOrientation = 'column',
-                                url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
-
-  physical
-}
-
-
 #' Create an EML physical object from system metadata
 #'
 #' This function creates a pre-canned EML physical object from what's in the
@@ -1150,4 +1099,57 @@ extract_name <- function(x){
       firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
       lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
       stringsAsFactors = F)})
+}
+
+
+#' Create EML physical objects for the given set of PIDs
+#'
+#' This function creates a data object's physical.
+#'
+#' @param mn (MNode) Member Node where the PID is associated with an object.
+#' @param pid (character) The PID of the object to create the physical for.
+#' @param num_header_lines (double) The number of headers in a csv/Excel file. Default is equal to 1.
+#'
+#' @return (list) A physical object.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate EML physical sections for an object in a data package
+#' phys <- pid_to_eml_physical(mn, pid, num_header_lines)
+#' }
+pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
+  stopifnot(is(mn, "MNode"))
+
+  if (!is_token_set(mn)) {
+    stop('No token set')
+  }
+  stopifnot(is.character(pid),
+            all(nchar(pid)) > 0,
+            length(pid) == 1)
+  names(pid) <- ''  # Named inputs produce a named output list - which is invalid in EML
+
+  sysmeta <- dataone::getSystemMetadata(mn, pid)
+
+  if (is.na(sysmeta@fileName)) {
+    ob_name <- "NA"
+  } else {
+    ob_name <- sysmeta@fileName
+  }
+
+  if(grepl(".csv", ob_name, fixed = TRUE) == TRUE || grepl(".xlsx", ob_name, fixed = TRUE) == TRUE){
+    physical <- EML::set_physical(objectName = ob_name,
+                                  size = format(sysmeta@size, scientific = FALSE),
+                                  sizeUnit = 'bytes',
+                                  authentication = sysmeta@checksum,
+                                  authMethod = sysmeta@checksumAlgorithm,
+                                  numHeaderLines = num_header_lines,
+                                  fieldDelimiter = ',',
+                                  attributeOrientation = 'column',
+                                  url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
+  }else{
+    physical <- sysmeta_to_eml_physical(sysmeta)
+  }
+  return(physical)
 }
