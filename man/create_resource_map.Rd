@@ -4,8 +4,14 @@
 \alias{create_resource_map}
 \title{Create a resource map object on a Member Node}
 \usage{
-create_resource_map(mn, metadata_pid, data_pids = NULL,
-  child_pids = NULL, check_first = TRUE, ...)
+create_resource_map(
+  mn,
+  metadata_pid,
+  data_pids = NULL,
+  child_pids = NULL,
+  check_first = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node}

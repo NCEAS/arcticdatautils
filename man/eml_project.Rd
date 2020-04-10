@@ -4,9 +4,15 @@
 \alias{eml_project}
 \title{Create an EML project section}
 \usage{
-eml_project(title, personnelList, abstract = NULL, funding = NULL,
-  studyAreaDescription = NULL, designDescription = NULL,
-  relatedProject = NULL)
+eml_project(
+  title,
+  personnelList,
+  abstract = NULL,
+  funding = NULL,
+  studyAreaDescription = NULL,
+  designDescription = NULL,
+  relatedProject = NULL
+)
 }
 \arguments{
 \item{title}{(character) Title of the project (Required). May have multiple titles
