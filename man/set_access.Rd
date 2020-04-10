@@ -4,8 +4,12 @@
 \alias{set_access}
 \title{Set the access policy for an object}
 \usage{
-set_access(mn, pids, subjects, permissions = c("read", "write",
-  "changePermission"))
+set_access(
+  mn,
+  pids,
+  subjects,
+  permissions = c("read", "write", "changePermission")
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}
