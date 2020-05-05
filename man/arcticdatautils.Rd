@@ -3,7 +3,6 @@
 \docType{package}
 \name{arcticdatautils}
 \alias{arcticdatautils}
-\alias{arcticdatautils-package}
 \title{arcticdatautils: Utilities for the Arctic Data Center}
 \description{
 This package contains code for doing lots of useful stuff that's too specific for the
