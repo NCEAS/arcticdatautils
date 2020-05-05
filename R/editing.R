@@ -447,6 +447,15 @@ publish_update <- function(mn,
   # Replace packageId
   doc$packageId <- metadata_updated_pid
 
+  # Add landing page
+  if (use_doi == T){
+    doc$dataset$distribution$online$url <- paste0("http://doi.org/", metadata_updated_pid)
+  }
+  else if (use_doi == F){
+    doc$dataset$distribution$online$url <- paste0("http://arcticdata.io/catalog/view/", metadata_updated_pid)
+  }
+
+
   # Replace system
   doc$system <- get_system_uri(doc$packageId)
 
@@ -454,6 +463,8 @@ publish_update <- function(mn,
   if (length(doc$access$allow) & (!is.null(metadata_path))) {
     doc$access <- list()
   }
+
+
 
   # Write out the document to disk. We do this in part because
   # set_other_entities takes a path to the doc.
