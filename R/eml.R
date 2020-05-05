@@ -1223,7 +1223,7 @@ eml_add_publisher <- function(doc){
 
   doc$dataset$publisher <- list(organizationName = "NSF Arctic Data Center",
                                          onlineUrl = "http://arcticdata.io",
-                                         userId = list(directory = "Wikidata", userId = "Q77285095"),
+                                         userId = list(directory = "https://www.wikidata.org/", userId = "Q77285095"),
                                 electronicMailAddress = "support@arcticdata.io")
 
   return(doc)
