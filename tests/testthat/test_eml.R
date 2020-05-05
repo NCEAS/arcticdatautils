@@ -411,3 +411,19 @@ test_that('Data object physical created for an EML', {
   expect_true(EML::eml_validate(doc))
 
 })
+
+test_that('Valid publisher information can be added', {
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc <- eml_add_publisher(doc)
+
+  expect_true(EML::eml_validate(doc))
+  expect_equal(doc$dataset$publisher$organizationName, "NSF Arctic Data Center")
+})

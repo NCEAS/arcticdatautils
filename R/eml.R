@@ -1202,3 +1202,31 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
   return(physical)
 
 }
+
+#' Add publisher information to EML document
+#'
+#' This function adds Arctic Data Center publisher information to an EML document
+#'
+#' @param doc (emld) An EML document
+#'
+#' @return (emld) An EML document
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add publisher information to an existing document
+#' doc <- eml_add_publisher(doc)
+#' }
+eml_add_publisher <- function(doc){
+  stopifnot(methods::is(doc, 'list'))
+
+  doc$dataset$publisher <- list(organizationName = "NSF Arctic Data Center",
+                                         onlineUrl = "http://arcticdata.io",
+                                         userId = list(directory = "Wikidata", userId = "Q77285095"),
+                                electronicMailAddress = "support@arcticdata.io")
+
+  return(doc)
+
+
+}
