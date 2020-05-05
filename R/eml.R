@@ -44,13 +44,15 @@ pid_to_eml_entity <- function(mn,
 
   # Set entity slots
   if (length(entity$id) == 0) {
-    # entity$id <- list(xml_attribute = systmeta@identifier)
     entity$id <- systmeta@identifier
   }
 
   if (length(entity$scope) == 0) {
-    #entity$scope <- list(xml_attribute = "document")
     entity$scope <- "document"
+  }
+
+  if (length(entity$system) == 0) {
+    entity$system <- get_system_uri(entity$id)
   }
 
   if (length(entity$entityName) == 0) {
