@@ -44,13 +44,15 @@ pid_to_eml_entity <- function(mn,
 
   # Set entity slots
   if (length(entity$id) == 0) {
-    # entity$id <- list(xml_attribute = systmeta@identifier)
     entity$id <- systmeta@identifier
   }
 
   if (length(entity$scope) == 0) {
-    #entity$scope <- list(xml_attribute = "document")
     entity$scope <- "document"
+  }
+
+  if (length(entity$system) == 0) {
+    entity$system <- get_system_uri(entity$id)
   }
 
   if (length(entity$entityName) == 0) {
@@ -1200,5 +1202,97 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
     physical <- sysmeta_to_eml_physical(sysmeta)
   }
   return(physical)
+
+}
+
+#' Add publisher information to EML document
+#'
+#' This function adds Arctic Data Center publisher information to an EML document
+#'
+#' @param doc (emld) An EML document
+#'
+#' @return (emld) An EML document
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add publisher information to an existing document
+#' doc <- eml_add_publisher(doc)
+#' }
+eml_add_publisher <- function(doc){
+  stopifnot(methods::is(doc, 'list'))
+
+  doc$dataset$publisher <- list(organizationName = "NSF Arctic Data Center",
+                                         onlineUrl = "http://arcticdata.io",
+                                         userId = list(directory = "https://www.wikidata.org/", userId = "Q77285095"),
+                                electronicMailAddress = "support@arcticdata.io")
+
+  return(doc)
+
+
+}
+
+#' Add system information to entities
+#'
+#' This function adds system information to entities in a document
+#'
+#' @param doc (emld) An EML document
+#'
+#' @return (emld) An EML document
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add publisher information to an existing document
+#' doc <- eml_add_entity_system(doc)
+#' }
+eml_add_entity_system <- function(doc){
+  stopifnot(methods::is(doc, 'list'))
+
+  # other entity
+  if (length(doc$dataset$otherEntity) > 1){
+    if (!is.null(names(doc$dataset$otherEntity))) {
+      doc$dataset$otherEntity <- list(doc$dataset$otherEntity)
+    }
+    for (i in 1:length(doc$dataset$otherEntity)){
+      doc$dataset$otherEntity[[i]]$system <- get_system_uri(doc$dataset$otherEntity[[i]]$id)
+    }
+  }
+
+
+  # data table
+  if (length(doc$dataset$dataTable) > 1){
+    if (!is.null(names(doc$dataset$dataTable))) {
+      doc$dataset$dataTable <- list(doc$dataset$dataTable)
+    }
+    for (i in 1:length(doc$dataset$dataTable)){
+      doc$dataset$dataTable[[i]]$system <- get_system_uri(doc$dataset$dataTable[[i]]$id)
+    }
+  }
+
+  # vector
+  if (length(doc$dataset$spatialVector) > 1){
+    if (!is.null(names(doc$dataset$spatialVector))) {
+      doc$dataset$spatialVector <- list(doc$dataset$spatialVector)
+    }
+    for (i in 1:length(doc$dataset$spatialVector)){
+      doc$dataset$spatialVector[[i]]$system <- get_system_uri(doc$dataset$spatialVector[[i]]$id)
+    }
+  }
+
+  # raster
+  if (length(doc$dataset$spatialRaster) > 1){
+    if (!is.null(names(doc$dataset$spatialRaster))) {
+      doc$dataset$spatialRaster <- list(doc$dataset$spatialRaster)
+    }
+    for (i in 1:length(doc$dataset$spatialRaster)){
+      doc$dataset$spatialRaster[[i]]$system <- get_system_uri(doc$dataset$spatialRaster[[i]]$id)
+    }
+  }
+
+  return(doc)
+
 
 }
