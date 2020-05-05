@@ -383,3 +383,31 @@ test_that('eml_nsf_to_project fails gracefully', {
 })
 
 
+test_that('Data object physical created for an EML', {
+
+  if (!is_token_set(mn)) {
+    skip("No token set. Skipping test.")
+  }
+
+  cn_staging <- CNode('STAGING')
+  mn_test <- getMNode(cn_staging, 'urn:node:mnTestARCTIC')
+
+  pkg <- arcticdatautils::get_package(mn_test, 'resource_map_urn:uuid:8e0cf450-44d2-4c9d-aa48-09cb32538d2b')
+
+  doc <- EML::read_eml(getObject(mn_test, pkg$metadata))
+
+  csv1_physical <- arcticdatautils::pid_to_eml_physical(mn_test, pkg$data[4], num_header_lines = sample(1:100,1))
+
+  attributes1 <- arcticdatautils::create_dummy_attributes_dataframe(2)
+  attributeList1 <- set_attributes(attributes1)
+
+  dataTable <- list(entityName = "dummy1.csv",
+                    entityDescription = "test csv",
+                    physical = csv1_physical,
+                    attributeList = attributeList1)
+
+  doc$dataset$dataTable[[1]] <- dataTable
+
+  expect_true(EML::eml_validate(doc))
+
+})
