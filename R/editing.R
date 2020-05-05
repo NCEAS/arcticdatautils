@@ -885,14 +885,19 @@ reformat_file_name <- function(path, sysmeta) {
 
 # helper to get approproate system URI
 get_system_uri <- function(id){
-  if (grepl("urn:uuid", id)){
-    system <- "https://tools.ietf.org/html/rfc4122"
-  }
-  else if (grepl("doi:", id)){
-    system <- "https://doi.org"
-  }
-  else if (grepl("arctic-data", id)){
-    system <- "https://search.dataone.org"
-  }
+  if (!is.null(id)){
+    if (grepl("urn:uuid|urn-uuid", id)){
+      system <- "https://tools.ietf.org/html/rfc4122"
+    }
+    else if (grepl("doi", id)){
+      system <- "https://doi.org"
+    }
+    else if (grepl("arctic-data", id)){
+      system <- "https://search.dataone.org"
+    }
+    else if (!grepl("urn:uuid|urn-uuid|doi|arctic-data", id)){
+      system <- "document"
+    }
+  } else system <- NULL
   return(system)
 }
