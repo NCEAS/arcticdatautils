@@ -4,10 +4,18 @@
 \alias{eml_party}
 \title{Create an EML party}
 \usage{
-eml_party(type = "associatedParty", given_names = NULL,
-  sur_name = NULL, organization = NULL, position = NULL,
-  email = NULL, phone = NULL, address = NULL, userId = NULL,
-  role = NULL)
+eml_party(
+  type = "associatedParty",
+  given_names = NULL,
+  sur_name = NULL,
+  organization = NULL,
+  position = NULL,
+  email = NULL,
+  phone = NULL,
+  address = NULL,
+  userId = NULL,
+  role = NULL
+)
 }
 \arguments{
 \item{type}{(character) The type of party (e.g. 'contact').}

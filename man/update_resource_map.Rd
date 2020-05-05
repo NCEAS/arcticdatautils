@@ -4,9 +4,17 @@
 \alias{update_resource_map}
 \title{Update an existing resource map object on a Member Node}
 \usage{
-update_resource_map(mn, resource_map_pid, metadata_pid, data_pids = NULL,
-  child_pids = NULL, other_statements = NULL, identifier = NULL,
-  public = TRUE, check_first = TRUE)
+update_resource_map(
+  mn,
+  resource_map_pid,
+  metadata_pid,
+  data_pids = NULL,
+  child_pids = NULL,
+  other_statements = NULL,
+  identifier = NULL,
+  public = TRUE,
+  check_first = TRUE
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node.}

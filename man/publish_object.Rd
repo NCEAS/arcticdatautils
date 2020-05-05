@@ -4,8 +4,15 @@
 \alias{publish_object}
 \title{Publish an object on a Member Node}
 \usage{
-publish_object(mn, path, format_id = NULL, pid = NULL, sid = NULL,
-  clone_pid = NULL, public = TRUE)
+publish_object(
+  mn,
+  path,
+  format_id = NULL,
+  pid = NULL,
+  sid = NULL,
+  clone_pid = NULL,
+  public = TRUE
+)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to publish the object to.}

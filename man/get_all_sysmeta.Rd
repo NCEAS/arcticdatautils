@@ -4,8 +4,7 @@
 \alias{get_all_sysmeta}
 \title{Get system metadata for all elements of a data package}
 \usage{
-get_all_sysmeta(mn, resource_map_pid, nmax = 1000,
-  child_packages = FALSE)
+get_all_sysmeta(mn, resource_map_pid, nmax = 1000, child_packages = FALSE)
 }
 \arguments{
 \item{mn}{(MNode) The Member Node to query.}
