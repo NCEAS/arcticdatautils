@@ -458,7 +458,7 @@ publish_update <- function(mn,
     doc$dataset$distribution$online$url <- paste0("http://knb.ecoinformatics.org/view/", metadata_updated_pid)
   }
   else if (use_doi == F & mn@identifier == "urn:node:mnTestARCTIC"){
-    doc$dataset$distribution$online$url <- paste0("http://test.arcticdata.io/catalog/view/", metadata_updated_pid)
+    doc$dataset$distribution$online$url <- paste0("http://test.arcticdata.io/view/", metadata_updated_pid)
   }
 
 
