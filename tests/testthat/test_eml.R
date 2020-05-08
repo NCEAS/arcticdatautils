@@ -411,3 +411,41 @@ test_that('Data object physical created for an EML', {
   expect_true(EML::eml_validate(doc))
 
 })
+
+test_that('Valid publisher information can be added', {
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+
+
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me))
+
+  doc <- eml_add_publisher(doc)
+
+  expect_true(EML::eml_validate(doc))
+  expect_equal(doc$dataset$publisher$organizationName, "NSF Arctic Data Center")
+})
+
+
+test_that('Identifier systems can be added', {
+
+  me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
+  doc <- list(packageId = "id", system = "system",
+              dataset = list(title = "A Mimimal Valid EML Dataset",
+                             creator = me,
+                             contact = me,
+                             otherEntity = list(list(entityName = "name",
+                                                     entityType = "other",
+                                                     id = "urn:uuid:asldkfjh"),
+                                                list(entityName = "name2",
+                                                     entityType = "other",
+                                                     id = "arctic-data.2.2"))))
+
+  doc <- eml_add_entity_system(doc)
+
+  expect_true(EML::eml_validate(doc))
+  expect_equal(doc$dataset$otherEntity[[1]]$system, "https://tools.ietf.org/html/rfc4122")
+  expect_equal(doc$dataset$otherEntity[[2]]$system, "https://search.dataone.org")
+})
