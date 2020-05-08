@@ -447,15 +447,24 @@ publish_update <- function(mn,
   # Replace packageId
   doc$packageId <- metadata_updated_pid
 
-  # Replace system if needed
-  if (is.null(doc$system)) {
-    doc$system <- "https://search.dataone.org"
+  # Add landing page
+  if (use_doi == T){
+    doc$dataset$distribution$online$url <- paste0("http://doi.org/", metadata_updated_pid)
   }
+  else if (use_doi == F){
+    doc$dataset$distribution$online$url <- paste0("http://arcticdata.io/catalog/view/", metadata_updated_pid)
+  }
+
+
+  # Replace system
+  doc$system <- get_system_uri(doc$packageId)
 
   # Replace access if needed
   if (length(doc$access$allow) & (!is.null(metadata_path))) {
     doc$access <- list()
   }
+
+
 
   # Write out the document to disk. We do this in part because
   # set_other_entities takes a path to the doc.
@@ -872,4 +881,23 @@ reformat_file_name <- function(path, sysmeta) {
     paste0(ext)
 
   return(file_name)
+}
+
+# helper to get approproate system URI
+get_system_uri <- function(id){
+  if (!is.null(id)){
+    if (grepl("urn:uuid|urn-uuid", id)){
+      system <- "https://tools.ietf.org/html/rfc4122"
+    }
+    else if (grepl("doi", id)){
+      system <- "https://doi.org"
+    }
+    else if (grepl("arctic-data", id)){
+      system <- "https://search.dataone.org"
+    }
+    else if (!grepl("urn:uuid|urn-uuid|doi|arctic-data", id)){
+      system <- "document"
+    }
+  } else system <- NULL
+  return(system)
 }

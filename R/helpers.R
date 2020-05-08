@@ -667,3 +667,37 @@ recover_failed_submission <- function(node, pid, path){
   EML::eml_validate(doc)
   EML::write_eml(doc, path)
 }
+
+#' Get list of Coordinate Reference Systems
+#'
+#' Get a data.frame of EML coordinate reference systems that can
+#' be searched and filtered more easily than the raw XML file.
+#'
+#' @export
+#'
+get_coord_list <- function(){
+  geo_list <- read_eml("https://raw.githubusercontent.com/NCEAS/eml/4417cbf6588fdca4e06bd67190a9d7a18a8e944f/eml-spatialReferenceDictionary.xml")
+
+  coord_df <- data.frame(horizCoordSysDef = rep(NA, length(geo_list$horizCoordSysDef)),
+                         geogCoordSys = rep(NA, length(geo_list$horizCoordSysDef)),
+                         projection = rep(NA, length(geo_list$horizCoordSysDef)),
+                         datum = rep(NA, length(geo_list$horizCoordSysDef)),
+                         proj_unit = rep(NA, length(geo_list$horizCoordSysDef)))
+
+  for (i in 1:length(geo_list$horizCoordSysDef)){
+    coord_df$horizCoordSysDef[i] <- geo_list$horizCoordSysDef[[i]]$name
+
+    if (!is.null(geo_list$horizCoordSysDef[[i]]$projCoordSys)){
+      coord_df$geogCoordSys[i]  <- geo_list$horizCoordSysDef[[i]]$projCoordSys$geogCoordSys$name
+      coord_df$datum[i]  <- geo_list$horizCoordSysDef[[i]]$projCoordSys$geogCoordSys$datum$name
+      coord_df$projection[i] <- geo_list$horizCoordSysDef[[i]]$projCoordSys$projection$name
+      coord_df$proj_unit[i] <- geo_list$horizCoordSysDef[[i]]$projCoordSys$projection$unit$name
+    } else {
+      coord_df$geogCoordSys[i]  <- geo_list$horizCoordSysDef[[i]]$geogCoordSys$name
+      coord_df$datum[i]  <- geo_list$horizCoordSysDef[[i]]$geogCoordSys$datum$name
+      coord_df$projection[i] <- NA
+      coord_df$proj_unit[i] <- NA
+    }
+  }
+  return(coord_df)
+}

@@ -44,13 +44,15 @@ pid_to_eml_entity <- function(mn,
 
   # Set entity slots
   if (length(entity$id) == 0) {
-    # entity$id <- list(xml_attribute = systmeta@identifier)
     entity$id <- systmeta@identifier
   }
 
   if (length(entity$scope) == 0) {
-    #entity$scope <- list(xml_attribute = "document")
     entity$scope <- "document"
+  }
+
+  if (length(entity$system) == 0) {
+    entity$system <- get_system_uri(entity$id)
   }
 
   if (length(entity$entityName) == 0) {
@@ -1102,6 +1104,54 @@ extract_name <- function(x){
 }
 
 
+#' Get raster info from a file on disk
+#'
+#' This function populates a spatialRaster element with the
+#' required elements by reading a local raster file in. The
+#' `coord_name` argument can be found by examining the data.frame
+#' that `get_coord_list()` returns against the proj4string of the
+#' raster file.
+#'
+#' @param path (char) Path to a raster file
+#' @param coord_name (char) horizCoordSysDef name
+#' @param attributes (attributeList) attribute list for raster
+#'
+#'
+#' @export
+eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
+
+  raster_obj <- raster::raster(path)
+  message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
+
+  if (is.null(coord_name)){
+    coord_name <- raster::crs(raster_obj)@projargs
+  }
+
+
+  if (identical(raster::origin(raster_obj), c(0,0))){
+    raster_orig <- "Upper Left"
+  } else if(!identical(raster::origin(raster_obj), c(0,0))){
+    message("Raster origin not at 0,0")
+    raster_orig <- "unknown"
+  }
+
+  raster_info <- list(entityName = basename(path),
+                      attributeList = set_attributes(attributes),
+                      spatialReference = list(horizCoordSysName = coord_name),
+                      horizontalAccuracy = list(accuracyReport = "unknown"),
+                      verticalAccuracy = list(accuracyReport = "unknown"),
+                      cellSizeXDirection = raster::res(raster_obj)[1],
+                      cellSizeYDirection = raster::res(raster_obj)[2],
+                      numberOfBands = raster::nbands(raster_obj),
+                      rasterOrigin = raster_orig,
+                      rows = dim(raster_obj)[1],
+                      columns = dim(raster_obj)[2],
+                      verticals = dim(raster_obj)[3],
+                      cellGeometry = "pixel")
+  return(raster_info)
+}
+
+
 #' Create EML physical objects for the given set of PIDs
 #'
 #' This function creates a data object's physical.
@@ -1152,4 +1202,97 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
     physical <- sysmeta_to_eml_physical(sysmeta)
   }
   return(physical)
+
+}
+
+#' Add publisher information to EML document
+#'
+#' This function adds Arctic Data Center publisher information to an EML document
+#'
+#' @param doc (emld) An EML document
+#'
+#' @return (emld) An EML document
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add publisher information to an existing document
+#' doc <- eml_add_publisher(doc)
+#' }
+eml_add_publisher <- function(doc){
+  stopifnot(methods::is(doc, 'list'))
+
+  doc$dataset$publisher <- list(organizationName = "NSF Arctic Data Center",
+                                         onlineUrl = "http://arcticdata.io",
+                                         userId = list(directory = "https://www.wikidata.org/", userId = "Q77285095"),
+                                electronicMailAddress = "support@arcticdata.io")
+
+  return(doc)
+
+
+}
+
+#' Add system information to entities
+#'
+#' This function adds system information to entities in a document
+#'
+#' @param doc (emld) An EML document
+#'
+#' @return (emld) An EML document
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Add publisher information to an existing document
+#' doc <- eml_add_entity_system(doc)
+#' }
+eml_add_entity_system <- function(doc){
+  stopifnot(methods::is(doc, 'list'))
+
+  # other entity
+  if (length(doc$dataset$otherEntity) > 1){
+    if (!is.null(names(doc$dataset$otherEntity))) {
+      doc$dataset$otherEntity <- list(doc$dataset$otherEntity)
+    }
+    for (i in 1:length(doc$dataset$otherEntity)){
+      doc$dataset$otherEntity[[i]]$system <- get_system_uri(doc$dataset$otherEntity[[i]]$id)
+    }
+  }
+
+
+  # data table
+  if (length(doc$dataset$dataTable) > 1){
+    if (!is.null(names(doc$dataset$dataTable))) {
+      doc$dataset$dataTable <- list(doc$dataset$dataTable)
+    }
+    for (i in 1:length(doc$dataset$dataTable)){
+      doc$dataset$dataTable[[i]]$system <- get_system_uri(doc$dataset$dataTable[[i]]$id)
+    }
+  }
+
+  # vector
+  if (length(doc$dataset$spatialVector) > 1){
+    if (!is.null(names(doc$dataset$spatialVector))) {
+      doc$dataset$spatialVector <- list(doc$dataset$spatialVector)
+    }
+    for (i in 1:length(doc$dataset$spatialVector)){
+      doc$dataset$spatialVector[[i]]$system <- get_system_uri(doc$dataset$spatialVector[[i]]$id)
+    }
+  }
+
+  # raster
+  if (length(doc$dataset$spatialRaster) > 1){
+    if (!is.null(names(doc$dataset$spatialRaster))) {
+      doc$dataset$spatialRaster <- list(doc$dataset$spatialRaster)
+    }
+    for (i in 1:length(doc$dataset$spatialRaster)){
+      doc$dataset$spatialRaster[[i]]$system <- get_system_uri(doc$dataset$spatialRaster[[i]]$id)
+    }
+  }
+
+  return(doc)
+
+
 }
