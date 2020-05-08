@@ -1188,7 +1188,7 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
     ob_name <- sysmeta@fileName
   }
 
-  if(grepl(".csv", ob_name, fixed = TRUE) == TRUE || grepl(".xlsx", ob_name, fixed = TRUE) == TRUE){
+  if(grepl(".csv", ob_name, fixed = TRUE) == TRUE){
     physical <- EML::set_physical(objectName = ob_name,
                                   size = format(sysmeta@size, scientific = FALSE),
                                   sizeUnit = 'bytes',
@@ -1198,6 +1198,7 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
                                   fieldDelimiter = ',',
                                   attributeOrientation = 'column',
                                   url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
+
   }else{
     physical <- sysmeta_to_eml_physical(sysmeta)
   }
