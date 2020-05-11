@@ -105,7 +105,7 @@ sysmeta_to_eml_physical <- function(sysmeta) {
                          sizeUnit = "bytes",
                          authentication = sysmeta@checksum,
                          authMethod = sysmeta@checksumAlgorithm,
-                         url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
+                         url = URLencode(paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier)))
 
     phys$dataFormat <- list(externallyDefinedFormat = list(formatName = sysmeta@formatId))
 
@@ -1197,7 +1197,7 @@ pid_to_eml_physical <- function(mn, pid, num_header_lines = 1) {
                                   numHeaderLines = num_header_lines,
                                   fieldDelimiter = ',',
                                   attributeOrientation = 'column',
-                                  url = paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier))
+                                  url = URLencode(paste0("https://cn.dataone.org/cn/v2/resolve/", sysmeta@identifier)))
 
   }else{
     physical <- sysmeta_to_eml_physical(sysmeta)
