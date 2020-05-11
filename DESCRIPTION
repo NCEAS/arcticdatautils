@@ -51,6 +51,6 @@ Suggests:
     testthat,
     xslt,
     yaml
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
