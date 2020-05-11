@@ -795,7 +795,7 @@ get_package_direct <- function(node, pid, file_names = FALSE, rows = 5000) {
   if (length(unknown_pids) != 0) {
     warning(call. = FALSE,
             "Some Objects in this package didn't have their formatType set in the Solr index and have been marked as 'unknown_pids'. They are likely DATA and you likely want to consider them as such but it wasn't possible to tell. Proceed with caution.")
-    response[["unknnown_pids"]] <- unknown_pids
+    response[["unknown_pids"]] <- unknown_pids
   }
 
   response
