@@ -449,17 +449,21 @@ publish_update <- function(mn,
 
   # Add landing page
   if (use_doi == T){
+    doc$dataset$distribution$offline <- NULL
     doc$dataset$distribution$online$url <- paste0("http://doi.org/", metadata_updated_pid)
   }
   else if (use_doi == F & mn@identifier == "urn:node:ARCTIC"){
+    doc$dataset$distribution$offline <- NULL
     doc$dataset$distribution$online$url <- list(url = paste0("http://arcticdata.io/catalog/view/", metadata_updated_pid),
                                                 `function` = "information")
   }
   else if (use_doi == F & mn@identifier == "urn:node:KNB"){
+    doc$dataset$distribution$offline <- NULL
     doc$dataset$distribution$online$url <- list(url = paste0("http://knb.ecoinformatics.org/view/", metadata_updated_pid),
                                                 `function` = "information")
   }
   else if (use_doi == F & mn@identifier == "urn:node:mnTestARCTIC"){
+    doc$dataset$distribution$offline <- NULL
     doc$dataset$distribution$online$url <- list(url = paste0("http://test.arcticdata.io/view/", metadata_updated_pid),
                                                 `function` = "information")
   }
