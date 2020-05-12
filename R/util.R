@@ -782,6 +782,13 @@ get_package_direct <- function(node, pid, file_names = FALSE, rows = 5000) {
   # formatId.
   response <- lapply(response, function(r) { if (!("formatType" %in% names(r))) { r[["formatType"]] = "UNKNOWN" }; r })
 
+  response <- lapply(response, function(x) {
+    if (length(x$identifier > 1)){
+      x$identifier <- x$identifier[[1]]
+    }
+    return(x)
+    })
+
   metadata_pids <- vapply(response[sapply(response, function(x) { x$formatType == "METADATA"})], function(x) x$identifier, "")
   data_pids <- vapply(response[sapply(response, function(x) { x$formatType == "DATA"})], function(x) x$identifier, "")
   child_pids <- vapply(response[sapply(response, function(x) { x$formatType == "RESOURCE"})], function(x) x$identifier, "")
