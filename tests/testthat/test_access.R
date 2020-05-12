@@ -64,7 +64,9 @@ test_that("get_package works the same when given a metadata pid as it does when 
   a <- suppressWarnings(get_package(mn, child_pkg$metadata))
   b <- get_package(mn, child_pkg$resource_map)
 
-  expect_equivalent(a, b)
+  expect_equivalent(a$metadata, b$metadata)
+  expect_equivalent(a$resource_map, b$resource_map)
+  expect_equivalent(a$data, b$data)
 })
 
 test_that("access functions stop if system metadata is not found", {
