@@ -704,6 +704,10 @@ get_package <- function(node, pid, file_names=FALSE, rows=5000) {
     resource_map_pids <- find_newest_resource_map(node, pid)
   }
 
+  if (grep(" ", resource_map_pids)){
+    resource_map_pids <- strsplit(resource_map_pids, " ")[[1]][1]
+  }
+
   # Stop if no resource map was found
   if (length(resource_map_pids) == 0) {
     stop(paste0("No resource map was found for ", pid, ". This may be because none existed or all that exist are obsoleted."))
@@ -852,6 +856,7 @@ find_newest_resource_map <- function(node, pid, rows = 1000) {
   }))
 
   all_resource_map_pids <- as.character(na.omit(all_resource_map_pids))
+  all_resource_map_pids <- unique(all_resource_map_pids)
 
   if (length(all_resource_map_pids) == 0) {
     stop(paste0("No resource map(s) found for ", pid, "."), call. = FALSE)
