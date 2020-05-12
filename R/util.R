@@ -783,7 +783,7 @@ get_package_direct <- function(node, pid, file_names = FALSE, rows = 5000) {
   response <- lapply(response, function(r) { if (!("formatType" %in% names(r))) { r[["formatType"]] = "UNKNOWN" }; r })
 
   response <- lapply(response, function(x) {
-    if (length(x$identifier > 1)){
+    if (length(x$identifier) == 2 & x$identifier[[1]] == x$identifier[[2]]){
       x$identifier <- x$identifier[[1]]
     }
     return(x)
