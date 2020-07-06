@@ -11,7 +11,7 @@ eml_get_raster_metadata(path, coord_name = NULL, attributes)
 
 \item{coord_name}{(char) horizCoordSysDef name}
 
-\item{attributes}{(attributeList) attribute list for raster}
+\item{attributes}{(dataTable) attributes for raster}
 }
 \description{
 This function populates a spatialRaster element with the
