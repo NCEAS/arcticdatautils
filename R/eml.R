@@ -1114,7 +1114,7 @@ extract_name <- function(x){
 #'
 #' @param path (char) Path to a raster file
 #' @param coord_name (char) horizCoordSysDef name
-#' @param attributes (attributeList) attribute list for raster
+#' @param attributes (dataTable) attributes for raster
 #'
 #'
 #' @export
