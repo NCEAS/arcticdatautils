@@ -1007,7 +1007,7 @@ reorder_pids <- function(pid_list, doc){
 #'
 #' EML::eml_validate(doc)
 #'
-eml_nsf_to_project <- function(awards, eml_version = "2.1"){
+eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 
   stopifnot(is.character(awards))
   stopifnot(eml_version %in% c("2.1", "2.1.1", "2.2", "2.2.0"))
