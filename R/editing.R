@@ -76,8 +76,8 @@ publish_object <- function(mn,
                  identifier = pid,
                  formatId = format_id,
                  size = file.size(path),
-                 checksum = digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE),
-                 checksumAlgorithm = "SHA1",
+                 checksum = digest::digest(path, algo = "sha256", serialize = FALSE, file = TRUE),
+                 checksumAlgorithm = "SHA-256",
                  submitter = me,
                  rightsHolder = me,
                  fileName = basename(path))
@@ -180,8 +180,8 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
 
   sysmeta@formatId <- format_id
   sysmeta@size <- file.size(path)
-  sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
-  sysmeta@checksumAlgorithm <- "SHA1"
+  sysmeta@checksum <- digest::digest(path, algo = "sha256", serialize = FALSE, file = TRUE)
+  sysmeta@checksumAlgorithm <- "SHA-256"
   slot(sysmeta, "obsoletes", check = FALSE) <- NA
   slot(sysmeta, "obsoletedBy", check = FALSE) <- NA
   sysmeta@fileName <- reformat_file_name(basename(path), sysmeta)
@@ -196,7 +196,7 @@ update_object <- function(mn, pid, path, format_id = NULL, new_pid = NULL, sid =
     path <- tempfile()
     EML::write_eml(doc, path)
     # File changed - update checksum
-    sysmeta@checksum <- digest::digest(path, algo = "sha1", serialize = FALSE, file = TRUE)
+    sysmeta@checksum <- digest::digest(path, algo = "sha256", serialize = FALSE, file = TRUE)
   }
 
   # Make the update
@@ -498,8 +498,8 @@ publish_update <- function(mn,
                                   identifier = metadata_updated_pid,
                                   formatId = metadata_updated_format_id,
                                   size = file.size(eml_path),
-                                  checksum = digest::digest(eml_path, algo = "sha1", serialize = FALSE, file = TRUE),
-                                  checksumAlgorithm = "SHA1",
+                                  checksum = digest::digest(eml_path, algo = "sha256", serialize = FALSE, file = TRUE),
+                                  checksumAlgorithm = "SHA-256",
                                   submitter = me,
                                   rightsHolder = metadata_sysmeta@rightsHolder,
                                   obsoletes = metadata_pid,
@@ -783,8 +783,8 @@ update_resource_map <- function(mn,
   new_rm_sysmeta <- sysmeta
   new_rm_sysmeta@identifier <- identifier
   new_rm_sysmeta@size <- file.size(new_rm_path)
-  new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha1", serialize = FALSE, file = TRUE)
-  new_rm_sysmeta@checksumAlgorithm <- "SHA1"
+  new_rm_sysmeta@checksum <- digest::digest(new_rm_path, algo = "sha256", serialize = FALSE, file = TRUE)
+  new_rm_sysmeta@checksumAlgorithm <- "SHA-256"
   new_rm_sysmeta@rightsHolder <- previous_rights_holder
   new_rm_sysmeta@obsoletes <- resource_map_pid
   slot(new_rm_sysmeta, "obsoletedBy", check = FALSE) <- NA
