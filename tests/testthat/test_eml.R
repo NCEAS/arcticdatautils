@@ -143,8 +143,8 @@ test_that("eml_otherEntity_to_dataTable works when every object is boxed", {
   expect_length(doc$dataset$otherEntity, 0)
 
   # test that dataTable was added
-  expect_equal(otherEntity$entityName, doc$dataset$dataTable$entityName)
-  expect_equivalent(otherEntity$physical, doc$dataset$dataTable$physical)
+  expect_equal(otherEntity$entityName, doc$dataset$dataTable[[1]]$entityName)
+  expect_equivalent(otherEntity$physical, doc$dataset$dataTable[[1]]$physical)
 })
 
 test_that("eml_oe_to_dt works in all cases", {
@@ -203,7 +203,7 @@ test_that("eml_oe_to_dt works in all cases", {
                                      contact = me,
                                      otherEntity = list(oe1, oe2)))
 
-  write_eml(doc_oes_dts, "~/test.xml")
+  write_eml(doc_two_oes, "~/test.xml")
   doc_two_oes <- read_eml("~/test.xml")
   doc_two_oes <- eml_otherEntity_to_dataTable(doc_two_oes, 1)
 
