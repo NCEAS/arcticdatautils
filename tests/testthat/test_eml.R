@@ -128,7 +128,7 @@ test_that("eml_otherEntity_to_dataTable fails gracefully", {
 
 })
 
-test_that("eml_otherEntity_to_dataTable works", {
+test_that("eml_otherEntity_to_dataTable works when every object is boxed", {
   if (!is_token_set(mn)) {
     skip("No token set. Skipping test.")
   }
@@ -143,9 +143,105 @@ test_that("eml_otherEntity_to_dataTable works", {
   expect_length(doc$dataset$otherEntity, 0)
 
   # test that dataTable was added
-  expect_equal(otherEntity$entityName, doc$dataset$dataTable$entityName)
-  expect_equivalent(otherEntity$physical, doc$dataset$dataTable$physical)
+  expect_equal(otherEntity$entityName, doc$dataset$dataTable[[1]]$entityName)
+  expect_equivalent(otherEntity$physical, doc$dataset$dataTable[[1]]$physical)
 })
+
+test_that("eml_oe_to_dt works in all cases", {
+
+
+  me <- list(individualName = list(givenName = "Kristen", surName = "Peach"))
+  attributes <- data.frame(attributeName = 'length_1',
+                           attributeDefinition = 'def1',
+                           measurementScale = 'ratio',
+                           domain = 'numericDomain',
+                           unit = 'meter',
+                           numberType = 'real',
+                           stringsAsFactors = FALSE)
+
+  att_list <- EML::set_attributes(attributes)
+
+  oe1 <- list(entityName = 'other entity', attributeList = att_list, entityType = "other")
+  oe2 <- list(entityName = 'other entity2', attributeList = att_list, entityType = "other")
+  dT1 = list(entityName = "data table", attributeList = att_list)
+  dT2 = list(entityName = "data table2", attributeList = att_list)
+
+  #Testing if it works when there are 0 dataTables and 1 otherEntity
+
+  doc_zero_dts <- list(packageId = 'id', system = 'system',
+              dataset = list(title = 'A Mimimal Valid EML Dataset',
+                             creator = me,
+                             contact = me,
+                             otherEntity = oe1))
+
+  write_eml(doc_zero_dts, "~/test.xml")
+  doc_zero_dts <- read_eml("~/test.xml")
+  doc_zero_dts <- eml_otherEntity_to_dataTable(doc_zero_dts, 1)
+
+  expect_true(eml_validate(doc_zero_dts))
+
+  #Testing if it works when there are 2 dataTables and 1 otherEntity
+
+  doc_two_dts <- list(packageId = 'id', system = 'system',
+                       dataset = list(title = 'A Mimimal Valid EML Dataset',
+                                      creator = me,
+                                      contact = me,
+                                      dataTable = list(dT1, dT2),
+                                      otherEntity = oe1))
+
+  write_eml(doc_two_dts, "~/test.xml")
+  doc_two_dts <- read_eml("~/test.xml")
+  doc_two_dts <- eml_otherEntity_to_dataTable(doc_two_dts, 1)
+
+  expect_true(eml_validate(doc_two_dts))
+
+  #Testing if it works when there are 2 dataTables and 1 boxed otherEntity
+
+  doc_two_dts_boxed_oe <- list(packageId = 'id', system = 'system',
+                      dataset = list(title = 'A Mimimal Valid EML Dataset',
+                                     creator = me,
+                                     contact = me,
+                                     dataTable = list(dT1, dT2),
+                                     otherEntity = list(oe1)))
+
+  write_eml(doc_two_dts_boxed_oe, "~/test.xml")
+  doc_two_dts_boxed_oe <- read_eml("~/test.xml")
+  doc_two_dts_boxed_oe <- eml_otherEntity_to_dataTable(doc_two_dts_boxed_oe, 1)
+
+  expect_true(eml_validate(doc_two_dts_boxed_oe))
+
+  #Testing if it works when there are 2 otherEntities and 0 dataTables
+
+  doc_two_oes <- list(packageId = 'id', system = 'system',
+                      dataset = list(title = 'A Mimimal Valid EML Dataset',
+                                     creator = me,
+                                     contact = me,
+                                     otherEntity = list(oe1, oe2)))
+
+  write_eml(doc_two_oes, "~/test.xml")
+  doc_two_oes <- read_eml("~/test.xml")
+  doc_two_oes <- eml_otherEntity_to_dataTable(doc_two_oes, 1)
+
+  expect_true(eml_validate(doc_two_oes))
+
+  #Testing if it works when there are two otherEntities and 1 dataTable
+
+  doc_two_oes_one_dt <- list(packageId = 'id', system = 'system',
+                      dataset = list(title = 'A Mimimal Valid EML Dataset',
+                                     creator = me,
+                                     contact = me,
+                                     dataTable = dT1,
+                                     otherEntity = list(oe1, oe2)))
+
+  write_eml(doc_two_oes_one_dt, "~/test.xml")
+  doc_two_oes_one_dt <- read_eml("~/test.xml")
+  doc_two_oes_one_dt <- eml_otherEntity_to_dataTable(doc_two_oes_one_dt, 1)
+
+  expect_true(eml_validate(doc_two_oes_one_dt))
+
+})
+
+
 
 test_that("which_in_eml returns correct locations", {
   if (!is_token_set(mn)) {
