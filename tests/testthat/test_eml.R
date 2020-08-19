@@ -195,6 +195,21 @@ test_that("eml_oe_to_dt works in all cases", {
 
   expect_true(eml_validate(doc_two_dts))
 
+  #Testing if it works when there are 2 dataTables and 1 boxed otherEntity
+
+  doc_two_dts_boxed_oe <- list(packageId = 'id', system = 'system',
+                      dataset = list(title = 'A Mimimal Valid EML Dataset',
+                                     creator = me,
+                                     contact = me,
+                                     dataTable = list(dT1, dT2),
+                                     otherEntity = list(oe1)))
+
+  write_eml(doc_two_dts_boxed_oe, "~/test.xml")
+  doc_two_dts_boxed_oe <- read_eml("~/test.xml")
+  doc_two_dts_boxed_oe <- eml_otherEntity_to_dataTable(doc_two_dts_boxed_oe, 1)
+
+  expect_true(eml_validate(doc_two_dts_boxed_oe))
+
   #Testing if it works when there are 2 otherEntities and 0 dataTables
 
   doc_two_oes <- list(packageId = 'id', system = 'system',
