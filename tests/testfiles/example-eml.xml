@@ -1,5 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:stmml="http://www.xml-cml.org/schema/stmml" xmlns:sw="eml://ecoinformatics.org/software-2.1.1" xmlns:cit="eml://ecoinformatics.org/literature-2.1.1" xmlns:ds="eml://ecoinformatics.org/dataset-2.1.1" xmlns:prot="eml://ecoinformatics.org/protocol-2.1.1" xmlns:doc="eml://ecoinformatics.org/documentation-2.1.1" xmlns:res="eml://ecoinformatics.org/resource-2.1.1" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 ~/development/eml/eml.xsd" packageId="urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c" system="knb" scope="system">
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.1" xmlns:sw="eml://ecoinformatics.org/software-2.2.0" xmlns:cit="eml://ecoinformatics.org/literature-2.2.0" xmlns:ds="eml://ecoinformatics.org/dataset-2.2.0" xmlns:prot="eml://ecoinformatics.org/protocol-2.2.0" xmlns:doc="eml://ecoinformatics.org/documentation-2.2.0" xmlns:res="eml://ecoinformatics.org/resource-2.2.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0 xsd/eml.xsd" packageId="urn:x-wmo:md:org.aoncadis.www::ee386c24-66ac-11e3-9147-00c0f03d5b7c" system="knb" scope="system">
+  <dataset>
+    <alternateIdentifier>some-alternate-identifier-string</alternateIdentifier>
+    <title>arcticdata R package test</title>
+    <creator>
+      <individualName>
+        <givenName>Bryce</givenName>
+        <surName>Mecum</surName>
+      </individualName>
+      <organizationName>National Center for Ecological Analysis and Synthesis</organizationName>
+    </creator>
+    <associatedParty>
+      <individualName>
+        <givenName>Bryce</givenName>
+        <surName>Mecum</surName>
+      </individualName>
+      <organizationName>National Center for Ecological Analysis and Synthesis</organizationName>
+      <role>creator</role>
+    </associatedParty>
+    <pubDate>2013-12-16</pubDate>
+    <language>eng</language>
+    <abstract>
+      <para>Just an abstract.</para>
+    </abstract>
+    <keywordSet>
+      <keyword>SOME_KEY_WORD</keyword>
+    </keywordSet>
+    <intellectualRights>
+      <para>This work is licensed under the Creative Commons Attribution 4.0 International License.To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/.</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>No geographic description provided.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-135</westBoundingCoordinate>
+          <eastBoundingCoordinate>-134</eastBoundingCoordinate>
+          <northBoundingCoordinate>59</northBoundingCoordinate>
+          <southBoundingCoordinate>57</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <!--Temporal coverage-->
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2011-06-15</calendarDate>
+            <time>00:00:00</time>
+          </beginDate>
+          <endDate>
+            <calendarDate>2013-05-31</calendarDate>
+            <time>00:00:00</time>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <contact>
+      <organizationName>NSF Arctic Data Center</organizationName>
+    </contact>
+    <project>
+      <title>A Test Project Title</title>
+      <personnel>
+        <individualName>
+          <givenName>Bryce</givenName>
+          <surName>Mecum</surName>
+        </individualName>
+        <role>principalInvestigator</role>
+      </personnel>
+      <abstract>An abstract.</abstract>
+      <funding>
+        <para>NSF Award XXXXXX</para>
+      </funding>
+    </project>
+  </dataset>
+</eml:eml>
+
   <dataset>
     <alternateIdentifier>some-alternate-identifier-string</alternateIdentifier>
     <title>arcticdata R package test</title>
