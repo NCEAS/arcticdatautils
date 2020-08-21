@@ -37,7 +37,7 @@ create_dummy_metadata <- function(mn, data_pids = NULL) {
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
-                 formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                 formatId = "https://eml.ecoinformatics.org/eml-2.2.0",
                  size = file.size(metadata_file),
                  checksum = digest::digest(metadata_file, algo = "sha256", serialize = FALSE, file = TRUE),
                  checksumAlgorithm = "SHA-256",
@@ -421,7 +421,7 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 
   pid_eml <- publish_object(mn,
                             path = eml_path,
-                            format_id = "eml://ecoinformatics.org/eml-2.1.1")
+                            format_id = "https://eml.ecoinformatics.org/eml-2.2.0")
 
   # Create resource map
   resource_map_pid <- create_resource_map(mn,
