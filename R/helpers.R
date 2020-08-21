@@ -37,7 +37,7 @@ create_dummy_metadata <- function(mn, data_pids = NULL) {
 
   sysmeta <- new("SystemMetadata",
                  id = pid,
-                 formatId = "eml://ecoinformatics.org/eml-2.1.1",
+                 formatId = "eml://ecoinformatics.org/eml-2.2.0",
                  size = file.size(metadata_file),
                  checksum = digest::digest(metadata_file, algo = "sha256", serialize = FALSE, file = TRUE),
                  checksumAlgorithm = "SHA-256",
