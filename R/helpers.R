@@ -421,7 +421,7 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
 
   pid_eml <- publish_object(mn,
                             path = eml_path,
-                            format_id = "eml://ecoinformatics.org/eml-2.1.1")
+                            format_id = "eml://ecoinformatics.org/eml-2.2.0")
 
   # Create resource map
   resource_map_pid <- create_resource_map(mn,
