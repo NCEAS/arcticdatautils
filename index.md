@@ -11,14 +11,11 @@ Note: The package is intended to be used by NCEAS staff and may not make much se
 
 ## Installing
 
-We recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) (aka tag) instead of from `master`. Install the latest release with the [`remotes`](https://github.com/r-lib/remotes) package:
+
+To install the latest version of this package we recommend installing from Github:
 
 ```r
-remotes::install_github("nceas/arcticdatautils@*release")
-```
 
-If you're feeling adventurous, you can install from the bleeding edge:
-
-```r
 remotes::install_github("nceas/arcticdatautils")
+
 ```

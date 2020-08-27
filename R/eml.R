@@ -1,6 +1,6 @@
 # Helper functions for creating EML metadata
 
-#' Create EML entity with physical section from a DataONE PID
+#' Create EML entity with physical section from any DataONE PID
 #'
 #' @param mn (MNode) Member Node where the PID is associated with an object.
 #' @param pid (character) The PID of the object to create the sub-tree for.
@@ -74,7 +74,7 @@ pid_to_eml_entity <- function(mn,
 
 #' Create an EML physical object from system metadata
 #'
-#' This function creates a pre-canned EML physical object from what's in the
+#' This function creates an EML physical object based on what's in the
 #' System Metadata of an object. Note that it sets an Online Distribution URL
 #' of the DataONE v2 resolve service for the PID.
 #'
@@ -276,7 +276,7 @@ eml_party <- function(type="associatedParty",
 }
 
 
-#' Create an EML creator
+#' Create an EML creator.
 #'
 #' See [eml_party()] for details.
 #'
@@ -298,7 +298,7 @@ eml_creator <- function(...) {
 }
 
 
-#' Create an EML contact
+#' Create an EML contact. Contact information is passed on to [eml_party()]
 #'
 #' See [eml_party()] for details.
 #'

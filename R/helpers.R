@@ -64,7 +64,7 @@ create_dummy_metadata <- function(mn, data_pids = NULL) {
 
 #' Create a test object
 #'
-#' Create a test data object.
+#' Create a test data object. Make sure the member node you use is not a production node.
 #'
 #' @param mn (MNode) The Member Node.
 #'
@@ -121,7 +121,7 @@ create_dummy_object <- function(mn) {
 
 #' Create a test package
 #'
-#' Create a test data package.
+#' Create a full test data package with data objects and 1 metadata object. Size = the number of data objects you want in the dummy package + 1 metadata object.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param size (numeric) The number of files in the package, including the metadata file.
@@ -195,7 +195,7 @@ create_dummy_package <- function(mn, size = 2) {
 
 #' Create a test parent package
 #'
-#' Create a test parent data package.
+#' Create a test parent data package. Make sure the node is not a production node.
 #'
 #' @param mn (MNode) The Member Node.
 #' @param children (character) Child package (resource maps) PIDs.
@@ -324,7 +324,7 @@ create_dummy_enumeratedDomain_dataframe <- function(factors) {
 
 #' Create dummy package with fuller metadata
 #'
-#' Creates a fuller package than [create_dummy_package()]
+#' Creates a more complete package than [create_dummy_package()]
 #' but is otherwise based on the same concept. This dummy
 #' package includes multiple data objects, responsible parties,
 #' geographic locations, method steps, etc.
@@ -579,7 +579,7 @@ list_submissions <- function(mn, from = Sys.Date(), to = Sys.Date(), formatType 
 
 #' Read a shapefile from a pid
 #'
-#' Read a shapefile from a pid that points to the zipped directory of the shapefile and associated files
+#' Read a shapefile 'sf' from a pid that points to the zipped directory of the shapefile and associated files
 #' on a given member node.
 #'
 #' @param mn (MNode) A DataOne Member Node
@@ -626,7 +626,7 @@ read_zip_shapefile <- function(mn, pid){
 
 #' Recovers failed submissions
 #'
-#' Recovers failed submissions and write the new, valid EML to a given path
+#' Recovers failed submissions and writes the new, valid EML to a given path
 #'
 #' @param node (MNode) The Member Node to publish the object to.
 #' @param pid The PID of the EML metadata document to be recovered.
