@@ -2,3 +2,50 @@ navbar:
   right:
     - icon: fa-github
       href: https://github.com/NCEAS/arcticdatautils
+reference:
+
+
+- title: Access functions
+  subtitle: Functions to change who can access the package
+  contents:
+  - starts_with("add_")
+
+- title: Functions to edit sysmeta
+  subtitle: Functions to access or edit the sysmeta of the package
+  contents:
+  - 'replace_subject'
+  - 'clear_replication_policy'
+  - 'get_all_sysmeta'
+  - 'translate'
+
+- title: Editing Functions
+  subtitle: Functions to edit a package
+  contents:
+  - 'publish_object'
+  - 'update_object'
+  - 'publish_update'
+  - 'create_resource_map'
+  - 'update_resource_map '
+  - 'set_file_name'
+  - 'reformat_file_name'
+
+- title: Helper Functions
+  subtitle: Functions to help test a package
+  contents:
+  -  starts_with("create_")
+  - 'get_orcid_name'
+  - 'get_orcid_email'
+
+- title: EML Functions
+  subtitle: Functions for creating EML metadata
+  contents:
+  -  starts_with("pid_")
+  -  starts_with("eml_")
+  - 'sysmeta_to_eml_physical'
+  - 'get_orcid_email'
+  - 'set_abstract'
+  - 'which_in_eml'
+  - 'reorder_pids'
+
+
+
