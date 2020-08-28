@@ -10,13 +10,29 @@ reference:
   contents:
   - starts_with("add_")
 
-- title: Functions to edit sysmeta
-  desc: Functions to access or edit the sysmeta of the package
+- title: DataOne functions
+  desc: Helper functions for the dataone package
   contents:
-  - 'replace_subject'
-  - 'clear_replication_policy'
+  - 'is_token_set'
+  - 'get_token'
+  - 'is_token_expired'
+  - 'get_mn_base_url'
+  - 'is_authorized'
+
+- title: NetCDF Attribute functions
+  desc: Get a data.frame of attributes from a NetCDF object
+  contents:
+  - 'get_ncdf4_attributes'
+  - 'get_token'
+  - 'is_token_expired'
+  - 'get_mn_base_url'
+  - 'is_authorized'
+
+- title: Sysmeta Function
+  desc: Function to access the sysmeta of the package
+  contents:
   - 'get_all_sysmeta'
-  - 'translate'
+
 
 - title: Editing Functions
   desc: Functions to edit a package
@@ -55,11 +71,9 @@ reference:
 - title: Format Functions
   desc: Functions related to data object formats
   contents:
-  - 'get_formats'
-  - 'check_format'
   - 'guess_format_id'
-  - 'get_netcdf_format_id'
-  - 'is_format_id'
+  - 'format_eml'
+  - 'format_iso'
   - 'format_eml'
 
   - title: Quality Function
