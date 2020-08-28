@@ -6,12 +6,12 @@ reference:
 
 
 - title: Access functions
-  subtitle: Functions to change who can access the package
+  desc: Functions to change who can access the package
   contents:
   - starts_with("add_")
 
 - title: Functions to edit sysmeta
-  subtitle: Functions to access or edit the sysmeta of the package
+  desc: Functions to access or edit the sysmeta of the package
   contents:
   - 'replace_subject'
   - 'clear_replication_policy'
@@ -19,7 +19,7 @@ reference:
   - 'translate'
 
 - title: Editing Functions
-  subtitle: Functions to edit a package
+  desc: Functions to edit a package
   contents:
   - 'publish_object'
   - 'update_object'
@@ -30,14 +30,14 @@ reference:
   - 'reformat_file_name'
 
 - title: Helper Functions
-  subtitle: Functions to help test a package
+  desc: Functions to help test a package
   contents:
   -  starts_with("create_")
   - 'get_orcid_name'
   - 'get_orcid_email'
 
 - title: EML Functions
-  subtitle: Functions for creating EML metadata
+  desc: Functions for creating and changing EML metadata
   contents:
   -  starts_with("pid_")
   -  starts_with("eml_")
@@ -46,6 +46,36 @@ reference:
   - 'set_abstract'
   - 'which_in_eml'
   - 'reorder_pids'
+
+- title: Environment Functions
+  desc: Functions related to loading configuriation based upon the environment
+  contents:
+  -  starts_with("env_")
+
+- title: Format Functions
+  desc: Functions related to data object formats
+  contents:
+  - 'get_formats'
+  - 'check_format'
+  - 'guess_format_id'
+  - 'get_netcdf_format_id'
+  - 'is_format_id'
+  - 'format_eml'
+
+  - title: Quality Function
+  desc: Function to check the quality of an EML document you are authoring
+  contents:
+  - 'mdq_run'
+
+
+  - title: ISO Metadata Functions
+  desc: Functions related to fixing invalid ISO metadata
+  contents:
+  - starts_with("test_")
+
+
+
+
 
 
 
