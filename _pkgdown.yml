@@ -81,7 +81,7 @@ reference:
 
   - subtitle: ISO Metadata Functions
   desc: Functions related to fixing invalid ISO metadata
-  - contents:
+  contents:
   - starts_with("test_")
 
 
