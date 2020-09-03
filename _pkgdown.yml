@@ -4,14 +4,12 @@ navbar:
       href: https://github.com/NCEAS/arcticdatautils
 reference:
 
--title: Functions
-
-- subtitle: Access functions
+- title: Access functions
   desc: Functions to change who can access the package
   contents:
   - starts_with("add_")
 
-- subtitle: DataOne functions
+- title: DataOne functions
   desc: Helper functions for the dataone package
   contents:
   - 'is_token_set'
@@ -20,7 +18,7 @@ reference:
   - 'get_mn_base_url'
   - 'is_authorized'
 
-- subtitle: NetCDF Attribute functions
+- title: NetCDF Attribute functions
   desc: Get a data.frame of attributes from a NetCDF object
   contents:
   - 'get_ncdf4_attributes'
@@ -29,13 +27,13 @@ reference:
   - 'get_mn_base_url'
   - 'is_authorized'
 
-- subtitle: Sysmeta Function
+- title: Sysmeta Function
   desc: Function to access the sysmeta of the package
   contents:
   - 'get_all_sysmeta'
 
 
-- subtitle: Editing Functions
+- title: Editing Functions
   desc: Functions to edit a package
   contents:
   - 'publish_object'
@@ -46,14 +44,14 @@ reference:
   - 'set_file_name'
   - 'reformat_file_name'
 
-- subtitle: Helper Functions
+- title: Helper Functions
   desc: Functions to help test a package
   contents:
   -  starts_with("create_")
   - 'get_orcid_name'
   - 'get_orcid_email'
 
-- subtitle: EML Functions
+- title: EML Functions
   desc: Functions for creating and changing EML metadata
   contents:
   -  starts_with("pid_")
@@ -64,7 +62,7 @@ reference:
   - 'which_in_eml'
   - 'reorder_pids'
 
-- subtitle: Environment Functions
+- title: Environment Functions
   desc: Functions related to loading configuriation based upon the environment
   contents:
   -  starts_with("env_")
@@ -75,13 +73,11 @@ reference:
   - 'guess_format_id'
   - 'format_eml'
   - 'format_iso'
-  - 'format_eml'
 
   - subtitle: Quality Function
   desc: Function to check the quality of an EML document you are authoring
   contents:
   - 'mdq_run'
-
 
   - subtitle: ISO Metadata Functions
   desc: Functions related to fixing invalid ISO metadata
