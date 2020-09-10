@@ -4,10 +4,16 @@ navbar:
       href: https://github.com/NCEAS/arcticdatautils
 
 reference:
-- title: Package access functions
+- title: Access functions
   desc: High-level utility functions for getting and setting access rules for DataONE objects
   contents:
-  - starts_with('add_')
+  - set_rights_holder
+  - set_access
+  - remove_access
+  - set_rights_and_access
+  - set_public_read
+  - remove_public_read
+  - is_public_read
 
 - title: DataOne Functions
   desc: Helper functions for the dataone package
@@ -54,8 +60,8 @@ reference:
 - title: EML Functions
   desc: Helper functions for creating EML metadata
   contents:
-  -  starts_with('pid_')
-  -  starts_with('eml_')
+  - starts_with('pid_')
+  - starts_with('eml_')
   - sysmeta_to_eml_physical
   - get_orcid_email
   - set_abstract
@@ -63,9 +69,9 @@ reference:
   - reorder_pids
 
 - title: Environment Functions
-  desc: Functions related to loading configuriation based upon the environment
+  desc: Function related to loading configuriation based upon the environment
   contents:
-  -  starts_with('env_')
+  - starts_with('env_')
 
 - title: Format Functions
   desc: Functions related to data object formats
@@ -75,7 +81,7 @@ reference:
   - format_iso
 
 - title: QA Function
-  desc: Functions related to metadata quality
+  desc: Function related to metadata quality
   contents:
   - mdq_run
 
