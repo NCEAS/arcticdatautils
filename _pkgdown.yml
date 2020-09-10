@@ -2,14 +2,14 @@ navbar:
   right:
     - icon: fa-github
       href: https://github.com/NCEAS/arcticdatautils
-reference:
 
-- title: Access functions
-  desc: Functions to change who can access the package
+reference:
+- title: Package access functions
+  desc: High-level utility functions for getting and setting access rules for DataONE objects
   contents:
   - starts_with('add_')
 
-- title: DataOne functions
+- title: DataOne Functions
   desc: Helper functions for the dataone package
   contents:
   - is_token_set
@@ -18,7 +18,7 @@ reference:
   - get_mn_base_url
   - is_authorized
 
-- title: NetCDF Attribute functions
+- title: NetCDF Functions
   desc: Get a data.frame of attributes from a NetCDF object
   contents:
   - get_ncdf4_attributes
@@ -28,13 +28,13 @@ reference:
   - is_authorized
 
 - title: Sysmeta Function
-  desc: Function to access the sysmeta of the package
+  desc: Utility function for modifying System Metadata objects
   contents:
   - get_all_sysmeta
 
 
-- title: Editing Functions
-  desc: Functions to edit a package
+- title: Package editing functions
+  desc: Functions for managing package contents
   contents:
   - publish_object
   - update_object
@@ -44,15 +44,15 @@ reference:
   - set_file_name
   - reformat_file_name
 
-- title: Helper Functions
-  desc: Functions to help test a package
+- title: Functions to help test a package
+  desc: Various helper functions for things like testing a package
   contents:
-  -  starts_with('create_')
+  - starts_with('create_')
   - get_orcid_name
   - get_orcid_email
 
 - title: EML Functions
-  desc: Functions for creating and changing EML metadata
+  desc: Helper functions for creating EML metadata
   contents:
   -  starts_with('pid_')
   -  starts_with('eml_')
@@ -67,19 +67,19 @@ reference:
   contents:
   -  starts_with('env_')
 
-- subtitle: Format Functions
+- title: Format Functions
   desc: Functions related to data object formats
   contents:
   - guess_format_id
   - format_eml
   - format_iso
 
-  - subtitle: Quality Function
-  desc: Function to check the quality of an EML document you are authoring
+- title: QA Function
+  desc: Functions related to metadata quality
   contents:
   - mdq_run
 
-  - subtitle: ISO Metadata Functions
+- title: ISO Metadata Functions
   desc: Functions related to fixing invalid ISO metadata
   contents:
   - starts_with('test_')
