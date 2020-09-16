@@ -60,3 +60,7 @@ If you *do* want to run integration tests
 options(dataone_test_token = "{YOUR_TOKEN_HERE}") # <- Modify this line
 devtools::test()
 ```
+
+<div>
+<p align="center"> <a href="https://www.nceas.ucsb.edu/"><img  src="https://www.nceas.ucsb.edu/files/logos/NCEAS/NCEAS-full%20logo-4C.jpg" width="250px" align="center" /></a> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"  /> </p>
+</div>
