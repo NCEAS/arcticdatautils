@@ -4,7 +4,7 @@
 \alias{eml_nsf_to_project}
 \title{Create an EML project section from a list of NSF award numbers}
 \usage{
-eml_nsf_to_project(awards, eml_version = "2.1")
+eml_nsf_to_project(awards, eml_version = "2.2")
 }
 \arguments{
 \item{awards}{(list) A list of NSF award numbers as characters}
