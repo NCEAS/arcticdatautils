@@ -10,11 +10,11 @@ r_packages:
   - sf
 sudo: false
 cache: packages
-warnings_are_errors: false
 addons:
   apt:
     update: true
     packages:
+      - libqpdf-dev
       - librdf0-dev
       - libnetcdf-dev
       - netcdf-bin
