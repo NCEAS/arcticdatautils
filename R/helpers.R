@@ -31,7 +31,7 @@ create_dummy_metadata <- function(mn, data_pids = NULL) {
 
   # Copy the original EML file to a temporary place
   original_file <- file.path(system.file(package = "arcticdatautils"),
-                             "example-eml.xml")
+                             "example-eml-220.xml")
   metadata_file <- tempfile()
   file.copy(original_file, metadata_file)
 
