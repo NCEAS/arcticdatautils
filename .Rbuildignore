@@ -7,3 +7,5 @@
 ^\.travis\.yml$
 ^LICENSE$
 ^MAINTENANCE\.md$
+^_pkgdown\.yml$
+^pkgdown$

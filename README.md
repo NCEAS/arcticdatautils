@@ -11,16 +11,12 @@ Note: The package is intended to be used by NCEAS staff and may not make much se
 
 ## Installing
 
-We recommend installing from the latest [release](https://github.com/NCEAS/arcticdatautils/releases) (aka tag) instead of from `master`. Install the latest release with the [`remotes`](https://github.com/r-lib/remotes) package:
+To install the latest version of this package we recommend installing from Github:
 
 ```r
-remotes::install_github("nceas/arcticdatautils@*release")
-```
 
-If you're feeling adventurous, you can install from the bleeding edge:
-
-```r
 remotes::install_github("nceas/arcticdatautils")
+
 ```
 
 ## Contributing
@@ -64,3 +60,7 @@ If you *do* want to run integration tests
 options(dataone_test_token = "{YOUR_TOKEN_HERE}") # <- Modify this line
 devtools::test()
 ```
+
+<div>
+<p align="center"> <a href="https://www.nceas.ucsb.edu/"> <img  src="https://www.nceas.ucsb.edu/files/logos/NCEAS/NCEAS-full%20logo-4C.jpg" width="250px" align="center" /></a> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"  /> </p>
+</div>

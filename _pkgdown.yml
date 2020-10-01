@@ -2,3 +2,93 @@ navbar:
   right:
     - icon: fa-github
       href: https://github.com/NCEAS/arcticdatautils
+
+reference:
+- title: Access functions
+  desc: High-level utility functions for getting and setting access rules for DataONE objects
+  contents:
+  - set_rights_holder
+  - set_access
+  - remove_access
+  - set_rights_and_access
+  - set_public_read
+  - remove_public_read
+  - is_public_read
+
+- title: DataOne Functions
+  desc: Helper functions for the dataone package
+  contents:
+  - is_token_set
+  - get_token
+  - is_token_expired
+  - get_mn_base_url
+  - is_authorized
+
+- title: NetCDF Functions
+  desc: Get a data.frame of attributes from a NetCDF object
+  contents:
+  - get_ncdf4_attributes
+  - get_token
+  - is_token_expired
+  - get_mn_base_url
+  - is_authorized
+
+- title: Sysmeta Function
+  desc: Utility function for modifying System Metadata objects
+  contents:
+  - get_all_sysmeta
+
+
+- title: Package editing functions
+  desc: Functions for managing package contents
+  contents:
+  - publish_object
+  - update_object
+  - publish_update
+  - create_resource_map
+  - update_resource_map
+  - set_file_name
+  - reformat_file_name
+
+- title: Functions to help test a package
+  desc: Various helper functions for things like testing a package
+  contents:
+  - starts_with('create_')
+  - get_orcid_name
+  - get_orcid_email
+
+- title: EML Functions
+  desc: Helper functions for creating EML metadata
+  contents:
+  - starts_with('pid_')
+  - starts_with('eml_')
+  - sysmeta_to_eml_physical
+  - get_orcid_email
+  - set_abstract
+  - which_in_eml
+  - reorder_pids
+
+- title: Environment Functions
+  desc: Function related to loading configuriation based upon the environment
+  contents:
+  - starts_with('env_')
+
+- title: Format Functions
+  desc: Functions related to data object formats
+  contents:
+  - guess_format_id
+  - format_eml
+  - format_iso
+
+- title: QA Function
+  desc: Function related to metadata quality
+  contents:
+  - mdq_run
+
+
+
+
+
+
+
+
