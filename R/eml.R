@@ -1018,7 +1018,10 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
   result <- lapply(award_nums, function(x){
     url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
 
-    t <- jsonlite::fromJSON(url)
+    t <- tryCatch(jsonlite::fromJSON(url),
+                  error = function(j) {
+                    j$message <- paste0("The NSF API is most likely down. Check back later. ", j$message)
+                  })
 
     if ("serviceNotification" %in% names(t$response)) {
       warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."), call. = FALSE)
