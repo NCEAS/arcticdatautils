@@ -1082,7 +1082,7 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
     for (i in 1:length(award_nums)){
       awards[[i]] <- list(title = titles[i],
                           funderName = "National Science Foundation",
-                          funderIdentifier = "https://doi.org/10.13039/00000001",
+                          funderIdentifier = "https://doi.org/10.13039/100000001",
                           awardNumber = award_nums[i],
                           awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
     }
