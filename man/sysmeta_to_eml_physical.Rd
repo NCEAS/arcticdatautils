@@ -13,7 +13,7 @@ sysmeta_to_eml_physical(sysmeta)
 (list) A list of physical objects.
 }
 \description{
-This function creates a pre-canned EML physical object from what's in the
+This function creates an EML physical object based on what's in the
 System Metadata of an object. Note that it sets an Online Distribution URL
 of the DataONE v2 resolve service for the PID.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_creator}
 \alias{eml_creator}
-\title{Create an EML creator}
+\title{Create an EML creator.}
 \usage{
 eml_creator(...)
 }

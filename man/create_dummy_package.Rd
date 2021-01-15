@@ -15,7 +15,7 @@ create_dummy_package(mn, size = 2)
 (list) The PIDs for all elements in the data package.
 }
 \description{
-Create a test data package.
+Create a full test data package with data objects and 1 metadata object. Size = the number of data objects you want in the dummy package + 1 metadata object.
 }
 \examples{
 \dontrun{

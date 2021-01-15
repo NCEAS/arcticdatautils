@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{pid_to_eml_entity}
 \alias{pid_to_eml_entity}
-\title{Create EML entity with physical section from a DataONE PID}
+\title{Create EML entity with physical section from any DataONE PID}
 \usage{
 pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 }
@@ -20,7 +20,7 @@ pid_to_eml_entity(mn, pid, entity_type = "otherEntity", ...)
 (list) The entity object.
 }
 \description{
-Create EML entity with physical section from a DataONE PID
+Create EML entity with physical section from any DataONE PID
 }
 \examples{
 \dontrun{

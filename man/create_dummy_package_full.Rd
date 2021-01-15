@@ -15,7 +15,7 @@ create_dummy_package_full(mn, title = "A Dummy Package")
 (list) The PIDs for all elements in the data package.
 }
 \description{
-Creates a fuller package than \code{\link[=create_dummy_package]{create_dummy_package()}}
+Creates a more complete package than \code{\link[=create_dummy_package]{create_dummy_package()}}
 but is otherwise based on the same concept. This dummy
 package includes multiple data objects, responsible parties,
 geographic locations, method steps, etc.

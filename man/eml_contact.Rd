@@ -2,7 +2,7 @@
 % Please edit documentation in R/eml.R
 \name{eml_contact}
 \alias{eml_contact}
-\title{Create an EML contact}
+\title{Create an EML contact. Contact information is passed on to \code{\link[=eml_party]{eml_party()}}}
 \usage{
 eml_contact(...)
 }
