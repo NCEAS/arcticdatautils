@@ -15,7 +15,7 @@ create_dummy_parent_package(mn, children)
 (list) The resource map PIDs for both the parent and child packages.
 }
 \description{
-Create a test parent data package.
+Create a test parent data package. Make sure the node is not a production node.
 }
 \examples{
 \dontrun{

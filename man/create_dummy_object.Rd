@@ -13,7 +13,7 @@ create_dummy_object(mn)
 (character) The PID of the dummy object.
 }
 \description{
-Create a test data object.
+Create a test data object. Make sure the member node you use is not a production node.
 }
 \examples{
 \dontrun{

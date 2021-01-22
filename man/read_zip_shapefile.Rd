@@ -15,7 +15,7 @@ read_zip_shapefile(mn, pid)
 shapefile (sf) The shapefile as an \code{sf} object
 }
 \description{
-Read a shapefile from a pid that points to the zipped directory of the shapefile and associated files
+Read a shapefile 'sf' from a pid that points to the zipped directory of the shapefile and associated files
 on a given member node.
 }
 \examples{

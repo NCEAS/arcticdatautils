@@ -17,7 +17,7 @@ recover_failed_submission(node, pid, path)
 recovers and write the valid EML to the indicated path
 }
 \description{
-Recovers failed submissions and write the new, valid EML to a given path
+Recovers failed submissions and writes the new, valid EML to a given path
 }
 \examples{
 \dontrun{

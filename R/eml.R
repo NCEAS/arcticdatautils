@@ -1018,7 +1018,10 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
   result <- lapply(award_nums, function(x){
     url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
 
-    t <- jsonlite::fromJSON(url)
+    t <- tryCatch(jsonlite::fromJSON(url),
+                  error = function(j) {
+                    j$message <- paste0("The NSF API is most likely down. Check back later. ", j$message)
+                  })
 
     if ("serviceNotification" %in% names(t$response)) {
       warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."), call. = FALSE)
@@ -1082,7 +1085,7 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
     for (i in 1:length(award_nums)){
       awards[[i]] <- list(title = titles[i],
                           funderName = "National Science Foundation",
-                          funderIdentifier = "https://doi.org/10.13039/00000001",
+                          funderIdentifier = "https://doi.org/10.13039/100000001",
                           awardNumber = award_nums[i],
                           awardUrl = paste0("https://www.nsf.gov/awardsearch/showAward?AWD_ID=", award_nums[i]))
     }
