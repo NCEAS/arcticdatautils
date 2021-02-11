@@ -1024,7 +1024,9 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
                   })
 
     if ("serviceNotification" %in% names(t$response)) {
-      warning(paste(t$response$serviceNotification$notificationType, "for award", x , "\n this award will not be included in the project section."), call. = FALSE)
+      warning(paste(t$response$serviceNotification$notificationMessage, "\n",
+                    t$response$serviceNotification$notificationType, "for award", x ,
+                    "\n this award will not be included in the project section."), call. = FALSE)
       t <- NULL
     }
     else if (length(t$response$award) == 0){
