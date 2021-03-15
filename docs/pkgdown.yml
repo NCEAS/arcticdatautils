@@ -1,7 +1,8 @@
-pandoc: 1.19.2.1
-pkgdown: 1.1.0
+pandoc: 2.3.1
+pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   a-overview: a-overview.html
   b-basic-usage: b-basic-usage.html
+last_built: 2021-03-15T23:00Z
 
