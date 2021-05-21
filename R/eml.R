@@ -1105,7 +1105,7 @@ extract_name <- function(x){
   lapply(x, function(x) {
     data.frame(
       firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
-      lastName = trimws(gsub("[A-Za-z]{2,}\\s[A-Z]?", "", x)),
+      lastName = trimws(gsub("^([A-Za-z]{2,})\\s[A-Z]?", "", x)),
       stringsAsFactors = F)})
 }
 
