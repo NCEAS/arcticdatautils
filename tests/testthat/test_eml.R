@@ -481,7 +481,7 @@ test_that('eml_nsf_to_project fails gracefully', {
 test+that('eml_nsf_to_project parses two-word last names correctly', {
   proj <- eml_nsf_to_project("1822406", eml_version = "2.2")
 
-  expect_equal(proj$personnel$individualName$givenName, "name")
+  expect_equal(proj$personnel$individualName$givenName, "Maria Val Martin")
 })
 
 test_that('Data object physical created for an EML', {
