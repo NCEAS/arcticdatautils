@@ -435,65 +435,6 @@ create_dummy_package_full <- function(mn, title = "A Dummy Package") {
               data = data_pids))
 }
 
-#' Retrieve a name from an ORCID URL
-#'
-#' Retrieve first and last name from an ORCID URL.
-#'
-#' @param orcid_url (character) A valid ORCID URL address.
-#'
-#' @return (character) First and last name.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' pi_name <- get_orcid_name('https://orcid.org/0000-0002-2561-5840')
-#' }
-
-get_orcid_name <- function(orcid_url) {
-  req <- httr::GET(paste0(orcid_url, "/person.json"))
-  if (req$status_code != 200) {
-    stop('Failed to read in ', orcid_url)
-  }
-  json <- httr::content(req)
-
-  display_name <- json$displayName
-
-  if (is.null(display_name)){
-    display_name <- NA
-  }
-  return(display_name)
-}
-
-#' Retrieve an email address from an ORCID URL
-#'
-#' Retrieve public email addresses from an ORCID URL.
-#'
-#' @param orcid_url (character) A valid ORCID URL address.
-#'
-#' @return (character) Public e-mail addresses.
-#' @export
-#'
-#'
-#' @examples
-#' \dontrun{
-#' pi_email <- get_orcid_email('https://orcid.org/0000-0002-2561-5840')
-#' }
-
-get_orcid_email <- function(orcid_url) {
-  req <- httr::GET(paste0(orcid_url, "/person.json"))
-  if (req$status_code != 200) {
-    stop('Failed to read in ', orcid_url)
-  }
-  json <- httr::content(req)
-  email_list <- eml_get_simple(json$publicGroupedEmails, "email") %>% paste0(., collapse = ";")
-  if (is.null(email_list)){
-    email_list <- NA
-  }
-  return(email_list)
-}
-
-
 #' List recent submissions to a DataOne Member Node
 #'
 #' List recent submissions to a DataOne Member Node from all submitters not present
