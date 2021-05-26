@@ -22,12 +22,6 @@ reference:
   contents:
   - get_ncdf4_attributes
 
-- title: "Sysmeta Function"
-  desc: >
-    Utility function for modifying System Metadata objects
-  contents:
-  - get_all_sysmeta
-
 - title: "Package editing functions"
   desc: >
     Functions for managing package contents
@@ -45,8 +39,6 @@ reference:
     Various helper functions for things like testing a package
   contents:
   - starts_with('create_')
-  - get_orcid_name
-  - get_orcid_email
 
 - title: "EML Functions"
   desc: >
@@ -56,10 +48,6 @@ reference:
   - eml_get_raster_metadata
   - eml_nsf_to_project
   - eml_otherEntity_to_dataTable
-  - eml_set_reference
-  - eml_set_shared_attributes
-  - eml_validate_attirbutes
-  - which_in_eml
   - reorder_pids
 
 - title: "Environment Functions"
