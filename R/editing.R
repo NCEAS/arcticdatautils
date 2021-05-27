@@ -859,9 +859,24 @@ set_file_name <- function(mn, pid, name) {
   dataone::updateSystemMetadata(mn, pid, sysmeta)
 }
 
+#' Formats the eml file name based on the dataset title
+#'
+#' @param title (character) title of the dataset
+#'
+#' @return (character) file path with underscores and extension (.xml)
+#' @export
+#'
+#' @examples title_to_file_name("Example title here")
+title_to_file_name <- function(title){
+  stringr::str_sub(title, 1, 50) %>%
+    stringr::str_trim() %>%
+    stringr::str_replace_all('[^[:alnum:]]', '_') %>%
+    stringr::str_replace_all('_[_]*', '_') %>%  # replaces consecutive underscores with one
+    paste0(".xml")
+}
 
 
-#' Helper for publish_object. Reformat the filName in system metadata.
+#' Helper for publish_object. Reformat the fileName in system metadata.
 #'
 #' Reformat the fileName field in an object's system metadata to follow Arctic Data Center
 #' system metdata naming conventions.  Publish_object calls this function to rename

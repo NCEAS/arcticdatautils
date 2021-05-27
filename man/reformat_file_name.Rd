@@ -2,7 +2,7 @@
 % Please edit documentation in R/editing.R
 \name{reformat_file_name}
 \alias{reformat_file_name}
-\title{Helper for publish_object. Reformat the filName in system metadata.}
+\title{Helper for publish_object. Reformat the fileName in system metadata.}
 \usage{
 reformat_file_name(path, sysmeta)
 }

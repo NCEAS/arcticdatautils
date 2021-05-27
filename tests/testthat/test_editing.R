@@ -318,3 +318,10 @@ test_that("publish_update can replace an EML 2.1.1 record with a 2.2.0 record", 
 
   expect_equal(sm@formatId, format_eml("2.2"))
 })
+
+test_that("we can reformat a dataset title", {
+  expect_equal(title_to_file_name("Example title here"),
+               "Example_title_here.xml")
+  expect_equal(title_to_file_name("A very very long example title here to convert to a file name"),
+               "A_very_very_long_example_title_here_to_convert_to.xml")
+})
