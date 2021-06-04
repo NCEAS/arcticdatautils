@@ -667,7 +667,7 @@ get_all_versions <- function(node, pid) {
 
 #' Get a structured list of PIDs for the objects in a package
 #'
-#' \Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+#' \Sexpr[results=rd, stage=render]{lifecycle::badge("deprecated")}
 #'
 #' Please use dataone::getDataPackage() when possible
 #'
