@@ -60,7 +60,9 @@ eml_contact <- function(...) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' eml_associated_party("test", "user", email = "test@@user.com", role = "Principal Investigator")
+#' }
 eml_associated_party <- function(...) {
   lifecycle::deprecate_warn("1.0.0", "eml_associated_party()", "EML::eml$associatedParty()")
   eml_party("associatedParty", ...)

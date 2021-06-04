@@ -20,7 +20,7 @@ useful to set if you are warned about the result set being truncated. Defaults t
 (list) A structured list of the members of the package.
 }
 \description{
-\Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+\Sexpr[results=rd, stage=render]{lifecycle::badge("deprecated")}
 }
 \details{
 Please use dataone::getDataPackage() when possible
