@@ -667,6 +667,10 @@ get_all_versions <- function(node, pid) {
 
 #' Get a structured list of PIDs for the objects in a package
 #'
+#' \Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+#'
+#' Please use dataone::getDataPackage() when possible
+#'
 #' Get a structured list of PIDs for the objects in a package,
 #' including the resource map, metadata, and data objects.
 #'
@@ -690,6 +694,8 @@ get_all_versions <- function(node, pid) {
 #' ids <- get_package(mn, pid)
 #' }
 get_package <- function(node, pid, file_names=FALSE, rows=5000) {
+  lifecycle::deprecate_soft("1.0.0", "get_package()", "dataone::getDataPackage()")
+
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
