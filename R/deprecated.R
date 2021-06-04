@@ -1,4 +1,126 @@
 # Deprecated functions that will be removed with the next release
+#' Create an EML party
+#'
+#' \Sexpr[results=rd, stage=render]{lifecycle::badge("deprecated")}
+#'
+#' Please use the constructors in the EML package instead
+#'
+#' You will usually want to use the high-level functions such as
+#' [eml_creator()] and [eml_contact()] but using this is fine.
+#'
+#' The `userId` argument assumes an ORCID so be sure to adjust for that.
+#'
+#' @param type (character) The type of party (e.g. 'contact').
+#' @param given_names (character) The party's given name(s).
+#' @param sur_name (character) The party's surname.
+#' @param organization (character) The party's organization name.
+#' @param position (character) The party's position.
+#' @param email (character) The party's email address(es).
+#' @param phone (character) The party's phone number(s).
+#' @param address (character) The party's address(es) as a valid EML address
+#' @param userId (character) The party's ORCID, in format https://orcid.org/WWWW-XXXX-YYYY-ZZZZ.
+#' @param role (character) The party's role.
+#'
+#' @return (party) An instance of the party specified by the `type` argument.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' eml_party("creator", "Test", "User")
+#' eml_party("creator", "Bryce", "Mecum", userId = "https://orcid.org/0000-0002-0381-3766")
+#' eml_party("creator", given_names = list("Dominic", "'Dom'"),
+#'                      sur_name = "Mullen", list("NCEAS", "UCSB"),
+#'                      position = list("Data Scientist", "Programmer"),
+#'                          address = eml$address(deliveryPoint = "735 State St",
+#'                          city = "Santa Barbara",
+#'                          administrativeArea = "CA",
+#'                          postalCode = "85719"))
+#'}
+eml_party <- function(type="associatedParty",
+                      given_names = NULL,
+                      sur_name = NULL,
+                      organization = NULL,
+                      position = NULL,
+                      email = NULL,
+                      phone = NULL,
+                      address = NULL,
+                      userId = NULL,
+                      role = NULL) {
+
+  lifecycle::deprecate_warn("1.0.0", "eml_party()")
+
+  if (all(sapply(c(sur_name, organization, position), is.null))) {
+    stop(call. = FALSE,
+         "You must specify at least one of sur_name, organization, or position to make a valid creator")
+  }
+  if (!is.null(address) &
+      !"deliveryPoint" %in% names(address) &
+      !"administrativeArea" %in% names(address) &
+      !"postalCode" %in% names(address) &
+      !"city" %in% names(address)) {
+    stop(call. = FALSE,
+         "An address was given but no deliveryPoint, administrativeArea, city, or postalCode child elements were specified.")
+  }
+
+  party <- list()
+
+  # Individual Name
+  if (!is.null(sur_name)) {
+    party$individualName <- list(givenName = given_names, surName = sur_name)
+  }
+
+  # Organization Name
+  if (!is.null(organization)) {
+    party$organizationName <- organization
+  }
+
+  # Position
+  if (!is.null(position)) {
+    party$positionName <- position
+  }
+
+  # Email
+  if (!is.null(email)) {
+    party$electronicMailAddress <- email
+  }
+
+  # Address
+  if (!is.null(address)) {
+    party$address <- address
+  }
+
+  # Phone
+  if (!is.null(phone)) {
+    party$phone <- phone
+  }
+
+  # userId
+  if (!is.null(userId)) {
+    # Warn if the userId doesn't look like an ORCID
+    if (!grepl("^https:\\/\\/orcid\\.org", userId)) {
+      warning(paste0("The provided `userId` of '", userId, "' does not look like an ORCID and the `userId` argument assumes the given `userId` is an ORCID. ORCIDs should be passed in like https://orcid.org/WWWW-XXXX-YYYY-ZZZZ."))
+    }
+
+    party$userId$userId <- userId
+    party$userId$directory = "https://orcid.org"
+  }
+
+  # Role
+  if (!is.null(role)) {
+    # Only allow roles to be set if type is associatedParty or personnel
+    if (type != "associatedParty" && type != "personnel") {
+      stop(call. = FALSE,
+           paste0("Setting a role is only valid on an associatedParty or personnel, not a ", type, "."))
+    }
+
+    party$role <- role
+  }
+
+
+
+  party
+}
 
 #' Create an EML creator.
 #'
