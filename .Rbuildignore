@@ -9,3 +9,4 @@
 ^MAINTENANCE\.md$
 ^_pkgdown\.yml$
 ^pkgdown$
+^\.github$
