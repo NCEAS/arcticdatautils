@@ -20,6 +20,11 @@ useful to set if you are warned about the result set being truncated. Defaults t
 (list) A structured list of the members of the package.
 }
 \description{
+\Sexpr[results=rd, stage=render]{lifecycle::badge("deprecated")}
+}
+\details{
+Please use dataone::getDataPackage() when possible
+
 Get a structured list of PIDs for the objects in a package,
 including the resource map, metadata, and data objects.
 }

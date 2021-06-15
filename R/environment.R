@@ -8,7 +8,6 @@
 #'
 #' @return (character) The environment name.
 #'
-#' @export
 env_get <- function() {
   env <- Sys.getenv("ARCTICDATA_ENV")
 

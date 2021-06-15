@@ -667,6 +667,10 @@ get_all_versions <- function(node, pid) {
 
 #' Get a structured list of PIDs for the objects in a package
 #'
+#' \Sexpr[results=rd, stage=render]{lifecycle::badge("deprecated")}
+#'
+#' Please use dataone::getDataPackage() when possible
+#'
 #' Get a structured list of PIDs for the objects in a package,
 #' including the resource map, metadata, and data objects.
 #'
@@ -690,6 +694,8 @@ get_all_versions <- function(node, pid) {
 #' ids <- get_package(mn, pid)
 #' }
 get_package <- function(node, pid, file_names=FALSE, rows=5000) {
+  lifecycle::deprecate_soft("1.0.0", "get_package()", "dataone::getDataPackage()")
+
   stopifnot(is(node, "MNode") || is(node, "CNode"))
   stopifnot(is.character(pid),
             nchar(pid) > 0)
@@ -914,87 +920,6 @@ find_newest_object <- function(node, identifiers, rows=1000) {
 filter_obsolete_pids <- function(node, pids) {
   pids[is.na(sapply(pids, function(pid) { dataone::getSystemMetadata(node, pid)@obsoletedBy }, USE.NAMES = FALSE))]
 }
-
-
-#' Get an approximate list of the datasets in a user's profile
-#'
-#' This function is intended to (poorly) simulate what a user sees when they
-#' browse to their "My Data Sets" page (their #profile URL). It uses a similar
-#' Solr query to what Metacat UI uses to generate the list.
-#'
-#' The results of this function may be the same as what's on the #profile page
-#' but may be missing some of the user's datasets when:
-#'
-#' - The user has any datasets in their #profile that the person running the
-#' query (you) can't \code{read}. This is rare on arcticdata.io but possible
-#' because arctic-data-admins usually has read/write/changePermission
-#' permissions on every object.
-#' - The user has datasets owned by an Equivalent Identity of the \code{subject}
-#' being queried. This is rare, especially on arcticdata.io.
-#'
-#' @param mn (MNode) The Member Node to query.
-#' @param subject (character) The subject to find the datasets for. This is
-#'   likely going to be an ORCID, e.g. http://orcid.org....
-#' @param fields (character) A vector of Solr fields to return.
-#'
-#' @return (data.frame) A data.frame with the results.
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' options(...set...your...token....)
-#' mn <- env_load('production')$mn
-#' me <- get_token_subject()
-#' profile(mn, me)
-#'
-#' // Get a custom set of fields
-#' view_profile(mn, me, "origin")
-#'
-#' # Set environment
-#' cn <- CNode("STAGING2")
-#' mn <- getMNode(cn,"urn:node:mnTestKNB")
-#'
-#' package_df <- view_profile(mn, "http://orcid.org/0000-0003-4703-1974", fields = c("title"))
-#'
-#' }
-view_profile <- function(mn, subject, fields=c("identifier", "title")) {
-  stopifnot(is(mn, "MNode"))
-  stopifnot(is.character(subject),
-            length(subject) == 1,
-            nchar(subject) > 0)
-  stopifnot(is.character(fields),
-            length(fields) > 0,
-            all(nzchar(fields) > 0))
-
-  rows <- 1000
-  start <- 0
-
-  # Function actually getting the page. Defined here so we can call it
-  # numerous times to get all the pages
-  get_page <- function(mn, subject, fields, rows, start) {
-    query_params <- list("q" = paste0('+(rightsHolder:"', subject, '\" OR changePermission:\"', subject, '\" OR writePermission:\"', subject, '\")+formatType:METADATA+-obsoletedBy:*'),
-                         "fl" = paste(fields, collapse = ","),
-                         "rows" = as.character(rows),
-                         "start" = as.character(start))
-    query(mn, query_params, as = "data.frame")
-  }
-
-  results <- data.frame()
-
-  last_result <- get_page(mn, subject, fields, rows, start)
-  results <- rbind(results, last_result)
-
-  while (nrow(last_result) >= as.numeric(rows)) {
-    message("Fetching more results...")
-    start <- start + rows
-    last_result <- get_page(mn, subject, fields, rows, start)
-    results <- rbind(results, last_result)
-  }
-
-  results
-}
-
 
 #' Show the indexing status of a set of PIDs
 #'
