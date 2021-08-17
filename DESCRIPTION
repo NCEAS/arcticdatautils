@@ -38,7 +38,8 @@ Imports:
     uuid,
     xml2,
     XML,
-    lifecycle
+    lifecycle,
+    rdflib
 Suggests:
     emld,
     humaniformat,
