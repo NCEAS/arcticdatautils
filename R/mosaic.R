@@ -3,7 +3,7 @@
 #'
 #' @param eventLabel (character) the event ID provided by the researcher
 #'
-#' @return (list) the annotation
+#' @return (list) the attribute level annotation
 #' @export
 #'
 #' @examples mosaic_annotate_attribute("PS122/2_14-270")
@@ -27,6 +27,8 @@ mosaic_annotate_attribute <- function(eventLabel) {
    }"
 
   events <- suppressMessages(rdflib::rdf_query(mosaic, query))
+
+  stopifnot(eventLabel %in% events$label)
 
   event_device_iri <- events %>%
     dplyr::filter(label == eventLabel)
@@ -63,49 +65,70 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #'
 #' the basis might differ depending on the campaign this function assumes the use of the Polarstern as the basis- please check carefully
 #'
-#' @param campaign (character) the campaign number (can be derrived from the eventID)
+#' @param campaign (character) the campaign number (can be derrived from the eventID),
 #'
-#' @return
+#' @return (list) the dataset level annotation
 #' @export
 #'
 #' @examples mosaic_annotate_dataset("PS122/2")
-mosaic_annotate_dataset <- function(campaign){
+mosaic_annotate_dataset <- function(campaign) {
 
-  #get the owl file from github
+  # get the owl file from github
   mosaic <- rdflib::rdf_parse("https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl",
-                      format = "rdfxml")
+    format = "rdfxml"
+  )
 
-  #possible campaigns
+  # possible campaigns
   query <-
-    'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
    SELECT ?campaign_iri ?label
    WHERE {
      ?campaign_iri rdf:type <https://purl.dataone.org/odo/MOSAIC_00000001> .
      ?campaign_iri rdfs:label ?label .
-   }'
+   }"
 
   df_campaign <- rdflib::rdf_query(mosaic, query)
+
+  stopifnot(campaign %in% df_campaign$label)
 
   campaign_iri <- dplyr::filter(df_campaign, label == campaign)
 
 
   list(
-    #Basis
-    list(propertyURI = list(label = "hasBasis",
-                            propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000034"),
-         valueURI = list(label = "Polarstern",
-                         valueURI = "http://purl.dataone.org/odo/MOSAiC_00000030")),
-    #Project
-    list(propertyURI = list(label = "hasProjectLabel",
-                            propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000025"),
-         valueURI = list(label = "MOSAiC20192020",
-                         valueURI = "http://purl.dataone.org/odo/MOSAiC_00000023")),
-    #Campaign
-    list(propertyURI = list(label = "isPartOfCampaign",
-                            propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000032"),
-         valueURI = list(label = campaign_iri$label[1],
-                         valueURI = campaign_iri$campaign_iri[1]))
+    # Basis
+    list(
+      propertyURI = list(
+        label = "hasBasis",
+        propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000034"
+      ),
+      valueURI = list(
+        label = "Polarstern",
+        valueURI = "http://purl.dataone.org/odo/MOSAiC_00000030"
+      )
+    ),
+    # Project
+    list(
+      propertyURI = list(
+        label = "hasProjectLabel",
+        propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000025"
+      ),
+      valueURI = list(
+        label = "MOSAiC20192020",
+        valueURI = "http://purl.dataone.org/odo/MOSAiC_00000023"
+      )
+    ),
+    # Campaign
+    list(
+      propertyURI = list(
+        label = "isPartOfCampaign",
+        propertyURI = "http://purl.dataone.org/odo/MOSAiC_00000032"
+      ),
+      valueURI = list(
+        label = campaign_iri$label[1],
+        valueURI = campaign_iri$campaign_iri[1]
+      )
+    )
   )
 }
