@@ -27,7 +27,7 @@ test_that("mosaic dataset annotations work", {
                eml_get_simple(annotation, "propertyURI"))
 })
 
-test_tat("mosaic attribute annotations"{
+test_that("mosaic attribute annotations"{
 
   annotation <- mosaic_annotate_attribute("PS122/2_14-270")
 
