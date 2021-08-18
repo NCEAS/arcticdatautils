@@ -10,7 +10,7 @@ mosaic_annotate_attribute(eventLabel)
 \item{eventLabel}{(character) the event ID provided by the researcher}
 }
 \value{
-(list) the annotation
+(list) the attribute level annotation
 }
 \description{
 Add an attribute annotation (does not include the id slot)

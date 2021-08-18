@@ -1,4 +1,4 @@
-test_that("multiplication works", {
+test_that("mosaic dataset annotations work", {
 
   annotation <- mosaic_annotate_dataset("PS122/2")
 
@@ -25,4 +25,25 @@ test_that("multiplication works", {
 
   expect_equal(eml_get_simple(example_annotation, "propertyURI"),
                eml_get_simple(annotation, "propertyURI"))
+})
+
+test_tat("mosaic attribute annotations"{
+
+  annotation <- mosaic_annotate_attribute("PS122/2_14-270")
+
+  example_annotation <- list(
+     #event
+     list(propertyURI = list(label = "wasGeneratedBy",
+                             propertyURI = "http://www.w3.org/ns/prov#wasGeneratedBy"),
+          valueURI = list(label = "PS122/2_14-270",
+                          valueURI = "https://purl.dataone.org/odo/MOSAIC_00004550")),
+     #Method/Device
+     list(propertyURI = list(label = "deployedSystem",
+                             propertyURI = "https://purl.dataone.org/odo/MOSAIC_00002201"),
+          valueURI = list(label = "Ultra-Wideband Software-defined Microwave Radiometer (0.5-2GHZ)",
+                          valueURI = "https://purl.dataone.org/odo/MOSAIC_00001163")))
+
+     expect_equal(eml_get_simple(example_annotation, "propertyURI"),
+                  eml_get_simple(annotation, "propertyURI"))
+
 })
