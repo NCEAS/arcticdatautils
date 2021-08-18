@@ -7,7 +7,7 @@
 mosaic_annotate_dataset(campaign)
 }
 \arguments{
-\item{campaign}{(character) the campaign number (can be derrived from the eventID),}
+\item{campaign}{(character vector) the campaign number (can be derrived from the eventID), PS122/#}
 }
 \value{
 (list) the dataset level annotation
@@ -16,5 +16,9 @@ mosaic_annotate_dataset(campaign)
 the basis might differ depending on the campaign this function assumes the use of the Polarstern as the basis- please check carefully
 }
 \examples{
+#with one campaign
 mosaic_annotate_dataset("PS122/2")
+
+#multiple campaigns
+mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
 }

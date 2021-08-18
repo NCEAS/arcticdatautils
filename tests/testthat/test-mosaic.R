@@ -47,3 +47,9 @@ test_tat("mosaic attribute annotations"{
                   eml_get_simple(annotation, "propertyURI"))
 
 })
+
+test_that("multiple campaigns work" {
+  annotations <- mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
+
+  expect_equal(length(annotations), 4)
+})

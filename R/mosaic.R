@@ -67,14 +67,19 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #'
 #' the basis might differ depending on the campaign this function assumes the use of the Polarstern as the basis- please check carefully
 #'
-#' @param campaign (character) the campaign number (can be derrived from the eventID), PS122/#
+#' @param campaign (character vector) the campaign number (can be derrived from the eventID), PS122/#
 #'
 #' @return (list) the dataset level annotation
 #' @export
 #'
-#' @examples mosaic_annotate_dataset("PS122/2")
+#' @examples
+#' #with one campaign
+#' mosaic_annotate_dataset("PS122/2")
+#'
+#' #multiple campaigns
+#' mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
 mosaic_annotate_dataset <- function(campaign) {
-
+  #!!! allow people to provide more than one compaign?
   # get the owl file from github
   mosaic <- rdflib::rdf_parse("https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl",
     format = "rdfxml"
@@ -91,14 +96,30 @@ mosaic_annotate_dataset <- function(campaign) {
      ?campaign_iri rdfs:label ?label .
    }"
 
-  df_campaign <- rdflib::rdf_query(mosaic, query)
+  df_campaign <- suppressMessages(rdflib::rdf_query(mosaic, query))
 
   stopifnot(campaign %in% df_campaign$label)
 
-  campaign_iri <- dplyr::filter(df_campaign, label == campaign)
+  campaign_iri <- dplyr::filter(df_campaign, label %in% campaign)
+
+  construct_campaign <- function(label, uri){
+    # Campaign
+    list(
+      propertyURI = list(
+        label = "isPartOfCampaign",
+        propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"
+      ),
+      valueURI = list(
+        label = label,
+        valueURI = uri
+      )
+    )
+  }
+
+  campaigns <- purrr::map2(campaign_iri$label, campaign_iri$campaign_iri, construct_campaign)
 
   #construct annotation
-  list(
+  standard_annotations <- list(
     # Basis
     list(
       propertyURI = list(
@@ -120,17 +141,8 @@ mosaic_annotate_dataset <- function(campaign) {
         label = "MOSAiC20192020",
         valueURI = "https://purl.dataone.org/odo/MOSAIC_00000023"
       )
-    ),
-    # Campaign
-    list(
-      propertyURI = list(
-        label = "isPartOfCampaign",
-        propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"
-      ),
-      valueURI = list(
-        label = campaign_iri$label[1],
-        valueURI = campaign_iri$campaign_iri[1]
-      )
     )
   )
+
+  append(standard_annotations, campaigns)
 }
