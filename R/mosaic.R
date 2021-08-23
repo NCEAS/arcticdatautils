@@ -81,6 +81,13 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #' #multiple campaigns
 #' mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
 mosaic_annotate_dataset <- function(campaign) {
+
+  check_ps <- purrr::map(campaign, ~stringr::str_detect(.x, "PS", negate = T))
+
+  if(all(unlist(check_ps))){
+    warning("Event id does not start with PS. Check if the basis is correct")
+  }
+
   # get the owl file from github
   mosaic_url <- "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
   mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),

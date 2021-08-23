@@ -27,6 +27,17 @@ test_that("mosaic dataset annotations work", {
                eml_get_simple(annotation, "propertyURI"))
 })
 
+test_that("multiple campaigns work", {
+  annotations <- mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
+
+  expect_equal(length(annotations), 4)
+})
+
+test_that("warns users if it isn't a PS attribute", {
+
+  expect_warning(mosaic_annotate_dataset("AF-MOSAiC-1"))
+})
+
 test_that("mosaic attribute annotations", {
 
   annotation <- mosaic_annotate_attribute("PS122/2_14-270")
@@ -46,10 +57,4 @@ test_that("mosaic attribute annotations", {
      expect_equal(eml_get_simple(example_annotation, "propertyURI"),
                   eml_get_simple(annotation, "propertyURI"))
 
-})
-
-test_that("multiple campaigns work", {
-  annotations <- mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
-
-  expect_equal(length(annotations), 4)
 })
