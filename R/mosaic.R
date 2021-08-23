@@ -1,3 +1,5 @@
+#!!! read the file using the pins package?
+
 # add attribute annotations
 #' Add an attribute annotation (does not include the id slot)
 #'
