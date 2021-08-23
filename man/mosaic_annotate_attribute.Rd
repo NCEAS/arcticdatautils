@@ -2,7 +2,7 @@
 % Please edit documentation in R/mosaic.R
 \name{mosaic_annotate_attribute}
 \alias{mosaic_annotate_attribute}
-\title{Add an attribute annotation (does not include the id slot)}
+\title{Add a MOSAiC (https://mosaic-expedition.org/) attribute annotation (the returned object does not include the id slot)}
 \usage{
 mosaic_annotate_attribute(eventLabel)
 }
@@ -13,7 +13,7 @@ mosaic_annotate_attribute(eventLabel)
 (list) the attribute level annotation
 }
 \description{
-Add an attribute annotation (does not include the id slot)
+Add a MOSAiC (https://mosaic-expedition.org/) attribute annotation (the returned object does not include the id slot)
 }
 \examples{
 mosaic_annotate_attribute("PS122/2_14-270")

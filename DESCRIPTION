@@ -39,7 +39,8 @@ Imports:
     xml2,
     XML,
     lifecycle,
-    rdflib
+    rdflib,
+    pins
 Suggests:
     emld,
     humaniformat,

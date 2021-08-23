@@ -1,7 +1,5 @@
-#!!! read the file using the pins package?
 
-# add attribute annotations
-#' Add an attribute annotation (does not include the id slot)
+#' Add a MOSAiC (https://mosaic-expedition.org/) attribute annotation (the returned object does not include the id slot)
 #'
 #' @param eventLabel (character) the event ID provided by the researcher
 #'
@@ -11,7 +9,8 @@
 #' @examples mosaic_annotate_attribute("PS122/2_14-270")
 mosaic_annotate_attribute <- function(eventLabel) {
   # get the owl file from github
-  mosaic <- rdflib::rdf_parse("https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl",
+  mosaic_url <- "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
+  mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
     format = "rdfxml"
   )
 
@@ -65,9 +64,10 @@ mosaic_annotate_attribute <- function(eventLabel) {
   return(event_annotation)
 }
 
-#' Annotating the dataset level annotations
+#' Annotating the MOSAiC dataset level annotations
 #'
-#' the basis might differ depending on the campaign this function assumes the use of the Polarstern as the basis- please check carefully
+#' The basis might differ depending on the campaign if it does not follow the pattern PS122/#. This function assumes the use of the Polarstern as the basis.
+#' Please verify this field before adding the annotation.
 #'
 #' @param campaign (character vector) the campaign number (can be derrived from the eventID), PS122/#
 #'
@@ -81,10 +81,10 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #' #multiple campaigns
 #' mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
 mosaic_annotate_dataset <- function(campaign) {
-  #!!! allow people to provide more than one compaign?
   # get the owl file from github
-  mosaic <- rdflib::rdf_parse("https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl",
-    format = "rdfxml"
+  mosaic_url <- "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
+  mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
+                              format = "rdfxml"
   )
 
   #get the possible campaigns

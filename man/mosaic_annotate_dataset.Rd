@@ -2,7 +2,7 @@
 % Please edit documentation in R/mosaic.R
 \name{mosaic_annotate_dataset}
 \alias{mosaic_annotate_dataset}
-\title{Annotating the dataset level annotations}
+\title{Annotating the MOSAiC dataset level annotations}
 \usage{
 mosaic_annotate_dataset(campaign)
 }
@@ -13,7 +13,8 @@ mosaic_annotate_dataset(campaign)
 (list) the dataset level annotation
 }
 \description{
-the basis might differ depending on the campaign this function assumes the use of the Polarstern as the basis- please check carefully
+The basis might differ depending on the campaign if it does not follow the pattern PS122/#. This function assumes the use of the Polarstern as the basis.
+Please verify this field before adding the annotation.
 }
 \examples{
 #with one campaign
