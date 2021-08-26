@@ -10,7 +10,7 @@
 #' @examples mosaic_annotate_attribute("PS122/2_14-270")
 mosaic_annotate_attribute <- function(eventLabel) {
   # get the owl file from github
-  mosaic <- read_mosaic()
+  mosaic <- read_ontology("mosaic")
 
   # search for the event labels and corresponding devices (labels and URIs)
   query <-
@@ -78,7 +78,7 @@ mosaic_annotate_dataset <- function(campaign) {
     warning("Event id does not start with PS. Check if the basis is correct")
   }
 
-  mosaic <- read_mosaic()
+  mosaic <- read_ontology("mosaic")
 
   #get the possible campaigns
   query <-
@@ -133,19 +133,34 @@ mosaic_annotate_dataset <- function(campaign) {
   append(standard_annotations, campaigns)
 }
 
+#just the concepts
+query_class <-
+  'select distinct ?Concept where {[] a ?Concept} LIMIT 100'
+
 #' Creates the choice label pairs to be pasted into a portal document
 #'
-#' @param class
+#' The function only selects the annotations that are used for method/devices (there are 500 + options).
+#' copy and paste the output into a portal document's choice filters
 #'
-#' @return
+#' @param class (character) a class in the MOSAiC ontology to get the filters from
+#'
+#' @return character
 #' @export
 #'
 #' @examples
-#' method <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000036")
-#' basis <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000028")
-#' campaign <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000001")
+#' mosaic_portal_filter("Method/Device")
+#'
+#' mosaic_portal_filter("Basis")
+#'
+#' mosaic_portal_filter("Campaign")
 mosaic_portal_filter <- function(class) {
-  #get the possible annotations under this class
+
+  #find the class IRI
+  mosaic <- read_ontology("mosaic")
+
+  concepts <- get_ontology_concepts(mosaic)
+
+  df_uri <- dplyr::filter(concepts, label == class)
 
   #build the SPARQL query
   query <-
@@ -156,25 +171,24 @@ mosaic_portal_filter <- function(class) {
    SELECT ?iri ?label
    WHERE {
      ?iri rdf:type <",
-      URI,
+     df_uri$Concept[1],
       "> .
      ?iri rdfs:label ?label .
    }"
     )
 
-  mosaic <- read_mosaic()
-
   df <- suppressMessages(rdflib::rdf_query(mosaic, query)) %>%
-    arrange(label)
+    dplyr::arrange(label)
 
-  #for method/devices find what the existing datasets are annotated with
-  if (class == "https://purl.dataone.org/odo/MOSAIC_00000036") {
-    cn <- CNode('PROD')
-    adc <- getMNode(cn, 'urn:node:ARCTIC')
+  #for method/devices, filter the list based on existing annotations
+  if (df_uri$Concept[1] == "https://purl.dataone.org/odo/MOSAIC_00000036") {
+
+    cn <- dataone::CNode('PROD')
+    adc <- dataone::getMNode(cn, 'urn:node:ARCTIC')
 
     #get all the MOSAiC datasets
     result <-
-      query(
+      dataone::query(
         adc,
         list(
           q = "sem_annotation:*MOSAIC* AND (*:* NOT obsoletedBy:*)",
@@ -186,15 +200,15 @@ mosaic_portal_filter <- function(class) {
         as = "data.frame"
       )
 
-    #all the relevant annotations
+    #select only the relevant annotations
     relevant <- unique(unlist(result$sem_annotation))
 
     df <- df %>%
-      filter(iri %in% relevant)
+      dplyr::filter(iri %in% relevant)
 
   }
 
-  campaigns <- purrr::map2(
+  formatted_choice <- purrr::map2(
     df$label,
     df$iri,
     ~ paste0(
@@ -206,21 +220,6 @@ mosaic_portal_filter <- function(class) {
     )
   )
 
-  paste0(campaigns, collapse = "")
+  paste0(formatted_choice, collapse = "")
 
-}
-
-#helper
-#' Get the MOSAiC owl file from github
-#'
-#' @return
-#' @export
-#'
-#' @examples
-read_mosaic <- function() {
-  # get the owl file from github
-  mosaic_url <-
-    "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
-  mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
-                              format = "rdfxml")
 }
