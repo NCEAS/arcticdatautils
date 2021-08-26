@@ -155,3 +155,73 @@ mosaic_annotate_dataset <- function(campaign) {
 
   append(standard_annotations, campaigns)
 }
+
+library(rdflib)
+library(dplyr)
+
+# get the owl file from github
+mosaic_url <- "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
+mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
+                            format = "rdfxml"
+)
+
+#' Creates the choice label pairs to be pasted into a portal document
+#'
+#' @param class
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' method <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000036")
+#' basis <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000028")
+#' campaign <- mosaic_portal_filter("https://purl.dataone.org/odo/MOSAIC_00000001")
+mosaic_portal_filter <- function(class){
+
+  #get the possible annotations under this class
+
+  #build the SPARQL query
+  query <-
+    paste0(
+      "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+   SELECT ?iri ?label
+   WHERE {
+     ?iri rdf:type <", URI, "> .
+     ?iri rdfs:label ?label .
+   }"
+    )
+
+  df <- suppressMessages(rdflib::rdf_query(mosaic, query)) %>%
+    arrange(label)
+
+  #for method/devices find what the existing datasets are annotated with
+  if(class == "https://purl.dataone.org/odo/MOSAIC_00000036"){
+    cn <- CNode('PROD')
+    adc <- getMNode(cn, 'urn:node:ARCTIC')
+
+    #get all the MOSAiC datasets
+    result <- query(adc, list(q = "sem_annotation:*MOSAIC* AND (*:* NOT obsoletedBy:*)",
+                              fl = "identifier,rightsHolder,formatId, fileName, dateUploaded, sem_annotation",
+                              sort = 'dateUploaded+desc',
+                              start ="0",
+                              rows = "1500"),
+                    as="data.frame")
+
+    #all the relevant annotations
+    relevant <- unique(unlist(result$sem_annotation))
+
+    df <- df %>%
+      filter(iri %in% relevant)
+
+  }
+
+  campaigns <- purrr::map2(df$label, df$iri,
+                           ~paste0("<choice><label>", .x, "</label><value>", .y, "</value></choice>"))
+
+  paste0(campaigns, collapse = "")
+
+}
+
+
