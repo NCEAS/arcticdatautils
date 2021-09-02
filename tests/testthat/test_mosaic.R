@@ -42,8 +42,56 @@ test_that("multiple campaigns work", {
   expect_equal(length(annotations), 4)
 })
 
-test_that("warns users if it isn't a PS attribute", {
-  expect_warning(mosaic_annotate_dataset("AF-MOSAiC-1"))
+test_that("multiple different campaigns work", {
+  annotations <- mosaic_annotate_dataset(c("PS122/2", "AF-MOSAiC-1"))
+
+  example_annotation <- list(
+    #Basis
+    list(
+      propertyURI = list(label = "hasBasis",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
+      valueURI = list(label = "Polarstern",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000030")
+    ),
+    list(
+      propertyURI = list(label = "hasBasis",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
+      valueURI = list(label = "Akademik Fedorov",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000038")
+    ),
+    #Project
+    list(
+      propertyURI = list(label = "hasProjectLabel",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000025"),
+      valueURI = list(label = "MOSAiC20192020",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000023")
+    ),
+    #Campaign
+    list(
+      propertyURI = list(label = "isPartOfCampaign",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
+      valueURI = list(label = "PS122/2",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000018")
+    ),
+    list(
+      propertyURI = list(label = "isPartOfCampaign",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
+      valueURI = list(label = "AF-MOSAiC-1",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000020")
+    )
+  )
+
+  expect_equal(length(annotations), 5)
+
+  expect_equal(
+    eml_get_simple(example_annotation, "label"),
+    eml_get_simple(annotation, "label")
+  )
+
+  expect_equal(
+    eml_get_simple(example_annotation, "propertyURI"),
+    eml_get_simple(annotation, "propertyURI")
+  )
 })
 
 test_that("mosaic attribute level annotations work", {
