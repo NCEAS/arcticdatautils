@@ -144,7 +144,7 @@ mosaic_annotate_dataset <- function(campaign) {
                     valueURI = "https://purl.dataone.org/odo/MOSAIC_00000023")
   )
 
-  #!!! need to fix issue with having only a list of 1 in the project
+  #!!! need to fix issue with having only a list of 1 in the project?
   append(basis,
        campaigns)
 }

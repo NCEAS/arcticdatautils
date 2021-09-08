@@ -42,7 +42,7 @@ test_that("multiple campaigns work", {
   expect_equal(length(annotations), 4)
 })
 
-test_that("multiple different campaigns work", {
+test_that("multiple campaigns with different basis work", {
   annotations <- mosaic_annotate_dataset(c("PS122/2", "AF-MOSAiC-1"))
 
   example_annotation <- list(

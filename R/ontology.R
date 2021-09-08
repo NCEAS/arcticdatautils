@@ -1,4 +1,6 @@
 
+
+
 #' Get an owl file from github
 #'
 #' @param ontology_name the name of the onotology to read; one of mosaic or ecso
@@ -11,12 +13,12 @@
 #' read_ontology("ecso")
 read_ontology <- function(ontology_name) {
   # get the owl file from github
-  if(ontology_name == "mosaic"){
+  if (ontology_name == "mosaic") {
     mosaic_url <-
       "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
     mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
                                 format = "rdfxml")
-  } else if(ontology_name == "ecso"){
+  } else if (ontology_name == "ecso") {
     mosaic_url <-
       "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/ECSO8-add_non-carbon_measurements/observation/ECSO8.owl"
     mosaic <- rdflib::rdf_parse(pins::pin(mosaic_url),
@@ -39,7 +41,7 @@ read_ontology <- function(ontology_name) {
 #'
 #' mosaic <- read_ontology("mosaic")
 #' get_ontology_concepts(mosaic)
-get_ontology_concepts <- function(ontology){
+get_ontology_concepts <- function(ontology) {
   #find the class IRI
   query_class <-
     'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -64,12 +66,11 @@ get_ontology_concepts <- function(ontology){
 #' @export
 #'
 #' @examples eml_ecso_annotation("latitude coordinate")
-eml_ecso_annotation <- function(valueLabel){
-
+eml_ecso_annotation <- function(valueLabel) {
   ecso <- read_ontology("ecso")
 
   query <-
-      "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
    SELECT ?iri ?label
@@ -82,7 +83,19 @@ eml_ecso_annotation <- function(valueLabel){
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <-
+    dplyr::filter(df,
+                  stringr::str_to_lower(label) == stringr::str_to_lower(valueLabel))
+
+  if (nrow(annotations) > 1) {
+    warning(
+      paste0(
+        "More than one annotation found for ",
+        valueLabel,
+        ". Please check the ontology on which one would be more appropriate."
+      )
+    )
+  }
 
   list(
     propertyURI = list(label = "contains measurements of type",
