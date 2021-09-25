@@ -46,18 +46,18 @@ test_that("multiple campaigns with different basis work", {
   annotations <- mosaic_annotate_dataset(c("PS122/2", "AF-MOSAiC-1"))
 
   example_annotation <- list(
+    list(
+      propertyURI = list(label = "hasBasis",
+                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
+      valueURI = list(label = "Akademik Fedorov",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000038")
+    ),
     #Basis
     list(
       propertyURI = list(label = "hasBasis",
                          propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
       valueURI = list(label = "Polarstern",
                       valueURI = "https://purl.dataone.org/odo/MOSAIC_00000030")
-    ),
-    list(
-      propertyURI = list(label = "hasBasis",
-                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
-      valueURI = list(label = "Akademik Fedorov",
-                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000038")
     ),
     #Project
     list(
@@ -70,14 +70,14 @@ test_that("multiple campaigns with different basis work", {
     list(
       propertyURI = list(label = "isPartOfCampaign",
                          propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
-      valueURI = list(label = "PS122/2",
-                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000018")
+      valueURI = list(label = "AF-MOSAiC-1",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000020")
     ),
     list(
       propertyURI = list(label = "isPartOfCampaign",
                          propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
-      valueURI = list(label = "AF-MOSAiC-1",
-                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000020")
+      valueURI = list(label = "PS122/2",
+                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000018")
     )
   )
 
@@ -85,12 +85,12 @@ test_that("multiple campaigns with different basis work", {
 
   expect_equal(
     eml_get_simple(example_annotation, "label"),
-    eml_get_simple(annotation, "label")
+    eml_get_simple(annotations, "label")
   )
 
   expect_equal(
     eml_get_simple(example_annotation, "propertyURI"),
-    eml_get_simple(annotation, "propertyURI")
+    eml_get_simple(annotations, "propertyURI")
   )
 })
 
