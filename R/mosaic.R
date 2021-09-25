@@ -1,5 +1,6 @@
 
 
+
 #' Add a MOSAiC (https://mosaic-expedition.org/) attribute annotation (the returned object does not include the id slot)
 #'
 #' @param eventLabel (character) the event ID provided by the researcher
@@ -71,25 +72,23 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #' #multiple campaigns
 #' mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
 mosaic_annotate_dataset <- function(campaign) {
-  check_ps <-
-    purrr::map(campaign, ~ stringr::str_detect(.x, "PS", negate = T))
-
-  if (all(unlist(check_ps))) {
-    warning("Event id does not start with PS. Check if the basis is correct")
-  }
-
   mosaic <- read_ontology("mosaic")
 
   #get the possible campaigns
   query <-
     "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX ssn: <http://www.w3.org/ns/ssn/>
 
-   SELECT ?campaign_iri ?label
-   WHERE {
-     ?campaign_iri rdf:type <https://purl.dataone.org/odo/MOSAIC_00000001> .
-     ?campaign_iri rdfs:label ?label .
-   }"
+    SELECT ?campaign_iri ?label ?basis_iri ?blabel
+    WHERE {
+    ?campaign_iri rdf:type <https://purl.dataone.org/odo/MOSAIC_00000001> .
+    ?campaign_iri rdfs:label ?label .
+    OPTIONAL {
+    ?campaign_iri <https://purl.dataone.org/odo/MOSAIC_00000034> ?basis_iri .
+    ?basis_iri rdfs:label ?blabel .
+    }
+  }"
 
   df_campaign <- suppressMessages(rdflib::rdf_query(mosaic, query))
 
@@ -97,40 +96,55 @@ mosaic_annotate_dataset <- function(campaign) {
 
   campaign_iri <- dplyr::filter(df_campaign, label %in% campaign)
 
-  construct_campaign <- function(label, uri) {
-    # Campaign
-    list(
-      propertyURI = list(label = "isPartOfCampaign",
-                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
-      valueURI = list(label = label,
-                      valueURI = uri)
-    )
+  construct_annotation <- function(label, uri, type) {
+    if (type == "Campaign") {
+      # Campaign
+      list(
+        propertyURI = list(label = "isPartOfCampaign",
+                           propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000032"),
+        valueURI = list(label = label,
+                        valueURI = uri)
+      )
+    } else{
+      # Basis
+      if(is.na(label) | label == "Polarstern"){
+        list(
+          propertyURI = list(label = "hasBasis",
+                             propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
+          valueURI = list(label = "Polarstern",
+                          valueURI = "https://purl.dataone.org/odo/MOSAIC_00000030")
+        )
+      } else{
+        list(
+          propertyURI = list(label = "hasBasis",
+                             propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
+          valueURI = list(label = label,
+                          valueURI = uri)
+        )
+      }
+    }
   }
 
   campaigns <-
     purrr::map2(campaign_iri$label,
                 campaign_iri$campaign_iri,
-                construct_campaign)
+                ~construct_annotation(.x, .y, type = "Campaign"))
+
+  basis <-
+    purrr::map2(unique(campaign_iri$blabel),
+                unique(campaign_iri$basis_iri),
+                ~construct_annotation(.x, .y, type = "Basis"))
 
   #construct annotation
-  standard_annotations <- list(
-    # Basis
-    list(
-      propertyURI = list(label = "hasBasis",
-                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000034"),
-      valueURI = list(label = "Polarstern",
-                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000030")
-    ),
-    # Project
-    list(
-      propertyURI = list(label = "hasProjectLabel",
-                         propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000025"),
-      valueURI = list(label = "MOSAiC20192020",
-                      valueURI = "https://purl.dataone.org/odo/MOSAIC_00000023")
-    )
+  # Project
+  project <- list(
+    propertyURI = list(label = "hasProjectLabel",
+                       propertyURI = "https://purl.dataone.org/odo/MOSAIC_00000025"),
+    valueURI = list(label = "MOSAiC20192020",
+                    valueURI = "https://purl.dataone.org/odo/MOSAIC_00000023")
   )
 
-  append(standard_annotations, campaigns)
+  c(basis, list(project), campaigns)
 }
 
 #just the concepts
@@ -154,7 +168,6 @@ query_class <-
 #'
 #' mosaic_portal_filter("Campaign")
 mosaic_portal_filter <- function(class) {
-
   #find the class IRI
   mosaic <- read_ontology("mosaic")
 
@@ -171,7 +184,7 @@ mosaic_portal_filter <- function(class) {
    SELECT ?iri ?label
    WHERE {
      ?iri rdf:type <",
-     df_uri$Concept[1],
+      df_uri$Concept[1],
       "> .
      ?iri rdfs:label ?label .
    }"
@@ -182,7 +195,6 @@ mosaic_portal_filter <- function(class) {
 
   #for method/devices, filter the list based on existing annotations
   if (df_uri$Concept[1] == "https://purl.dataone.org/odo/MOSAIC_00000036") {
-
     cn <- dataone::CNode('PROD')
     adc <- dataone::getMNode(cn, 'urn:node:ARCTIC')
 

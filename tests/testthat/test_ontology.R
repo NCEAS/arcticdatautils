@@ -18,3 +18,11 @@ test_that("fails if the annotation does not exist in ECSO", {
   expect_error(eml_ecso_annotation("Annotation does not exist"))
 
 })
+
+test_that("produces a warning if there are more than one annotation found", {
+
+  expect_warning(eml_ecso_annotation("thickness"))
+  expect_warning(eml_ecso_annotation("Depth"))
+
+})
+
