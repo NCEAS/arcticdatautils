@@ -16,7 +16,7 @@ To install the latest version of this package we recommend installing from Githu
 
 ```r
 
-remotes::install_github("nceas/arcticdatautils")
+remotes::install_github("nceas/arcticdatautils@main")
 
 ```
 
