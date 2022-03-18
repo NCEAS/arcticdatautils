@@ -644,3 +644,42 @@ eml_add_entity_system <- function(doc){
 
 
 }
+
+#' Categorize a dataset with an annotation
+#'
+#' Creates an annotation from the ADC Academic Disciplines ontology
+#' [here](https://bioportal.bioontology.org/ontologies/ADCAD/?p=classes&conceptid=root)
+#' and inserts the annotation into the EML document `doc` while retaining any existing
+#' annotations such as the sensitivity annotations. For a list of available disciplines,
+#' see link above.
+#'
+#'
+#'
+#' @param doc (emld) An EML document
+#' @param discipline (character) One or more disciplines in title case from the ADCAD ontology.
+#'
+#' @return doc (emld) An EML document with annotation added
+#' @export
+#' @examples
+#' library(EML)
+#' # read in any EML document
+#' doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+#' # add the dataset categories
+#' doc <- eml_categorize_dataset(doc, c("Soil Science", "Ecology"))
+#'
+eml_categorize_dataset <- function(doc, discipline){
+
+  stopifnot("emld" %in% class(doc))
+
+  if (is.null(doc$dataset$id)){
+    doc$dataset$id <- gsub(":", "-", doc$packageId)
+  }
+
+  existing_anns <- doc$dataset$annotation
+
+  new_ann <- purrr::map(discipline, eml_adcad_annotation)
+
+  doc$dataset$annotation <- c(list(existing_anns), new_ann)
+
+  return(doc)
+}

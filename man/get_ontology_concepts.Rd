@@ -7,7 +7,7 @@
 get_ontology_concepts(ontology)
 }
 \arguments{
-\item{ontology}{(list)}
+\item{ontology}{(list) the list form of a OWL file}
 }
 \value{
 dataframe
