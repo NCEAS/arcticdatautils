@@ -660,6 +660,12 @@ eml_add_entity_system <- function(doc){
 #'
 #' @return doc (emld) An EML document with annotation added
 #' @export
+#' @examples
+#' library(EML)
+#' # read in any EML document
+#' doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+#' # add the dataset categories
+#' doc <- eml_categorize_dataset(doc, c("Soil Science", "Ecology"))
 #'
 eml_categorize_dataset <- function(doc, discipline){
 

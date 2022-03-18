@@ -21,3 +21,11 @@ and inserts the annotation into the EML document \code{doc} while retaining any 
 annotations such as the sensitivity annotations. For a list of available disciplines,
 see link above.
 }
+\examples{
+library(EML)
+# read in any EML document
+doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+# add the dataset categories
+doc <- eml_categorize_dataset(doc, c("Soil Science", "Ecology"))
+
+}
