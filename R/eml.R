@@ -648,7 +648,7 @@ eml_add_entity_system <- function(doc){
 #' Categorize a dataset with an annotation
 #'
 #' Creates an annotation from the ADC Academic Disciplines ontology
-#' [here](https://bioportal.bioontology.org/ontologies/OBOE/?p=classes&conceptid=root)
+#' [here](https://bioportal.bioontology.org/ontologies/ADCAD/?p=classes&conceptid=root)
 #' and inserts the annotation into the EML document `doc` while retaining any existing
 #' annotations such as the sensitivity annotations. For a list of available disciplines,
 #' see link above.

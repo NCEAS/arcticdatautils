@@ -9,14 +9,14 @@ eml_categorize_dataset(doc, discipline)
 \arguments{
 \item{doc}{(emld) An EML document}
 
-\item{discipline}{(character) A discipline in title case from the ADCAD ontology.}
+\item{discipline}{(character) One or more disciplines in title case from the ADCAD ontology.}
 }
 \value{
 doc (emld) An EML document with annotation added
 }
 \description{
 Creates an annotation from the ADC Academic Disciplines ontology
-\href{https://bioportal.bioontology.org/ontologies/OBOE/?p=classes&conceptid=root}{here}
+\href{https://bioportal.bioontology.org/ontologies/ADCAD/?p=classes&conceptid=root}{here}
 and inserts the annotation into the EML document \code{doc} while retaining any existing
 annotations such as the sensitivity annotations. For a list of available disciplines,
 see link above.
