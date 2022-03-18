@@ -372,11 +372,23 @@ test_that('Identifier systems can be added', {
 
 test_that('Datasets can be categorized', {
 
+  # two disciplines
   doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
 
-  doc <- eml_categorize_dataset(doc, "Atmospheric Science")
+  doc <- eml_categorize_dataset(doc, c("Atmospheric Science", "Chemistry"))
 
   expect_true(eml_validate(doc))
   expect_true("Atmospheric Science" %in% eml_get_simple(doc$dataset$annotation, "label"))
+  expect_true("Chemistry" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # one discipline
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_categorize_dataset(doc, c("Atmospheric Science"))
+
+  expect_true(eml_validate(doc))
+  expect_true("Atmospheric Science" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+
 
 })

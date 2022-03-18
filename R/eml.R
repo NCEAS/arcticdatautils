@@ -656,7 +656,7 @@ eml_add_entity_system <- function(doc){
 #'
 #'
 #' @param doc (emld) An EML document
-#' @param discipline (character) A discipline in title case from the ADCAD ontology.
+#' @param discipline (character) One or more disciplines in title case from the ADCAD ontology.
 #'
 #' @return doc (emld) An EML document with annotation added
 #' @export
@@ -667,8 +667,8 @@ eml_categorize_dataset <- function(doc, discipline){
 
   existing_anns <- doc$dataset$annotation
 
-  new_ann <- eml_adcad_annotation(discipline)
+  new_ann <- purrr::map(discipline, eml_adcad_annotation)
 
-  doc$dataset$annotation <- list(existing_anns, new_ann)
+  doc$dataset$annotation <- c(list(existing_anns), new_ann)
   return(doc)
 }
