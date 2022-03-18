@@ -389,6 +389,18 @@ test_that('Datasets can be categorized', {
   expect_true(eml_validate(doc))
   expect_true("Atmospheric Science" %in% eml_get_simple(doc$dataset$annotation, "label"))
 
+  # no previous annotations with one
 
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA2PV6B79W")
+  doc <- eml_categorize_dataset(doc, c("Oceanography"))
+
+  expect_true(eml_validate(doc))
+
+  # no previous annotations with one
+
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA2PV6B79W")
+  doc <- eml_categorize_dataset(doc, c("Oceanography", "Mathematics"))
+
+  expect_true(eml_validate(doc))
 
 })

@@ -671,10 +671,15 @@ eml_categorize_dataset <- function(doc, discipline){
 
   stopifnot("emld" %in% class(doc))
 
+  if (is.null(doc$dataset$id)){
+    doc$dataset$id <- gsub(":", "-", doc$packageId)
+  }
+
   existing_anns <- doc$dataset$annotation
 
   new_ann <- purrr::map(discipline, eml_adcad_annotation)
 
   doc$dataset$annotation <- c(list(existing_anns), new_ann)
+
   return(doc)
 }
