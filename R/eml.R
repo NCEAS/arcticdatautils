@@ -683,3 +683,52 @@ eml_categorize_dataset <- function(doc, discipline){
 
   return(doc)
 }
+
+
+#' Add distribution information to EML
+#'
+#' Adds a landing page URL to the dataset, and corrects the metadata identifier
+#' by replacing the existing identifier with that which is passed. Note that this
+#' function constructs landing page URLs for the Arctic Data Center only and will not work
+#' correctly on other repositories.
+#'
+#'
+#'
+#' @param doc (emld) An EML document
+#' @param identifier (character) A pre-issued, unassigned identifier (as from `dataone::generateIdentifier()`)
+#'
+#' @return doc (emld) An EML document with distribution added
+#' @export
+#' @examples
+#' \dontrun{
+#' library(EML)
+#' d1c <- dataone::D1Client("STAGING", "mnTestARCTIC")
+#' # read in any EML document
+#' doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+#' # generate a doi
+#' id <- generateIdentifier(d1c@mn, "doi")
+#' doc <- eml_add_distribution(doc, id)
+#' }
+#'
+eml_add_distribution <- function(doc, identifier){
+
+  stopifnot("emld" %in% class(doc))
+
+  doc$packageId <- identifier
+
+  use_doi <- grepl("doi", identifier)
+
+  # Add landing page
+  if (use_doi == T){
+    doc$dataset$distribution$offline <- NULL
+    doc$dataset$distribution$online$url <- list(url = paste0("http://doi.org/", identifier),
+                                                `function` = "information")
+  }
+  else if (use_doi == F){
+    doc$dataset$distribution$offline <- NULL
+    doc$dataset$distribution$online$url <- list(url = paste0("http://arcticdata.io/catalog/view/", identifier),
+                                                `function` = "information")
+  }
+
+  return(doc)
+}
