@@ -404,3 +404,20 @@ test_that('Datasets can be categorized', {
   expect_true(eml_validate(doc))
 
 })
+
+
+test_that('Distribution info can be added', {
+
+  doc <- EML::read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+  # generate a doi
+  id <- "test_id"
+  doc <- eml_add_distribution(doc, id)
+
+  expect_true(eml_validate(doc))
+
+  expect_equal(doc$packageId, id)
+
+  expect_true(grepl(id, doc$dataset$distribution))
+
+
+})
