@@ -471,13 +471,16 @@ read_zip_shapefile <- function(mn, pid){
   temp <- tempfile()
   writeBin(dataone::getObject(mn, pid), temp)
   zip_contents <- utils::unzip(temp, exdir = tempfile())
+  zip_contents_f <- grep("__MACOSX", zip_contents, value = TRUE, invert = TRUE)
 
-  if (length(grep("shp", tools::file_ext(zip_contents))) != 1){
+  if (length(grep("shp", tools::file_ext(zip_contents_f))) !=
+      1) {
     stop("Zipped directory must contain one and only one .shp file")
   }
-
-  shapefile <- sf::st_read(zip_contents[grep("shp", tools::file_ext(zip_contents))], quiet = T, stringsAsFactors = F)
+  shapefile <- sf::st_read(zip_contents_f[grep("shp", tools::file_ext(zip_contents_f))],
+                           quiet = T, stringsAsFactors = F)
   unlink(temp)
+
   return(shapefile)
 }
 
