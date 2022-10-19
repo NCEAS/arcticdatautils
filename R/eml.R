@@ -461,11 +461,11 @@ extract_name <- function(x){
 #'
 #' @param path (char) Path to a raster file
 #' @param coord_name (char) horizCoordSysDef name
-#' @param attributes (dataTable) attributes for raster
+#' @param attributeList (list) Entity attributeList for raster
 #'
 #'
 #' @export
-eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
+eml_get_raster_metadata <- function(path, coord_name = NULL, attributeList){
 
   raster_obj <- raster::raster(path)
   message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
@@ -483,7 +483,7 @@ eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
   }
 
   raster_info <- list(entityName = basename(path),
-                      attributeList = set_attributes(attributes),
+                      attributeList = attributeList,
                       spatialReference = list(horizCoordSysName = coord_name),
                       horizontalAccuracy = list(accuracyReport = "unknown"),
                       verticalAccuracy = list(accuracyReport = "unknown"),
