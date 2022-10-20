@@ -471,7 +471,8 @@ eml_get_raster_metadata <- function(path, coord_name = NULL, attributeList){
   message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
 
   if (is.null(coord_name)){
-    coord_name <- raster::crs(raster_obj)@projargs
+    #coord_name <- raster::crs(raster_obj)@projargs
+    warning(paste("Error in the 'coord_name' argument. The following coordinate string will not allow the EML to validate if used:", raster::crs(raster_obj)@projargs, "\n \nPlease search for the appropriate coordinate string by running View(get_coord_list()). You should use a string from the 'geogCoordSys' column. Commonly used projections are WGS84 and NAD83. The correct strings for these projections are 'GCS_WGS_1984' and 'GCS_North_American_1983', respectively."))
   }
 
 
