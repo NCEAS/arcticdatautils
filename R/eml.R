@@ -468,7 +468,7 @@ extract_name <- function(x){
 eml_get_raster_metadata <- function(path, coord_name = NULL, attributeList){
 
   raster_obj <- raster::raster(path)
-  message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
+  # message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
 
   if (is.null(coord_name)){
     #coord_name <- raster::crs(raster_obj)@projargs
