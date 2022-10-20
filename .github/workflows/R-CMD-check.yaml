@@ -24,7 +24,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - uses: r-lib/actions/setup-tinytex@v1
 
       - name: Cache R packages
