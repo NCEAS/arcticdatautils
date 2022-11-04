@@ -194,10 +194,8 @@ eml_otherEntity_to_dataTable <- function(doc, index, validate_eml = TRUE) {
   if (length(eml_get_simple(doc$dataset$otherEntity, "entityName")) == 1) {
     ## prepare OE to copy
     otherEntity <- doc$dataset$otherEntity
-    ## Handle case where otherEntity is in a list of length 1 (boxed)
-    if (is.null(names(otherEntity))) {
-      otherEntity <- otherEntity[[1]]
-    } else if (!is.null(names(otherEntity))) {  ## Handle case where otherEntity is unboxed
+  ## Handle case where otherEntity is unboxed
+  if (!is.null(names(otherEntity))) {
       otherEntity <- list(otherEntity)
     }
     otherEntity[[1]]$entityType <- NULL
