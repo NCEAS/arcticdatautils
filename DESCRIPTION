@@ -29,7 +29,7 @@ Imports:
     digest,
     EML (>= 2.0),
     httr,
-    jsonlite,
+    jsonlite (>= 1.8.4),
     magrittr,
     methods,
     stringr,
