@@ -354,7 +354,7 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
   award_nums <- awards
 
   result <- lapply(award_nums, function(x){
-    url <- paste0("https://api.nsf.gov/services/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
+    url <- paste0("https://www.research.gov/awardapi-service/v1/awards.json?id=", x ,"&printFields=coPDPI,pdPIName,title")
 
     t <- tryCatch(jsonlite::fromJSON(url),
                   error = function(j) {
