@@ -459,29 +459,47 @@ extract_name <- function(x){
 #'
 #' @param path (char) Path to a raster file
 #' @param coord_name (char) horizCoordSysDef name
-#' @param attributes (dataTable) attributes for raster
+#' @param attributeList (list) Entity attributeList for raster
 #'
 #'
 #' @export
-eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
+eml_get_raster_metadata <- function(path, coord_name = NULL, attributeList){
 
   raster_obj <- raster::raster(path)
-  message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
+  # message(paste("Reading raster object with proj4string of ", raster::crs(raster_obj)@projargs))
 
   if (is.null(coord_name)){
-    coord_name <- raster::crs(raster_obj)@projargs
+    #coord_name <- raster::crs(raster_obj)@projargs
+    warning(paste("Error in the 'coord_name' argument. The following coordinate string will not allow the EML to validate if used:", raster::crs(raster_obj)@projargs, "\n \nPlease search for the appropriate coordinate string by running View(get_coord_list()). You should use a string from the 'geogCoordSys' column. Commonly used projections are WGS84 and NAD83. The correct strings for these projections are 'GCS_WGS_1984' and 'GCS_North_American_1983', respectively."))
   }
 
 
-  if (identical(raster::origin(raster_obj), c(0,0))){
+  if (raster::origin(raster_obj)[1] > 0 & raster::origin(raster_obj)[2] > 0 ){
+    # positive x, positive y
+    raster_orig <- "Upper Right"
+  } else if (raster::origin(raster_obj)[1] < 0 & raster::origin(raster_obj)[2] > 0 ){
+    # negative x, positive y
     raster_orig <- "Upper Left"
-  } else if(!identical(raster::origin(raster_obj), c(0,0))){
-    message("Raster origin not at 0,0")
-    raster_orig <- "unknown"
+  } else if (raster::origin(raster_obj)[1] < 0 & raster::origin(raster_obj)[2] < 0 ){
+    # negative x, negative y
+    raster_orig <- "Lower Left"
+  } else if (raster::origin(raster_obj)[1] > 0 & raster::origin(raster_obj)[2] < 0 ){
+    # positive x, negative y
+    raster_orig <- "Lower Right"
+  } else if (raster::origin(raster_obj)[1] == 0 & raster::origin(raster_obj)[2] < 0 ){
+    raster_orig <- "Lower Left"
+  } else if (raster::origin(raster_obj)[1] == 0 & raster::origin(raster_obj)[2] > 0 ){
+    raster_orig <- "Upper Left"
+  } else if (raster::origin(raster_obj)[1] > 0 & raster::origin(raster_obj)[2] == 0 ){
+    raster_orig <- "Upper Right"
+  } else if (raster::origin(raster_obj)[1] < 0 & raster::origin(raster_obj)[2] == 0 ){
+    raster_orig <- "Upper Left"
+  } else if (identical(raster::origin(raster_obj), c(0,0))){
+    raster_orig <- "Upper Left"
   }
 
   raster_info <- list(entityName = basename(path),
-                      attributeList = set_attributes(attributes),
+                      attributeList = attributeList,
                       spatialReference = list(horizCoordSysName = coord_name),
                       horizontalAccuracy = list(accuracyReport = "unknown"),
                       verticalAccuracy = list(accuracyReport = "unknown"),
