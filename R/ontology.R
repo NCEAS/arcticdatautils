@@ -139,3 +139,41 @@ eml_adcad_annotation <- function(valueLabel){
   )
 }
 
+#' Given a key variable from the Arctic Report Card (ARCRC) ontology, produce the corresponding annotation
+#'
+#' Reduces the amount of copy pasting needed
+#'
+#' @param valueLabel (character) One of the key variables found in
+#' [ARCRC](https://bioportal.bioontology.org/ontologies/ARCRC/?p=classes&conceptid=http%3A%2F%2Fpurl.dataone.org%2Fodo%2FARCRC_00000040)
+#'
+#' @return list - a formatted EML annotation
+#' @export
+#'
+#' @examples eml_arcrc_key_variable_annotation("surface temperature")
+eml_arcrc_key_variable_annotation <- function(valueLabel) {
+
+  arcrc <- read_ontology("ARCRC")
+
+  query <-
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+   SELECT ?iri ?label
+   WHERE {
+     ?iri rdf:type <http://www.w3.org/2002/07/owl#Class> .
+     ?iri rdfs:label ?label .
+   }"
+
+  df <- suppressMessages(rdflib::rdf_query(ont, query))
+
+  stopifnot(valueLabel %in% df$label)
+
+  annotations <- dplyr::filter(df, label == valueLabel)
+
+  list(
+    propertyURI = list(label = "isAbout",
+                       propertyURI = "http://purl.obolibrary.org/obo/IAO_0000136"),
+    valueURI = list(label = annotations$label,
+                    valueURI = annotations$iri)
+  )
+}

@@ -53,9 +53,10 @@ Suggests:
     raster,
     rmarkdown,
     sf,
-    testthat,
+    testthat (>= 3.0.0),
     xslt,
     yaml
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
+Config/testthat/edition: 3
