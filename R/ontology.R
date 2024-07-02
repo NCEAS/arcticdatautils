@@ -25,7 +25,10 @@ read_ontology <- function(ontology_name) {
     ann_url <- "https://data.bioontology.org/ontologies/ADCAD/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
     ont <- rdflib::rdf_parse(ann_url,
                              format = "rdfxml")
-
+  } else if (ontology_name == "ARCRC") {
+    ann_url <- "https://data.bioontology.org/ontologies/ARCRC/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
+    ont <- rdflib::rdf_parse(ann_url,
+                             format = "rdfxml")
   }
 
 }
