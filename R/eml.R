@@ -730,3 +730,46 @@ eml_add_distribution <- function(doc, identifier){
 
   return(doc)
 }
+
+#' Add an Arctic Report Card annotation to a dataset
+#'
+#' Creates an annotation from the Arctic Report Card ontology
+#' [here](https://bioportal.bioontology.org/ontologies/ARCRC/?p=summary)
+#' and inserts the annotation into the EML document `doc` while retaining any existing
+#' annotations such as the sensitivity annotations or dataset categorization. For a
+#' list of available essay topics or key variables, see link above.
+#'
+#'
+#'
+#' @param doc (emld) An EML document
+#' @param property (character) One of two properties: "isAbout" for key variables or "influenced" for essay topics
+#' @param label (character) One or more labels in title case from the ADCAD ontology.
+#'
+#' @return doc (emld) An EML document with annotation added
+#' @export
+#' @examples
+#' library(EML)
+#' # read in any EML document
+#' doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+#' # add the dataset categories
+#' doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness", "sea surface temperature"))
+#'
+eml_arcrc_add_annotation <- function(doc, property, label){
+
+  stopifnot("emld" %in% class(doc))
+  existing_anns <- doc$dataset$annotation
+
+  if (is.null(doc$dataset$id)){
+    doc$dataset$id <- gsub(":", "-", doc$packageId)
+  }
+
+  if (property == "isAbout") {
+    new_ann <- purrr::map(label, eml_arcrc_key_variable_annotation)
+  } else if (property == "influenced") {
+    new_ann <- purrr::map(label, eml_arcrc_essay_annotation)
+  }
+
+  doc$dataset$annotation <- c(list(existing_anns), new_ann)
+
+  return(doc)
+}
