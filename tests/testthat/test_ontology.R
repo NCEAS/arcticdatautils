@@ -38,3 +38,23 @@ test_that("fails if the annotation does not exist in ARCRC", {
 
   expect_error(eml_arcrc_key_variable_annotation("Annotation does not exist"))
 })
+
+test_that("Creating an ARCRC essay annotation works", {
+
+  expected <- list(
+    propertyURI = list(label = "influenced",
+                       propertyURI = "http://www.w3.org/ns/prov#influenced"),
+    valueURI = list(label = "Sea Ice Indicator",
+                    valueURI = "http://purl.dataone.org/odo/ARCRC_00000007")
+  )
+
+  arcrc_annotation <- eml_arcrc_essay_annotation("Sea Ice Indicator")
+
+  expect_equal(arcrc_annotation$propertyURI$label, expected$propertyURI$label)
+  expect_equal(arcrc_annotation$valueURI$label, expected$valueURI$label)
+})
+
+test_that("fails if the annotation does not exist in ARCRC", {
+
+  expect_error(eml_arcrc_essay_annotation("Annotation does not exist"))
+})
