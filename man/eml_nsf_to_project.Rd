@@ -35,5 +35,4 @@ doc <- list(packageId = "id", system = "system",
 doc$dataset$project <- proj
 
 EML::eml_validate(doc)
-
 }

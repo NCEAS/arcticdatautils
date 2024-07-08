@@ -35,6 +35,7 @@
 #' @return (data.frame) An inventory.
 #'
 #' @noRd
+#' @importFrom rlang .data
 theme_packages <- function(inventory, nfiles_cutoff=100) {
   stopifnot(is.data.frame(inventory),
             "package_nfiles" %in% names(inventory))
@@ -59,9 +60,9 @@ theme_packages <- function(inventory, nfiles_cutoff=100) {
   inventory$theme[grep("v_\\d\\.", inventory$file)] <- "has-versions"
 
   # There should be no un-themed packages once we're done
-  theme_stats <- dplyr::group_by(inventory, theme)
-  theme_stats <- dplyr::filter(theme_stats, is_metadata == TRUE)
-  theme_stats <- dplyr::summarize(theme_stats, npkgs = length(filename))
+  theme_stats <- dplyr::group_by(inventory, .data$theme)
+  theme_stats <- dplyr::filter(theme_stats, .data$is_metadata == TRUE)
+  theme_stats <- dplyr::summarize(theme_stats, npkgs = length(.data$filename))
 
   cat("Theme summary (by package):\n")
 

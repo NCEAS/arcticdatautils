@@ -345,7 +345,7 @@ reorder_pids <- function(pid_list, doc){
 #' doc$dataset$project <- proj
 #'
 #' EML::eml_validate(doc)
-#'
+#' @importFrom utils tail
 eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 
   stopifnot(is.character(awards))

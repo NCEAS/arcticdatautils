@@ -270,6 +270,7 @@ inv_load_identifiers <- function(inventory, paths) {
 #' @return (data.frame) An inventory.
 #'
 #' @noRd
+#' @importFrom rlang .data
 inv_add_extra_columns <- function(inventory) {
   stopifnot(is(inventory, "data.frame"), "file" %in% names(inventory))
 
@@ -348,8 +349,8 @@ inv_add_extra_columns <- function(inventory) {
 
   # Calculate statistics related to packages
   cat("Adding 'package_nfiles', 'package_size_mb', and 'package_has_archives' columns.\n")
-  inventory <- dplyr::group_by(inventory, package)
-  inventory <- dplyr::mutate(inventory, package_nfiles = length(package))
+  inventory <- dplyr::group_by(inventory, .data$package)
+  inventory <- dplyr::mutate(inventory, package_nfiles = length(.data$package))
 
   as.data.frame(inventory)
 }

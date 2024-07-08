@@ -72,6 +72,7 @@ get_ontology_concepts <- function(ontology){
 #' @export
 #'
 #' @examples eml_ecso_annotation("latitude coordinate")
+#' @importFrom rlang .data
 eml_ecso_annotation <- function(valueLabel){
 
   ecso <- read_ontology("ecso")
@@ -90,7 +91,7 @@ eml_ecso_annotation <- function(valueLabel){
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "contains measurements of type",
@@ -151,6 +152,7 @@ eml_adcad_annotation <- function(valueLabel){
 #' @export
 #'
 #' @examples eml_arcrc_key_variable_annotation("age of sea ice")
+#' @importFrom rlang .data
 eml_arcrc_key_variable_annotation <- function(valueLabel) {
 
   arcrc <- read_ontology("ARCRC")
@@ -169,7 +171,7 @@ eml_arcrc_key_variable_annotation <- function(valueLabel) {
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "isAbout",
@@ -190,6 +192,7 @@ eml_arcrc_key_variable_annotation <- function(valueLabel) {
 #' @export
 #'
 #' @examples eml_arcrc_essay_annotation("Sea Ice Indicator")
+#' @importFrom rlang .data
 eml_arcrc_essay_annotation <- function(valueLabel) {
 
   arcrc <- read_ontology("ARCRC")
@@ -208,7 +211,7 @@ eml_arcrc_essay_annotation <- function(valueLabel) {
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "influenced",
