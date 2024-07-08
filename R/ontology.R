@@ -149,7 +149,7 @@ eml_adcad_annotation <- function(valueLabel){
 #' @return list - a formatted EML annotation
 #' @export
 #'
-#' @examples eml_arcrc_key_variable_annotation("surface temperature")
+#' @examples eml_arcrc_key_variable_annotation("age of sea ice")
 eml_arcrc_key_variable_annotation <- function(valueLabel) {
 
   arcrc <- read_ontology("ARCRC")
