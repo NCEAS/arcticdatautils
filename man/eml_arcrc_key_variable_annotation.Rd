@@ -17,5 +17,5 @@ list - a formatted EML annotation
 Reduces the amount of copy pasting needed
 }
 \examples{
-eml_arcrc_key_variable_annotation("surface temperature")
+eml_arcrc_key_variable_annotation("age of sea ice")
 }
