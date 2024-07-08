@@ -28,7 +28,6 @@ Imports:
     dplyr,
     digest,
     EML (>= 2.0),
-    filelock,
     httr,
     jsonlite (>= 1.8.4),
     magrittr,
