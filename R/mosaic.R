@@ -181,7 +181,7 @@ mosaic_portal_filter <- function(class) {
     )
 
   df <- suppressMessages(rdflib::rdf_query(mosaic, query)) %>%
-    dplyr::arrange(label)
+    dplyr::arrange(.data$label)
 
   #for method/devices, filter the list based on existing annotations
   if (df_uri$Concept[1] == "https://purl.dataone.org/odo/MOSAIC_00000036") {

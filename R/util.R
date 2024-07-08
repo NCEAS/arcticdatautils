@@ -135,7 +135,7 @@ log_message <- function(message=NULL) {
 
 #' Check if an object exists on a Member Node
 #'
-#' This is a simple check for the HTTP status of a /meta/{PID} call on the
+#' This is a simple check for the HTTP status of a /meta/\{PID\} call on the
 #' provided Member Mode.
 #'
 #' @param node (MNode) The Member Node to query.
