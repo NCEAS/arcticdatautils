@@ -575,7 +575,8 @@ remove_public_read <- function(mn, pids) {
 #' @return (logical) Whether an object has public read access.
 #'
 #' @importFrom httr content
-#' @import dataone
+#' @importFrom dataone auth_get
+#' @importFrom dataone getErrorDescription
 #'
 #' @export
 #'
