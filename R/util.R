@@ -459,6 +459,7 @@ path_join <- function(path_parts=c("")) {
 #' @param pids (character) Vector of PIDs.
 #'
 #' @return (logical) Whether or not the object(s) are resource maps.
+#' @export
 #'
 #' @noRd
 is_resource_map <- function(node, pids) {
