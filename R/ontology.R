@@ -111,6 +111,7 @@ eml_ecso_annotation <- function(valueLabel){
 #' @export
 #'
 #' @examples eml_ecso_annotation("latitude coordinate")
+#' @importFrom rlang .data
 eml_adcad_annotation <- function(valueLabel){
 
   adcad <- read_ontology("ADCAD")
@@ -129,7 +130,7 @@ eml_adcad_annotation <- function(valueLabel){
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "theme",
