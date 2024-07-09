@@ -25,7 +25,10 @@ read_ontology <- function(ontology_name) {
     ann_url <- "https://data.bioontology.org/ontologies/ADCAD/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
     ont <- rdflib::rdf_parse(ann_url,
                              format = "rdfxml")
-
+  } else if (ontology_name == "ARCRC") {
+    ann_url <- "https://data.bioontology.org/ontologies/ARCRC/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
+    ont <- rdflib::rdf_parse(ann_url,
+                             format = "rdfxml")
   }
 
 }
@@ -69,6 +72,7 @@ get_ontology_concepts <- function(ontology){
 #' @export
 #'
 #' @examples eml_ecso_annotation("latitude coordinate")
+#' @importFrom rlang .data
 eml_ecso_annotation <- function(valueLabel){
 
   ecso <- read_ontology("ecso")
@@ -87,7 +91,7 @@ eml_ecso_annotation <- function(valueLabel){
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "contains measurements of type",
@@ -108,6 +112,7 @@ eml_ecso_annotation <- function(valueLabel){
 #' @export
 #'
 #' @examples eml_ecso_annotation("latitude coordinate")
+#' @importFrom rlang .data
 eml_adcad_annotation <- function(valueLabel){
 
   adcad <- read_ontology("ADCAD")
@@ -126,7 +131,7 @@ eml_adcad_annotation <- function(valueLabel){
 
   stopifnot(valueLabel %in% df$label)
 
-  annotations <- dplyr::filter(df, label == valueLabel)
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
 
   list(
     propertyURI = list(label = "theme",
@@ -136,3 +141,82 @@ eml_adcad_annotation <- function(valueLabel){
   )
 }
 
+#' Given a key variable from the Arctic Report Card (ARCRC) ontology, produce the corresponding annotation
+#'
+#' Reduces the amount of copy pasting needed
+#'
+#' @param valueLabel (character) One of the key variables found in
+#' [ARCRC](https://bioportal.bioontology.org/ontologies/ARCRC/?p=classes&conceptid=http%3A%2F%2Fpurl.dataone.org%2Fodo%2FARCRC_00000040)
+#'
+#' @return list - a formatted EML annotation
+#' @export
+#'
+#' @examples eml_arcrc_key_variable_annotation("age of sea ice")
+#' @importFrom rlang .data
+eml_arcrc_key_variable_annotation <- function(valueLabel) {
+
+  arcrc <- read_ontology("ARCRC")
+
+  query <-
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+   SELECT ?iri ?label
+   WHERE {
+     ?iri rdf:type <http://www.w3.org/2002/07/owl#Class> .
+     ?iri rdfs:label ?label .
+   }"
+
+  df <- suppressMessages(rdflib::rdf_query(arcrc, query))
+
+  stopifnot(valueLabel %in% df$label)
+
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
+
+  list(
+    propertyURI = list(label = "isAbout",
+                       propertyURI = "http://purl.obolibrary.org/obo/IAO_0000136"),
+    valueURI = list(label = annotations$label,
+                    valueURI = annotations$iri)
+  )
+}
+
+#' Given an essay topic from the Arctic Report Card (ARCRC) ontology, produce the corresponding annotation
+#'
+#' Reduces the amount of copy pasting needed
+#'
+#' @param valueLabel (character) One of the essay topics found in
+#' [ARCRC](https://bioportal.bioontology.org/ontologies/ARCRC/?p=classes&conceptid=http%3A%2F%2Fpurl.dataone.org%2Fodo%2FARCRC_00000510)
+#'
+#' @return list - a formatted EML annotation
+#' @export
+#'
+#' @examples eml_arcrc_essay_annotation("Sea Ice Indicator")
+#' @importFrom rlang .data
+eml_arcrc_essay_annotation <- function(valueLabel) {
+
+  arcrc <- read_ontology("ARCRC")
+
+  query <-
+    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+   SELECT ?iri ?label
+   WHERE {
+     ?iri rdf:type <http://www.w3.org/2002/07/owl#Class> .
+     ?iri rdfs:label ?label .
+   }"
+
+  df <- suppressMessages(rdflib::rdf_query(arcrc, query))
+
+  stopifnot(valueLabel %in% df$label)
+
+  annotations <- dplyr::filter(df, .data$label == valueLabel)
+
+  list(
+    propertyURI = list(label = "influenced",
+                       propertyURI = "http://www.w3.org/ns/prov#influenced"),
+    valueURI = list(label = annotations$label,
+                    valueURI = annotations$iri)
+  )
+}

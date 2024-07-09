@@ -15,7 +15,7 @@ object_exists(node, pids)
 (logical) Whether the object exists.
 }
 \description{
-This is a simple check for the HTTP status of a /meta/{PID} call on the
+This is a simple check for the HTTP status of a /meta/\{PID\} call on the
 provided Member Mode.
 }
 \examples{

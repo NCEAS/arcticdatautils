@@ -345,7 +345,7 @@ reorder_pids <- function(pid_list, doc){
 #' doc$dataset$project <- proj
 #'
 #' EML::eml_validate(doc)
-#'
+#' @importFrom utils tail
 eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 
   stopifnot(is.character(awards))
@@ -443,10 +443,12 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 extract_name <- function(x){
   lapply(x, function(x) {
     data.frame(
-      firstName = trimws(stringr::str_extract(x, "[A-Za-z]{2,}\\s[A-Z]?")),
-      lastName = trimws(gsub("^([A-Za-z]{2,})\\s[A-Z]?", "", x)),
-      stringsAsFactors = F)})
+      firstName = unlist(lapply(x, function(x){head(strsplit(x, split = " ")[[1]], 1)})),
+      lastName = unlist(lapply(x, function(x) {paste(tail(strsplit(x, split = " ")[[1]], -1), collapse = " ")}))
+    )
+  })
 }
+
 
 
 #' Get raster info from a file on disk
@@ -727,6 +729,49 @@ eml_add_distribution <- function(doc, identifier){
     doc$dataset$distribution$online$url <- list(url = paste0("http://arcticdata.io/catalog/view/", identifier),
                                                 `function` = "information")
   }
+
+  return(doc)
+}
+
+#' Add an Arctic Report Card annotation to a dataset
+#'
+#' Creates an annotation from the Arctic Report Card ontology
+#' [here](https://bioportal.bioontology.org/ontologies/ARCRC/?p=summary)
+#' and inserts the annotation into the EML document `doc` while retaining any existing
+#' annotations such as the sensitivity annotations or dataset categorization. For a
+#' list of available essay topics or key variables, see link above.
+#'
+#'
+#'
+#' @param doc (emld) An EML document
+#' @param property (character) One of two properties: "isAbout" for key variables or "influenced" for essay topics
+#' @param label (character) One or more labels in title case from the ADCAD ontology.
+#'
+#' @return doc (emld) An EML document with annotation added
+#' @export
+#' @examples
+#' library(EML)
+#' # read in any EML document
+#' doc <- read_eml(system.file("extdata/strix-pacific-northwest.xml", package="dataone"))
+#' # add the dataset categories
+#' doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness", "sea surface temperature"))
+#'
+eml_arcrc_add_annotation <- function(doc, property, label){
+
+  stopifnot("emld" %in% class(doc))
+  existing_anns <- doc$dataset$annotation
+
+  if (is.null(doc$dataset$id)){
+    doc$dataset$id <- gsub(":", "-", doc$packageId)
+  }
+
+  if (property == "isAbout") {
+    new_ann <- purrr::map(label, eml_arcrc_key_variable_annotation)
+  } else if (property == "influenced") {
+    new_ann <- purrr::map(label, eml_arcrc_essay_annotation)
+  }
+
+  doc$dataset$annotation <- c(list(existing_anns), new_ann)
 
   return(doc)
 }

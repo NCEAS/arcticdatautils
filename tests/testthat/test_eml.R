@@ -421,3 +421,73 @@ test_that('Distribution info can be added', {
 
 
 })
+
+test_that('Datasets can have ARCRC essay annotations added', {
+
+  # two key variables
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness", "sea surface temperature"))
+
+  expect_true(eml_validate(doc))
+  expect_true("sea ice thickness" %in% eml_get_simple(doc$dataset$annotation, "label"))
+  expect_true("sea surface temperature" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # one key variable
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness"))
+
+  expect_true(eml_validate(doc))
+  expect_true("sea ice thickness" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # one key variable without list
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", "sea ice thickness") # change here to no list
+
+  expect_true(eml_validate(doc))
+  expect_true("sea ice thickness" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # two essay topics
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_arcrc_add_annotation(doc, "influenced", c("Greenland Ice Sheet Indicator", "Sea Ice Indicator"))
+
+  expect_true(eml_validate(doc))
+  expect_true("Greenland Ice Sheet Indicator" %in% eml_get_simple(doc$dataset$annotation, "label"))
+  expect_true("Sea Ice Indicator" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # one essay topic
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA27D2Q84F")
+
+  doc <- eml_arcrc_add_annotation(doc, "influenced", "Sea Ice Indicator")
+
+  expect_true(eml_validate(doc))
+  expect_true("Sea Ice Indicator" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # no previous annotations with one
+
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA2PV6B79W")
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness"))
+
+  expect_true(eml_validate(doc))
+
+  # no previous annotations with one
+
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA2PV6B79W")
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", "sea ice thickness")
+
+  expect_true(eml_validate(doc))
+  expect_true("sea ice thickness" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+  # no previous annotations with one
+
+  doc <- read_eml("https://arcticdata.io/metacat/d1/mn/v2/object/doi%3A10.18739%2FA2PV6B79W")
+  doc <- eml_arcrc_add_annotation(doc, "isAbout", c("sea ice thickness", "sea surface temperature"))
+
+  expect_true(eml_validate(doc))
+  expect_true("sea ice thickness" %in% eml_get_simple(doc$dataset$annotation, "label"))
+  expect_true("sea surface temperature" %in% eml_get_simple(doc$dataset$annotation, "label"))
+
+})

@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples mosaic_annotate_attribute("PS122/2_14-270")
+#' @importFrom rlang .data
 mosaic_annotate_attribute <- function(eventLabel) {
   # get the owl file from github
   mosaic <- read_ontology("mosaic")
@@ -31,7 +32,7 @@ mosaic_annotate_attribute <- function(eventLabel) {
   stopifnot(eventLabel %in% events$label)
 
   event_device_iri <- events %>%
-    dplyr::filter(label == eventLabel)
+    dplyr::filter(.data$label == eventLabel)
 
   #construct the annotation
   event_annotation <- list(
@@ -70,6 +71,7 @@ mosaic_annotate_attribute <- function(eventLabel) {
 #'
 #' #multiple campaigns
 #' mosaic_annotate_dataset(c("PS122/2", "PS122/1"))
+#' @importFrom rlang .data
 mosaic_annotate_dataset <- function(campaign) {
   check_ps <-
     purrr::map(campaign, ~ stringr::str_detect(.x, "PS", negate = T))
@@ -95,7 +97,7 @@ mosaic_annotate_dataset <- function(campaign) {
 
   stopifnot(campaign %in% df_campaign$label)
 
-  campaign_iri <- dplyr::filter(df_campaign, label %in% campaign)
+  campaign_iri <- dplyr::filter(df_campaign, .data$label %in% campaign)
 
   construct_campaign <- function(label, uri) {
     # Campaign
@@ -153,6 +155,7 @@ query_class <-
 #' mosaic_portal_filter("Basis")
 #'
 #' mosaic_portal_filter("Campaign")
+#' @importFrom rlang .data
 mosaic_portal_filter <- function(class) {
 
   #find the class IRI
@@ -160,7 +163,7 @@ mosaic_portal_filter <- function(class) {
 
   concepts <- get_ontology_concepts(mosaic)
 
-  df_uri <- dplyr::filter(concepts, label == class)
+  df_uri <- dplyr::filter(concepts, .data$label == class)
 
   #build the SPARQL query
   query <-
@@ -178,7 +181,7 @@ mosaic_portal_filter <- function(class) {
     )
 
   df <- suppressMessages(rdflib::rdf_query(mosaic, query)) %>%
-    dplyr::arrange(label)
+    dplyr::arrange(.data$label)
 
   #for method/devices, filter the list based on existing annotations
   if (df_uri$Concept[1] == "https://purl.dataone.org/odo/MOSAIC_00000036") {
@@ -204,7 +207,7 @@ mosaic_portal_filter <- function(class) {
     relevant <- unique(unlist(result$sem_annotation))
 
     df <- df %>%
-      dplyr::filter(iri %in% relevant)
+      dplyr::filter(.data$iri %in% relevant)
 
   }
 
