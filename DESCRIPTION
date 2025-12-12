@@ -40,6 +40,7 @@ Imports:
     xml2,
     XML,
     lifecycle,
+    raster,
     rdflib,
     pins,
     rlang
@@ -51,13 +52,12 @@ Suggests:
     ncdf4,
     RCurl,
     purrr,
-    raster,
     rmarkdown,
     sf,
     testthat (>= 3.0.0),
     xslt,
     yaml
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

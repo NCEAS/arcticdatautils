@@ -2,9 +2,35 @@
 % Please edit documentation in R/arcticdatautils.R
 \docType{package}
 \name{arcticdatautils}
+\alias{arcticdatautils-package}
 \alias{arcticdatautils}
 \title{arcticdatautils: Utilities for the Arctic Data Center}
 \description{
 This package contains code for doing lots of useful stuff that's too specific for the
 dataone package, primarily functions that streamline Arctic Data Center operations.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://nceas.github.io/arcticdatautils/}
+  \item Report bugs at \url{https://github.com/NCEAS/arcticdatautils/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Bryce Mecum \email{mecum@nceas.ucsb.edu}
+
+Other contributors:
+\itemize{
+  \item Matt Jones \email{jones@nceas.ucsb.edu} [contributor]
+  \item Jesse Goldstein \email{jgoldstein@nceas.ucsb.edu} (Maintainer) [contributor]
+  \item Jeanette Clark \email{jclark@nceas.ucsb.edu} (Maintainer) [contributor]
+  \item Dominic Mullen \email{dmullen17@gmail.com} [contributor]
+  \item Emily O'Dean \email{eodean10@gmail.com} [contributor]
+  \item Robyn Thiessen-Bock \email{robyn.thiessenbock@gmail.com} [contributor]
+  \item Derek Strong \email{dstrong@nceas.ucsb.edu} [contributor]
+  \item Rachel Sun \email{rachelsun@ucsb.edu} [contributor]
+  \item Jasmine Lai \email{jasminelai@nceas.ucsb.edu} [contributor]
+}
+
 }

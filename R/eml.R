@@ -469,7 +469,7 @@ extract_name <- function(x){
 #' @param coord_name (char) horizCoordSysDef name
 #' @param attributes (dataTable) attributes for raster
 #'
-#'
+#' @import raster
 #' @export
 eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
 
