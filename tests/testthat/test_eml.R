@@ -1,5 +1,3 @@
-context("EML")
-
 mn <- env_load()$mn
 
 test_that("a dataTable and otherEntity can be added from a pid", {
