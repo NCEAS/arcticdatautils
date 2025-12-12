@@ -444,12 +444,18 @@ extract_name <- function(x){
   lapply(x, function(x) {
     data.frame(
       firstName = unlist(lapply(x, function(x){head(strsplit(x, split = " ")[[1]], 1)})),
-      lastName = unlist(lapply(x, function(x) {paste(tail(strsplit(x, split = " ")[[1]], -1), collapse = " ")}))
+      lastName = unlist(lapply(x, function(x) {
+          paste(
+            head(
+              tail(
+                strsplit(x, split = " ")[[1]],
+                -1),
+              -1),
+            collapse = " ")
+        }))
     )
   })
 }
-
-
 
 #' Get raster info from a file on disk
 #'
