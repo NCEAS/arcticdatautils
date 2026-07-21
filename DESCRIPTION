@@ -34,6 +34,7 @@ Imports:
     magrittr,
     methods,
     filelock,
+    raster,
     stringr,
     stringi,
     tools,
