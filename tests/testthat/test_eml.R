@@ -1,5 +1,3 @@
-context("EML")
-
 mn <- env_load()$mn
 
 test_that("a dataTable and otherEntity can be added from a pid", {
@@ -272,9 +270,12 @@ test_that('eml_nsf_to_project generates a valid project section', {
 
 test_that('eml_nsf_to_project handles bad funding numbers gracefully', {
 
-  awards <- c("abcdef", "1203473", "12345")
+  awards <- c("1203473", "12345")
 
-  expect_warning(proj <- eml_nsf_to_project(awards), "this award will not be included in the project section")
+  # test to be sure that missing award numbers generates warning
+  expect_warning(proj <- eml_nsf_to_project(awards), class="warning")
+  # test to be sure that a list with no valid award number generates error
+  expect_error(expect_warning(proj <- eml_nsf_to_project(c("abcdef"))))
 
   me <- list(individualName = list(givenName = "Jeanette", surName = "Clark"))
 
