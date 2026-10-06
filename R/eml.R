@@ -438,21 +438,47 @@ eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 
 # Extract first and last name from NSF API results
 #
-# The NSF API jams the first name, last name, and middle initial if it exists into a single string.
+# The NSF API jams the first name, last name, middle initial, and email if it exists into a single string.
 # This simple helper uses some regex to split the names up.
 extract_name <- function(x){
   lapply(x, function(x) {
+    email_pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    name_without_email <- lapply(x, function(x) {
+      split_name <- strsplit(x, split = " ")[[1]]
+      if (grepl(email_pattern, tail(split_name, 1))) {
+        split_name <- head(split_name, -1)
+      }
+      if (grepl(c("(Former)"), tail(split_name, 1))) {
+        split_name <- head(split_name, -1)
+      }
+      if (grepl(c("(former)"), tail(split_name, 1))) {
+        split_name <- head(split_name, -1)
+      }
+      name_without_email <- paste(split_name, collapse = " ")
+    })
     data.frame(
-      firstName = unlist(lapply(x, function(x){head(strsplit(x, split = " ")[[1]], 1)})),
-      lastName = unlist(lapply(x, function(x) {
-          paste(
-            head(
-              tail(
-                strsplit(x, split = " ")[[1]],
-                -1),
-              -1),
-            collapse = " ")
-        }))
+      firstName = unlist(lapply(name_without_email, function(full_names) {
+        # Standardize spacing and punctuation
+        cleaned <- humaniformat::format_period(full_names)
+
+        first  <- humaniformat::first_name(cleaned)
+        middle <- humaniformat::middle_name(cleaned)
+
+        # Combine first and middle names, handling NA values safely
+        given <- ifelse(is.na(middle) | middle == "", first, paste(first, middle))
+        return(given)
+      })),
+      lastName = unlist(lapply(name_without_email, function(full_names) {
+        # Standardize spacing and punctuation
+        cleaned <- humaniformat::format_period(full_names)
+
+        last   <- humaniformat::last_name(cleaned)
+        suffix <- humaniformat::suffix(cleaned)
+
+        # Combine last name and suffix (e.g., Jr.), handling NA values safely
+        surname <- ifelse(is.na(suffix) | suffix == "", last, paste(last, suffix))
+        return(surname)
+      }))
     )
   })
 }
