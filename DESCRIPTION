@@ -29,25 +29,25 @@ Imports:
     dplyr,
     digest,
     EML (>= 2.0),
+    filelock,
     httr,
+    humaniformat,
     jsonlite (>= 1.8.4),
+    lifecycle,
     magrittr,
     methods,
-    filelock,
+    pins,
     raster,
+    rdflib,
+    rlang,
     stringr,
     stringi,
     tools,
     uuid,
     xml2,
-    XML,
-    lifecycle,
-    rdflib,
-    pins,
-    rlang
+    XML
 Suggests:
     emld,
-    humaniformat,
     knitr,
     lubridate,
     ncdf4,
@@ -58,7 +58,7 @@ Suggests:
     testthat (>= 3.0.0),
     xslt,
     yaml
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0

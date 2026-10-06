@@ -77,20 +77,21 @@ import(EML)
 import(XML)
 import(dataone)
 import(datapack)
-import(raster)
 importFrom(httr,content)
 importFrom(magrittr,'%>%')
-importFrom(methods,"slot<-")
-importFrom(methods,as)
-importFrom(methods,is)
-importFrom(methods,new)
-importFrom(methods,slot)
+importFrom(methods,
+  "slot<-",
+  as,
+  is,
+  new,
+  slot
+)
 importFrom(rlang,.data)
 importFrom(stats,na.omit)
-importFrom(utils,URLencode)
-importFrom(utils,head)
-importFrom(utils,read.csv)
-importFrom(utils,read.delim)
-importFrom(utils,setTxtProgressBar)
-importFrom(utils,tail)
-importFrom(utils,txtProgressBar)
+importFrom(utils,
+  URLencode,
+  read.csv,
+  read.delim,
+  setTxtProgressBar,
+  txtProgressBar
+)

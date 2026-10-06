@@ -345,7 +345,6 @@ reorder_pids <- function(pid_list, doc){
 #' doc$dataset$project <- proj
 #'
 #' EML::eml_validate(doc)
-#' @importFrom utils tail
 eml_nsf_to_project <- function(awards, eml_version = "2.2"){
 
   stopifnot(is.character(awards))
@@ -445,14 +444,14 @@ extract_name <- function(x){
     email_pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
     name_without_email <- lapply(x, function(x) {
       split_name <- strsplit(x, split = " ")[[1]]
-      if (grepl(email_pattern, tail(split_name, 1))) {
-        split_name <- head(split_name, -1)
+      if (grepl(email_pattern, utils::tail(split_name, 1))) {
+        split_name <- utils::head(split_name, -1)
       }
-      if (grepl(c("(Former)"), tail(split_name, 1))) {
-        split_name <- head(split_name, -1)
+      if (grepl(c("(Former)"), utils::tail(split_name, 1))) {
+        split_name <- utils::head(split_name, -1)
       }
-      if (grepl(c("(former)"), tail(split_name, 1))) {
-        split_name <- head(split_name, -1)
+      if (grepl(c("(former)"), utils::tail(split_name, 1))) {
+        split_name <- utils::head(split_name, -1)
       }
       name_without_email <- paste(split_name, collapse = " ")
     })
@@ -495,7 +494,6 @@ extract_name <- function(x){
 #' @param coord_name (char) horizCoordSysDef name
 #' @param attributes (dataTable) attributes for raster
 #'
-#' @import raster
 #' @export
 eml_get_raster_metadata <- function(path, coord_name = NULL, attributes){
 
