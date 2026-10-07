@@ -1,5 +1,3 @@
-context("Helpers for the dataone package")
-
 node <- env_load()$mn
 
 test_that("permissions can be checked", {

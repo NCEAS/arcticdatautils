@@ -1,5 +1,3 @@
-context("Editing and managing data packages")
-
 mn <- env_load()$mn
 
 test_that("we can publish an update", {

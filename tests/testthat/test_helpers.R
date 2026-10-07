@@ -1,5 +1,3 @@
-context("Helpers")
-
 mn <- env_load()$mn
 
 test_that("a dummy package can be created", {
