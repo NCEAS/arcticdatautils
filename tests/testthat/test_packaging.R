@@ -1,5 +1,3 @@
-context("Packaging")
-
 test_that("child pids are correctly determined", {
   inventory <- data.frame(pid = c("A", "B", "C"),
                           package = c("PA", "PB", "PC"),

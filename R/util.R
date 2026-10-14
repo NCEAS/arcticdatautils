@@ -91,7 +91,7 @@ show_random_dataset <- function(inventory, theme=NULL, n=10) {
   cat(paste0("Theme: ", theme, "\n"))
   cat(paste0("nfiles: ", length(files), "\n"))
   cat(paste0("Base dir: ", base_dir, "\n"))
-  print(head(files, n = n))
+  print(utils::head(files, n = n))
   if (length(files) > n) { cat(paste0("...and ", length(files) - n, " more files.\n")) }
 }
 
@@ -1007,7 +1007,7 @@ set_public_read_all_versions <- function(mn, resource_map_pid) {
   stopifnot(is(mn, 'MNode'))
   stopifnot(is_token_set(mn))
   stopifnot(is.character(resource_map_pid))
-  stopifnot(arcticdatautils:::is_resource_map(mn, resource_map_pid))
+  stopifnot(is_resource_map(mn, resource_map_pid))
 
   pids <- get_package(mn, resource_map_pid) %>%
     unlist()

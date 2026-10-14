@@ -1,5 +1,3 @@
-context("Environment")
-
 test_that("can load a simple environment file", {
   x <- yaml::yaml.load_file(system.file("./environment.yml", package = "arcticdatautils"))
 

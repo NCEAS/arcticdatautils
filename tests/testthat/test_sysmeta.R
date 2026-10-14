@@ -1,5 +1,3 @@
-context("System metadata")
-
 test_that("the replication policy gets cleared", {
   library(datapack)
 

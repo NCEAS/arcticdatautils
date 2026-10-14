@@ -1,5 +1,3 @@
-context("Access rules")
-
 mn <- tryCatch(env_load()$mn, error = function(e) env_load()$mn)
 
 test_that("get_package works for a simple package", {

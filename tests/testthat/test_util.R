@@ -1,5 +1,3 @@
-context("Utilities")
-
 test_that("paths can be joined", {
   expect_equal(path_join(""), "")
   expect_equal(path_join(1), "1")

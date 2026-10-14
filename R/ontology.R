@@ -14,12 +14,12 @@ read_ontology <- function(ontology_name) {
   if(ontology_name == "mosaic"){
     ann_url <-
       "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/main/MOSAiC/MOSAiC.owl"
-    ont <- rdflib::rdf_parse(pins::pin(ann_url),
+    ont <- rdflib::rdf_parse(ann_url,
                                 format = "rdfxml")
   } else if(ontology_name == "ecso"){
     ann_url <-
       "https://raw.githubusercontent.com/DataONEorg/sem-prov-ontologies/ECSO8-add_non-carbon_measurements/observation/ECSO8.owl"
-    ont <- rdflib::rdf_parse(pins::pin(ann_url),
+    ont <- rdflib::rdf_parse(ann_url,
                                 format = "rdfxml")
   } else if (ontology_name == "ADCAD"){
     ann_url <- "https://data.bioontology.org/ontologies/ADCAD/download?apikey=8b5b7825-538d-40e0-9e9e-5ab9274a9aeb&download_format=rdf"
