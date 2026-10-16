@@ -17,9 +17,11 @@ The function only selects the annotations that are used for method/devices (ther
 copy and paste the output into a portal document's choice filters
 }
 \examples{
+\donttest{
 mosaic_portal_filter("Method/Device")
 
 mosaic_portal_filter("Basis")
 
 mosaic_portal_filter("Campaign")
+}
 }

@@ -150,11 +150,13 @@ query_class <-
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' mosaic_portal_filter("Method/Device")
 #'
 #' mosaic_portal_filter("Basis")
 #'
 #' mosaic_portal_filter("Campaign")
+#' }
 #' @importFrom rlang .data
 mosaic_portal_filter <- function(class) {
 
