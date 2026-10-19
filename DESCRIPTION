@@ -46,6 +46,7 @@ Imports:
     XML
 Suggests:
     emld,
+    httptest,
     knitr,
     lubridate,
     ncdf4,
